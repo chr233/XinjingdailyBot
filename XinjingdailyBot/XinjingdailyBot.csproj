@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="MySql.Data" Version="8.0.29" />
+		<PackageReference Include="NLog" Version="5.0.0" />
+		<PackageReference Include="SqlSugarCore" Version="5.0.8.6" />
+		<PackageReference Include="Telegram.Bot" Version="17.0.0" />
+		<PackageReference Include="Telegram.Bot.Extensions.Polling" Version="1.0.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Localization\Static.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Static.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Localization\Static.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Static.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Handlers\Queues\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="NLog.config">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
+</Project>

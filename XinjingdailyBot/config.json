@@ -1,0 +1,15 @@
+﻿{
+  "Debug": false,
+  "LogLevel": 0,
+  "BotToken": "",
+  "Proxy": "",
+  "DBHost": "127.0.0.1",
+  "DBPort": 3306,
+  "DBName": "xjb_db",
+  "DBUser": "root",
+  "DBPassword": "123456",
+  "SuperAdmins": [],
+  "ReviewGroup": "",
+  "AcceptChannel": "",
+  "RejectChannel": ""
+}
