@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace XinjingdailyBot.Enums
+﻿namespace XinjingdailyBot.Enums
 {
     /// <summary>
     /// 拒稿原因
@@ -12,9 +6,9 @@ namespace XinjingdailyBot.Enums
     internal enum RejectReason : byte
     {
         /// <summary>
-        /// 未知
+        /// 未拒绝
         /// </summary>
-        Unknown = 0,
+        NotReject = 0,
         /// <summary>
         /// 图片模糊
         /// </summary>
@@ -32,12 +26,12 @@ namespace XinjingdailyBot.Enums
         /// </summary>
         Deny,
         /// <summary>
+        /// 其他原因
+        /// </summary>
+        Other,
+        /// <summary>
         /// 审核超时,自动拒稿
         /// </summary>
         AutoReject,
-        /// <summary>
-        /// 已接受
-        /// </summary>
-        Accepted = byte.MaxValue
     }
 }

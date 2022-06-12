@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using XinjingdailyBot.Storage;
-using XinjingdailyBot.Localization;
 using XinjingdailyBot.Converters;
+using XinjingdailyBot.Storage;
+using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Helpers
 {
@@ -79,7 +75,7 @@ namespace XinjingdailyBot.Helpers
                 }
                 catch (Exception ex)
                 {
-
+                    Logger.Error(ex);
                 }
             }
             else

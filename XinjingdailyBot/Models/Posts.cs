@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SqlSugar;
+﻿using SqlSugar;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Enums;
 
@@ -15,32 +10,33 @@ namespace XinjingdailyBot.Models
     [SugarIndex("index_action_mid", nameof(ActionMsgID), OrderByType.Asc)]
     [SugarIndex("index_review_mid", nameof(ReviewMsgID), OrderByType.Asc)]
     [SugarIndex("index_manage_mid", nameof(ManageMsgID), OrderByType.Asc)]
-    [SugarIndex("index_posterid", nameof(PosterID), OrderByType.Asc)]
-    [SugarIndex("index_reviewerid", nameof(ReviewerID), OrderByType.Asc)]
+    [SugarIndex("index_media_group_id", nameof(MediaGroupID), OrderByType.Asc)]
+    [SugarIndex("index_posterid", nameof(PosterUID), OrderByType.Asc)]
+    [SugarIndex("index_reviewerid", nameof(ReviewerUID), OrderByType.Asc)]
     internal sealed class Posts
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
-        public ulong Id { get; set; }
+        public long Id { get; set; }
         /// <summary>
         /// 原始消息会话ID
         /// </summary>
-        public ulong OriginChatID { get; set; }
+        public long OriginChatID { get; set; } = -1;
         /// <summary>
         /// 原始消息ID
         /// </summary>
-        public ulong OriginMsgID { get; set; }
+        public long OriginMsgID { get; set; } = -1;
         /// <summary>
         /// 投稿控制消息ID
         /// </summary>
-        public ulong ActionMsgID { get; set; }
+        public long ActionMsgID { get; set; } = -1;
         /// <summary>
         /// 审核群消息ID
         /// </summary>
-        public ulong ReviewMsgID { get; set; }
+        public long ReviewMsgID { get; set; } = -1;
         /// <summary>
         /// 审核群控制消息ID
         /// </summary>
-        public ulong ManageMsgID { get; set; }
+        public long ManageMsgID { get; set; } = -1;
         /// <summary>
         /// 匿名投稿
         /// </summary>
@@ -58,16 +54,17 @@ namespace XinjingdailyBot.Models
         /// <summary>
         /// 是否为频道转发
         /// </summary>
-        public bool IsFromChannel => !string.IsNullOrEmpty(ChannelID);
+        [SugarColumn(IsIgnore = true)]
+        public bool IsFromChannel => !string.IsNullOrEmpty(ChannelName);
 
         /// <summary>
         /// 来源频道ID
         /// </summary>
-        public string ChannelID { get; set; } = "";
+        public string ChannelName { get; set; } = "";
         /// <summary>
         /// 来源频道名称
         /// </summary>
-        public string ChannelName { get; set; } = "";
+        public string ChannelTitle { get; set; } = "";
         /// <summary>
         /// 投稿状态
         /// </summary>
@@ -79,33 +76,38 @@ namespace XinjingdailyBot.Models
         /// <summary>
         /// 是否为媒体组消息
         /// </summary>
-        public bool IsMediaGroup { get; set; }
+        [SugarColumn(IsIgnore = true)]
+        public bool IsMediaGroup => !string.IsNullOrEmpty(MediaGroupID);
+        /// <summary>
+        /// 媒体组ID
+        /// </summary>
+        public string MediaGroupID { get; set; } = "";
         /// <summary>
         /// 标签
         /// </summary>
-        public byte Tags { get; set; }
+        public BuildInTags Tags { get; set; }
         /// <summary>
         /// 拒绝原因(如果拒绝)
         /// </summary>
-        public RejectReason Reason { get; set; } = RejectReason.Unknown;
+        public RejectReason Reason { get; set; } = RejectReason.NotReject;
         /// <summary>
         /// 创建时间
         /// </summary>
-        public DateTime CreateAt { get; set; }
+        public DateTime CreateAt { get; set; } = DateTime.Now;
         /// <summary>
         /// 修改时间
         /// </summary>
-        public DateTime ModifyAt { get; set; }
+        public DateTime ModifyAt { get; set; } = DateTime.Now;
         /// <summary>
         /// 投稿人用户ID
         /// </summary>
-        public ulong PosterID { get; set; }
+        public long PosterUID { get; set; } = -1;
         /// <summary>
-        /// 审核人ID
+        /// 审核人用户ID
         /// </summary>
-        public ulong ReviewerID { get; set; }
+        public long ReviewerUID { get; set; } = -1;
 
-        [Navigate(NavigateType.OneToMany, nameof(Models.Attachments.PostID))]
+        [Navigate(NavigateType.OneToMany, nameof(Models.Attachments.MediaGroupID))]
         public List<Attachments>? Attachments { get; set; }
     }
 }

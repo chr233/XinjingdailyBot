@@ -1,7 +1,4 @@
-﻿using XinjingdailyBot.Storage;
-using XinjingdailyBot.Helpers;
-
-namespace XinjingdailyBot
+﻿namespace XinjingdailyBot
 {
     internal static class SharedInfo
     {

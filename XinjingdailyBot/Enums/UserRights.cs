@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace XinjingdailyBot.Enums
+﻿namespace XinjingdailyBot.Enums
 {
     [Flags]
     internal enum UserRights : byte
     {
+        None = 0x00,
         /// <summary>
         /// 投稿
         /// </summary>

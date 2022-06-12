@@ -4,12 +4,20 @@
     internal enum BuildInTags : byte
     {
         /// <summary>
+        /// 无
+        /// </summary>
+        None = 0,
+        /// <summary>
         /// NSFW
         /// </summary>
-        NSFW = 0x01,
+        NSFW = 1,
         /// <summary>
         /// 我有一个朋友
         /// </summary>
-        Friend = 0x02,
+        Friend = 2,
+        /// <summary>
+        /// 晚安
+        /// </summary>
+        WanAn = 4,
     }
 }

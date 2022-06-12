@@ -8,6 +8,14 @@
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <LangVersion>10.0</LangVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <LangVersion>10.0</LangVersion>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<PackageReference Include="MySql.Data" Version="8.0.29" />
 		<PackageReference Include="NLog" Version="5.0.0" />
@@ -17,25 +25,24 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Localization\Static.Designer.cs">
+	  <Compile Update="Localization\Emoji.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
-	    <DependentUpon>Static.resx</DependentUpon>
+	    <DependentUpon>Emoji.resx</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Update="Localization\Static.resx">
+	  <EmbeddedResource Update="Localization\Emoji.resx">
 	    <Generator>ResXFileCodeGenerator</Generator>
-	    <LastGenOutput>Static.Designer.cs</LastGenOutput>
+	    <LastGenOutput>Emoji.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Handlers\Queues\" />
-	</ItemGroup>
-
-	<ItemGroup>
+	  <None Update="config.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	  <None Update="NLog.config">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>

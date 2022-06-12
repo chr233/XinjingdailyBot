@@ -22,14 +22,14 @@ namespace XinjingdailyBot.Localization {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Static {
+    internal class Emoji {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Static() {
+        internal Emoji() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace XinjingdailyBot.Localization {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("XinjingdailyBot.Localization.Static", typeof(Static).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("XinjingdailyBot.Localization.Emoji", typeof(Emoji).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,11 +61,65 @@ namespace XinjingdailyBot.Localization {
         }
         
         /// <summary>
-        ///   查找类似 config.json 的本地化字符串。
+        ///   查找类似 ↩️ 的本地化字符串。
         /// </summary>
-        internal static string ConfigFileName {
+        internal static string Back {
             get {
-                return ResourceManager.GetString("ConfigFileName", resourceCulture);
+                return ResourceManager.GetString("Back", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 🔷 的本地化字符串。
+        /// </summary>
+        internal static string Blue {
+            get {
+                return ResourceManager.GetString("Blue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 👻 的本地化字符串。
+        /// </summary>
+        internal static string Ghost {
+            get {
+                return ResourceManager.GetString("Ghost", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 ❌ 的本地化字符串。
+        /// </summary>
+        internal static string No {
+            get {
+                return ResourceManager.GetString("No", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 🔶 的本地化字符串。
+        /// </summary>
+        internal static string Orange {
+            get {
+                return ResourceManager.GetString("Orange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 🤔 的本地化字符串。
+        /// </summary>
+        internal static string Thinking {
+            get {
+                return ResourceManager.GetString("Thinking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 ✅ 的本地化字符串。
+        /// </summary>
+        internal static string Yes {
+            get {
+                return ResourceManager.GetString("Yes", resourceCulture);
             }
         }
     }

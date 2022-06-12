@@ -1,23 +1,20 @@
 ﻿using SqlSugar;
+using XinjingdailyBot.Enums;
 
 namespace XinjingdailyBot.Models
 {
-    [SugarTable("level", TableDescription = "等级组")]
-    internal sealed class Levels
+    [SugarTable("group", TableDescription = "用户组")]
+    internal sealed class Groups
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
         /// <summary>
-        /// 等级名称
+        /// 权限名
         /// </summary>
         public string Name { get; set; } = "";
         /// <summary>
-        /// 最小经验
+        /// 默认权限
         /// </summary>
-        public ulong MinExp { get; set; }
-        /// <summary>
-        /// 最高经验
-        /// </summary>
-        public ulong MaxExp { get; set; }
+        public UserRights DefaultRight { get; set; } = UserRights.None;
     }
 }
