@@ -20,7 +20,7 @@
         /// <summary>
         /// 代理
         /// </summary>
-        public string Proxy { get; set; } = "";
+        public string? Proxy { get; set; } 
 
         /// <summary>
         /// 数据库设定

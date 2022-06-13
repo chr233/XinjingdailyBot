@@ -32,6 +32,10 @@ namespace XinjingdailyBot.Models
         /// </summary>
         public bool PerferAnymouse { get; set; }
         /// <summary>
+        /// 是否开启通知
+        /// </summary>
+        public bool Notification { get; set; } = true;
+        /// <summary>
         /// 通过的稿件数量
         /// </summary>
         public int AcceptCount { get; set; }

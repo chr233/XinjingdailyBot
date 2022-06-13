@@ -61,6 +61,8 @@ namespace XinjingdailyBot.Handlers
 
         internal static async Task BotOnMessageReceived(ITelegramBotClient botClient, Users dbUser, Message message)
         {
+            Logger.Debug($"M {message.Type} {dbUser}");
+
             bool isMediaGroup = message.MediaGroupId != null;
             bool isPrivateChat = message.Chat.Type == ChatType.Private;
 
@@ -88,13 +90,18 @@ namespace XinjingdailyBot.Handlers
                     await Messages.PostHandler.HandleMediaPosts(botClient, dbUser, message);
                     break;
                 default:
-                    await botClient.AutoReplyAsync("未处理的消息", message);
+                    if (isPrivateChat)
+                    {
+                        await botClient.AutoReplyAsync("未处理的消息", message);
+                    }
                     break;
             }
         }
 
         private static async Task BotOnCallbackQueryReceived(ITelegramBotClient botClient, Users dbUser, CallbackQuery callbackQuery)
         {
+            Logger.Debug($"Q {callbackQuery.Data} {dbUser}");
+
             string? data = callbackQuery.Data;
             Message? message = callbackQuery.Message;
             if (string.IsNullOrEmpty(data) || message == null)
@@ -114,7 +121,7 @@ namespace XinjingdailyBot.Handlers
 
                 case "revi":
                 case "reje":
-                    await Queries.ReviewHandler.HandleQuery();
+                    await Queries.ReviewHandler.HandleQuery(botClient, dbUser, callbackQuery);
                     break;
             }
         }

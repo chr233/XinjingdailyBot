@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using System.Net;
+using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Helpers;
@@ -20,7 +21,28 @@ namespace XinjingdailyBot
             ThreadPool.SetMinThreads(1, 1);
             ThreadPool.SetMaxThreads(10, 10);
 
-            var bot = new TelegramBotClient(BotConfig.BotToken);
+            TelegramBotClient bot;
+
+            if (!string.IsNullOrEmpty(BotConfig.Proxy))
+            {
+                WebProxy proxy = new()
+                {
+                    Address = new Uri(BotConfig.Proxy),
+                };
+
+                HttpClientHandler handler = new()
+                {
+                    Proxy = proxy
+                };
+
+                HttpClient httpClient = new(handler);
+
+                bot = new TelegramBotClient(BotConfig.BotToken, httpClient);
+            }
+            else
+            {
+                bot = new TelegramBotClient(BotConfig.BotToken);
+            }
 
             BotID = bot.BotId ?? 0;
 

@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections.Concurrent;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -11,45 +11,7 @@ namespace XinjingdailyBot.Handlers.Messages
 {
     internal sealed class PostHandler
     {
-        public static string PureText(string? text)
-        {
-            if (string.IsNullOrEmpty(text))
-            {
-                return "";
-            }
-
-            text = Regex.Replace(text, @"(^#\S+)|(\s#\S+)", "");
-
-            string[] parts = text.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
-
-            return string.Join('\n', parts);
-        }
-
-        public static BuildInTags FetchTags(string? text)
-        {
-            if (string.IsNullOrEmpty(text))
-            {
-                return BuildInTags.None;
-            }
-
-            BuildInTags tags = BuildInTags.None;
-
-            if (text.Contains("NSFW", StringComparison.InvariantCultureIgnoreCase))
-            {
-                tags |= BuildInTags.NSFW;
-            }
-            if (text.Contains("朋友", StringComparison.InvariantCultureIgnoreCase) || text.Contains("英雄", StringComparison.InvariantCultureIgnoreCase))
-            {
-                tags |= BuildInTags.Friend;
-            }
-            if (text.Contains("晚安", StringComparison.InvariantCultureIgnoreCase))
-            {
-                tags |= BuildInTags.WanAn | BuildInTags.NSFW;
-            }
-            return tags;
-        }
-
-        public static async Task HandleTextPosts(ITelegramBotClient botClient, Users dbUser, Message message)
+        internal static async Task HandleTextPosts(ITelegramBotClient botClient, Users dbUser, Message message)
         {
             if (!dbUser.Right.HasFlag(UserRights.SendPost))
             {
@@ -63,8 +25,8 @@ namespace XinjingdailyBot.Handlers.Messages
                 channelTitle = message.ForwardFromChat.Title;
             }
 
-            BuildInTags tags = FetchTags(message.Text);
-            string text = PureText(message.Text);
+            BuildInTags tags = TextHelper.FetchTags(message.Text);
+            string text = TextHelper.PureText(message.Text);
 
             bool anymouse = dbUser.PerferAnymouse;
 
@@ -91,90 +53,12 @@ namespace XinjingdailyBot.Handlers.Messages
             await DB.Insertable(post).ExecuteCommandAsync();
         }
 
-        private static Attachments? GenerateAttachment(Message message)
-        {
-            string? fileID, fileName, FileUid, mimeType;
-            int size, height, width;
-
-            switch (message.Type)
-            {
-                case MessageType.Photo:
-                    {
-                        var x = message.Photo!.Last();
-                        fileID = x.FileId;
-                        fileName = "";
-                        FileUid = x.FileUniqueId;
-                        mimeType = "";
-                        size = x.FileSize ?? 0;
-                        height = x.Height;
-                        width = x.Width;
-                    }
-                    break;
-                case MessageType.Audio:
-                    {
-                        var x = message.Audio!;
-                        fileID = x.FileId;
-                        fileName = x.FileName ?? "";
-                        FileUid = x.FileUniqueId;
-                        mimeType = x.MimeType ?? "";
-                        size = x.FileSize ?? 0;
-                        height = -1;
-                        width = -1;
-                    }
-                    break;
-
-                case MessageType.Video:
-                    {
-                        var x = message.Video!;
-                        fileID = x.FileId;
-                        fileName = x.FileName ?? "";
-                        FileUid = x.FileUniqueId;
-                        mimeType = x.MimeType ?? "";
-                        size = x.FileSize ?? 0;
-                        height = x.Height;
-                        width = x.Width;
-                    }
-                    break;
-                case MessageType.Document:
-                    {
-                        var x = message.Document!;
-                        fileID = x.FileId;
-                        fileName = x.FileName ?? "";
-                        FileUid = x.FileUniqueId;
-                        mimeType = x.MimeType ?? "";
-                        size = x.FileSize ?? 0;
-                        height = -1;
-                        width = -1;
-                    }
-                    break;
-
-                default:
-                    return null;
-            }
-
-            Attachments result = new()
-            {
-                MediaGroupID = message.MediaGroupId ?? "",
-                FileID = fileID,
-                FileName = fileName,
-                FileUniqueID = FileUid,
-                MimeType = mimeType,
-                Size = size,
-                Height = height,
-                Width = width,
-            };
-
-            return result;
-        }
-
-
-        public static async Task HandleMediaPosts(ITelegramBotClient botClient, Users dbUser, Message message)
+        internal static async Task HandleMediaPosts(ITelegramBotClient botClient, Users dbUser, Message message)
         {
             if (!dbUser.Right.HasFlag(UserRights.SendPost))
             {
                 await botClient.AutoReplyAsync("没有权限", message);
             }
-
 
             string? channelName = null, channelTitle = null;
             if (message.ForwardFromChat?.Type == ChatType.Channel)
@@ -183,15 +67,22 @@ namespace XinjingdailyBot.Handlers.Messages
                 channelTitle = message.ForwardFromChat.Title;
             }
 
-            BuildInTags tags = FetchTags(message.Caption);
-            string text = PureText(message.Caption);
+            BuildInTags tags = TextHelper.FetchTags(message.Caption);
+            string text = TextHelper.PureText(message.Caption);
+
+            bool anymouse = dbUser.PerferAnymouse;
+
+            //发送确认消息
+            var keyboard = MarkupHelper.PostKeyboard(anymouse);
+            Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, "真的要投稿吗?", replyToMessageId: message.MessageId, replyMarkup: keyboard);
 
             //存入数据库
             Posts textPost = new()
             {
                 OriginChatID = message.Chat.Id,
                 OriginMsgID = message.MessageId,
-                Anymouse = dbUser.PerferAnymouse,
+                ActionMsgID = msg.MessageId,
+                Anymouse = anymouse,
                 Text = text,
                 RawText = message.Text ?? "",
                 ChannelName = channelName ?? "",
@@ -204,21 +95,17 @@ namespace XinjingdailyBot.Handlers.Messages
 
             long postID = await DB.Insertable(textPost).ExecuteReturnBigIdentityAsync();
 
-            Attachments? attachment = GenerateAttachment(message);
+            Attachments? attachment = AttachmentHelpers.GenerateAttachment(message, postID);
 
             if (attachment != null)
             {
                 await DB.Insertable(attachment).ExecuteCommandAsync();
             }
-
-            //发送确认消息
-
-            await botClient.AutoReplyAsync("rwr", message);
         }
 
-        private static HashSet<string> MediaGroupIDs = new();
+        private static ConcurrentDictionary<string, long> MediaGroupIDs = new();
 
-        public static async Task HandleMediaGroupPosts(ITelegramBotClient botClient, Users dbUser, Message message)
+        internal static async Task HandleMediaGroupPosts(ITelegramBotClient botClient, Users dbUser, Message message)
         {
             if (!dbUser.Right.HasFlag(UserRights.SendPost))
             {
@@ -226,11 +113,11 @@ namespace XinjingdailyBot.Handlers.Messages
             }
 
             string mediaGroupId = message.MediaGroupId!;
-            if (!MediaGroupIDs.Contains(mediaGroupId)) //不存在标记则创建标记
+            if (!MediaGroupIDs.TryGetValue(mediaGroupId, out long postID)) //如果mediaGroupId不存在则创建新Post
             {
-                MediaGroupIDs.Add(mediaGroupId);
+                MediaGroupIDs.TryAdd(mediaGroupId, -1);
 
-                bool exists = await DB.Queryable<Attachments>().AnyAsync(x => x.MediaGroupID == mediaGroupId);
+                bool exists = await DB.Queryable<Posts>().AnyAsync(x => x.MediaGroupID == mediaGroupId);
                 if (!exists)
                 {
                     string? channelName = null, channelTitle = null;
@@ -240,15 +127,20 @@ namespace XinjingdailyBot.Handlers.Messages
                         channelTitle = message.ForwardFromChat.Title;
                     }
 
-                    BuildInTags tags = FetchTags(message.Caption);
-                    string text = PureText(message.Caption);
+                    BuildInTags tags = TextHelper.FetchTags(message.Caption);
+                    string text = TextHelper.PureText(message.Caption);
+
+                    bool anymouse = dbUser.PerferAnymouse;
+
+                    Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, "处理中?", replyToMessageId: message.MessageId);
 
                     //存入数据库
                     Posts textPost = new()
                     {
                         OriginChatID = message.Chat.Id,
                         OriginMsgID = message.MessageId,
-                        Anymouse = dbUser.PerferAnymouse,
+                        ActionMsgID = msg.MessageId,
+                        Anymouse = anymouse,
                         Text = text,
                         RawText = message.Text ?? "",
                         ChannelName = channelName ?? "",
@@ -260,28 +152,31 @@ namespace XinjingdailyBot.Handlers.Messages
                         PosterUID = dbUser.UserID,
                     };
 
-                    long postID = await DB.Insertable(textPost).ExecuteReturnBigIdentityAsync();
+                    postID = await DB.Insertable(textPost).ExecuteReturnBigIdentityAsync();
 
-                    //两秒后发送确认消息
+                    MediaGroupIDs[mediaGroupId] = postID;
+
+                    //两秒后停止接收媒体组消息
                     _ = Task.Run(async () =>
                     {
                         await Task.Delay(2000);
-                        MediaGroupIDs.Remove(mediaGroupId);
+                        MediaGroupIDs.Remove(mediaGroupId, out _);
 
-                        int x = await DB.Queryable<Attachments>().CountAsync(x => x.MediaGroupID == mediaGroupId);
-
-                        await botClient.AutoReplyAsync(x.ToString(), message);
-
+                        var keyboard = MarkupHelper.PostKeyboard(anymouse);
+                        await botClient.EditMessageTextAsync(msg, "真的要投稿吗", replyMarkup: keyboard);
                     });
                 }
             }
 
-
-            Attachments? attachment = GenerateAttachment(message);
-
-            if (attachment != null)
+            //更新附件
+            if (postID > 0)
             {
-                await DB.Insertable(attachment).ExecuteCommandAsync();
+                Attachments? attachment = AttachmentHelpers.GenerateAttachment(message, postID);
+
+                if (attachment != null)
+                {
+                    await DB.Insertable(attachment).ExecuteCommandAsync();
+                }
             }
         }
     }

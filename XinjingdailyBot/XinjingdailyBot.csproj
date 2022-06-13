@@ -18,10 +18,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="MySql.Data" Version="8.0.29" />
-		<PackageReference Include="NLog" Version="5.0.0" />
-		<PackageReference Include="SqlSugarCore" Version="5.0.8.6" />
-		<PackageReference Include="Telegram.Bot" Version="17.0.0" />
-		<PackageReference Include="Telegram.Bot.Extensions.Polling" Version="1.0.2" />
+		<PackageReference Include="NLog" Version="5.0.1" />
+		<PackageReference Include="SqlSugarCore" Version="5.0.8.9" />
+		<PackageReference Include="Telegram.Bot" Version="18.0.0-alpha.3" />
+		<PackageReference Include="Telegram.Bot.Extensions.Polling" Version="2.0.0-alpha.1" />
 	</ItemGroup>
 
 	<ItemGroup>

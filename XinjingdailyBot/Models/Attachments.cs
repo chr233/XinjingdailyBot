@@ -3,7 +3,7 @@
 namespace XinjingdailyBot.Models
 {
     [SugarTable("attachment", TableDescription = "投稿附件")]
-    [SugarIndex("index_media_group_id", nameof(MediaGroupID), OrderByType.Asc)]
+    [SugarIndex("index_media_group_id", nameof(PostID), OrderByType.Asc)]
     internal sealed class Attachments
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
@@ -11,7 +11,7 @@ namespace XinjingdailyBot.Models
         /// <summary>
         /// 稿件ID
         /// </summary>
-        public string MediaGroupID { get; set; } = "";
+        public long PostID { get; set; } 
         /// <summary>
         /// 文件ID
         /// </summary>

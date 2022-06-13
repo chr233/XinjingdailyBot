@@ -38,6 +38,11 @@ namespace XinjingdailyBot.Models
         /// </summary>
         public long ManageMsgID { get; set; } = -1;
         /// <summary>
+        /// 发布的消息Id
+        /// </summary>
+        public long PublicMsgID { get; set; } = -1;
+
+        /// <summary>
         /// 匿名投稿
         /// </summary>
         public bool Anymouse { get; set; }
@@ -69,6 +74,11 @@ namespace XinjingdailyBot.Models
         /// 投稿状态
         /// </summary>
         public PostStatus Status { get; set; } = PostStatus.Unknown;
+        /// <summary>
+        /// 是否有附件
+        /// </summary>
+        [SugarColumn(IsIgnore = true)]
+        public bool HasAttachments => PostType != MessageType.Text;
         /// <summary>
         /// 消息类型
         /// </summary>
@@ -106,8 +116,5 @@ namespace XinjingdailyBot.Models
         /// 审核人用户ID
         /// </summary>
         public long ReviewerUID { get; set; } = -1;
-
-        [Navigate(NavigateType.OneToMany, nameof(Models.Attachments.MediaGroupID))]
-        public List<Attachments>? Attachments { get; set; }
     }
 }

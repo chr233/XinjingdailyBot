@@ -10,6 +10,13 @@ namespace XinjingdailyBot.Handlers.Queries
 {
     internal class PostHandler
     {
+        /// <summary>
+        /// 处理CallbackQuery
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="callbackQuery"></param>
+        /// <returns></returns>
         internal static async Task HandleQuery(ITelegramBotClient botClient, Users dbUser, CallbackQuery callbackQuery)
         {
             Message message = callbackQuery.Message!;
@@ -45,17 +52,18 @@ namespace XinjingdailyBot.Handlers.Queries
                     await CancelPost(botClient, post, callbackQuery);
                     break;
                 case "post confirm":
-                    await ConfirmPost(botClient, post, callbackQuery);
+                    await ConfirmPost(botClient, post, dbUser, callbackQuery);
                     break;
             }
         }
+
 
         /// <summary>
         /// 设置或者取消匿名
         /// </summary>
         /// <param name="botClient"></param>
         /// <param name="post"></param>
-        /// <param name="message"></param>
+        /// <param name="callbackQuery"></param>
         /// <returns></returns>
         private static async Task SetAnymouse(ITelegramBotClient botClient, Posts post, CallbackQuery callbackQuery)
         {
@@ -96,15 +104,41 @@ namespace XinjingdailyBot.Handlers.Queries
         /// <param name="post"></param>
         /// <param name="callbackQuery"></param>
         /// <returns></returns>
-        private static async Task ConfirmPost(ITelegramBotClient botClient, Posts post, CallbackQuery callbackQuery)
+        private static async Task ConfirmPost(ITelegramBotClient botClient, Posts post, Users dbUser, CallbackQuery callbackQuery)
         {
-            Message reviewMsg = await botClient.ForwardMessageAsync(ReviewGroup.Id, post.OriginChatID, (int)post.OriginMsgID);
+            Message reviewMsg;
+            if (!post.IsMediaGroup)
+            {
+                reviewMsg = await botClient.ForwardMessageAsync(ReviewGroup.Id, post.OriginChatID, (int)post.OriginMsgID);
+            }
+            else
+            {
+                var attachments = await DB.Queryable<Attachments>().Where(x => x.PostID == post.Id).ToListAsync();
+                var group = new IAlbumInputMedia[attachments.Count];
+                for (int i = 0; i < attachments.Count; i++)
+                {
+                    group[i] = post.PostType switch
+                    {
+                        MessageType.Photo => new InputMediaPhoto(attachments[i].FileID),
+                        MessageType.Audio => new InputMediaAudio(attachments[i].FileID),
+                        MessageType.Video => new InputMediaVideo(attachments[i].FileID),
+                        MessageType.Document => new InputMediaDocument(attachments[i].FileID),
+                        _ => throw new Exception(),
+                    };
+                }
+                var messages = await botClient.SendMediaGroupAsync(ReviewGroup.Id, group);
+                reviewMsg = messages.First();
+            }
 
-            string msg = string.Join('\n', "投稿人", "222");
+            string poster = TextHelper.HtmlUserLink(dbUser);
+            string anymouse = post.Anymouse ? "匿名投稿" : "保留来源";
+            string time = post.ModifyAt.ToString("MM/dd HH:mm:ss");
+
+            string msg = string.Join('\n', $"投稿人: {poster}", $"模式: {anymouse}", $"时间: {time}");
 
             var keyboard = MarkupHelper.ReviewKeyboardA();
 
-            Message manageMsg = await botClient.SendTextMessageAsync(ReviewGroup.Id, msg, ParseMode.Html, replyToMessageId: reviewMsg.MessageId, replyMarkup: keyboard);
+            Message manageMsg = await botClient.SendTextMessageAsync(ReviewGroup.Id, msg, ParseMode.Html, disableWebPagePreview: true, replyToMessageId: reviewMsg.MessageId, replyMarkup: keyboard);
 
             post.ReviewMsgID = reviewMsg.MessageId;
             post.ManageMsgID = manageMsg.MessageId;
@@ -113,7 +147,6 @@ namespace XinjingdailyBot.Handlers.Queries
             await DB.Updateable(post).UpdateColumns(x => new { x.ReviewMsgID, x.ManageMsgID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
 
             await botClient.EditMessageTextAsync(callbackQuery.Message!, "稿件已投递", replyMarkup: null);
-
             await botClient.AutoReplyAsync("稿件已投递", callbackQuery);
         }
 

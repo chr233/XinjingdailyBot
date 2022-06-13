@@ -30,7 +30,7 @@ namespace XinjingdailyBot.Helpers
             {
                 DB.Aop.OnLogExecuted = (sql, pars) =>
                 {
-                    Logger.Debug(sql);
+                    //Logger.Debug(sql);
                     Logger.Debug(UtilMethods.GetSqlString(DbType.SqlServer, sql, pars));
                 };
             }
