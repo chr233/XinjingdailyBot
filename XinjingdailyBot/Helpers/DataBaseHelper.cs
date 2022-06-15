@@ -17,7 +17,7 @@ namespace XinjingdailyBot.Helpers
         {
             Storage.Config config = BotConfig;
 
-            string dbString = $"server={config.DBHost};port={config.DBPort};Database={config.DBName};Uid={config.DBUser};Pwd={config.DBPassword};CharSet=utf8mb4;Allow Zero Datetime=True";
+            string dbString = $"Host={config.DBHost};Port={config.DBPort};Database={config.DBName};UserID={config.DBUser};Password={config.DBPassword};CharSet=utf8mb4;AllowZeroDateTime=true";
 
             DB = new SqlSugarScope(new ConnectionConfig()
             {

@@ -11,6 +11,13 @@ namespace XinjingdailyBot.Handlers.Messages
 {
     internal sealed class PostHandler
     {
+        /// <summary>
+        /// 处理文字投稿
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         internal static async Task HandleTextPosts(ITelegramBotClient botClient, Users dbUser, Message message)
         {
             if (!dbUser.Right.HasFlag(UserRights.SendPost))
@@ -28,13 +35,16 @@ namespace XinjingdailyBot.Handlers.Messages
             BuildInTags tags = TextHelper.FetchTags(message.Text);
             string text = TextHelper.PureText(message.Text);
 
-            bool anymouse = dbUser.PerferAnymouse;
+            bool anymouse = dbUser.PreferAnymouse;
 
-            var keyboard = MarkupHelper.PostKeyboard(anymouse);
+            //直接发布模式
+            bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
+            //发送确认消息
+            var keyboard = directPost ? MarkupHelper.DirectPostKeyboard(anymouse, tags) : MarkupHelper.PostKeyboard(anymouse);
             Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, "真的要投稿吗?", replyToMessageId: message.MessageId, replyMarkup: keyboard);
 
             //存入数据库
-            Posts post = new()
+            Posts newPost = new()
             {
                 OriginChatID = message.Chat.Id,
                 OriginMsgID = message.MessageId,
@@ -44,15 +54,28 @@ namespace XinjingdailyBot.Handlers.Messages
                 RawText = message.Text ?? "",
                 ChannelName = channelName ?? "",
                 ChannelTitle = channelTitle ?? "",
-                Status = PostStatus.Padding,
+                Status = directPost ? PostStatus.Reviewing : PostStatus.Padding,
                 PostType = message.Type,
                 Tags = tags,
                 PosterUID = dbUser.UserID
             };
 
-            await DB.Insertable(post).ExecuteCommandAsync();
+            if (directPost)
+            {
+                newPost.ReviewMsgID = msg.MessageId;
+                newPost.ManageMsgID = msg.MessageId;
+            }
+
+            await DB.Insertable(newPost).ExecuteCommandAsync();
         }
 
+        /// <summary>
+        /// 处理多媒体投稿
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         internal static async Task HandleMediaPosts(ITelegramBotClient botClient, Users dbUser, Message message)
         {
             if (!dbUser.Right.HasFlag(UserRights.SendPost))
@@ -70,14 +93,16 @@ namespace XinjingdailyBot.Handlers.Messages
             BuildInTags tags = TextHelper.FetchTags(message.Caption);
             string text = TextHelper.PureText(message.Caption);
 
-            bool anymouse = dbUser.PerferAnymouse;
+            bool anymouse = dbUser.PreferAnymouse;
 
+            //直接发布模式
+            bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
             //发送确认消息
-            var keyboard = MarkupHelper.PostKeyboard(anymouse);
+            var keyboard = directPost ? MarkupHelper.DirectPostKeyboard(anymouse, tags) : MarkupHelper.PostKeyboard(anymouse);
             Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, "真的要投稿吗?", replyToMessageId: message.MessageId, replyMarkup: keyboard);
 
             //存入数据库
-            Posts textPost = new()
+            Posts newPost = new()
             {
                 OriginChatID = message.Chat.Id,
                 OriginMsgID = message.MessageId,
@@ -87,13 +112,19 @@ namespace XinjingdailyBot.Handlers.Messages
                 RawText = message.Text ?? "",
                 ChannelName = channelName ?? "",
                 ChannelTitle = channelTitle ?? "",
-                Status = PostStatus.Padding,
+                Status = directPost ? PostStatus.Reviewing : PostStatus.Padding,
                 PostType = message.Type,
                 Tags = tags,
                 PosterUID = dbUser.UserID
             };
 
-            long postID = await DB.Insertable(textPost).ExecuteReturnBigIdentityAsync();
+            if (directPost)
+            {
+                newPost.ReviewMsgID = msg.MessageId;
+                newPost.ManageMsgID = msg.MessageId;
+            }
+
+            long postID = await DB.Insertable(newPost).ExecuteReturnBigIdentityAsync();
 
             Attachments? attachment = AttachmentHelpers.GenerateAttachment(message, postID);
 
@@ -103,8 +134,18 @@ namespace XinjingdailyBot.Handlers.Messages
             }
         }
 
-        private static ConcurrentDictionary<string, long> MediaGroupIDs = new();
+        /// <summary>
+        /// mediaGroupID字典
+        /// </summary>
+        private static ConcurrentDictionary<string, long> MediaGroupIDs { get; } = new();
 
+        /// <summary>
+        /// 处理多媒体投稿(mediaGroup)
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         internal static async Task HandleMediaGroupPosts(ITelegramBotClient botClient, Users dbUser, Message message)
         {
             if (!dbUser.Right.HasFlag(UserRights.SendPost))
@@ -130,12 +171,15 @@ namespace XinjingdailyBot.Handlers.Messages
                     BuildInTags tags = TextHelper.FetchTags(message.Caption);
                     string text = TextHelper.PureText(message.Caption);
 
-                    bool anymouse = dbUser.PerferAnymouse;
+                    bool anymouse = dbUser.PreferAnymouse;
 
-                    Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, "处理中?", replyToMessageId: message.MessageId);
+                    Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, "处理中", replyToMessageId: message.MessageId);
+
+                    //直接发布模式
+                    bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
 
                     //存入数据库
-                    Posts textPost = new()
+                    Posts newPost = new()
                     {
                         OriginChatID = message.Chat.Id,
                         OriginMsgID = message.MessageId,
@@ -145,14 +189,20 @@ namespace XinjingdailyBot.Handlers.Messages
                         RawText = message.Text ?? "",
                         ChannelName = channelName ?? "",
                         ChannelTitle = channelTitle ?? "",
-                        Status = PostStatus.Padding,
+                        Status = directPost ? PostStatus.Reviewing : PostStatus.Padding,
                         PostType = message.Type,
                         MediaGroupID = mediaGroupId,
                         Tags = tags,
                         PosterUID = dbUser.UserID,
                     };
 
-                    postID = await DB.Insertable(textPost).ExecuteReturnBigIdentityAsync();
+                    if (directPost)
+                    {
+                        newPost.ReviewMsgID = msg.MessageId;
+                        newPost.ManageMsgID = msg.MessageId;
+                    }
+
+                    postID = await DB.Insertable(newPost).ExecuteReturnBigIdentityAsync();
 
                     MediaGroupIDs[mediaGroupId] = postID;
 
@@ -162,7 +212,8 @@ namespace XinjingdailyBot.Handlers.Messages
                         await Task.Delay(2000);
                         MediaGroupIDs.Remove(mediaGroupId, out _);
 
-                        var keyboard = MarkupHelper.PostKeyboard(anymouse);
+                        //发送确认消息
+                        var keyboard = directPost ? MarkupHelper.DirectPostKeyboard(anymouse, tags) : MarkupHelper.PostKeyboard(anymouse);
                         await botClient.EditMessageTextAsync(msg, "真的要投稿吗", replyMarkup: keyboard);
                     });
                 }

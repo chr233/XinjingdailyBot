@@ -1,9 +1,9 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
-using XinjingdailyBot.Models;
+using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Enums;
 using XinjingdailyBot.Helpers;
-using Telegram.Bot.Types.Enums;
+using XinjingdailyBot.Models;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Queries
@@ -46,7 +46,7 @@ namespace XinjingdailyBot.Handlers.Queries
             switch (callbackQuery.Data)
             {
                 case "post anymouse":
-                    await SetAnymouse(botClient, post, callbackQuery);
+                    await SetAnymouse(botClient, post, dbUser, callbackQuery);
                     break;
                 case "post cancel":
                     await CancelPost(botClient, post, callbackQuery);
@@ -57,7 +57,6 @@ namespace XinjingdailyBot.Handlers.Queries
             }
         }
 
-
         /// <summary>
         /// 设置或者取消匿名
         /// </summary>
@@ -65,18 +64,17 @@ namespace XinjingdailyBot.Handlers.Queries
         /// <param name="post"></param>
         /// <param name="callbackQuery"></param>
         /// <returns></returns>
-        private static async Task SetAnymouse(ITelegramBotClient botClient, Posts post, CallbackQuery callbackQuery)
+        internal static async Task SetAnymouse(ITelegramBotClient botClient, Posts post, Users dbUser, CallbackQuery callbackQuery)
         {
+            await botClient.AutoReplyAsync("可以使用命令 /anymouse 切换默认匿名投稿", callbackQuery);
+
             bool anymouse = !post.Anymouse;
             post.Anymouse = anymouse;
             post.ModifyAt = DateTime.Now;
             await DB.Updateable(post).UpdateColumns(x => new { x.Anymouse, x.ModifyAt }).ExecuteCommandAsync();
 
-            var keyboard = MarkupHelper.PostKeyboard(anymouse);
-
+            var keyboard = post.IsDirectPost ? MarkupHelper.DirectPostKeyboard(anymouse, post.Tags) : MarkupHelper.PostKeyboard(anymouse);
             await botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, keyboard);
-
-            await botClient.AutoReplyAsync("可以使用命令 /perfect_anymouse 切换默认匿名投稿", callbackQuery);
         }
 
         /// <summary>
@@ -86,7 +84,7 @@ namespace XinjingdailyBot.Handlers.Queries
         /// <param name="post"></param>
         /// <param name="callbackQuery"></param>
         /// <returns></returns>
-        private static async Task CancelPost(ITelegramBotClient botClient, Posts post, CallbackQuery callbackQuery)
+        internal static async Task CancelPost(ITelegramBotClient botClient, Posts post, CallbackQuery callbackQuery)
         {
             post.Status = PostStatus.Cancel;
             post.ModifyAt = DateTime.Now;
@@ -130,13 +128,9 @@ namespace XinjingdailyBot.Handlers.Queries
                 reviewMsg = messages.First();
             }
 
-            string poster = TextHelper.HtmlUserLink(dbUser);
-            string anymouse = post.Anymouse ? "匿名投稿" : "保留来源";
-            string time = post.ModifyAt.ToString("MM/dd HH:mm:ss");
+            string msg = TextHelper.MakeReviewMessage(dbUser, post.Anymouse);
 
-            string msg = string.Join('\n', $"投稿人: {poster}", $"模式: {anymouse}", $"时间: {time}");
-
-            var keyboard = MarkupHelper.ReviewKeyboardA();
+            var keyboard = MarkupHelper.ReviewKeyboardA(post.Tags);
 
             Message manageMsg = await botClient.SendTextMessageAsync(ReviewGroup.Id, msg, ParseMode.Html, disableWebPagePreview: true, replyToMessageId: reviewMsg.MessageId, replyMarkup: keyboard);
 
@@ -146,9 +140,19 @@ namespace XinjingdailyBot.Handlers.Queries
             post.ModifyAt = DateTime.Now;
             await DB.Updateable(post).UpdateColumns(x => new { x.ReviewMsgID, x.ManageMsgID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
 
-            await botClient.EditMessageTextAsync(callbackQuery.Message!, "稿件已投递", replyMarkup: null);
             await botClient.AutoReplyAsync("稿件已投递", callbackQuery);
-        }
+            if (dbUser.Notification)
+            {
+                await botClient.EditMessageTextAsync(callbackQuery.Message!, "感谢您的投稿, 审核结果将会稍后通知", replyMarkup: null);
+            }
+            else
+            {
+                await botClient.EditMessageTextAsync(callbackQuery.Message!, "感谢您的投稿, 已开启静默模式", replyMarkup: null);
+            }
 
+            dbUser.PostCount++;
+            dbUser.ModifyAt = DateTime.Now;
+            await DB.Updateable(dbUser).UpdateColumns(x => new { x.PostCount, x.ModifyAt }).ExecuteCommandAsync();
+        }
     }
 }

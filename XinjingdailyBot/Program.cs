@@ -67,13 +67,15 @@ namespace XinjingdailyBot
                     return;
                 }
 
-                bot.StartReceiving(updateHandler: Handlers.Dispatcher.HandleUpdateAsync,
-                                   errorHandler: Handlers.Dispatcher.HandleErrorAsync,
-                                   receiverOptions: new ReceiverOptions()
-                                   {
-                                       AllowedUpdates = Array.Empty<UpdateType>()
-                                   },
-                                   cancellationToken: cts.Token);
+                bot.StartReceiving(
+                    updateHandler: Handlers.Dispatcher.HandleUpdateAsync,
+                    errorHandler: Handlers.Dispatcher.HandleErrorAsync,
+                    receiverOptions: new ReceiverOptions()
+                    {
+                        AllowedUpdates = Array.Empty<UpdateType>()
+                    },
+                    cancellationToken: cts.Token
+                );
 
                 Logger.Info("Bot开始运行, 回车键退出进程");
                 Console.ReadLine();

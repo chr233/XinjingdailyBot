@@ -22,7 +22,7 @@ namespace XinjingdailyBot.Handlers
 
             if (dbUser == null)
             {
-                await botClient.AutoReplyAsync(text: "不允许Bot访问", update, cancellationToken);
+                await botClient.AutoReplyAsync(text: "意外错误", update, cancellationToken);
                 return;
             }
 
@@ -61,7 +61,10 @@ namespace XinjingdailyBot.Handlers
 
         internal static async Task BotOnMessageReceived(ITelegramBotClient botClient, Users dbUser, Message message)
         {
-            Logger.Debug($"M {message.Type} {dbUser}");
+            if (BotConfig.Debug)
+            {
+                Logger.Debug($"M {message.Type} {dbUser}");
+            }
 
             bool isMediaGroup = message.MediaGroupId != null;
             bool isPrivateChat = message.Chat.Type == ChatType.Private;
@@ -69,8 +72,7 @@ namespace XinjingdailyBot.Handlers
             switch (message.Type)
             {
                 case MessageType.Text when message.Text!.StartsWith("/"):
-                    string? answer = await Messages.CommandHandler.ExecCommand(botClient, dbUser, message);
-                    await botClient.AutoReplyAsync(answer ?? "未知命令", message);
+                    await Messages.CommandHandler.HandleCommand(botClient, dbUser, message);
                     break;
 
                 case MessageType.Text when isPrivateChat:
@@ -100,7 +102,10 @@ namespace XinjingdailyBot.Handlers
 
         private static async Task BotOnCallbackQueryReceived(ITelegramBotClient botClient, Users dbUser, CallbackQuery callbackQuery)
         {
-            Logger.Debug($"Q {callbackQuery.Data} {dbUser}");
+            if (BotConfig.Debug)
+            {
+                Logger.Debug($"Q {callbackQuery.Data} {dbUser}");
+            }
 
             string? data = callbackQuery.Data;
             Message? message = callbackQuery.Message;

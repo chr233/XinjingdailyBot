@@ -24,13 +24,18 @@ namespace XinjingdailyBot.Models
         public string FirstName { get; set; } = "";
         public string LastName { get; set; } = "";
         /// <summary>
+        /// 用户昵称
+        /// </summary>
+        [SugarColumn(IsIgnore = true)]
+        public string UserNick => string.IsNullOrEmpty(LastName) ? FirstName : $"{FirstName} {LastName}";
+        /// <summary>
         /// 是否封禁
         /// </summary>
         public bool IsBan { get; set; }
         /// <summary>
         /// 默认开启匿名模式
         /// </summary>
-        public bool PerferAnymouse { get; set; }
+        public bool PreferAnymouse { get; set; }
         /// <summary>
         /// 是否开启通知
         /// </summary>

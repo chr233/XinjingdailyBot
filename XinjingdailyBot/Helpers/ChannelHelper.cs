@@ -11,7 +11,14 @@ namespace XinjingdailyBot.Helpers
         internal static Chat RejectChannel = new();
         internal static async Task VerifyChannelConfig(ITelegramBotClient botClient)
         {
-            ReviewGroup = await botClient.GetChatAsync(BotConfig.ReviewGroup);
+            if (long.TryParse(BotConfig.ReviewGroup, out long groupId))
+            {
+                ReviewGroup = await botClient.GetChatAsync(groupId);
+            }
+            else
+            {
+                ReviewGroup = await botClient.GetChatAsync(BotConfig.ReviewGroup);
+            }
             AcceptChannel = await botClient.GetChatAsync(BotConfig.AcceptChannel);
             RejectChannel = await botClient.GetChatAsync(BotConfig.RejectChannel);
         }

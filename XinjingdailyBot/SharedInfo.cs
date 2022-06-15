@@ -2,6 +2,6 @@
 {
     internal static class SharedInfo
     {
-        internal const string XJBBot = nameof(XinjingdailyBot);
+        internal static string XJBBot { get; } = nameof(XinjingdailyBot);
     }
 }

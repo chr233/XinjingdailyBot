@@ -43,6 +43,12 @@ namespace XinjingdailyBot.Models
         public long PublicMsgID { get; set; } = -1;
 
         /// <summary>
+        /// 是否为直接投稿
+        /// </summary>
+        [SugarColumn(IsIgnore = true)]
+        public bool IsDirectPost => ManageMsgID == ActionMsgID;
+
+        /// <summary>
         /// 匿名投稿
         /// </summary>
         public bool Anymouse { get; set; }

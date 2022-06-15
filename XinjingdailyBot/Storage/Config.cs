@@ -8,11 +8,6 @@
         public bool Debug { get; set; } = false;
 
         /// <summary>
-        /// 日志等级
-        /// </summary>
-        public int LogLevel { get; set; } = 0;
-
-        /// <summary>
         /// 机器人Token
         /// </summary>
         public string BotToken { get; set; } = "";
@@ -20,7 +15,7 @@
         /// <summary>
         /// 代理
         /// </summary>
-        public string? Proxy { get; set; } 
+        public string? Proxy { get; set; }
 
         /// <summary>
         /// 数据库设定

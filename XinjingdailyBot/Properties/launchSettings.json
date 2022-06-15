@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "XinjingdailyBot": {
+      "commandName": "Project",
+      "remoteDebugEnabled": false
+    }
+  }
+}

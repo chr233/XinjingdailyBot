@@ -11,7 +11,7 @@ namespace XinjingdailyBot.Models
         /// <summary>
         /// 稿件ID
         /// </summary>
-        public long PostID { get; set; } 
+        public long PostID { get; set; }
         /// <summary>
         /// 文件ID
         /// </summary>

@@ -100,10 +100,11 @@ namespace XinjingdailyBot.Helpers
             Message message,
             string text,
             ParseMode? parseMode = default,
+            bool? disableWebPagePreview = null,
             InlineKeyboardMarkup? replyMarkup = default,
             CancellationToken cancellationToken = default)
         {
-            return await botClient.EditMessageTextAsync(message.Chat.Id, message.MessageId, text, parseMode: parseMode, replyMarkup: replyMarkup, cancellationToken: cancellationToken);
+            return await botClient.EditMessageTextAsync(message.Chat.Id, message.MessageId, text, parseMode: parseMode, disableWebPagePreview: disableWebPagePreview, replyMarkup: replyMarkup, cancellationToken: cancellationToken);
         }
     }
 }

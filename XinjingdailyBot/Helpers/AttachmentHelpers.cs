@@ -2,11 +2,11 @@
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Models;
 
-namespace XinjingdailyBot.Handlers.Messages
+namespace XinjingdailyBot.Helpers
 {
     internal static class AttachmentHelpers
     {
-        internal static Attachments? GenerateAttachment(Message message,long postID)
+        internal static Attachments? GenerateAttachment(Message message, long postID)
         {
             string? fileID, fileName, FileUid, mimeType;
             int size, height, width;
@@ -29,7 +29,7 @@ namespace XinjingdailyBot.Handlers.Messages
                     {
                         var x = message.Audio!;
                         fileID = x.FileId;
-                        fileName = x.FileName ?? "";
+                        fileName = x.Title ?? x.FileName ?? "";
                         FileUid = x.FileUniqueId;
                         mimeType = x.MimeType ?? "";
                         size = x.FileSize ?? 0;

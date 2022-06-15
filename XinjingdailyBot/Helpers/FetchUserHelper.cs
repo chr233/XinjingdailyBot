@@ -38,7 +38,7 @@ namespace XinjingdailyBot.Handlers
         /// <returns></returns>
         internal static async Task<Users?> FetchDbUser(User? msgUser)
         {
-            if (msgUser == null || msgUser.IsBot)
+            if (msgUser == null)
             {
                 return null;
             }
@@ -47,7 +47,7 @@ namespace XinjingdailyBot.Handlers
 
             if (dbUser == null)
             {
-                if (!UGroups.TryGetValue(1, out Groups? group))
+                if (!UGroups.TryGetValue(1, out var group))
                 {
                     Logger.Error("不存在 Id 为 1 的权限组, 请重建数据库");
                     return null;
@@ -61,7 +61,7 @@ namespace XinjingdailyBot.Handlers
                     LastName = msgUser.LastName ?? "",
                     GroupID = group.Id,
                     Right = group.DefaultRight,
-                    Level = 0,
+                    Level = 1,
                 };
 
                 try
