@@ -64,6 +64,9 @@ namespace XinjingdailyBot.Handlers.Messages
                 case 1://不带参数
                     switch (args[0].ToUpperInvariant())
                     {
+                        case "VERSION":
+                            return Commands.NormalCmd.ResponseVersion();
+
                         case "START" when normal:
                         case "HELP" when normal:
                             return Commands.NormalCmd.ResponseHelp(dbUser);

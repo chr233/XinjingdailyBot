@@ -11,6 +11,18 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 {
     internal static class NormalCmd
     {
+        private static Dictionary<string, string> CommandList { get; } = new()
+        {
+            { "anymouse", "设置投稿是否默认匿名" },
+            { "", "" },
+            { "admin", "呼叫群管理" },
+            { "", "" },
+            { "myinfo", "查询投稿数量" },
+            { "myright", "查询权限信息" },
+            { "", "" },
+            { "TODO", "" },
+        };
+
         /// <summary>
         /// 显示命令帮助
         /// </summary>
@@ -21,15 +33,18 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         internal static string ResponseHelp(Users dbUser)
         {
             StringBuilder sb = new();
-            sb.AppendLine("/anymouse  设置投稿是否默认匿名");
-            sb.AppendLine();
-            sb.AppendLine("/admin  呼叫群管理");
-            sb.AppendLine();
-            sb.AppendLine("/myinfo  查询投稿数量");
-            sb.AppendLine("/myright  查询权限信息");
-            sb.AppendLine();
-            sb.AppendLine("TODO");
+
+            foreach (var cmd in CommandList)
+            {
+                sb.AppendLine($"/{cmd.Key}  {cmd.Value}");
+            }
+
             return sb.ToString();
+        }
+
+        internal static string ResponseVersion()
+        {
+            return $"机器人版本: {MyVersion}";
         }
 
         /// <summary>

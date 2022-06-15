@@ -20,5 +20,7 @@ namespace XinjingdailyBot
         internal static Chat ReviewGroup => ChannelHelper.ReviewGroup;
         internal static Chat AcceptChannel => ChannelHelper.AcceptChannel;
         internal static Chat RejectChannel => ChannelHelper.RejectChannel;
+
+        internal static Version MyVersion => typeof(Program).Assembly.GetName().Version ?? new Version("0");
     }
 }
