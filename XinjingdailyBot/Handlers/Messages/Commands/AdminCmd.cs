@@ -54,7 +54,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             }
 
             var keyboard = MarkupHelper.SetGroupKeyboard();
-            var msg = await botClient.SendTextMessageAsync(message.Chat.Id, "请选择用户组", replyMarkup: keyboard, replyToMessageId: message.MessageId);
+            var msg = await botClient.SendTextMessageAsync(message.Chat.Id, "请选择用户组", replyMarkup: keyboard, replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
 
             CmdRecord record = new()
             {

@@ -6,10 +6,10 @@ namespace XinjingdailyBot.Helpers
 {
     internal sealed class MarkupHelper
     {
-        private static readonly string AnymouseOn = Emoji.Ghost + "匿名投稿";
-        private static readonly string AnymouseOff = Emoji.Thinking + "保留来源";
-        private static readonly string PostCancel = Emoji.No + "取消";
-        private static readonly string PostConfirm = Emoji.Yes + "投稿";
+        private static readonly string AnymouseOn = Emojis.Ghost + "匿名投稿";
+        private static readonly string AnymouseOff = Emojis.Thinking + "保留来源";
+        private static readonly string PostCancel = Emojis.No + "取消";
+        private static readonly string PostConfirm = Emojis.Yes + "投稿";
 
         private static readonly string TagNSFWOn = "#NSFW";
         private static readonly string TagFriendOn = "#我有一个朋友";
@@ -19,8 +19,8 @@ namespace XinjingdailyBot.Helpers
         private static readonly string TagFriendOff = "#我_____";
         private static readonly string TagWanAnOff = "#晚_";
 
-        private static readonly string ReviewReject = Emoji.No + "拒绝";
-        private static readonly string ReviewAccept = Emoji.Yes + "采用";
+        private static readonly string ReviewReject = Emojis.No + "拒绝";
+        private static readonly string ReviewAccept = Emojis.Yes + "采用";
 
         private static readonly string RejectFuzzy = "模糊";
         private static readonly string RejectDuplicate = "重复";
@@ -28,7 +28,7 @@ namespace XinjingdailyBot.Helpers
         private static readonly string RejectDeny = "内容不合适";
         private static readonly string RejectOther = "其他原因";
 
-        private static readonly string RejectCancel = Emoji.Back + "返回";
+        private static readonly string RejectCancel = Emojis.Back + "返回";
 
         internal static InlineKeyboardMarkup PostKeyboard(bool anymouse)
         {

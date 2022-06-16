@@ -1,5 +1,6 @@
 ﻿using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using XinjingdailyBot.Enums;
 using XinjingdailyBot.Models;
 using static XinjingdailyBot.Utils;
 
@@ -43,6 +44,11 @@ namespace XinjingdailyBot.Handlers
                 return null;
             }
 
+            if(msgUser.Username == "GroupAnonymousBot")
+            {
+                return null;
+            }
+
             Users? dbUser = await DB.Queryable<Users>().FirstAsync(x => x.UserID == msgUser.Id);
 
             if (dbUser == null)
@@ -59,6 +65,7 @@ namespace XinjingdailyBot.Handlers
                     UserName = msgUser.Username ?? "",
                     FirstName = msgUser.FirstName,
                     LastName = msgUser.LastName ?? "",
+                    IsBot = msgUser.IsBot,
                     GroupID = group.Id,
                     Right = group.DefaultRight,
                     Level = 1,
@@ -76,26 +83,53 @@ namespace XinjingdailyBot.Handlers
                     return null;
                 }
             }
-            else if (
-                !(dbUser.UserName.Equals(msgUser.Username ?? "")
-                && dbUser.FirstName.Equals(msgUser.FirstName)
-                && dbUser.LastName.Equals(msgUser.LastName ?? "")))
+            else
             {
-                dbUser.UserName = msgUser.Username ?? "";
-                dbUser.FirstName = msgUser.FirstName;
-                dbUser.LastName = msgUser.LastName ?? "";
-                dbUser.ModifyAt = DateTime.Now;
-
-                try
+                bool needUpdate = false;
+                //用户名不一致时更新
+                if (!(dbUser.UserName.Equals(msgUser.Username ?? "") && dbUser.FirstName.Equals(msgUser.FirstName) && dbUser.LastName.Equals(msgUser.LastName ?? "")))
                 {
-                    await DB.Updateable(dbUser).UpdateColumns(x => new { x.UserName, x.FirstName, x.LastName, x.ModifyAt }).ExecuteCommandAsync();
-                    Logger.Debug($"更新用户 {dbUser} 成功");
+                    dbUser.UserName = msgUser.Username ?? "";
+                    dbUser.FirstName = msgUser.FirstName;
+                    dbUser.LastName = msgUser.LastName ?? "";
+                    needUpdate = true;
                 }
-                catch (Exception ex)
+
+                if (dbUser.IsBot != msgUser.IsBot)
                 {
-                    Logger.Debug($"更新用户 {dbUser} 失败");
-                    Logger.Error(ex);
-                    return null;
+                    dbUser.IsBot = msgUser.IsBot;
+                    needUpdate = true;
+                }
+
+                if (UGroups.TryGetValue(dbUser.GroupID, out var group))
+                {
+                    if (dbUser.Right != group.DefaultRight)
+                    {
+                        dbUser.Right = group.DefaultRight;
+                        needUpdate = true;
+                    }
+                }
+                else
+                {
+                    dbUser.GroupID = 1;
+                    dbUser.Right = UserRights.SendPost | UserRights.NormalCmd;
+                    needUpdate = true;
+                }
+
+                if (needUpdate)
+                {
+                    try
+                    {
+                        dbUser.ModifyAt = DateTime.Now;
+                        await DB.Updateable(dbUser).UpdateColumns(x => new { x.UserName, x.FirstName, x.LastName, x.IsBot, x.Right, x.GroupID, x.ModifyAt }).ExecuteCommandAsync();
+                        Logger.Debug($"更新用户 {dbUser} 成功");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Debug($"更新用户 {dbUser} 失败");
+                        Logger.Error(ex);
+                        return null;
+                    }
                 }
             }
             return dbUser;

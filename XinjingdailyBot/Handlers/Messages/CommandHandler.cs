@@ -3,6 +3,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Enums;
 using XinjingdailyBot.Models;
+using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Messages
 {
@@ -21,21 +22,30 @@ namespace XinjingdailyBot.Handlers.Messages
 
             bool inGroup = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
 
-            string answer = await ExecCommand(botClient, dbUser, message) ?? "未知命令";
+            string? answer = await ExecCommand(botClient, dbUser, message) ?? "未知命令";
 
             if (!string.IsNullOrEmpty(answer))
             {
-                var msg = await botClient.SendTextMessageAsync(chatID, answer, ParseMode.Html, replyToMessageId: inGroup ? null : message.MessageId);
-
-                if (inGroup)
+                if (inGroup && !message.Text!.Contains(BotName) && answer == "未知命令")
                 {
-                    _ = Task.Run(async () =>
-                    {
-                        await botClient.DeleteMessageAsync(chatID, message.MessageId);
-                        await Task.Delay(TimeSpan.FromSeconds(30));
-                        await botClient.DeleteMessageAsync(chatID, msg.MessageId);
-                    });
+                    return;
                 }
+
+                if (!string.IsNullOrEmpty(answer))
+                {
+                    var msg = await botClient.SendTextMessageAsync(chatID, answer, ParseMode.Html, replyToMessageId: inGroup ? null : message.MessageId, allowSendingWithoutReply: true);
+
+                    if (inGroup)
+                    {
+                        _ = Task.Run(async () =>
+                        {
+                            await botClient.DeleteMessageAsync(chatID, message.MessageId);
+                            await Task.Delay(TimeSpan.FromSeconds(30));
+                            await botClient.DeleteMessageAsync(chatID, msg.MessageId);
+                        });
+                    }
+                }
+
             }
         }
 

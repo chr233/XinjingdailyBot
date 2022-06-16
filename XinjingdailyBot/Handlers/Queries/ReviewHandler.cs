@@ -3,13 +3,15 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Enums;
 using XinjingdailyBot.Helpers;
+using XinjingdailyBot.Localization;
 using XinjingdailyBot.Models;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Queries
 {
-    internal class ReviewHandler
+    internal static class ReviewHandler
     {
+
         /// <summary>
         /// 处理CallbackQuery
         /// </summary>
@@ -189,7 +191,7 @@ namespace XinjingdailyBot.Handlers.Queries
             string posterMsg = TextHelper.MakeNotification(rejectReason);
             if (poster.Notification)
             {
-                await botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, replyToMessageId: (int)post.OriginMsgID);
+                await botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true);
             }
             else
             {
@@ -226,6 +228,11 @@ namespace XinjingdailyBot.Handlers.Queries
             //发布频道发布消息
             if (!post.IsMediaGroup)
             {
+                if (post.Tags.HasFlag(BuildInTags.NSFW))
+                {
+                    await botClient.SendTextMessageAsync(AcceptChannel.Id, Dispatcher.NSFWWrning, allowSendingWithoutReply: true);
+                }
+
                 Message msg;
                 if (post.PostType == MessageType.Text)
                 {
@@ -301,7 +308,7 @@ namespace XinjingdailyBot.Handlers.Queries
 
             if (poster.Notification && poster.UserID != dbUser.UserID)//启用通知并且审核与投稿不是同一个人
             {//单独发送通知消息
-                await botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, replyToMessageId: (int)post.OriginMsgID);
+                await botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true);
             }
             else
             {//静默模式, 不单独发送通知消息

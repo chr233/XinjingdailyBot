@@ -17,7 +17,9 @@ namespace XinjingdailyBot
         internal static Dictionary<int, Models.Groups> UGroups => DataBaseHelper.UGroups;
         internal static Dictionary<int, Models.Levels> ULevels => DataBaseHelper.ULevels;
 
+        internal static string BotName { get; set; } = "";
         internal static Chat ReviewGroup => ChannelHelper.ReviewGroup;
+        internal static Chat SubGroup => ChannelHelper.SubGroup;
         internal static Chat AcceptChannel => ChannelHelper.AcceptChannel;
         internal static Chat RejectChannel => ChannelHelper.RejectChannel;
 

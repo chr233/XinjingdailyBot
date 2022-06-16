@@ -38,6 +38,11 @@
         public string ReviewGroup { get; set; } = "";
 
         /// <summary>
+        /// 发布频道的子频道
+        /// </summary>
+        public string SubGroup { get; set; } = "";
+
+        /// <summary>
         /// 通过频道
         /// </summary>
         public string AcceptChannel { get; set; } = "";

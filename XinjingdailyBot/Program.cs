@@ -46,6 +46,8 @@ namespace XinjingdailyBot
 
             BotID = bot.BotId ?? 0;
 
+            Logger.Info(BotName);
+
             using var cts = new CancellationTokenSource();
 
             try

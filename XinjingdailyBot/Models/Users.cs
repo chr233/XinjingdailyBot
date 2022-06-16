@@ -33,6 +33,10 @@ namespace XinjingdailyBot.Models
         /// </summary>
         public bool IsBan { get; set; }
         /// <summary>
+        /// 是否为Bot
+        /// </summary>
+        public bool IsBot { get; set; }
+        /// <summary>
         /// 默认开启匿名模式
         /// </summary>
         public bool PreferAnymouse { get; set; }

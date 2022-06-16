@@ -135,6 +135,9 @@
   <data name="Thinking" xml:space="preserve">
     <value>🤔</value>
   </data>
+  <data name="Warning" xml:space="preserve">
+    <value>⚠️</value>
+  </data>
   <data name="Yes" xml:space="preserve">
     <value>✅</value>
   </data>

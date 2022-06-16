@@ -132,7 +132,7 @@ namespace XinjingdailyBot.Handlers.Queries
 
             var keyboard = MarkupHelper.ReviewKeyboardA(post.Tags);
 
-            Message manageMsg = await botClient.SendTextMessageAsync(ReviewGroup.Id, msg, ParseMode.Html, disableWebPagePreview: true, replyToMessageId: reviewMsg.MessageId, replyMarkup: keyboard);
+            Message manageMsg = await botClient.SendTextMessageAsync(ReviewGroup.Id, msg, ParseMode.Html, disableWebPagePreview: true, replyToMessageId: reviewMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
             post.ReviewMsgID = reviewMsg.MessageId;
             post.ManageMsgID = manageMsg.MessageId;

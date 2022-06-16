@@ -3,13 +3,16 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using XinjingdailyBot.Helpers;
+using XinjingdailyBot.Localization;
 using XinjingdailyBot.Models;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers
 {
-    internal sealed class Dispatcher
+    internal static class Dispatcher
     {
+        internal static string NSFWWrning { get; } = $"{Emojis.Warning} NSFW 提前预警 {Emojis.Warning}";
+
         internal static Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
             Logger.Error(exception);
@@ -22,7 +25,7 @@ namespace XinjingdailyBot.Handlers
 
             if (dbUser == null)
             {
-                await botClient.AutoReplyAsync(text: "意外错误", update, cancellationToken);
+                //await botClient.AutoReplyAsync(text: "意外错误", update, cancellationToken);
                 return;
             }
 
@@ -30,6 +33,11 @@ namespace XinjingdailyBot.Handlers
             {
                 await botClient.AutoReplyAsync("没有权限", update, cancellationToken);
                 return;
+            }
+
+            if (BotConfig.Debug)
+            {
+                Logger.Debug($"Dispatcher {update.Type} {dbUser}");
             }
 
             var handler = update.Type switch
@@ -63,11 +71,30 @@ namespace XinjingdailyBot.Handlers
         {
             if (BotConfig.Debug)
             {
-                Logger.Debug($"M {message.Type} {dbUser}");
+                Logger.Debug($"Message {message.Type} {dbUser}");
             }
 
             bool isMediaGroup = message.MediaGroupId != null;
             bool isPrivateChat = message.Chat.Type == ChatType.Private;
+
+            if (dbUser.UserID == 777000)//Telegram
+            {
+                if (!isPrivateChat && message.Chat.Id == SubGroup.Id)
+                {//绑定频道的通知
+                    if (NSFWWrning == message.Text)
+                    {
+                        try
+                        {
+                            await botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Error(ex);
+                        }
+                    }
+                }
+                return;
+            }
 
             switch (message.Type)
             {
@@ -104,7 +131,7 @@ namespace XinjingdailyBot.Handlers
         {
             if (BotConfig.Debug)
             {
-                Logger.Debug($"Q {callbackQuery.Data} {dbUser}");
+                Logger.Debug($"Query {callbackQuery.Data} {dbUser}");
             }
 
             string? data = callbackQuery.Data;

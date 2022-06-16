@@ -24,7 +24,7 @@ namespace XinjingdailyBot.Helpers
             if (update.Type == UpdateType.Message)
             {
                 Message msg = update.Message!;
-                return await botClient.SendTextMessageAsync(msg.Chat.Id, text, replyToMessageId: msg.MessageId, cancellationToken: cancellationToken);
+                return await botClient.SendTextMessageAsync(msg.Chat.Id, text, replyToMessageId: msg.MessageId, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
             }
             else if (update.Type == UpdateType.CallbackQuery)
             {
@@ -48,7 +48,7 @@ namespace XinjingdailyBot.Helpers
             Message message,
             CancellationToken cancellationToken = default)
         {
-            return await botClient.SendTextMessageAsync(message.Chat.Id, text, replyToMessageId: message.MessageId, cancellationToken: cancellationToken);
+            return await botClient.SendTextMessageAsync(message.Chat.Id, text, replyToMessageId: message.MessageId, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
         }
 
         /// <summary>

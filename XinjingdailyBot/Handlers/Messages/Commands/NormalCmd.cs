@@ -14,12 +14,12 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         private static Dictionary<string, string> CommandList { get; } = new()
         {
             { "anymouse", "设置投稿是否默认匿名" },
-            { "", "" },
+            { "A", "" },
             { "admin", "呼叫群管理" },
-            { "", "" },
+            { "B", "" },
             { "myinfo", "查询投稿数量" },
             { "myright", "查询权限信息" },
-            { "", "" },
+            { "C", "" },
             { "TODO", "" },
         };
 
@@ -36,7 +36,14 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             foreach (var cmd in CommandList)
             {
-                sb.AppendLine($"/{cmd.Key}  {cmd.Value}");
+                if (!string.IsNullOrEmpty(cmd.Value))
+                {
+                    sb.AppendLine($"/{cmd.Key}  {cmd.Value}");
+                }
+                else
+                {
+                    sb.AppendLine();
+                }
             }
 
             return sb.ToString();

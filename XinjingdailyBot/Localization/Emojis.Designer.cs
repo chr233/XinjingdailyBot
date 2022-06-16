@@ -22,14 +22,14 @@ namespace XinjingdailyBot.Localization {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Emoji {
+    internal class Emojis {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Emoji() {
+        internal Emojis() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace XinjingdailyBot.Localization {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("XinjingdailyBot.Localization.Emoji", typeof(Emoji).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("XinjingdailyBot.Localization.Emojis", typeof(Emojis).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -111,6 +111,15 @@ namespace XinjingdailyBot.Localization {
         internal static string Thinking {
             get {
                 return ResourceManager.GetString("Thinking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 ⚠️ 的本地化字符串。
+        /// </summary>
+        internal static string Warning {
+            get {
+                return ResourceManager.GetString("Warning", resourceCulture);
             }
         }
         

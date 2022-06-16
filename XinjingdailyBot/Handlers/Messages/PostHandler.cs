@@ -41,7 +41,7 @@ namespace XinjingdailyBot.Handlers.Messages
             bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
             //发送确认消息
             var keyboard = directPost ? MarkupHelper.DirectPostKeyboard(anymouse, tags) : MarkupHelper.PostKeyboard(anymouse);
-            Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, "真的要投稿吗?", replyToMessageId: message.MessageId, replyMarkup: keyboard);
+            Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, "真的要投稿吗?", replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
             //存入数据库
             Posts newPost = new()
@@ -99,7 +99,7 @@ namespace XinjingdailyBot.Handlers.Messages
             bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
             //发送确认消息
             var keyboard = directPost ? MarkupHelper.DirectPostKeyboard(anymouse, tags) : MarkupHelper.PostKeyboard(anymouse);
-            Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, "真的要投稿吗?", replyToMessageId: message.MessageId, replyMarkup: keyboard);
+            Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, "真的要投稿吗?", replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
             //存入数据库
             Posts newPost = new()
@@ -173,7 +173,7 @@ namespace XinjingdailyBot.Handlers.Messages
 
                     bool anymouse = dbUser.PreferAnymouse;
 
-                    Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, "处理中", replyToMessageId: message.MessageId);
+                    Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, "处理中", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
 
                     //直接发布模式
                     bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);

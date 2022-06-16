@@ -6,6 +6,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<AssemblyVersion></AssemblyVersion>
+		<FileVersion></FileVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -25,17 +27,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Localization\Emoji.Designer.cs">
+	  <Compile Update="Localization\Emojis.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
-	    <DependentUpon>Emoji.resx</DependentUpon>
+	    <DependentUpon>Emojis.resx</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Update="Localization\Emoji.resx">
+	  <EmbeddedResource Update="Localization\Emojis.resx">
 	    <Generator>ResXFileCodeGenerator</Generator>
-	    <LastGenOutput>Emoji.Designer.cs</LastGenOutput>
+	    <LastGenOutput>Emojis.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
 	</ItemGroup>
 
