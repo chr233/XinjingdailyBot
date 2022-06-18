@@ -39,8 +39,8 @@ namespace XinjingdailyBot.Handlers.Messages
                     {
                         _ = Task.Run(async () =>
                         {
-                            await botClient.DeleteMessageAsync(chatID, message.MessageId);
                             await Task.Delay(TimeSpan.FromSeconds(30));
+                            await botClient.DeleteMessageAsync(chatID, message.MessageId);
                             await botClient.DeleteMessageAsync(chatID, msg.MessageId);
                         });
                     }
@@ -59,6 +59,18 @@ namespace XinjingdailyBot.Handlers.Messages
         private static async Task<string?> ExecCommand(ITelegramBotClient botClient, Users dbUser, Message message)
         {
             string input = message.Text![1..];
+
+            int index = input.IndexOf('@');
+
+            if (index != -1)
+            {
+                string botName = input[(index + 1)..];
+                if (!botName.Equals(BotName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return "";
+                }
+                input = input[..index];
+            }
 
             bool super = dbUser.Right.HasFlag(UserRights.SuperCmd);
             bool admin = dbUser.Right.HasFlag(UserRights.AdminCmd) || super;

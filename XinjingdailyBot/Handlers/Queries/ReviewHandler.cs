@@ -135,8 +135,24 @@ namespace XinjingdailyBot.Handlers.Queries
                 post.Tags |= tag;
             }
 
+            List<string> tagNames = new() { "当前标签:" };
+            if (post.Tags.HasFlag(BuildInTags.NSFW))
+            {
+                tagNames.Add("NSFE");
+            }
+            if (post.Tags.HasFlag(BuildInTags.Friend))
+            {
+                tagNames.Add("我有一个朋友");
+            }
+            if (post.Tags.HasFlag(BuildInTags.NSFW))
+            {
+                tagNames.Add("晚安");
+            }
+
             post.ModifyAt = DateTime.Now;
             await DB.Updateable(post).UpdateColumns(x => new { x.Tags, x.ModifyAt }).ExecuteCommandAsync();
+
+            await botClient.AutoReplyAsync(string.Join(' ', tagNames), callbackQuery);
 
             var keyboard = post.IsDirectPost ? MarkupHelper.DirectPostKeyboard(post.Anymouse, post.Tags) : MarkupHelper.ReviewKeyboardA(post.Tags);
             await botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, keyboard);

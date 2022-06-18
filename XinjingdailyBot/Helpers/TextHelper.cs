@@ -240,11 +240,11 @@ namespace XinjingdailyBot.Helpers
 
                 if (post.Anymouse)
                 {
-                    return $"<i>From</i> {channel}";
+                    return $"<i>from</i> {channel}";
                 }
                 else
                 {
-                    return $"<i>From</i> {channel} <i>via</i> {user}";
+                    return $"<i>from</i> {channel} <i>via</i> {user}";
                 }
             }
             else

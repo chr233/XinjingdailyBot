@@ -44,7 +44,7 @@ namespace XinjingdailyBot.Handlers
                 return null;
             }
 
-            if(msgUser.Username == "GroupAnonymousBot")
+            if (msgUser.Username == "GroupAnonymousBot")
             {
                 return null;
             }
@@ -101,19 +101,19 @@ namespace XinjingdailyBot.Handlers
                     needUpdate = true;
                 }
 
+                if (!UGroups.ContainsKey(dbUser.GroupID))
+                {
+                    dbUser.GroupID = 1;
+                    needUpdate = true;
+                }
+
                 if (UGroups.TryGetValue(dbUser.GroupID, out var group))
                 {
-                    if (dbUser.Right != group.DefaultRight)
-                    {
-                        dbUser.Right = group.DefaultRight;
-                        needUpdate = true;
-                    }
+                    dbUser.Right = group.DefaultRight;
                 }
                 else
                 {
-                    dbUser.GroupID = 1;
-                    dbUser.Right = UserRights.SendPost | UserRights.NormalCmd;
-                    needUpdate = true;
+                    return null;
                 }
 
                 if (needUpdate)
@@ -121,7 +121,7 @@ namespace XinjingdailyBot.Handlers
                     try
                     {
                         dbUser.ModifyAt = DateTime.Now;
-                        await DB.Updateable(dbUser).UpdateColumns(x => new { x.UserName, x.FirstName, x.LastName, x.IsBot, x.Right, x.GroupID, x.ModifyAt }).ExecuteCommandAsync();
+                        await DB.Updateable(dbUser).UpdateColumns(x => new { x.UserName, x.FirstName, x.LastName, x.IsBot, x.GroupID, x.ModifyAt }).ExecuteCommandAsync();
                         Logger.Debug($"更新用户 {dbUser} 成功");
                     }
                     catch (Exception ex)
