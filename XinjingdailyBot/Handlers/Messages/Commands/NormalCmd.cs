@@ -1,11 +1,11 @@
 ﻿using System.Text;
-using XinjingdailyBot.Enums;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using XinjingdailyBot.Enums;
 using XinjingdailyBot.Helpers;
 using XinjingdailyBot.Models;
 using static XinjingdailyBot.Utils;
-using Telegram.Bot;
 
 namespace XinjingdailyBot.Handlers.Messages.Commands
 {
@@ -14,6 +14,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         private static Dictionary<string, string> CommandList { get; } = new()
         {
             { "anymouse", "设置投稿是否默认匿名" },
+            { "notification", "设置是否开启投稿通知" },
             { "A", "" },
             { "admin", "呼叫群管理" },
             { "B", "" },
@@ -68,6 +69,22 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             string mode = anymouse ? "匿名投稿" : "保留来源";
             return $"后续投稿将默认使用【{mode}】";
+        }
+
+        /// <summary>
+        /// 设置是否匿名
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <returns></returns>
+        internal static async Task<string> ResponseNotification(Users dbUser)
+        {
+            bool notificationg = !dbUser.Notification;
+            dbUser.Notification = notificationg;
+            dbUser.ModifyAt = DateTime.Now;
+            await DB.Updateable(dbUser).UpdateColumns(x => new { x.Notification, x.ModifyAt }).ExecuteCommandAsync();
+
+            string mode = notificationg ? "发送通知" : "静默模式";
+            return $"投稿通过或者拒绝后将【{mode}】";
         }
 
         /// <summary>
@@ -158,7 +175,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         {
             if (message.Chat.Type != ChatType.Group && message.Chat.Type != ChatType.Supergroup)
             {
-                return "该命令仅在频道内有效";
+                return "该命令仅在群组内有效";
             }
 
             ChatMember[] admins = await botClient.GetChatAdministratorsAsync(message.Chat.Id);

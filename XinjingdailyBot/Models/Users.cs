@@ -72,12 +72,12 @@ namespace XinjingdailyBot.Models
         /// <summary>
         /// 用户权限
         /// </summary>
+        [SugarColumn(IsIgnore = true)]
         public UserRights Right { get; set; } = UserRights.None;
 
         /// <summary>
         /// 用户组ID
         /// </summary>
-        [SugarColumn(IsIgnore = true)]
         public int GroupID { get; set; }
         /// <summary>
         /// 创建时间

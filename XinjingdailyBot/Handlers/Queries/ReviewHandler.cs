@@ -3,7 +3,6 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Enums;
 using XinjingdailyBot.Helpers;
-using XinjingdailyBot.Localization;
 using XinjingdailyBot.Models;
 using static XinjingdailyBot.Utils;
 
@@ -144,9 +143,13 @@ namespace XinjingdailyBot.Handlers.Queries
             {
                 tagNames.Add("我有一个朋友");
             }
-            if (post.Tags.HasFlag(BuildInTags.NSFW))
+            if (post.Tags.HasFlag(BuildInTags.WanAn))
             {
                 tagNames.Add("晚安");
+            }
+            if (post.Tags == BuildInTags.None)
+            {
+                tagNames.Add("无");
             }
 
             post.ModifyAt = DateTime.Now;

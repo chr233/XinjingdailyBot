@@ -1,11 +1,11 @@
-using System.Reflection;
+﻿using System.Reflection;
 
 [assembly: CLSCompliant(false)]
-[assembly: AssemblyVersion("1.0.0.266")]
-[assembly: AssemblyFileVersion("1.0.0.266")]
+[assembly: AssemblyVersion("1.0.1.279")]
+[assembly: AssemblyFileVersion("1.0.1.279")]
 
-[assembly: AssemblyCopyright("Copyright © 2022 Chr_")]
-[assembly: AssemblyProduct("Xiaoheihe CShape")]
+[assembly: AssemblyCopyright("Copyright 漏 2022 Chr_")]
+[assembly: AssemblyProduct("XinjingDaily Bot")]
 [assembly: AssemblyCompany("chrxw.com")]
-[assembly: AssemblyTitle("An third-party Xiaoheihe client developed by Chr_.")]
-[assembly: AssemblyDescription("An third-party Xiaoheihe client developed by Chr_.")]
+[assembly: AssemblyTitle("An third-party XinjingDaily Bot developed by Chr_.")]
+[assembly: AssemblyDescription("An third-party XinjingDaily Bot developed by Chr_.")]

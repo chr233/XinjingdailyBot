@@ -96,6 +96,9 @@ namespace XinjingdailyBot.Handlers.Messages
                         case "ANYMOUSE" when normal:
                             return await Commands.NormalCmd.ResponseAnymouse(dbUser);
 
+                        case "NOTIFICATION" when normal:
+                            return await Commands.NormalCmd.ResponseNotification(dbUser);
+
                         case "MYINFO" when normal:
                             return Commands.NormalCmd.ResponseMyInfo(dbUser);
 
