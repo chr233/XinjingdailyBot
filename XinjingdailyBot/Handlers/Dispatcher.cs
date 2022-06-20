@@ -76,10 +76,12 @@ namespace XinjingdailyBot.Handlers
 
             bool isMediaGroup = message.MediaGroupId != null;
             bool isPrivateChat = message.Chat.Type == ChatType.Private;
+            bool isGroupChat = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
+            bool isSubGroup = isGroupChat && message.Chat.Id == SubGroup.Id;
 
             if (dbUser.UserID == 777000)//Telegram
             {
-                if (!isPrivateChat && message.Chat.Id == SubGroup.Id)
+                if (isSubGroup)
                 {
                     try
                     {
@@ -123,6 +125,11 @@ namespace XinjingdailyBot.Handlers
                 case MessageType.Document when isPrivateChat:
                     await Messages.PostHandler.HandleMediaPosts(botClient, dbUser, message);
                     break;
+
+                case MessageType.Text when isSubGroup && !dbUser.IsBot:
+                    await Messages.GroupHandler.HandlerGroupMessage(botClient, dbUser, message);
+                    break;
+
                 default:
                     if (isPrivateChat)
                     {
