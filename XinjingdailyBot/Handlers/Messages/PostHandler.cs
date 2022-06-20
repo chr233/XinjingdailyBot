@@ -173,7 +173,7 @@ namespace XinjingdailyBot.Handlers.Messages
 
                     bool anymouse = dbUser.PreferAnymouse;
 
-                    Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, "处理中", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
+                    Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, "处理中, 请稍后", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
 
                     //直接发布模式
                     bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
@@ -209,7 +209,7 @@ namespace XinjingdailyBot.Handlers.Messages
                     //两秒后停止接收媒体组消息
                     _ = Task.Run(async () =>
                     {
-                        await Task.Delay(2000);
+                        await Task.Delay(1500);
                         MediaGroupIDs.Remove(mediaGroupId, out _);
 
                         //发送确认消息

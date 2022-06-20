@@ -137,15 +137,15 @@ namespace XinjingdailyBot.Handlers.Queries
             List<string> tagNames = new() { "当前标签:" };
             if (post.Tags.HasFlag(BuildInTags.NSFW))
             {
-                tagNames.Add("NSFE");
-            }
-            if (post.Tags.HasFlag(BuildInTags.Friend))
-            {
-                tagNames.Add("我有一个朋友");
+                tagNames.Add("NSFW");
             }
             if (post.Tags.HasFlag(BuildInTags.WanAn))
             {
                 tagNames.Add("晚安");
+            }
+            if (post.Tags.HasFlag(BuildInTags.Friend))
+            {
+                tagNames.Add("我有一个朋友");
             }
             if (post.Tags == BuildInTags.None)
             {
@@ -290,13 +290,14 @@ namespace XinjingdailyBot.Handlers.Queries
                 {
                     group[i] = post.PostType switch
                     {
-                        MessageType.Photo => new InputMediaPhoto(attachments[i].FileID),
-                        MessageType.Audio => new InputMediaAudio(attachments[i].FileID),
-                        MessageType.Video => new InputMediaVideo(attachments[i].FileID),
-                        MessageType.Document => new InputMediaDocument(attachments[i].FileID),
+                        MessageType.Photo => new InputMediaPhoto(attachments[i].FileID) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
+                        MessageType.Audio => new InputMediaAudio(attachments[i].FileID) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
+                        MessageType.Video => new InputMediaVideo(attachments[i].FileID) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
+                        MessageType.Document => new InputMediaDocument(attachments[i].FileID) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
                         _ => throw new Exception(),
                     };
                 }
+
                 var messages = await botClient.SendMediaGroupAsync(AcceptChannel.Id, group);
                 post.PublicMsgID = messages.First().MessageId;
             }

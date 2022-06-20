@@ -35,6 +35,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         {
             StringBuilder sb = new();
 
+            sb.AppendLine("发送图片/视频或者文字内容即可投稿");
+
             foreach (var cmd in CommandList)
             {
                 if (!string.IsNullOrEmpty(cmd.Value))
@@ -108,6 +110,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             StringBuilder sb = new();
             sb.AppendLine($"用户名: <code>{userNick}</code>");
+            sb.AppendLine($"用户ID: <code>{dbUser.UserID}</code>");
             sb.AppendLine($"用户组: <code>{group}</code>");
             sb.AppendLine($"等级:  <code>{level}</code>");
             sb.AppendLine($"投稿数量: <code>{dbUser.PostCount}</code>");

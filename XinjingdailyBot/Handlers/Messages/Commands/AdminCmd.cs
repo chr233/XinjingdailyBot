@@ -100,5 +100,10 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             return "Bot即将重启";
         }
 
+
+        internal static async Task<string> BotStatus(Users dbUser, Message message)
+        {
+            return "";
+        }
     }
 }

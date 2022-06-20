@@ -80,18 +80,23 @@ namespace XinjingdailyBot.Handlers
             if (dbUser.UserID == 777000)//Telegram
             {
                 if (!isPrivateChat && message.Chat.Id == SubGroup.Id)
-                {//绑定频道的通知
-                    if (NSFWWrning == message.Text)
+                {
+                    try
                     {
-                        try
-                        {
+                        if (NSFWWrning == message.Text)
+                        {//绑定频道的通知
                             await botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            Logger.Error(ex);
+                            await botClient.UnpinChatMessageAsync(message.Chat.Id, message.MessageId);
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex);
+                    }
+
                 }
                 return;
             }
