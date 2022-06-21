@@ -31,7 +31,7 @@ namespace XinjingdailyBot.Models
         /// <summary>
         /// 文件尺寸
         /// </summary>
-        public int Size { get; set; }
+        public long Size { get; set; }
         /// <summary>
         /// 图像高度
         /// </summary>

@@ -9,7 +9,8 @@ namespace XinjingdailyBot.Helpers
         internal static Attachments? GenerateAttachment(Message message, long postID)
         {
             string? fileID, fileName, FileUid, mimeType;
-            int size, height, width;
+            long size;
+            int height, width;
 
             switch (message.Type)
             {

@@ -19,5 +19,9 @@
         /// 晚安
         /// </summary>
         WanAn = 4,
+        /// <summary>
+        /// 故事会
+        /// </summary>
+        Story = 8,
     }
 }
