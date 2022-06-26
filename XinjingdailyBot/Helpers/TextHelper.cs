@@ -237,7 +237,6 @@ namespace XinjingdailyBot.Helpers
             if (post.IsFromChannel)
             {
                 string channel = HtmlUserLink(0, post.ChannelName, post.ChannelTitle);
-
                 if (post.Anymouse)
                 {
                     return $"<i>from</i> {channel}";
@@ -257,7 +256,6 @@ namespace XinjingdailyBot.Helpers
                 {
                     return $"<i>via</i> {user}";
                 }
-
             }
         }
 
