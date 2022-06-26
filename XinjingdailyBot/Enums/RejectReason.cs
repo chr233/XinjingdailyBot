@@ -30,8 +30,13 @@
         /// </summary>
         Other,
         /// <summary>
+        /// 牛皮癣二维码
+        /// </summary>
+        QRCode,
+        /// <summary>
         /// 审核超时,自动拒稿
         /// </summary>
-        AutoReject,
+        AutoReject = 255,
+        
     }
 }

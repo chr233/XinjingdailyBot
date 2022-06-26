@@ -3,6 +3,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Enums;
 using XinjingdailyBot.Models;
+using XinjingdailyBot.Handlers.Messages.Commands;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Messages
@@ -86,34 +87,43 @@ namespace XinjingdailyBot.Handlers.Messages
                 case 1://不带参数
                     switch (args[0].ToUpperInvariant())
                     {
-                        case "VERSION":
-                            return Commands.NormalCmd.ResponseVersion();
+                        case "VERSION" :
+                            return NormalCmd.ResponseVersion();
+                        //Normal
 
                         case "START" when normal:
+                            return NormalCmd.ResponseStart();
+
                         case "HELP" when normal:
-                            return Commands.NormalCmd.ResponseHelp(dbUser);
+                            return NormalCmd.ResponseHelp(dbUser);
 
                         case "ANYMOUSE" when normal:
-                            return await Commands.NormalCmd.ResponseAnymouse(dbUser);
+                            return await NormalCmd.ResponseAnymouse(dbUser);
 
                         case "NOTIFICATION" when normal:
-                            return await Commands.NormalCmd.ResponseNotification(dbUser);
+                            return await NormalCmd.ResponseNotification(dbUser);
 
                         case "MYINFO" when normal:
-                            return Commands.NormalCmd.ResponseMyInfo(dbUser);
+                            return NormalCmd.ResponseMyInfo(dbUser);
 
                         case "MYRIGHT" when normal:
-                            return Commands.NormalCmd.ResponseMyRight(dbUser);
+                            return NormalCmd.ResponseMyRight(dbUser);
 
                         case "ADMIN" when normal:
                         case "ADMINS" when normal:
-                            return await Commands.NormalCmd.ResponseCallAdmins(botClient, dbUser, message);
+                            return await NormalCmd.ResponseCallAdmins(botClient, dbUser, message);
 
+                        case "PING" when normal:
+                            return NormalCmd.ResponsePing();
+
+                        //Admin
+
+                        //Super
                         case "SETGROUP" when super:
-                            return await Commands.AdminCmd.SetUserGroup(botClient, dbUser, message, args[1..]);
+                            return await AdminCmd.SetUserGroup(botClient, dbUser, message, args[1..]);
 
                         case "RESTART" when super:
-                            return await Commands.AdminCmd.Restart(botClient, dbUser, message);
+                            return await AdminCmd.Restart(botClient, dbUser, message);
 
                         default:
                             return null;

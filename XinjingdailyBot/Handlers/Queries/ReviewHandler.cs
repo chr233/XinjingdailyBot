@@ -298,6 +298,11 @@ namespace XinjingdailyBot.Handlers.Queries
                     };
                 }
 
+                if (post.Tags.HasFlag(BuildInTags.NSFW))
+                {
+                    await botClient.SendTextMessageAsync(AcceptChannel.Id, Dispatcher.NSFWWrning, allowSendingWithoutReply: true);
+                }
+
                 var messages = await botClient.SendMediaGroupAsync(AcceptChannel.Id, group);
                 post.PublicMsgID = messages.First().MessageId;
             }

@@ -52,9 +52,30 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             return sb.ToString();
         }
 
+        internal static string ResponseStart()
+        {
+            StringBuilder sb = new();
+            sb.AppendLine("欢迎使用心惊报 @xinjingdaily 专用投稿机器人");
+            sb.AppendLine("直接发送图片或者文字内容即可投稿");
+            sb.AppendLine("查看命令帮助: /help");
+            return sb.ToString();
+        }
+
+        internal static string ResponsePing()
+        {
+            return "PONG!";
+        }
+
+        /// <summary>
+        /// 查看机器人版本
+        /// </summary>
+        /// <returns></returns>
         internal static string ResponseVersion()
         {
-            return $"机器人版本: {MyVersion}";
+            StringBuilder sb = new();
+            sb.AppendLine($"{nameof(XinjingdailyBot)} Developed by @yilvnanfeng");
+            sb.AppendLine($"机器人版本: {MyVersion}");
+            return sb.ToString();
         }
 
         /// <summary>
