@@ -1,6 +1,5 @@
 ﻿{
   "Debug": false,
-  "LogLevel": 0,
   "BotToken": "",
   "Proxy": "",
   "DBHost": "127.0.0.1",
@@ -8,8 +7,10 @@
   "DBName": "xjb_db",
   "DBUser": "root",
   "DBPassword": "123456",
+  "DBGenerate": true,
   "SuperAdmins": [],
   "ReviewGroup": "",
+  "SubGroup": "",
   "AcceptChannel": "",
   "RejectChannel": ""
 }

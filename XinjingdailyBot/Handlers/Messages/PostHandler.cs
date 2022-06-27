@@ -28,7 +28,7 @@ namespace XinjingdailyBot.Handlers.Messages
             string? channelName = null, channelTitle = null;
             if (message.ForwardFromChat?.Type == ChatType.Channel)
             {
-                channelName = message.ForwardFromChat.Username;
+                channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
                 channelTitle = message.ForwardFromChat.Title;
             }
 
@@ -86,7 +86,7 @@ namespace XinjingdailyBot.Handlers.Messages
             string? channelName = null, channelTitle = null;
             if (message.ForwardFromChat?.Type == ChatType.Channel)
             {
-                channelName = message.ForwardFromChat.Username;
+                channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
                 channelTitle = message.ForwardFromChat.Title;
             }
 
@@ -164,7 +164,7 @@ namespace XinjingdailyBot.Handlers.Messages
                     string? channelName = null, channelTitle = null;
                     if (message.ForwardFromChat?.Type == ChatType.Channel)
                     {
-                        channelName = message.ForwardFromChat.Username;
+                        channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
                         channelTitle = message.ForwardFromChat.Title;
                     }
 

@@ -98,6 +98,7 @@ namespace XinjingdailyBot.Handlers.Messages
                             return NormalCmd.ResponseHelp(dbUser);
 
                         case "ANYMOUSE" when normal:
+                        case "ANONYMOUS" when normal:
                             return await NormalCmd.ResponseAnymouse(dbUser);
 
                         case "NOTIFICATION" when normal:
