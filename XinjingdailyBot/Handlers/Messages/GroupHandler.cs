@@ -1,7 +1,10 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using XinjingdailyBot.Localization;
+using XinjingdailyBot.Enums;
 using XinjingdailyBot.Models;
+using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Messages
 {
@@ -32,7 +35,37 @@ namespace XinjingdailyBot.Handlers.Messages
             {
                 if (text.Contains(item.Key, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    await botClient.SendTextMessageAsync(message.Chat.Id, item.Value, ParseMode.Html, replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
+                    var chatId = message.Chat.Id;
+                    if (message.ReplyToMessage?.From?.Username == BotName && message.ReplyToMessage?.Text != null && message.ReplyToMessage.Text.Contains(item.Key, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        if (dbUser.Right.HasFlag(UserRights.AdminCmd) || dbUser.Right.HasFlag(UserRights.SuperCmd))
+                        {
+                            await botClient.SendTextMessageAsync(chatId, "原来是狗管理, 惹不起惹不起...", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
+
+                        }
+                        else
+                        {
+                            Random rand = new();
+                            int seconds = rand.Next(60, 666);
+                            DateTime banTime = DateTime.Now + TimeSpan.FromSeconds(seconds);
+
+                            var msg = await botClient.SendTextMessageAsync(chatId, $"学我说话很好玩{Emojis.Horse}? 劳资反手就是禁言 <code>{seconds}</code> 秒.", ParseMode.Html, replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
+                            try
+                            {
+                                ChatPermissions permission = new() { CanSendMessages = false, };
+                                await botClient.RestrictChatMemberAsync(chatId, dbUser.UserID, permission, banTime);
+                            }
+                            catch
+                            {
+                                await botClient.DeleteMessageAsync(chatId, msg.MessageId);
+                                await botClient.SendTextMessageAsync(chatId, "原来是狗管理, 惹不起惹不起...", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        await botClient.SendTextMessageAsync(chatId, item.Value, ParseMode.Html, replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
+                    }
                     return;
                 }
             }

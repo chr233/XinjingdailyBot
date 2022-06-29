@@ -126,6 +126,9 @@
   <data name="Ghost" xml:space="preserve">
     <value>👻</value>
   </data>
+  <data name="Horse" xml:space="preserve">
+    <value>🐴</value>
+  </data>
   <data name="No" xml:space="preserve">
     <value>❌</value>
   </data>

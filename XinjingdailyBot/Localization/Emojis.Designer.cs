@@ -88,6 +88,15 @@ namespace XinjingdailyBot.Localization {
         }
         
         /// <summary>
+        ///   查找类似 🐴 的本地化字符串。
+        /// </summary>
+        internal static string Horse {
+            get {
+                return ResourceManager.GetString("Horse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 ❌ 的本地化字符串。
         /// </summary>
         internal static string No {
