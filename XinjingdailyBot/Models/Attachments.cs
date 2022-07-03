@@ -1,4 +1,5 @@
 ﻿using SqlSugar;
+using Telegram.Bot.Types.Enums;
 
 namespace XinjingdailyBot.Models
 {
@@ -40,5 +41,9 @@ namespace XinjingdailyBot.Models
         /// 图像宽度
         /// </summary>
         public int Width { get; set; }
+        /// <summary>
+        /// 消息类型
+        /// </summary>
+        public MessageType Type { get; set; } = MessageType.Unknown;
     }
 }

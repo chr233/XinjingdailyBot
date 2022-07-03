@@ -17,9 +17,10 @@ namespace XinjingdailyBot.Handlers.Messages
 
         private static Dictionary<string, List<string>> OneToManyWords { get; } = new()
         {
-            { "丁真", new() { "一眼丁真, 鉴定为纯纯的RBQ" , "到达美丽世界最高层理塘" } },
+            { "丁真", new() { "一眼丁真, 鉴定为纯纯的RBQ" , "到达美丽世界最高层理塘", "给大哥递烟" } },
             { "GFW", new() { "社会信用-10", "社会信用-10", "社会信用-20", "社会信用-30", "社会信用-114514" } },
             { "24岁", new() { "事先辈", "要素察觉", "只有冰红茶可以吗", "事学生", "冬之花(意味深)" } },
+            { "女装", new() { "事先辈", "要素察觉", "只有冰红茶可以吗", "事学生", "冬之花(意味深)" } },
         };
 
         internal static async Task HandlerGroupMessage(ITelegramBotClient botClient, Users dbUser, Message message)
@@ -46,7 +47,7 @@ namespace XinjingdailyBot.Handlers.Messages
                         else
                         {
                             Random rand = new();
-                            int seconds = rand.Next(60, 666);
+                            int seconds = rand.Next(60, 300);
                             DateTime banTime = DateTime.Now + TimeSpan.FromSeconds(seconds);
 
                             var msg = await botClient.SendTextMessageAsync(chatId, $"学我说话很好玩{Emojis.Horse}? 劳资反手就是禁言 <code>{seconds}</code> 秒.", ParseMode.Html, replyToMessageId: message.MessageId, allowSendingWithoutReply: true);

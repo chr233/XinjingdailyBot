@@ -115,7 +115,12 @@ namespace XinjingdailyBot.Handlers.Queries
                 var group = new IAlbumInputMedia[attachments.Count];
                 for (int i = 0; i < attachments.Count; i++)
                 {
-                    group[i] = post.PostType switch
+                    MessageType attachmentType = attachments[i].Type;
+                    if (attachmentType == MessageType.Unknown)
+                    {
+                        attachmentType = post.PostType;
+                    }
+                    group[i] = attachmentType switch
                     {
                         MessageType.Photo => new InputMediaPhoto(attachments[i].FileID),
                         MessageType.Audio => new InputMediaAudio(attachments[i].FileID),

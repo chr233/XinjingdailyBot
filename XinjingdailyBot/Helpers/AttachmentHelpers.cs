@@ -78,6 +78,7 @@ namespace XinjingdailyBot.Helpers
                 Size = size,
                 Height = height,
                 Width = width,
+                Type = message.Type,
             };
 
             return result;

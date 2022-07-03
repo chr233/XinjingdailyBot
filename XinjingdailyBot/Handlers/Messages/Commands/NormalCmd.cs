@@ -72,10 +72,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <returns></returns>
         internal static string ResponseVersion()
         {
-            StringBuilder sb = new();
-            sb.AppendLine($"{nameof(XinjingdailyBot)} Developed by @yilvnanfeng");
-            sb.AppendLine($"机器人版本: {MyVersion}");
-            return sb.ToString();
+            return $"机器人版本: {MyVersion}";
         }
 
         /// <summary>
