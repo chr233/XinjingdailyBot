@@ -87,13 +87,12 @@ namespace XinjingdailyBot.Handlers.Messages
                 case 1://不带参数
                     switch (args[0].ToUpperInvariant())
                     {
-                        case "VERSION" :
+                        case "VERSION":
                             return NormalCmd.ResponseVersion();
-                        //Normal
-
-                        case "START" when normal:
+                        case "START":
                             return NormalCmd.ResponseStart();
 
+                        //Normal
                         case "HELP" when normal:
                             return NormalCmd.ResponseHelp(dbUser);
 
@@ -118,13 +117,19 @@ namespace XinjingdailyBot.Handlers.Messages
                             return NormalCmd.ResponsePing();
 
                         //Admin
+                        case "REVIEWHELP" when admin:
+                            return await AdminCmd.ResponseNo(botClient, dbUser, message, string.Join(' ', args[1..]));
+                        case "NO" when admin:
+                            return await AdminCmd.ResponseNo(botClient, dbUser, message, string.Join(' ', args[1..]));
+                        case "YES" when admin:
+                            return await AdminCmd.ResponseNo(botClient, dbUser, message, string.Join(' ', args[1..]));
 
                         //Super
                         case "SETGROUP" when super:
-                            return await AdminCmd.SetUserGroup(botClient, dbUser, message, args[1..]);
+                            return await SuperCmd.SetUserGroup(botClient, dbUser, message, args[1..]);
 
                         case "RESTART" when super:
-                            return await AdminCmd.Restart(botClient, dbUser, message);
+                            return await SuperCmd.ResponseRestart(botClient, dbUser, message);
 
                         default:
                             return null;

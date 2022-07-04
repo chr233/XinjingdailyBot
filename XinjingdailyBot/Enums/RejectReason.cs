@@ -34,9 +34,13 @@
         /// </summary>
         QRCode,
         /// <summary>
+        /// 自定义原因
+        /// </summary>
+        CustomReason,
+        /// <summary>
         /// 审核超时,自动拒稿
         /// </summary>
         AutoReject = 255,
-        
+
     }
 }

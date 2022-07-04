@@ -11,7 +11,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 {
     internal static class NormalCmd
     {
-        private static Dictionary<string, string> CommandList { get; } = new()
+        private static Dictionary<string, string> NormalCmds { get; } = new()
         {
             { "anymouse", "设置投稿是否默认匿名" },
             { "notification", "设置是否开启投稿通知" },
@@ -21,7 +21,18 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             { "myinfo", "查询投稿数量" },
             { "myright", "查询权限信息" },
             { "C", "" },
-            { "TODO", "" },
+            { "TODO", "TODO" },
+        };
+
+        private static Dictionary<string, string> AdminCmds { get; } = new()
+        {
+            { "no", "自定义拒稿理由" },
+            { "yes", "自定义稿件说明" },
+        };
+
+        private static Dictionary<string, string> SuperCmds { get; } = new()
+        {
+            { "restart", "重启机器人" },
         };
 
         /// <summary>
@@ -33,25 +44,73 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <returns></returns>
         internal static string ResponseHelp(Users dbUser)
         {
+            bool super = dbUser.Right.HasFlag(UserRights.SuperCmd);
+            bool admin = dbUser.Right.HasFlag(UserRights.AdminCmd) || super;
+            bool normal = dbUser.Right.HasFlag(UserRights.NormalCmd) || admin;
+
             StringBuilder sb = new();
 
-            sb.AppendLine("发送图片/视频或者文字内容即可投稿");
-
-            foreach (var cmd in CommandList)
+            if (normal)
             {
-                if (!string.IsNullOrEmpty(cmd.Value))
+                sb.AppendLine("发送图片/视频或者文字内容即可投稿\n");
+            }
+            else
+            {
+                sb.AppendLine("无权访问\n");
+            }
+
+            if (super)
+            {
+                foreach (var cmd in SuperCmds)
                 {
-                    sb.AppendLine($"/{cmd.Key}  {cmd.Value}");
+                    if (!string.IsNullOrEmpty(cmd.Value))
+                    {
+                        sb.AppendLine($"/{cmd.Key}  {cmd.Value}");
+                    }
+                    else
+                    {
+                        sb.AppendLine();
+                    }
                 }
-                else
+            }
+
+            if (admin)
+            {
+                foreach (var cmd in AdminCmds)
                 {
-                    sb.AppendLine();
+                    if (!string.IsNullOrEmpty(cmd.Value))
+                    {
+                        sb.AppendLine($"/{cmd.Key}  {cmd.Value}");
+                    }
+                    else
+                    {
+                        sb.AppendLine();
+                    }
+                }
+            }
+
+            if (normal)
+            {
+                foreach (var cmd in NormalCmds)
+                {
+                    if (!string.IsNullOrEmpty(cmd.Value))
+                    {
+                        sb.AppendLine($"/{cmd.Key}  {cmd.Value}");
+                    }
+                    else
+                    {
+                        sb.AppendLine();
+                    }
                 }
             }
 
             return sb.ToString();
         }
 
+        /// <summary>
+        /// 首次欢迎语
+        /// </summary>
+        /// <returns></returns>
         internal static string ResponseStart()
         {
             StringBuilder sb = new();
@@ -61,6 +120,10 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             return sb.ToString();
         }
 
+        /// <summary>
+        /// 测试存活
+        /// </summary>
+        /// <returns></returns>
         internal static string ResponsePing()
         {
             return "PONG!";
