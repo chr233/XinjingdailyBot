@@ -76,6 +76,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             if (admin)
             {
+                sb.AppendLine();
                 foreach (var cmd in AdminCmds)
                 {
                     if (!string.IsNullOrEmpty(cmd.Value))
@@ -91,6 +92,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             if (normal)
             {
+                sb.AppendLine();
                 foreach (var cmd in NormalCmds)
                 {
                     if (!string.IsNullOrEmpty(cmd.Value))

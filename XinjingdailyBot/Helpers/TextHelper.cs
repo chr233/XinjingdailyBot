@@ -149,13 +149,12 @@ namespace XinjingdailyBot.Helpers
         /// <param name="poster"></param>
         /// <param name="reviewer"></param>
         /// <returns></returns>
-        internal static string MakeReviewMessage(Users poster, Users reviewer, bool anymouse, RejectReason rejectReason)
+        internal static string MakeReviewMessage(Users poster, Users reviewer, bool anymouse, string rejectReason)
         {
             string pUser = HtmlUserLink(poster);
             string rUser = HtmlUserLink(reviewer);
             string strAny = anymouse ? "匿名投稿" : "保留来源";
-            string reason = RejectReasonToString(rejectReason);
-            string status = $"已拒绝 {reason}";
+            string status = $"已拒绝 {rejectReason}";
 
             string msg = string.Join('\n', $"投稿人: {pUser}", $"审核人: {rUser}", $"模式: {strAny}", $"状态: {status}");
             return msg;
@@ -166,7 +165,7 @@ namespace XinjingdailyBot.Helpers
         /// </summary>
         /// <param name="rejectReason"></param>
         /// <returns></returns>
-        private static string RejectReasonToString(RejectReason rejectReason)
+        internal static string RejectReasonToString(RejectReason rejectReason)
         {
             string reason = rejectReason switch
             {
@@ -174,6 +173,8 @@ namespace XinjingdailyBot.Helpers
                 RejectReason.Duplicate => "重复的稿件",
                 RejectReason.Boring => "内容不够有趣",
                 RejectReason.Deny => "不合适发布的内容",
+                RejectReason.CustomReason => "其他原因",
+                RejectReason.AutoReject => "稿件审核超时, 自动拒绝",
                 RejectReason.Other => "其他原因",
                 _ => "未知",
             };
@@ -195,9 +196,8 @@ namespace XinjingdailyBot.Helpers
         /// </summary>
         /// <param name="rejectReason"></param>
         /// <returns></returns>
-        internal static string MakeNotification(RejectReason rejectReason)
+        internal static string MakeNotification(string reason)
         {
-            string reason = RejectReasonToString(rejectReason);
             string msg = string.Join('\n', "稿件未通过", $"原因: {reason}");
             return msg;
         }
