@@ -38,7 +38,12 @@
         public string ReviewGroup { get; set; } = "";
 
         /// <summary>
-        /// 发布频道的子频道
+        /// 频道评论区群组
+        /// </summary>
+        public string CommentGroup { get; set; } = "";
+        
+        /// <summary>
+        /// 闲聊区群组
         /// </summary>
         public string SubGroup { get; set; } = "";
 

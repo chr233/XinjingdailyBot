@@ -9,39 +9,58 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 {
     internal static class SuperCmd
     {
-        internal static async Task<string> SetUserGroup(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
+        /// <summary>
+        /// 设置用户组
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        internal static async Task<string> SetUserGroup(ITelegramBotClient botClient, Users dbUser, Message message, string[]? args)
         {
             long? targetUserId = null;
             if (message.ReplyToMessage != null)
             {
+
                 User? user = message.ReplyToMessage.From;
                 if (user != null)
                 {
+                    if (user.IsBot)
+                    {
+                        if (user.Id == BotID)
+                        {
+
+                        }
+                    }
                     targetUserId = user.Id;
                 }
             }
             else
             {
-                foreach (string arg in args)
+                if (args != null)
                 {
-                    if (arg.StartsWith('@'))
+                    foreach (string arg in args)
                     {
-                        string userName = arg[1..];
-
-                        Users? user = await DB.Queryable<Users>().FirstAsync(x => x.UserName == userName);
-
-                        if (user != null)
+                        if (arg.StartsWith('@'))
                         {
-                            targetUserId = user.UserID;
-                            break;
+                            string userName = arg[1..];
+
+                            Users? user = await DB.Queryable<Users>().FirstAsync(x => x.UserName == userName);
+
+                            if (user != null)
+                            {
+                                targetUserId = user.UserID;
+                                break;
+                            }
                         }
-                    }
-                    else
-                    {
-                        if (long.TryParse(arg, out var uid))
+                        else
                         {
-                            targetUserId = uid;
-                            break;
+                            if (long.TryParse(arg, out var uid))
+                            {
+                                targetUserId = uid;
+                                break;
+                            }
                         }
                     }
                 }
@@ -52,7 +71,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 return "找不到目标用户";
             }
 
-            var keyboard = MarkupHelper.SetGroupKeyboard();
+            var keyboard = MarkupHelper.SetUserGroupKeyboard();
             var msg = await botClient.SendTextMessageAsync(message.Chat.Id, "请选择用户组", replyMarkup: keyboard, replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
 
             CmdRecord record = new()

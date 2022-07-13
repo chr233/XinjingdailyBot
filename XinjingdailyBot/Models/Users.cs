@@ -68,17 +68,19 @@ namespace XinjingdailyBot.Models
         /// 用户等级
         /// </summary>
         public int Level { get; set; }
-
         /// <summary>
         /// 用户权限
         /// </summary>
         [SugarColumn(IsIgnore = true)]
         public UserRights Right { get; set; } = UserRights.None;
-
         /// <summary>
         /// 用户组ID
         /// </summary>
         public int GroupID { get; set; }
+        /// <summary>
+        /// 私聊ChatID
+        /// </summary>
+        //public long ChatID { get; set; } = -1;
         /// <summary>
         /// 创建时间
         /// </summary>

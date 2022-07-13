@@ -77,6 +77,7 @@ namespace XinjingdailyBot.Handlers
             bool isMediaGroup = message.MediaGroupId != null;
             bool isPrivateChat = message.Chat.Type == ChatType.Private;
             bool isGroupChat = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
+            bool isCommentGroup = isGroupChat && message.Chat.Id == CommentGroup.Id;
             bool isSubGroup = isGroupChat && message.Chat.Id == SubGroup.Id;
 
             if (dbUser.UserID == 777000)//Telegram
@@ -126,7 +127,7 @@ namespace XinjingdailyBot.Handlers
                     await Messages.PostHandler.HandleMediaPosts(botClient, dbUser, message);
                     break;
 
-                case MessageType.Text when isSubGroup && !dbUser.IsBot:
+                case MessageType.Text when (isCommentGroup || isSubGroup) && !dbUser.IsBot:
                     await Messages.GroupHandler.HandlerGroupMessage(botClient, dbUser, message);
                     break;
 

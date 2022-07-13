@@ -133,38 +133,5 @@ namespace XinjingdailyBot.Handlers
             }
             return dbUser;
         }
-
-        /// <summary>
-        /// 根据Message获取用户, 可以获取被回复的用户
-        /// </summary>
-        /// <param name="msgUser"></param>
-        /// <returns></returns>
-        internal static async Task<Users?> FetchDbUser(Message message)
-        {
-            Message? replyMsg = message.ReplyToMessage;
-
-            if (replyMsg != null)
-            {
-                if (replyMsg.Chat.Id == ReviewGroup.Id && replyMsg.From!.Id == BotID) // 当前会话为审核频道, 并且发布者为当前bot
-                {
-                    int mid = replyMsg.MessageId;
-                    Posts? post = await DB.Queryable<Posts>().FirstAsync(x => x.ReviewMsgID == mid || x.ManageMsgID == mid);
-                    if (post != null)
-                    {
-                        Users? dbUser = await DB.Queryable<Users>().FirstAsync(x => x.UserID == post.PosterUID);
-                        return dbUser;
-                    }
-                    return null;
-                }
-                else
-                {
-                    return await FetchDbUser(replyMsg.From);
-                }
-            }
-            else
-            {
-                return await FetchDbUser(message.From);
-            }
-        }
     }
 }

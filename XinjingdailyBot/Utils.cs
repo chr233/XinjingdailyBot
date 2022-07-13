@@ -19,6 +19,7 @@ namespace XinjingdailyBot
 
         internal static string BotName { get; set; } = "";
         internal static Chat ReviewGroup => ChannelHelper.ReviewGroup;
+        internal static Chat CommentGroup => ChannelHelper.CommentGroup;
         internal static Chat SubGroup => ChannelHelper.SubGroup;
         internal static Chat AcceptChannel => ChannelHelper.AcceptChannel;
         internal static Chat RejectChannel => ChannelHelper.RejectChannel;

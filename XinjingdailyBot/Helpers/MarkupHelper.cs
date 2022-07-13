@@ -119,7 +119,7 @@ namespace XinjingdailyBot.Helpers
             return keyboard;
         }
 
-        internal static InlineKeyboardMarkup SetGroupKeyboard()
+        internal static InlineKeyboardMarkup SetUserGroupKeyboard()
         {
             InlineKeyboardMarkup keyboard = new(new[]
             {

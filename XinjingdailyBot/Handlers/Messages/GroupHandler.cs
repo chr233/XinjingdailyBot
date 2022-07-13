@@ -17,10 +17,9 @@ namespace XinjingdailyBot.Handlers.Messages
 
         private static Dictionary<string, List<string>> OneToManyWords { get; } = new()
         {
-            { "丁真", new() { "一眼丁真, 鉴定为纯纯的RBQ" , "到达美丽世界最高层理塘", "给大哥递烟" } },
-            { "GFW", new() { "社会信用-10", "社会信用-10", "社会信用-20", "社会信用-30", "社会信用-114514" } },
-            { "24岁", new() { "事先辈", "要素察觉", "只有冰红茶可以吗", "事学生", "冬之花(意味深)" } },
-            { "女装", new() { "事先辈", "要素察觉", "只有冰红茶可以吗", "事学生", "冬之花(意味深)" } },
+            { "丁真", new() { "一眼丁真, 鉴定为纯纯的RBQ", "到达美丽世界最高层理塘", "给大哥递烟" } },
+            { "24岁", new() { "事先辈", "要素察觉", "只有冰红茶可以吗", "事学生", "意味深" } },
+            { "女装", new() { "?", "??", "???", "????", "?????", "??????", "???????" } },
         };
 
         internal static async Task HandlerGroupMessage(ITelegramBotClient botClient, Users dbUser, Message message)
@@ -76,7 +75,7 @@ namespace XinjingdailyBot.Handlers.Messages
                 if (text.Contains(item.Key, StringComparison.InvariantCultureIgnoreCase))
                 {
                     Random rd = new();
-                    if (rd.Next(100) >= 0)
+                    if (rd.Next(100) >= 50)
                     {
                         if (item.Value.Any())
                         {

@@ -118,15 +118,19 @@ namespace XinjingdailyBot.Handlers.Messages
 
                         //Admin
                         case "REVIEWHELP" when admin:
-                            return await AdminCmd.ResponseNo(botClient, dbUser, message, "");
+                            return await AdminCmd.ResponseReviewHelp(dbUser);
                         case "NO" when admin:
-                            return await AdminCmd.ResponseNo(botClient, dbUser, message, "");
-                        case "YES" when admin:
-                            return await AdminCmd.ResponseNo(botClient, dbUser, message, "");
+                            return await AdminCmd.ResponseNo(botClient, dbUser, message, null);
+                        //case "YES" when admin:
+                        //    return await AdminCmd.ResponseYes(botClient, dbUser, message, null);
+
+                        case "GROUPINFO" when admin:
+                            return AdminCmd.ResponseGroupInfo(dbUser, message);
+
 
                         //Super
                         case "SETGROUP" when super:
-                            return await SuperCmd.SetUserGroup(botClient, dbUser, message, args[1..]);
+                            return await SuperCmd.SetUserGroup(botClient, dbUser, message, null);
 
                         case "RESTART" when super:
                             return await SuperCmd.ResponseRestart(botClient, dbUser, message);
@@ -135,15 +139,21 @@ namespace XinjingdailyBot.Handlers.Messages
                             return null;
                     }
                 default://带参数
+                    string payload = string.Join(" ", args[1..]);
+
                     switch (args[0].ToUpperInvariant())
                     {
                         //Admin
                         case "REVIEWHELP" when admin:
-                            return await AdminCmd.ResponseNo(botClient, dbUser, message, string.Join(' ', args[1..]));
+                            return await AdminCmd.ResponseReviewHelp(dbUser);
                         case "NO" when admin:
-                            return await AdminCmd.ResponseNo(botClient, dbUser, message, string.Join(' ', args[1..]));
-                        case "YES" when admin:
-                            return await AdminCmd.ResponseNo(botClient, dbUser, message, string.Join(' ', args[1..]));
+                            return await AdminCmd.ResponseNo(botClient, dbUser, message, payload);
+                        //case "YES" when admin:
+                        //    return await AdminCmd.ResponseYes(botClient, dbUser, message, payload);
+
+                        //Super
+                        case "SETGROUP" when super:
+                            return await SuperCmd.SetUserGroup(botClient, dbUser, message, args[1..]);
 
                         default:
                             return null;
