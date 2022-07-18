@@ -82,7 +82,7 @@ namespace XinjingdailyBot.Handlers
 
             if (dbUser.UserID == 777000)//Telegram
             {
-                if (isSubGroup)
+                if (isSubGroup || isCommentGroup)
                 {
                     try
                     {
