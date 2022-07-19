@@ -1,12 +1,12 @@
-﻿using Telegram.Bot;
+﻿using System.Text;
+using Telegram.Bot;
 using Telegram.Bot.Types;
-using XinjingdailyBot.Enums;
-using XinjingdailyBot.Helpers;
 using Telegram.Bot.Types.Enums;
+using XinjingdailyBot.Enums;
 using XinjingdailyBot.Handlers.Queries;
+using XinjingdailyBot.Helpers;
 using XinjingdailyBot.Models;
 using static XinjingdailyBot.Utils;
-using System.Text;
 
 namespace XinjingdailyBot.Handlers.Messages.Commands
 {
@@ -110,6 +110,193 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             await ReviewHandler.RejetPost(botClient, post, dbUser, reason);
 
             return $"已拒绝该稿件, 理由: {reason}";
+        }
+
+
+        internal static async Task<string> ResponseBan(ITelegramBotClient botClient, Users dbUser, Message message, string argv)
+        {
+            if (!dbUser.Right.HasFlag(UserRights.AdminCmd))
+            {
+                return "你没有管理权限";
+            }
+
+            if (message.Chat.Id != ReviewGroup.Id)
+            {
+                return "该命令仅限审核群内使用";
+            }
+
+            long UserID;
+            string reason;
+
+            if (message.ReplyToMessage != null)
+            {
+                int messageId = message.ReplyToMessage.MessageId;
+                var post = await DB.Queryable<Posts>().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
+                if (post != null)
+                {
+                    UserID = post.PosterUID;
+                }
+                else
+                {
+                    return "你回复的信息不是稿件";
+                }
+
+                reason = argv;
+            }
+            else
+            {
+                string [] argvs = argv.Split(" ", 2);
+
+                if (IsLong(argvs[0]))
+                {
+                    return "第一个字符串必须为用户ID";
+                }
+
+                UserID = long.Parse(argvs[0]);
+                reason = argvs[1];
+            }
+
+            var target = await DB.Queryable<Ban>().FirstAsync(x => x.UserID == UserID);
+
+            if (target == null)
+            {
+                target = new Ban();
+                target.UserID = UserID;
+                target.Reason = reason;
+                target.BanTime = DateTime.Now;
+                target.ExecutiveAdminID = message.From!.Id;
+
+                await DB.Insertable(target).InsertColumns(x => new
+                {
+                    x.Reason,
+                    x.BanTime,
+                    x.UserID,
+                    x.ExecutiveAdminID
+                }).ExecuteCommandAsync();
+            }
+            else
+            {
+                target.Reason = reason;
+                target.BanTime = DateTime.Now;
+                target.ExecutiveAdminID = message.From!.Id;
+
+                await DB.Updateable(target).UpdateColumns(x => new
+                {
+                    x.Reason,
+                    x.BanTime,
+                    x.UserID,
+                    x.ExecutiveAdminID
+                }).ExecuteCommandAsync();
+            }
+
+            return "已封禁该用户!\n理由: <code>{reason}</code>";
+
+        }
+
+        internal static async Task<string> ResponseUnban(ITelegramBotClient botClient, Users dbUser, Message message, string argv)
+        {
+            if (!dbUser.Right.HasFlag(UserRights.AdminCmd))
+            {
+                return "你没有管理权限";
+            }
+
+            if (message.Chat.Id != ReviewGroup.Id)
+            {
+                return "该命令仅限审核群内使用";
+            }
+
+            long userID;
+            string reason;
+
+            if (message.ReplyToMessage != null)
+            {
+                int messageId = message.ReplyToMessage.MessageId;
+                var post = await DB.Queryable<Posts>().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
+                if (post != null)
+                {
+                    userID = post.PosterUID;
+                }
+                else
+                {
+                    return "你回复的信息不是稿件";
+                }
+
+                reason = argv;
+            }
+            else
+            {
+                string [] argvs = argv.Split(" ", 2);
+
+                if (IsLong(argvs[0]))
+                {
+                    return "第一个字符串必须为用户ID";
+                }
+
+                userID = long.Parse(argvs[0]);
+                reason = argvs[1];
+            }
+
+            var target = await DB.Queryable<Ban>().FirstAsync(x => x.UserID == userID);
+
+            if (target == null)
+            {
+                return "该用户未被封禁";
+            }
+
+            DB.Deleteable(target).ExecuteCommand();
+
+            return $"已解封用户 {TextHelper.HtmlUserLink(await DB.Queryable<Users>().FirstAsync(x => x.Id == target.UserID))}\n" +
+                   $"理由: <code>{reason}</code>";
+        }
+
+        internal static async Task<string> QueryBan(ITelegramBotClient botClient, Users dbUser, Message message)
+        {
+            return await QueryBan(botClient, dbUser, message, null);
+        }
+
+        internal static async Task<string> QueryBan(ITelegramBotClient botClient, Users dbUser, Message message, string? argv)
+        {
+            if (!dbUser.Right.HasFlag(UserRights.AdminCmd))
+            {
+                return "你没有管理权限";
+            }
+
+            if (message.Chat.Id != ReviewGroup.Id)
+            {
+                return "该命令仅限审核群内使用";
+            }
+
+            long targetID;
+
+            if (argv != null)
+            {
+                if (!IsLong(argv))
+                {
+                    return "参数必须为一个数字";
+                }
+                targetID = long.Parse(argv);
+            }
+            else
+            {
+                int messageId = message.ReplyToMessage!.MessageId;
+                var post = await DB.Queryable<Posts>().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
+                if (post == null)
+                {
+                    return "未找到此投稿";
+                }
+                targetID = post.PosterUID;
+            }
+
+            var ban = await IsBan(targetID);
+            if (ban == null)
+            {
+                return "该用户未被封禁";
+            }
+
+            return $"被封禁人: {TextHelper.HtmlUserLink(await DB.Queryable<Users>().FirstAsync(x => x.Id == ban.UserID))}\n" +
+                   $"封禁管理: {TextHelper.HtmlUserLink(await DB.Queryable<Users>().FirstAsync(x => x.Id == ban.ExecutiveAdminID))}\n" +
+                   $"封禁时间: {ban.BanTime.ToString("yyyy MMMM dd")}\n" +
+                   $"封禁理由: <code>{ban.Reason}</code>";
         }
 
         /// <summary>

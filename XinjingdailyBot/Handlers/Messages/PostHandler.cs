@@ -24,6 +24,15 @@ namespace XinjingdailyBot.Handlers.Messages
             {
                 await botClient.AutoReplyAsync("没有权限", message);
             }
+            var ban = await IsBan(dbUser);
+            if (ban != null)
+            {
+                await botClient.AutoReplyAsync($"您已被封禁!\n" +
+                                               $"封禁时间: <code>{ban.BanTime.ToString("yyyy MMMM dd")}</code>" +
+                                               $"理由: <code>{ban.Reason}</code>",
+                                               message);
+                return;
+            }
 
             string? channelName = null, channelTitle = null;
             if (message.ForwardFromChat?.Type == ChatType.Channel)
@@ -81,6 +90,15 @@ namespace XinjingdailyBot.Handlers.Messages
             if (!dbUser.Right.HasFlag(UserRights.SendPost))
             {
                 await botClient.AutoReplyAsync("没有权限", message);
+            }
+            var ban = await IsBan(dbUser);
+            if (ban != null)
+            {
+                await botClient.AutoReplyAsync($"您已被封禁!\n" +
+                                               $"封禁时间: <code>{ban.BanTime.ToString("yyyy MMMM dd")}</code>" +
+                                               $"理由: <code>{ban.Reason}</code>",
+                                               message);
+                return;
             }
 
             string? channelName = null, channelTitle = null;
@@ -152,9 +170,18 @@ namespace XinjingdailyBot.Handlers.Messages
             {
                 await botClient.AutoReplyAsync("没有权限", message);
             }
+            var ban = await IsBan(dbUser);
+            if (ban != null)
+            {
+                await botClient.AutoReplyAsync($"您已被封禁!\n" +
+                                               $"封禁时间: <code>{ban.BanTime.ToString("yyyy MMMM dd")}</code>" +
+                                               $"理由: <code>{ban.Reason}</code>",
+                                               message);
+                return;
+            }
 
             string mediaGroupId = message.MediaGroupId!;
-            if (!MediaGroupIDs.TryGetValue(mediaGroupId, out long postID)) //如果mediaGroupId不存在则创建新Post
+            if (!MediaGroupIDs.TryGetValue(mediaGroupId, out long postID))//如果mediaGroupId不存在则创建新Post
             {
                 MediaGroupIDs.TryAdd(mediaGroupId, -1);
 

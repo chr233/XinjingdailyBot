@@ -2,8 +2,8 @@
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Enums;
-using XinjingdailyBot.Models;
 using XinjingdailyBot.Handlers.Messages.Commands;
+using XinjingdailyBot.Models;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Messages
@@ -77,7 +77,7 @@ namespace XinjingdailyBot.Handlers.Messages
             bool admin = dbUser.Right.HasFlag(UserRights.AdminCmd) || super;
             bool normal = dbUser.Right.HasFlag(UserRights.NormalCmd) || admin;
 
-            string[] args = input.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
+            string [] args = input.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
 
             switch (args.Length)
             {
@@ -126,6 +126,8 @@ namespace XinjingdailyBot.Handlers.Messages
 
                         case "GROUPINFO" when admin:
                             return AdminCmd.ResponseGroupInfo(dbUser, message);
+                        case "QUERYBAN":
+                            return await AdminCmd.QueryBan(botClient, dbUser, message);
 
 
                         //Super
@@ -148,6 +150,14 @@ namespace XinjingdailyBot.Handlers.Messages
                             return await AdminCmd.ResponseReviewHelp(dbUser);
                         case "NO" when admin:
                             return await AdminCmd.ResponseNo(botClient, dbUser, message, payload);
+                        case "BAN" when admin:
+                            return await AdminCmd.ResponseBan(botClient, dbUser, message, payload);
+                        case "UNBAN" when admin:
+                            return await AdminCmd.ResponseUnban(botClient, dbUser, message, payload);
+                        case "QUERYBAN":
+                            return await AdminCmd.QueryBan(botClient, dbUser, message, payload);
+
+
                         //case "YES" when admin:
                         //    return await AdminCmd.ResponseYes(botClient, dbUser, message, payload);
 
