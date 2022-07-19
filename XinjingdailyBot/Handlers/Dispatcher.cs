@@ -28,9 +28,9 @@ namespace XinjingdailyBot.Handlers
                 //await botClient.AutoReplyAsync(text: "意外错误", update, cancellationToken);
                 return;
             }
-            var ban = await IsBan(dbUser);
-            if (ban != null)
+            if (dbUser.IsBan)
             {
+                var ban = await GetBan(dbUser);
                 await botClient.AutoReplyAsync($"您已被封禁!\n" +
                                                $"封禁时间: <code>{ban.BanTime.ToString("yyyy MMMM dd")}</code>" +
                                                $"理由: <code>{ban.Reason}</code>",

@@ -189,6 +189,14 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 }).ExecuteCommandAsync();
             }
 
+            var user = await DB.Queryable<Users>().FirstAsync(x => x.Id == target.UserID);
+            if (user == null)
+            {
+                return "未找到该用户";
+            }
+            user.IsBan = true;
+            await DB.Updateable(user).UpdateColumns(x => x.IsBan).ExecuteCommandAsync();
+
             return "已封禁该用户!\n理由: <code>{reason}</code>";
 
         }
@@ -245,7 +253,15 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             DB.Deleteable(target).ExecuteCommand();
 
-            return $"已解封用户 {TextHelper.HtmlUserLink(await DB.Queryable<Users>().FirstAsync(x => x.Id == target.UserID))}\n" +
+            var user = await DB.Queryable<Users>().FirstAsync(x => x.Id == target.UserID);
+            if (user == null)
+            {
+                return "未找到该用户";
+            }
+            user.IsBan = false;
+            await DB.Updateable(user).UpdateColumns(x => x.IsBan).ExecuteCommandAsync();
+
+            return $"已解封用户 {TextHelper.HtmlUserLink(user)}\n" +
                    $"理由: <code>{reason}</code>";
         }
 
@@ -287,7 +303,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 targetID = post.PosterUID;
             }
 
-            var ban = await IsBan(targetID);
+            var ban = await GetBan(targetID);
             if (ban == null)
             {
                 return "该用户未被封禁";

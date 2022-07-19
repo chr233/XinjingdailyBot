@@ -46,7 +46,7 @@ namespace XinjingdailyBot
         /// </summary>
         /// <param name="user">目标用户</param>
         /// <returns>如果被封禁，则返回结果为栏目，如果否，则返回null</returns>
-        public static async Task<Ban?> IsBan(Users user)
+        public static async Task<Ban?> GetBan(Users user)
         {
             var dbUser = await DB.Queryable<Ban>().FirstAsync(x => x.UserID == user.UserID);
             if (dbUser != null)
@@ -62,7 +62,7 @@ namespace XinjingdailyBot
         /// </summary>
         /// <param name="user">目标用户</param>
         /// <returns>如果被封禁，则返回结果为栏目，如果否，则返回null</returns>
-        public static async Task<Ban?> IsBan(long userID)
+        public static async Task<Ban?> GetBan(long userID)
         {
             var dbUser = await DB.Queryable<Ban>().FirstAsync(x => x.UserID == userID);
             if (dbUser != null)
