@@ -24,9 +24,9 @@ namespace XinjingdailyBot.Handlers.Messages
             {
                 await botClient.AutoReplyAsync("没有权限", message);
             }
-            var ban = await IsBan(dbUser);
-            if (ban != null)
+            if (dbUser.IsBan)
             {
+                var ban = await GetBan(dbUser);
                 await botClient.AutoReplyAsync($"您已被封禁!\n" +
                                                $"封禁时间: <code>{ban.BanTime.ToString("yyyy MMMM dd")}</code>" +
                                                $"理由: <code>{ban.Reason}</code>",
@@ -91,9 +91,9 @@ namespace XinjingdailyBot.Handlers.Messages
             {
                 await botClient.AutoReplyAsync("没有权限", message);
             }
-            var ban = await IsBan(dbUser);
-            if (ban != null)
+            if (dbUser.IsBan)
             {
+                var ban = await GetBan(dbUser);
                 await botClient.AutoReplyAsync($"您已被封禁!\n" +
                                                $"封禁时间: <code>{ban.BanTime.ToString("yyyy MMMM dd")}</code>" +
                                                $"理由: <code>{ban.Reason}</code>",
@@ -170,9 +170,9 @@ namespace XinjingdailyBot.Handlers.Messages
             {
                 await botClient.AutoReplyAsync("没有权限", message);
             }
-            var ban = await IsBan(dbUser);
-            if (ban != null)
+            if (dbUser.IsBan)
             {
+                var ban = await GetBan(dbUser);
                 await botClient.AutoReplyAsync($"您已被封禁!\n" +
                                                $"封禁时间: <code>{ban.BanTime.ToString("yyyy MMMM dd")}</code>" +
                                                $"理由: <code>{ban.Reason}</code>",

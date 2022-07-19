@@ -112,9 +112,9 @@ namespace XinjingdailyBot.Handlers.Queries
         /// <returns></returns>
         private static async Task ConfirmPost(ITelegramBotClient botClient, Posts post, Users dbUser, CallbackQuery callbackQuery)
         {
-            var ban = await IsBan(dbUser);
-            if (ban != null)
+            if (dbUser.IsBan)
             {
+                var ban = await GetBan(dbUser);
                 await botClient.SendTextMessageAsync(post.OriginChatID,
                                                      $"您已被封禁!\n" +
                                                      $"封禁时间: <code>{ban.BanTime.ToString("yyyy MMMM dd")}</code>" +
