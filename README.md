@@ -20,8 +20,9 @@
   "DBName": "xjb_db",
   "DBUser": "root",
   "DBPassword": "123456",
-  "ReviewGroup": "", //@开头为公开频道,也可以为数字(非公开群组)
+  "ReviewGroup": "", //审核群组
   "SubGroup": "", //@开头为公开频道,也可以为数字(非公开群组)
+  "CommentGroup": "", //@开头为公开频道,也可以为数字(非公开群组)
   "AcceptChannel": "",
   "RejectChannel": ""
 }
