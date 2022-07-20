@@ -31,7 +31,7 @@ namespace XinjingdailyBot.Models
         /// <summary>
         /// 是否封禁
         /// </summary>
-        public bool IsBan { get; set; }
+        public bool IsBan { get; set; } = false;
         /// <summary>
         /// 是否为Bot
         /// </summary>
@@ -77,10 +77,6 @@ namespace XinjingdailyBot.Models
         /// 用户组ID
         /// </summary>
         public int GroupID { get; set; }
-        /// <summary>
-        /// 私聊ChatID
-        /// </summary>
-        //public long ChatID { get; set; } = -1;
         /// <summary>
         /// 创建时间
         /// </summary>

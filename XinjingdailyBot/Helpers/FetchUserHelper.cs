@@ -65,6 +65,7 @@ namespace XinjingdailyBot.Handlers
                     FirstName = msgUser.FirstName,
                     LastName = msgUser.LastName ?? "",
                     IsBot = msgUser.IsBot,
+                    IsBan = false,
                     GroupID = group.Id,
                     Right = group.DefaultRight,
                     Level = 1,
@@ -120,7 +121,15 @@ namespace XinjingdailyBot.Handlers
                     try
                     {
                         dbUser.ModifyAt = DateTime.Now;
-                        await DB.Updateable(dbUser).UpdateColumns(x => new { x.UserName, x.FirstName, x.LastName, x.IsBot, x.GroupID, x.ModifyAt }).ExecuteCommandAsync();
+                        await DB.Updateable(dbUser).UpdateColumns(x => new
+                        {
+                            x.UserName,
+                            x.FirstName,
+                            x.LastName,
+                            x.IsBot,
+                            x.GroupID,
+                            x.ModifyAt
+                        }).ExecuteCommandAsync();
                         Logger.Debug($"更新用户 {dbUser} 成功");
                     }
                     catch (Exception ex)
