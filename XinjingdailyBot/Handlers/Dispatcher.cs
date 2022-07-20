@@ -28,10 +28,14 @@ namespace XinjingdailyBot.Handlers
                 //await botClient.AutoReplyAsync(text: "意外错误", update, cancellationToken);
                 return;
             }
-
             if (dbUser.IsBan)
             {
-                await botClient.AutoReplyAsync("没有权限", update, cancellationToken);
+                var ban = await GetBan(dbUser);
+                await botClient.AutoReplyAsync($"您已被封禁!\n" +
+                                               $"封禁时间: <code>{ban.BanTime.ToString("yyyy MMMM dd")}</code>" +
+                                               $"理由: <code>{ban.Reason}</code>",
+                                               update,
+                                               cancellationToken);
                 return;
             }
 
@@ -175,16 +179,17 @@ namespace XinjingdailyBot.Handlers
         {
             Console.WriteLine($"Received inline query from: {inlineQuery.From.Id}");
 
-            InlineQueryResult[] results = {
-            // displayed result
-            new InlineQueryResultArticle(
-                id: "3",
-                title: "TgBots",
-                inputMessageContent: new InputTextMessageContent(
-                    "hello"
+            InlineQueryResult [] results =
+            {
+                // displayed result
+                new InlineQueryResultArticle(
+                    id: "3",
+                    title: "TgBots",
+                    inputMessageContent: new InputTextMessageContent(
+                        "hello"
+                    )
                 )
-            )
-        };
+            };
 
             await botClient.AnswerInlineQueryAsync(inlineQueryId: inlineQuery.Id,
                                                    results: results,
