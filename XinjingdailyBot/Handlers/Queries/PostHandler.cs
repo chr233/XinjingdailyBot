@@ -71,11 +71,7 @@ namespace XinjingdailyBot.Handlers.Queries
             bool anymouse = !post.Anymouse;
             post.Anymouse = anymouse;
             post.ModifyAt = DateTime.Now;
-            await DB.Updateable(post).UpdateColumns(x => new
-            {
-                x.Anymouse,
-                x.ModifyAt
-            }).ExecuteCommandAsync();
+            await DB.Updateable(post).UpdateColumns(x => new { x.Anymouse, x.ModifyAt }).ExecuteCommandAsync();
 
             var keyboard = post.IsDirectPost ? MarkupHelper.DirectPostKeyboard(anymouse, post.Tags) : MarkupHelper.PostKeyboard(anymouse);
             await botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, keyboard);
@@ -92,11 +88,7 @@ namespace XinjingdailyBot.Handlers.Queries
         {
             post.Status = PostStatus.Cancel;
             post.ModifyAt = DateTime.Now;
-            await DB.Updateable(post).UpdateColumns(x => new
-            {
-                x.Status,
-                x.ModifyAt
-            }).ExecuteCommandAsync();
+            await DB.Updateable(post).UpdateColumns(x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
 
             await botClient.EditMessageTextAsync(callbackQuery.Message!, "投稿已取消", replyMarkup: null);
 
@@ -112,16 +104,6 @@ namespace XinjingdailyBot.Handlers.Queries
         /// <returns></returns>
         private static async Task ConfirmPost(ITelegramBotClient botClient, Posts post, Users dbUser, CallbackQuery callbackQuery)
         {
-            if (dbUser.IsBan)
-            {
-                var ban = await GetBan(dbUser);
-                await botClient.SendTextMessageAsync(post.OriginChatID,
-                                                     $"您已被封禁!\n" +
-                                                     $"封禁时间: <code>{ban.BanTime.ToString("yyyy MMMM dd")}</code>" +
-                                                     $"理由: <code>{ban.Reason}</code>");
-                return;
-            }
-
             Message reviewMsg;
             if (!post.IsMediaGroup)
             {
@@ -161,13 +143,7 @@ namespace XinjingdailyBot.Handlers.Queries
             post.ManageMsgID = manageMsg.MessageId;
             post.Status = PostStatus.Reviewing;
             post.ModifyAt = DateTime.Now;
-            await DB.Updateable(post).UpdateColumns(x => new
-            {
-                x.ReviewMsgID,
-                x.ManageMsgID,
-                x.Status,
-                x.ModifyAt
-            }).ExecuteCommandAsync();
+            await DB.Updateable(post).UpdateColumns(x => new { x.ReviewMsgID, x.ManageMsgID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
 
             await botClient.AutoReplyAsync("稿件已投递", callbackQuery);
             if (dbUser.Notification)
@@ -181,11 +157,7 @@ namespace XinjingdailyBot.Handlers.Queries
 
             dbUser.PostCount++;
             dbUser.ModifyAt = DateTime.Now;
-            await DB.Updateable(dbUser).UpdateColumns(x => new
-            {
-                x.PostCount,
-                x.ModifyAt
-            }).ExecuteCommandAsync();
+            await DB.Updateable(dbUser).UpdateColumns(x => new { x.PostCount, x.ModifyAt }).ExecuteCommandAsync();
         }
     }
 }

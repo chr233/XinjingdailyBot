@@ -64,23 +64,19 @@ namespace XinjingdailyBot.Handlers.Queries
                     break;
 
                 case "reject fuzzy":
-                    await RejectPostHelper(botClient, post, dbUser, RejectReason.Fuzzy);
+                    await RejetPost(botClient, post, dbUser, RejectReason.Fuzzy, callbackQuery);
                     break;
                 case "reject duplicate":
-                    post.Reason = RejectReason.Duplicate;
-                    await RejectPostHelper(botClient, post, dbUser, RejectReason.Duplicate);
+                    await RejetPost(botClient, post, dbUser, RejectReason.Duplicate, callbackQuery);
                     break;
                 case "reject boring":
-                    post.Reason = RejectReason.Boring;
-                    await RejectPostHelper(botClient, post, dbUser, RejectReason.Boring);
+                    await RejetPost(botClient, post, dbUser, RejectReason.Boring, callbackQuery);
                     break;
                 case "reject deny":
-                    post.Reason = RejectReason.Deny;
-                    await RejectPostHelper(botClient, post, dbUser, RejectReason.Deny);
+                    await RejetPost(botClient, post, dbUser, RejectReason.Deny, callbackQuery);
                     break;
                 case "reject other":
-                    post.Reason = RejectReason.Other;
-                    await RejectPostHelper(botClient, post, dbUser, RejectReason.Other);
+                    await RejetPost(botClient, post, dbUser, RejectReason.Other, callbackQuery);
                     break;
 
                 case "review accept":
@@ -98,23 +94,6 @@ namespace XinjingdailyBot.Handlers.Queries
                 default:
                     break;
             }
-        }
-
-        /// <summary>
-        /// 拒绝稿件包装方法
-        /// </summary>
-        /// <param name="botClient"></param>
-        /// <param name="post"></param>
-        /// <param name="dbUser"></param>
-        /// <param name="rejectReason"></param>
-        /// <param name="callbackQuery"></param>
-        /// <returns></returns>
-        private static async Task RejectPostHelper(ITelegramBotClient botClient, Posts post, Users dbUser, RejectReason rejectReason)
-        {
-            post.Reason = RejectReason.Fuzzy;
-            string reason = TextHelper.RejectReasonToString(rejectReason);
-            await RejetPost(botClient, post, dbUser, reason);
-
         }
 
         /// <summary>
@@ -190,8 +169,9 @@ namespace XinjingdailyBot.Handlers.Queries
         /// <param name="rejectReason"></param>
         /// <param name="callbackQuery"></param>
         /// <returns></returns>
-        internal static async Task RejetPost(ITelegramBotClient botClient, Posts post, Users dbUser, string rejectReason)
+        private static async Task RejetPost(ITelegramBotClient botClient, Posts post, Users dbUser, RejectReason rejectReason, CallbackQuery callbackQuery)
         {
+            post.Reason = rejectReason;
             post.ReviewerUID = dbUser.UserID;
             post.Status = PostStatus.Rejected;
             post.ModifyAt = DateTime.Now;
@@ -201,7 +181,7 @@ namespace XinjingdailyBot.Handlers.Queries
 
             //修改审核群消息
             string reviewMsg = TextHelper.MakeReviewMessage(poster, dbUser, post.Anymouse, rejectReason);
-            await botClient.EditMessageTextAsync(ReviewGroup.Id, (int)post.ManageMsgID, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
+            await botClient.EditMessageTextAsync(callbackQuery.Message!, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
 
             //拒稿频道发布消息
             if (!post.IsMediaGroup)
