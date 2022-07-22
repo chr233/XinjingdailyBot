@@ -25,6 +25,8 @@ namespace XinjingdailyBot.Helpers
         private static readonly string RejectFuzzy = "模糊";
         private static readonly string RejectDuplicate = "重复";
         private static readonly string RejectBoring = "无趣";
+        private static readonly string RejectConfusing = "没懂";
+        private static readonly string RejectQRCode = "二维码";
         private static readonly string RejectDeny = "内容不合适";
         private static readonly string RejectOther = "其他原因";
 
@@ -105,10 +107,12 @@ namespace XinjingdailyBot.Helpers
                     InlineKeyboardButton.WithCallbackData(RejectFuzzy, "reject fuzzy"),
                     InlineKeyboardButton.WithCallbackData(RejectDuplicate, "reject duplicate"),
                     InlineKeyboardButton.WithCallbackData(RejectBoring, "reject boring"),
+                    InlineKeyboardButton.WithCallbackData(RejectConfusing, "reject confusing"),
                 },
                 new []
                 {
                     InlineKeyboardButton.WithCallbackData(RejectDeny, "reject deny"),
+                    InlineKeyboardButton.WithCallbackData(RejectQRCode, "reject qrcode"),
                     InlineKeyboardButton.WithCallbackData(RejectOther, "reject other"),
                 },
                 new []

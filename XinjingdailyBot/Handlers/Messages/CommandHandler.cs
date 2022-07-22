@@ -23,7 +23,7 @@ namespace XinjingdailyBot.Handlers.Messages
 
             bool inGroup = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
 
-            string? answer = await ExecCommand(botClient, dbUser, message) ?? "未知命令";
+            string answer = await ExecCommand(botClient, dbUser, message) ?? "未知命令";
 
             if (!string.IsNullOrEmpty(answer))
             {
@@ -32,21 +32,17 @@ namespace XinjingdailyBot.Handlers.Messages
                     return;
                 }
 
-                if (!string.IsNullOrEmpty(answer))
+                var msg = await botClient.SendTextMessageAsync(chatID, answer, ParseMode.Html, replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
+
+                if (inGroup) //定时删除命令消息
                 {
-                    var msg = await botClient.SendTextMessageAsync(chatID, answer, ParseMode.Html, replyToMessageId: inGroup ? null : message.MessageId, allowSendingWithoutReply: true);
-
-                    if (inGroup)
+                    _ = Task.Run(async () =>
                     {
-                        _ = Task.Run(async () =>
-                        {
-                            await Task.Delay(TimeSpan.FromSeconds(30));
-                            await botClient.DeleteMessageAsync(chatID, message.MessageId);
-                            await botClient.DeleteMessageAsync(chatID, msg.MessageId);
-                        });
-                    }
+                        await Task.Delay(TimeSpan.FromSeconds(30));
+                        await botClient.DeleteMessageAsync(chatID, message.MessageId);
+                        await botClient.DeleteMessageAsync(chatID, msg.MessageId);
+                    });
                 }
-
             }
         }
 
@@ -59,6 +55,7 @@ namespace XinjingdailyBot.Handlers.Messages
         /// <returns></returns>
         private static async Task<string?> ExecCommand(ITelegramBotClient botClient, Users dbUser, Message message)
         {
+            
             string input = message.Text![1..];
 
             int index = input.IndexOf('@');
@@ -77,7 +74,12 @@ namespace XinjingdailyBot.Handlers.Messages
             bool admin = dbUser.Right.HasFlag(UserRights.AdminCmd) || super;
             bool normal = dbUser.Right.HasFlag(UserRights.NormalCmd) || admin;
 
-            string [] args = input.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
+            string[] args = input.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
+
+            if (!args.Any())
+            {
+                return null;
+            }
 
             switch (args.Length)
             {
@@ -119,6 +121,7 @@ namespace XinjingdailyBot.Handlers.Messages
                         //Admin
                         case "REVIEWHELP" when admin:
                             return await AdminCmd.ResponseReviewHelp(dbUser);
+
                         case "NO" when admin:
                             return await AdminCmd.ResponseNo(botClient, dbUser, message, null);
                         //case "YES" when admin:
@@ -126,9 +129,10 @@ namespace XinjingdailyBot.Handlers.Messages
 
                         case "GROUPINFO" when admin:
                             return AdminCmd.ResponseGroupInfo(dbUser, message);
-                        case "QUERYBAN":
-                            return await AdminCmd.QueryBan(botClient, dbUser, message);
 
+
+                        case "QUERYBAN" when admin:
+                            return await AdminCmd.QueryBan(botClient, dbUser, message);
 
                         //Super
                         case "SETGROUP" when super:
@@ -148,15 +152,18 @@ namespace XinjingdailyBot.Handlers.Messages
                         //Admin
                         case "REVIEWHELP" when admin:
                             return await AdminCmd.ResponseReviewHelp(dbUser);
+
                         case "NO" when admin:
                             return await AdminCmd.ResponseNo(botClient, dbUser, message, payload);
-                        case "BAN" when admin:
-                            return await AdminCmd.ResponseBan(botClient, dbUser, message, payload);
-                        case "UNBAN" when admin:
-                            return await AdminCmd.ResponseUnban(botClient, dbUser, message, payload);
-                        case "QUERYBAN":
-                            return await AdminCmd.QueryBan(botClient, dbUser, message, payload);
 
+                        case "BAN" when admin:
+                            return await AdminCmd.ResponseBan(botClient, dbUser, message, args[1..]);
+
+                        case "UNBAN" when admin:
+                            return await AdminCmd.ResponseUnban(botClient, dbUser, message, args[1..]);
+
+                        case "QUERYBAN":
+                            return await AdminCmd.QueryBan(botClient, dbUser, message, args[1..]);
 
                         //case "YES" when admin:
                         //    return await AdminCmd.ResponseYes(botClient, dbUser, message, payload);

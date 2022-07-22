@@ -1,5 +1,6 @@
 ﻿using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using XinjingdailyBot.Enums;
 using XinjingdailyBot.Models;
 using static XinjingdailyBot.Utils;
 
@@ -18,8 +19,6 @@ namespace XinjingdailyBot.Handlers
             {
                 UpdateType.ChannelPost => update.ChannelPost!.From,
                 UpdateType.EditedChannelPost => update.EditedChannelPost!.From,
-                UpdateType.ShippingQuery => update.ShippingQuery!.From,
-                UpdateType.PreCheckoutQuery => update.PreCheckoutQuery!.From,
                 UpdateType.Message => update.Message!.From,
                 UpdateType.EditedMessage => update.EditedMessage!.From,
                 UpdateType.CallbackQuery => update.CallbackQuery!.From,
@@ -28,7 +27,16 @@ namespace XinjingdailyBot.Handlers
                 _ => null
             };
 
-            return await FetchDbUser(msgUser);
+            Chat? msgChat = update.Type switch
+            {
+                UpdateType.ChannelPost => update.ChannelPost!.Chat,
+                UpdateType.EditedChannelPost => update.EditedChannelPost!.Chat,
+                UpdateType.Message => update.Message!.Chat,
+                UpdateType.EditedMessage => update.EditedMessage!.Chat,
+                _ => null
+            };
+
+            return await FetchDbUser(msgUser, msgChat);
         }
 
         /// <summary>
@@ -36,7 +44,7 @@ namespace XinjingdailyBot.Handlers
         /// </summary>
         /// <param name="msgUser"></param>
         /// <returns></returns>
-        internal static async Task<Users?> FetchDbUser(User? msgUser)
+        internal static async Task<Users?> FetchDbUser(User? msgUser, Chat? msgChat)
         {
             if (msgUser == null)
             {
@@ -49,6 +57,8 @@ namespace XinjingdailyBot.Handlers
             }
 
             Users? dbUser = await DB.Queryable<Users>().FirstAsync(x => x.UserID == msgUser.Id);
+
+            long chatID = (msgChat?.Type == ChatType.Private) ? msgChat.Id : -1;
 
             if (dbUser == null)
             {
@@ -67,6 +77,7 @@ namespace XinjingdailyBot.Handlers
                     IsBot = msgUser.IsBot,
                     IsBan = false,
                     GroupID = group.Id,
+                    PrivateChatID = chatID,
                     Right = group.DefaultRight,
                     Level = 1,
                 };
@@ -74,11 +85,14 @@ namespace XinjingdailyBot.Handlers
                 try
                 {
                     await DB.Insertable(dbUser).ExecuteCommandAsync();
-                    Logger.Debug($"创建用户 {dbUser} 成功");
+                    if (IsDebug)
+                    {
+                        Logger.Debug($"创建用户 {dbUser} 成功");
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Debug($"创建用户 {dbUser} 失败");
+                    Logger.Error($"创建用户 {dbUser} 失败");
                     Logger.Error(ex);
                     return null;
                 }
@@ -101,19 +115,35 @@ namespace XinjingdailyBot.Handlers
                     needUpdate = true;
                 }
 
+                if (dbUser.PrivateChatID != chatID)
+                {
+                    if (chatID != -1)
+                    {
+                        dbUser.PrivateChatID = chatID;
+                        needUpdate = true;
+                    }
+                }
+
                 if (!UGroups.ContainsKey(dbUser.GroupID))
                 {
                     dbUser.GroupID = 1;
                     needUpdate = true;
                 }
 
-                if (UGroups.TryGetValue(dbUser.GroupID, out var group))
+                if (BotConfig.SuperAdmins.Contains(dbUser.UserID))
                 {
-                    dbUser.Right = group.DefaultRight;
+                    dbUser.Right = UserRights.ALL;
                 }
                 else
                 {
-                    return null;
+                    if (UGroups.TryGetValue(dbUser.GroupID, out var group))
+                    {
+                        dbUser.Right = group.DefaultRight;
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
 
                 if (needUpdate)
@@ -128,18 +158,139 @@ namespace XinjingdailyBot.Handlers
                             x.LastName,
                             x.IsBot,
                             x.GroupID,
+                            x.PrivateChatID,
                             x.ModifyAt
                         }).ExecuteCommandAsync();
-                        Logger.Debug($"更新用户 {dbUser} 成功");
+                        if (IsDebug)
+                        {
+                            Logger.Debug($"更新用户 {dbUser} 成功");
+                        }
                     }
                     catch (Exception ex)
                     {
-                        Logger.Debug($"更新用户 {dbUser} 失败");
+                        Logger.Error($"更新用户 {dbUser} 失败");
                         Logger.Error(ex);
                         return null;
                     }
                 }
             }
+            return dbUser;
+        }
+
+        /// <summary>
+        /// 根据UserID获取用户
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        private static async Task<Users?> FetchDbUser(long? userID)
+        {
+            if (userID == null)
+            {
+                return null;
+            }
+            else
+            {
+                var dbUser = await DB.Queryable<Users>().FirstAsync(x => x.UserID == userID);
+                return dbUser;
+            }
+        }
+
+        /// <summary>
+        /// 根据UserName获取用户
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        private static async Task<Users?> FetchDbUser(string? userName)
+        {
+            if (string.IsNullOrEmpty(userName))
+            {
+                return null;
+            }
+            else
+            {
+                var dbUser = await DB.Queryable<Users>().FirstAsync(x => x.UserName == userName);
+                return dbUser;
+            }
+        }
+
+        /// <summary>
+        /// 根据ReplyToMessage获取目标用户
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        internal static async Task<Users?> FetchTargetUser(Message message)
+        {
+            if (message.ReplyToMessage == null)
+            {
+                return null;
+            }
+
+            Message replyToMsg = message.ReplyToMessage;
+
+            if (replyToMsg.From == null)
+            {
+                return null;
+            }
+
+            //被回复的消息是Bot发的消息
+            if (replyToMsg.From.Id == BotUser.Id)
+            {
+                //在审核群内
+                if (message.Chat.Id == ReviewGroup.Id)
+                {
+                    int msgID = replyToMsg.MessageId;
+
+                    var post = await DB.Queryable<Posts>().FirstAsync(x => x.ReviewMsgID == msgID || x.ManageMsgID == msgID);
+
+                    //判断是不是审核相关消息
+                    if (post != null)
+                    {
+                        //通过稿件读取用户信息
+                        return await FetchDbUser(post.PosterUID);
+                    }
+                }
+                //在CMD回调表里查看
+                var cmdAction = await DB.Queryable<CmdActions>().FirstAsync(x => x.MessageID == replyToMsg.MessageId);
+                if (cmdAction != null)
+                {
+                    return await FetchDbUser(cmdAction.OperatorUID);
+                }
+
+                return null;
+            }
+
+            return await FetchDbUser(replyToMsg.From.Id);
+        }
+
+        /// <summary>
+        /// 根据用户输入查找指定用户
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        internal static async Task<Users?> FetchTargetUser(string? target)
+        {
+            if (string.IsNullOrEmpty(target))
+            {
+                return null;
+            }
+
+            if (target.StartsWith('@'))
+            {
+                return await FetchDbUser(target.Substring(1));
+            }
+
+            Users? dbUser = null;
+
+            if (long.TryParse(target, out var userID))
+            {
+                dbUser = await FetchDbUser(userID) ;    
+            }
+
+            if(dbUser == null)
+            {
+                dbUser = await FetchDbUser(target);
+            }
+
             return dbUser;
         }
     }

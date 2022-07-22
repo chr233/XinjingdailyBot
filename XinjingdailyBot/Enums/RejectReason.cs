@@ -38,6 +38,10 @@
         /// </summary>
         CustomReason,
         /// <summary>
+        /// 令人迷惑
+        /// </summary>
+        Confused,
+        /// <summary>
         /// 审核超时,自动拒稿
         /// </summary>
         AutoReject = 255,
