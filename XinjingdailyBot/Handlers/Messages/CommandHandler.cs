@@ -55,6 +55,7 @@ namespace XinjingdailyBot.Handlers.Messages
         /// <returns></returns>
         private static async Task<string?> ExecCommand(ITelegramBotClient botClient, Users dbUser, Message message)
         {
+
             string input = message.Text![1..];
 
             int index = input.IndexOf('@');
@@ -144,6 +145,8 @@ namespace XinjingdailyBot.Handlers.Messages
                             return null;
                     }
                 default://带参数
+                    int argsLen = args.Length;
+
                     string payload = string.Join(" ", args[1..]);
 
                     switch (args[0].ToUpperInvariant())
