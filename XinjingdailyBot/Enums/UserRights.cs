@@ -3,6 +3,9 @@
     [Flags]
     internal enum UserRights : byte
     {
+        /// <summary>
+        /// 无权限
+        /// </summary>
         None = 0x00,
         /// <summary>
         /// 投稿
@@ -29,5 +32,10 @@
         /// 超管命令
         /// </summary>
         SuperCmd = 0x40,
+
+        /// <summary>
+        /// 全部权限
+        /// </summary>
+        ALL = 0xFF,
     }
 }

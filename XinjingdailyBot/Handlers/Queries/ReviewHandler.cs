@@ -67,19 +67,21 @@ namespace XinjingdailyBot.Handlers.Queries
                     await RejectPostHelper(botClient, post, dbUser, RejectReason.Fuzzy);
                     break;
                 case "reject duplicate":
-                    post.Reason = RejectReason.Duplicate;
                     await RejectPostHelper(botClient, post, dbUser, RejectReason.Duplicate);
                     break;
                 case "reject boring":
-                    post.Reason = RejectReason.Boring;
                     await RejectPostHelper(botClient, post, dbUser, RejectReason.Boring);
                     break;
+                case "reject confusing":
+                    await RejectPostHelper(botClient, post, dbUser, RejectReason.Confused);
+                    break;
                 case "reject deny":
-                    post.Reason = RejectReason.Deny;
                     await RejectPostHelper(botClient, post, dbUser, RejectReason.Deny);
                     break;
+                case "reject qrcode":
+                    await RejectPostHelper(botClient, post, dbUser, RejectReason.QRCode);
+                    break;
                 case "reject other":
-                    post.Reason = RejectReason.Other;
                     await RejectPostHelper(botClient, post, dbUser, RejectReason.Other);
                     break;
 
@@ -111,7 +113,7 @@ namespace XinjingdailyBot.Handlers.Queries
         /// <returns></returns>
         private static async Task RejectPostHelper(ITelegramBotClient botClient, Posts post, Users dbUser, RejectReason rejectReason)
         {
-            post.Reason = RejectReason.Fuzzy;
+            post.Reason = rejectReason;
             string reason = TextHelper.RejectReasonToString(rejectReason);
             await RejetPost(botClient, post, dbUser, reason);
 

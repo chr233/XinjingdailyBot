@@ -12,11 +12,15 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 {
     internal static class AdminCmd
     {
+        /// <summary>
+        /// 审核命令帮助
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <returns></returns>
         internal static async Task<string?> ResponseReviewHelp(Users dbUser)
         {
             return "";
         }
-
 
         /// <summary>
         /// 自定义拒稿
@@ -66,7 +70,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         }
 
         /// <summary>
-        /// 自定义通过
+        /// 自定义通过(TODO)
         /// </summary>
         /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
@@ -113,156 +117,171 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         }
 
 
-        internal static async Task<string> ResponseBan(ITelegramBotClient botClient, Users dbUser, Message message, string argv)
+        /// <summary>
+        /// 封禁用户
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        internal static async Task<string> ResponseBan(ITelegramBotClient botClient, Users dbUser, Message message, string[]? args)
         {
-            if (!dbUser.Right.HasFlag(UserRights.AdminCmd))
-            {
-                return "你没有管理权限";
-            }
+            var targetUser = await FetchUserHelper.FetchTargetUser(message);
 
-            if (message.Chat.Id != ReviewGroup.Id)
+            if(targetUser == null)
             {
-                return "该命令仅限审核群内使用";
-            }
-
-            long UserID;
-            string reason;
-
-            if (message.ReplyToMessage != null)
-            {
-                int messageId = message.ReplyToMessage.MessageId;
-                var post = await DB.Queryable<Posts>().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
-                if (post != null)
+                if(args != null && args.Any())
                 {
-                    UserID = post.PosterUID;
+                    targetUser = await FetchUserHelper.FetchTargetUser(args.First());
                 }
-                else
-                {
-                    return "你回复的信息不是稿件";
-                }
-
-                reason = argv;
             }
-            else
+
+            if(targetUser == null)
             {
-                string [] argvs = argv.Split(" ", 2);
-
-                if (IsLong(argvs[0]))
-                {
-                    return "第一个字符串必须为用户ID";
-                }
-
-                UserID = long.Parse(argvs[0]);
-                reason = argvs[1];
+                return "找不到指定用户";
             }
 
-            var target = await DB.Queryable<Ban>().FirstAsync(x => x.UserID == UserID);
+            return targetUser.ToString();
+            //Users targetUser;
+            //string reason;
 
-            if (target == null)
-            {
-                target = new Ban();
-                target.UserID = UserID;
-                target.Reason = reason;
-                target.BanTime = DateTime.Now;
-                target.ExecutiveAdminID = message.From!.Id;
+            //if (message.ReplyToMessage != null)
+            //{
+            //    int messageId = message.ReplyToMessage.MessageId;
 
-                await DB.Insertable(target).InsertColumns(x => new
-                {
-                    x.Reason,
-                    x.BanTime,
-                    x.UserID,
-                    x.ExecutiveAdminID
-                }).ExecuteCommandAsync();
-            }
-            else
-            {
-                target.Reason = reason;
-                target.BanTime = DateTime.Now;
-                target.ExecutiveAdminID = message.From!.Id;
+            //    //在审核群内
+            //    if (message.Chat.Id == ReviewGroup.Id)
+            //    {
+            //        var post = await DB.Queryable<Posts>().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
 
-                await DB.Updateable(target).UpdateColumns(x => new
-                {
-                    x.Reason,
-                    x.BanTime,
-                    x.UserID,
-                    x.ExecutiveAdminID
-                }).ExecuteCommandAsync();
-            }
+            //        if (post != null)
+            //        {
+            //            //通过稿件读取用户信息
+            //            targetUser = await DB.Queryable<Users>().FirstAsync(x => x.UserID == post.PosterUID) ?? throw new Exception("用户不存在");
+            //            reason = string.Join(' ', args);
+            //        }
+            //        else
+            //        {
 
-            var user = await DB.Queryable<Users>().FirstAsync(x => x.Id == target.UserID);
-            if (user == null)
-            {
-                return "未找到该用户";
-            }
-            user.IsBan = true;
-            await DB.Updateable(user).UpdateColumns(x => x.IsBan).ExecuteCommandAsync();
+            //        }
 
-            return "已封禁该用户!\n理由: <code>{reason}</code>";
+            //    }
+
+
+            //    else
+            //    {
+            //        return "你回复的信息不是稿件";
+            //    }
+
+            //    reason = args;
+            //}
+            //else
+            //{
+            //    string[] argvs = args.Split(" ", 2);
+
+            //    if (IsLong(argvs[0]))
+            //    {
+            //        return "第一个字符串必须为用户ID";
+            //    }
+
+            //    UserID = long.Parse(argvs[0]);
+            //    reason = argvs[1];
+            //}
+
+
+            //var target = await DB.Queryable<BanRecords>().FirstAsync(x => x.UserID == UserID);
+
+            //if (target == null)
+            //{
+            //    target = new BanRecords();
+            //    target.UserID = UserID;
+            //    target.Reason = reason;
+            //    target.BanTime = DateTime.Now;
+            //    target.OperatorUID = message.From!.Id;
+
+            //    await DB.Insertable(target).ExecuteCommandAsync();
+            //}
+            //else
+            //{
+            //    target.Reason = reason;
+            //    target.BanTime = DateTime.Now;
+            //    target.ExecutiveAdminID = message.From!.Id;
+
+            //    await DB.Updateable(target).UpdateColumns(x => new
+            //    {
+            //        x.Reason,
+            //        x.BanTime,
+            //        x.UserID,
+            //        x.ExecutiveAdminID
+            //    }).ExecuteCommandAsync();
+            //}
+
+            //var user = await DB.Queryable<Users>().FirstAsync(x => x.Id == target.UserID);
+            //if (user == null)
+            //{
+            //    return "未找到该用户";
+            //}
+            //user.IsBan = true;
+            //await DB.Updateable(user).UpdateColumns(x => x.IsBan).ExecuteCommandAsync();
+
+            //return $"已封禁该用户!\n理由: <code>{reason}</code>";
 
         }
 
-        internal static async Task<string> ResponseUnban(ITelegramBotClient botClient, Users dbUser, Message message, string argv)
+        internal static async Task<string> ResponseUnban(ITelegramBotClient botClient, Users dbUser, Message message, string[] argv)
         {
-            if (!dbUser.Right.HasFlag(UserRights.AdminCmd))
-            {
-                return "你没有管理权限";
-            }
+            return "";
+            //long userID;
+            //string reason;
 
-            if (message.Chat.Id != ReviewGroup.Id)
-            {
-                return "该命令仅限审核群内使用";
-            }
+            //if (message.ReplyToMessage != null)
+            //{
+            //    int messageId = message.ReplyToMessage.MessageId;
+            //    var post = await DB.Queryable<Posts>().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
+            //    if (post != null)
+            //    {
+            //        userID = post.PosterUID;
+            //    }
+            //    else
+            //    {
+            //        return "你回复的信息不是稿件";
+            //    }
 
-            long userID;
-            string reason;
+            //    reason = argv;
+            //}
+            //else
+            //{
+            //    string[] argvs = argv.Split(" ", 2);
 
-            if (message.ReplyToMessage != null)
-            {
-                int messageId = message.ReplyToMessage.MessageId;
-                var post = await DB.Queryable<Posts>().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
-                if (post != null)
-                {
-                    userID = post.PosterUID;
-                }
-                else
-                {
-                    return "你回复的信息不是稿件";
-                }
+            //    if (IsLong(argvs[0]))
+            //    {
+            //        return "第一个字符串必须为用户ID";
+            //    }
 
-                reason = argv;
-            }
-            else
-            {
-                string [] argvs = argv.Split(" ", 2);
+            //    userID = long.Parse(argvs[0]);
+            //    reason = argvs[1];
+            //}
 
-                if (IsLong(argvs[0]))
-                {
-                    return "第一个字符串必须为用户ID";
-                }
+            //var target = await DB.Queryable<BanRecords>().FirstAsync(x => x.UserID == userID);
 
-                userID = long.Parse(argvs[0]);
-                reason = argvs[1];
-            }
+            //if (target == null)
+            //{
+            //    return "该用户未被封禁";
+            //}
 
-            var target = await DB.Queryable<Ban>().FirstAsync(x => x.UserID == userID);
+            //DB.Deleteable(target).ExecuteCommand();
 
-            if (target == null)
-            {
-                return "该用户未被封禁";
-            }
+            //var user = await DB.Queryable<Users>().FirstAsync(x => x.Id == target.UserID);
+            //if (user == null)
+            //{
+            //    return "未找到该用户";
+            //}
+            //user.IsBan = false;
+            //await DB.Updateable(user).UpdateColumns(x => x.IsBan).ExecuteCommandAsync();
 
-            DB.Deleteable(target).ExecuteCommand();
-
-            var user = await DB.Queryable<Users>().FirstAsync(x => x.Id == target.UserID);
-            if (user == null)
-            {
-                return "未找到该用户";
-            }
-            user.IsBan = false;
-            await DB.Updateable(user).UpdateColumns(x => x.IsBan).ExecuteCommandAsync();
-
-            return $"已解封用户 {TextHelper.HtmlUserLink(user)}\n" +
-                   $"理由: <code>{reason}</code>";
+            //return $"已解封用户 {TextHelper.HtmlUserLink(user)}\n" +
+            //       $"理由: <code>{reason}</code>";
         }
 
         internal static async Task<string> QueryBan(ITelegramBotClient botClient, Users dbUser, Message message)
@@ -270,59 +289,44 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             return await QueryBan(botClient, dbUser, message, null);
         }
 
-        internal static async Task<string> QueryBan(ITelegramBotClient botClient, Users dbUser, Message message, string? argv)
+        internal static async Task<string> QueryBan(ITelegramBotClient botClient, Users dbUser, Message message, string[]? argv)
         {
-            if (!dbUser.Right.HasFlag(UserRights.AdminCmd))
-            {
-                return "你没有管理权限";
-            }
+            return "";
 
-            if (message.Chat.Id != ReviewGroup.Id)
-            {
-                return "该命令仅限审核群内使用";
-            }
+            //long targetID;
 
-            long targetID;
+            //if (argv != null)
+            //{
+            //    if (!IsLong(argv))
+            //    {
+            //        return "参数必须为一个数字";
+            //    }
+            //    targetID = long.Parse(argv);
+            //}
+            //else
+            //{
+            //    int messageId = message.ReplyToMessage!.MessageId;
+            //    var post = await DB.Queryable<Posts>().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
+            //    if (post == null)
+            //    {
+            //        return "未找到此投稿";
+            //    }
+            //    targetID = post.PosterUID;
+            //}
 
-            if (argv != null)
-            {
-                if (!IsLong(argv))
-                {
-                    return "参数必须为一个数字";
-                }
-                targetID = long.Parse(argv);
-            }
-            else
-            {
-                int messageId = message.ReplyToMessage!.MessageId;
-                var post = await DB.Queryable<Posts>().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
-                if (post == null)
-                {
-                    return "未找到此投稿";
-                }
-                targetID = post.PosterUID;
-            }
+            //var ban = await GetBan(targetID);
+            //if (ban == null)
+            //{
+            //    return "该用户未被封禁";
+            //}
 
-            var ban = await GetBan(targetID);
-            if (ban == null)
-            {
-                return "该用户未被封禁";
-            }
-
-            return $"被封禁人: {TextHelper.HtmlUserLink(await DB.Queryable<Users>().FirstAsync(x => x.Id == ban.UserID))}\n" +
-                   $"封禁管理: {TextHelper.HtmlUserLink(await DB.Queryable<Users>().FirstAsync(x => x.Id == ban.ExecutiveAdminID))}\n" +
-                   $"封禁时间: {ban.BanTime.ToString("yyyy MMMM dd")}\n" +
-                   $"封禁理由: <code>{ban.Reason}</code>";
+            //return $"被封禁人: {TextHelper.HtmlUserLink(await DB.Queryable<Users>().FirstAsync(x => x.Id == ban.UserID))}\n" +
+            //       $"封禁管理: {TextHelper.HtmlUserLink(await DB.Queryable<Users>().FirstAsync(x => x.Id == ban.ExecutiveAdminID))}\n" +
+            //       $"封禁时间: {ban.BanTime.ToString("yyyy MMMM dd")}\n" +
+            //       $"封禁理由: <code>{ban.Reason}</code>";
         }
 
-        /// <summary>
-        /// 自定义通过
-        /// </summary>
-        /// <param name="botClient"></param>
-        /// <param name="dbUser"></param>
-        /// <param name="message"></param>
-        /// <param name="reason"></param>
-        /// <returns></returns>
+
         internal static string ResponseGroupInfo(Users dbUser, Message message)
         {
             var chat = message.Chat;
