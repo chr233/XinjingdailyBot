@@ -27,12 +27,10 @@
         public string DBPassword { get; set; } = "123456";
         public bool DBGenerate { get; set; } = true;
 
-        public int DBVersion { get; set; } = 1;
-
         /// <summary>
         /// 超级管理员(覆盖数据库配置)
         /// </summary>
-        public HashSet<int> SuperAdmins { get; set; } = new();
+        public HashSet<long> SuperAdmins { get; set; } = new();
 
         /// <summary>
         /// 审核群组

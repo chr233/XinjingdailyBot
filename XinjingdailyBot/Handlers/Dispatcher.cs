@@ -1,7 +1,6 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InlineQueryResults;
 using XinjingdailyBot.Helpers;
 using XinjingdailyBot.Localization;
 using XinjingdailyBot.Models;
@@ -28,14 +27,10 @@ namespace XinjingdailyBot.Handlers
                 //await botClient.AutoReplyAsync(text: "意外错误", update, cancellationToken);
                 return;
             }
+
             if (dbUser.IsBan)
             {
-                var ban = await GetBan(dbUser);
-                await botClient.AutoReplyAsync($"您已被封禁!\n" +
-                                               $"封禁时间: <code>{ban.BanTime.ToString("yyyy MMMM dd")}</code>" +
-                                               $"理由: <code>{ban.Reason}</code>",
-                                               update,
-                                               cancellationToken);
+                await botClient.AutoReplyAsync("无权访问", update, cancellationToken);
                 return;
             }
 
@@ -90,8 +85,8 @@ namespace XinjingdailyBot.Handlers
                 {
                     try
                     {
-                        if (NSFWWrning == message.Text)
-                        {//绑定频道的通知
+                        if (NSFWWrning == message.Text)//绑定频道的通知
+                        {
                             await botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
                         }
                         else
@@ -175,26 +170,10 @@ namespace XinjingdailyBot.Handlers
             }
         }
 
-        private static async Task BotOnInlineQueryReceived(ITelegramBotClient botClient, Users dbUser, InlineQuery inlineQuery)
+        private static Task BotOnInlineQueryReceived(ITelegramBotClient botClient, Users dbUser, InlineQuery inlineQuery)
         {
             Console.WriteLine($"Received inline query from: {inlineQuery.From.Id}");
-
-            InlineQueryResult [] results =
-            {
-                // displayed result
-                new InlineQueryResultArticle(
-                    id: "3",
-                    title: "TgBots",
-                    inputMessageContent: new InputTextMessageContent(
-                        "hello"
-                    )
-                )
-            };
-
-            await botClient.AnswerInlineQueryAsync(inlineQueryId: inlineQuery.Id,
-                                                   results: results,
-                                                   isPersonal: true,
-                                                   cacheTime: 0);
+            return Task.CompletedTask;
         }
 
         private static Task BotOnChosenInlineResultReceived(ITelegramBotClient botClient, Users dbUser, ChosenInlineResult chosenInlineResult)

@@ -74,11 +74,11 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             var keyboard = MarkupHelper.SetUserGroupKeyboard();
             var msg = await botClient.SendTextMessageAsync(message.Chat.Id, "请选择用户组", replyMarkup: keyboard, replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
 
-            CmdRecord record = new()
+            CmdActions record = new()
             {
                 ChatID = msg.Chat.Id,
                 MessageID = msg.MessageId,
-                UserID = dbUser.UserID,
+                OperatorUID = dbUser.UserID,
                 Command = "SETGROUP",
                 TargetUserID = (long)targetUserId,
             };
@@ -88,13 +88,20 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             return "";
         }
 
+        /// <summary>
+        /// 机器人重启
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         internal static async Task<string> ResponseRestart(ITelegramBotClient botClient, Users dbUser, Message message)
         {
-            CmdRecord record = new()
+            CmdActions record = new()
             {
                 ChatID = message.Chat.Id,
                 MessageID = message.MessageId,
-                UserID = dbUser.UserID,
+                OperatorUID = dbUser.UserID,
                 Command = "RESTART",
             };
 
