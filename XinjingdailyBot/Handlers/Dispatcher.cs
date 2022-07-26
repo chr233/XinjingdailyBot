@@ -167,6 +167,9 @@ namespace XinjingdailyBot.Handlers
                 case "reje":
                     await Queries.ReviewHandler.HandleQuery(botClient, dbUser, callbackQuery);
                     break;
+
+                //case "exec":
+                //    await 
             }
         }
 

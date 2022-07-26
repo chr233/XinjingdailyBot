@@ -124,6 +124,12 @@ namespace XinjingdailyBot.Handlers
                     }
                 }
 
+                //如果被封禁自动覆盖原用户组
+                if (dbUser.IsBan)
+                {
+                    dbUser.GroupID = 6;
+                }
+
                 if (!UGroups.ContainsKey(dbUser.GroupID))
                 {
                     dbUser.GroupID = 1;
@@ -259,6 +265,7 @@ namespace XinjingdailyBot.Handlers
                 return null;
             }
 
+            //获取消息发送人
             return await FetchDbUser(replyToMsg.From.Id);
         }
 
@@ -283,10 +290,10 @@ namespace XinjingdailyBot.Handlers
 
             if (long.TryParse(target, out var userID))
             {
-                dbUser = await FetchDbUser(userID) ;    
+                dbUser = await FetchDbUser(userID);
             }
 
-            if(dbUser == null)
+            if (dbUser == null)
             {
                 dbUser = await FetchDbUser(target);
             }

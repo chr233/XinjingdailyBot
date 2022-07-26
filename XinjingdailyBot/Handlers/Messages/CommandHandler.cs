@@ -55,39 +55,41 @@ namespace XinjingdailyBot.Handlers.Messages
         /// <returns></returns>
         private static async Task<string?> ExecCommand(ITelegramBotClient botClient, Users dbUser, Message message)
         {
-
             string input = message.Text![1..];
 
-            int index = input.IndexOf('@');
+            string[] args = input.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
 
+            if (!args.Any()) { return null; }
+
+            int argsLen = args.Length;
+
+            string cmd = args.First();
+            args = args[1..];
+
+            //判断是不是自己的命令
+            int index = cmd.IndexOf('@');
             if (index != -1)
             {
-                string botName = input[(index + 1)..];
+                string botName = cmd[(index + 1)..];
                 if (!botName.Equals(BotName, StringComparison.OrdinalIgnoreCase))
                 {
                     return "";
                 }
-                input = input[..index];
+                cmd = cmd[..index];
             }
+            cmd = cmd.ToUpperInvariant();
 
             bool super = dbUser.Right.HasFlag(UserRights.SuperCmd);
             bool admin = dbUser.Right.HasFlag(UserRights.AdminCmd) || super;
             bool normal = dbUser.Right.HasFlag(UserRights.NormalCmd) || admin;
 
-            string[] args = input.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
-
-            if (!args.Any())
-            {
-                return null;
-            }
-
-            switch (args.Length)
+            switch (argsLen)
             {
                 case 0:
                     return null;
 
                 case 1://不带参数
-                    switch (args[0].ToUpperInvariant())
+                    switch (cmd)
                     {
                         case "VERSION":
                             return NormalCmd.ResponseVersion();
@@ -122,6 +124,9 @@ namespace XinjingdailyBot.Handlers.Messages
                         case "REVIEWHELP" when admin:
                             return await AdminCmd.ResponseReviewHelp(dbUser);
 
+                        case "USERINFO" when admin:
+                            return await AdminCmd.ResponseUserInfo(botClient, dbUser, message, null);
+
                         case "NO" when admin:
                             return await AdminCmd.ResponseNo(botClient, dbUser, message, null);
                         //case "YES" when admin:
@@ -130,9 +135,14 @@ namespace XinjingdailyBot.Handlers.Messages
                         case "GROUPINFO" when admin:
                             return AdminCmd.ResponseGroupInfo(dbUser, message);
 
+                        case "BAN" when admin:
+                            return await AdminCmd.ResponseBan(botClient, dbUser, message, null);
+
+                        case "UNBAN" when admin:
+                            return await AdminCmd.ResponseUnban(botClient, dbUser, message, null);
 
                         case "QUERYBAN" when admin:
-                            return await AdminCmd.QueryBan(botClient, dbUser, message);
+                            return await AdminCmd.ResponseQueryBan(botClient, dbUser, message, null);
 
                         //Super
                         case "SETGROUP" when super:
@@ -145,34 +155,35 @@ namespace XinjingdailyBot.Handlers.Messages
                             return null;
                     }
                 default://带参数
-                    int argsLen = args.Length;
-
                     string payload = string.Join(" ", args[1..]);
 
-                    switch (args[0].ToUpperInvariant())
+                    switch (cmd)
                     {
                         //Admin
                         case "REVIEWHELP" when admin:
                             return await AdminCmd.ResponseReviewHelp(dbUser);
 
+                        case "USERINFO" when admin:
+                            return await AdminCmd.ResponseUserInfo(botClient, dbUser, message, args);
+
                         case "NO" when admin:
                             return await AdminCmd.ResponseNo(botClient, dbUser, message, payload);
 
                         case "BAN" when admin:
-                            return await AdminCmd.ResponseBan(botClient, dbUser, message, args[1..]);
+                            return await AdminCmd.ResponseBan(botClient, dbUser, message, args);
 
                         case "UNBAN" when admin:
-                            return await AdminCmd.ResponseUnban(botClient, dbUser, message, args[1..]);
+                            return await AdminCmd.ResponseUnban(botClient, dbUser, message, args);
 
                         case "QUERYBAN":
-                            return await AdminCmd.QueryBan(botClient, dbUser, message, args[1..]);
+                            return await AdminCmd.ResponseQueryBan(botClient, dbUser, message, args);
 
                         //case "YES" when admin:
                         //    return await AdminCmd.ResponseYes(botClient, dbUser, message, payload);
 
                         //Super
-                        case "SETGROUP" when super:
-                            return await SuperCmd.SetUserGroup(botClient, dbUser, message, args[1..]);
+                        case "SETUSERGROUP" when super:
+                            return await SuperCmd.SetUserGroup(botClient, dbUser, message, args);
 
                         default:
                             return null;
