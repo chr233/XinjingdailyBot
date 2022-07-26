@@ -262,7 +262,6 @@ namespace XinjingdailyBot.Handlers.Queries
         /// <param name="botClient"></param>
         /// <param name="post"></param>
         /// <param name="dbUser"></param>
-        /// <param name="rejectReason"></param>
         /// <param name="callbackQuery"></param>
         /// <returns></returns>
         private static async Task AcceptPost(ITelegramBotClient botClient, Posts post, Users dbUser, CallbackQuery callbackQuery)
@@ -341,6 +340,10 @@ namespace XinjingdailyBot.Handlers.Queries
 
             await botClient.AutoReplyAsync("稿件已发布", callbackQuery);
 
+            post.ReviewerUID = dbUser.UserID;
+            post.Status = PostStatus.Accepted;
+            post.ModifyAt = DateTime.Now;
+
             //修改审核群消息
             if (!post.IsDirectPost) // 非直接投稿
             {
@@ -350,13 +353,11 @@ namespace XinjingdailyBot.Handlers.Queries
             else //直接投稿, 在审核群留档
             {
                 string reviewMsg = TextHelper.MakeReviewMessage(poster, post.PublicMsgID, post.Anymouse);
-                await botClient.SendTextMessageAsync(ReviewGroup.Id, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
+                var msg = await botClient.SendTextMessageAsync(ReviewGroup.Id, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
+                post.ReviewMsgID = msg.MessageId;
             }
 
-            post.ReviewerUID = dbUser.UserID;
-            post.Status = PostStatus.Accepted;
-            post.ModifyAt = DateTime.Now;
-            await DB.Updateable(post).UpdateColumns(x => new { x.PublicMsgID, x.ReviewerUID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
+            await DB.Updateable(post).UpdateColumns(x => new { x.ReviewMsgID, x.PublicMsgID, x.ReviewerUID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
 
             //通知投稿人
             bool directPost = post.ManageMsgID == post.ActionMsgID;
