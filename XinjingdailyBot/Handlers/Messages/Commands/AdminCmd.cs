@@ -258,7 +258,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 return "找不到指定用户";
             }
 
-            if(targetUser.Id == dbUser.Id)
+            if (targetUser.Id == dbUser.Id)
             {
                 return "无法对自己进行操作";
             }
@@ -331,7 +331,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             sb.AppendLine($"状态: <code>{status}</code>");
             sb.AppendLine();
 
-            if (records == null)
+            if (records == null || !records.Any())
             {
                 sb.AppendLine("尚未查到封禁/解封记录");
             }
@@ -347,7 +347,6 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             return sb.ToString();
         }
-
 
         /// <summary>
         /// 获取群组信息
