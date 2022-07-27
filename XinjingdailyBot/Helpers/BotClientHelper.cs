@@ -46,9 +46,10 @@ namespace XinjingdailyBot.Helpers
             this ITelegramBotClient botClient,
             string text,
             Message message,
+            ParseMode? parsemode = null,
             CancellationToken cancellationToken = default)
         {
-            return await botClient.SendTextMessageAsync(message.Chat.Id, text, replyToMessageId: message.MessageId, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
+            return await botClient.SendTextMessageAsync(message.Chat.Id, text, parsemode, replyToMessageId: message.MessageId, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
         }
 
         /// <summary>

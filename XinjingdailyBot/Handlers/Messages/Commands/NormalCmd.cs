@@ -11,141 +11,27 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 {
     internal static class NormalCmd
     {
-        private static Dictionary<string, string> NormalCmds { get; } = new()
-        {
-            { "anymouse", "设置投稿是否默认匿名" },
-            { "notification", "设置是否开启投稿通知" },
-            { "A", "" },
-            { "admin", "呼叫群管理" },
-            { "B", "" },
-            { "myinfo", "查询投稿数量" },
-            { "myright", "查询权限信息" },
-            { "C", "" },
-            { "TODO", "TODO" },
-        };
-
-        private static Dictionary<string, string> AdminCmds { get; } = new()
-        {
-            { "no", "自定义拒稿理由" },
-            { "yes", "自定义稿件说明" },
-        };
-
-        private static Dictionary<string, string> SuperCmds { get; } = new()
-        {
-            { "restart", "重启机器人" },
-        };
-
         /// <summary>
-        /// 显示命令帮助
+        /// 测试机器人是否存活
         /// </summary>
-        /// <param name="normal"></param>
-        /// <param name="admin"></param>
-        /// <param name="super"></param>
+        /// <param name="botClient"></param>
+        /// <param name="message"></param>
+        /// <param name="msgs"></param>
         /// <returns></returns>
-        internal static string ResponseHelp(Users dbUser)
+        internal static async Task ResponsePing(ITelegramBotClient botClient, Message message, List<Message> msgs)
         {
-            bool super = dbUser.Right.HasFlag(UserRights.SuperCmd);
-            bool admin = dbUser.Right.HasFlag(UserRights.AdminCmd) || super;
-            bool normal = dbUser.Right.HasFlag(UserRights.NormalCmd) || admin;
-
-            StringBuilder sb = new();
-
-            if (normal)
-            {
-                sb.AppendLine("发送图片/视频或者文字内容即可投稿\n");
-            }
-            else
-            {
-                sb.AppendLine("无权访问\n");
-            }
-
-            if (super)
-            {
-                foreach (var cmd in SuperCmds)
-                {
-                    if (!string.IsNullOrEmpty(cmd.Value))
-                    {
-                        sb.AppendLine($"/{cmd.Key}  {cmd.Value}");
-                    }
-                    else
-                    {
-                        sb.AppendLine();
-                    }
-                }
-            }
-
-            if (admin)
-            {
-                sb.AppendLine();
-                foreach (var cmd in AdminCmds)
-                {
-                    if (!string.IsNullOrEmpty(cmd.Value))
-                    {
-                        sb.AppendLine($"/{cmd.Key}  {cmd.Value}");
-                    }
-                    else
-                    {
-                        sb.AppendLine();
-                    }
-                }
-            }
-
-            if (normal)
-            {
-                sb.AppendLine();
-                foreach (var cmd in NormalCmds)
-                {
-                    if (!string.IsNullOrEmpty(cmd.Value))
-                    {
-                        sb.AppendLine($"/{cmd.Key}  {cmd.Value}");
-                    }
-                    else
-                    {
-                        sb.AppendLine();
-                    }
-                }
-            }
-
-            return sb.ToString();
-        }
-
-        /// <summary>
-        /// 首次欢迎语
-        /// </summary>
-        /// <returns></returns>
-        internal static string ResponseStart()
-        {
-            StringBuilder sb = new();
-            sb.AppendLine("欢迎使用心惊报 @xinjingdaily 专用投稿机器人");
-            sb.AppendLine("直接发送图片或者文字内容即可投稿");
-            sb.AppendLine("查看命令帮助: /help");
-            return sb.ToString();
-        }
-
-        /// <summary>
-        /// 测试存活
-        /// </summary>
-        /// <returns></returns>
-        internal static string ResponsePing()
-        {
-            return "PONG!";
-        }
-
-        /// <summary>
-        /// 查看机器人版本
-        /// </summary>
-        /// <returns></returns>
-        internal static string ResponseVersion()
-        {
-            return $"机器人版本: {MyVersion}";
+            msgs.Add(await botClient.AutoReplyAsync("PONG!", message));
         }
 
         /// <summary>
         /// 设置是否匿名
         /// </summary>
+        /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <param name="msgs"></param>
         /// <returns></returns>
-        internal static async Task<string> ResponseAnymouse(Users dbUser)
+        internal static async Task ResponseAnymouse(ITelegramBotClient botClient, Users dbUser, Message message, List<Message> msgs)
         {
             bool anymouse = !dbUser.PreferAnymouse;
             dbUser.PreferAnymouse = anymouse;
@@ -153,15 +39,19 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             await DB.Updateable(dbUser).UpdateColumns(x => new { x.PreferAnymouse, x.ModifyAt }).ExecuteCommandAsync();
 
             string mode = anymouse ? "匿名投稿" : "保留来源";
-            return $"后续投稿将默认使用【{mode}】";
+            string text = $"后续投稿将默认使用【{mode}】";
+            msgs.Add(await botClient.AutoReplyAsync(text, message));
         }
 
         /// <summary>
-        /// 设置是否匿名
+        /// 设置稿件审核后是否通知
         /// </summary>
+        /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <param name="msgs"></param>
         /// <returns></returns>
-        internal static async Task<string> ResponseNotification(Users dbUser)
+        internal static async Task ResponseNotification(ITelegramBotClient botClient, Users dbUser, Message message, List<Message> msgs)
         {
             bool notificationg = !dbUser.Notification;
             dbUser.Notification = notificationg;
@@ -169,15 +59,20 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             await DB.Updateable(dbUser).UpdateColumns(x => new { x.Notification, x.ModifyAt }).ExecuteCommandAsync();
 
             string mode = notificationg ? "发送通知" : "静默模式";
-            return $"投稿通过或者拒绝后将【{mode}】";
+            string text = $"投稿通过或者拒绝后将【{mode}】";
+            msgs.Add(await botClient.AutoReplyAsync(text, message));
         }
 
+
         /// <summary>
-        /// 获取用户信息
+        /// 获取自己的信息
         /// </summary>
+        /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <param name="msgs"></param>
         /// <returns></returns>
-        internal static string ResponseMyInfo(Users dbUser)
+        internal static async Task ResponseMyInfo(ITelegramBotClient botClient, Users dbUser, Message message, List<Message> msgs)
         {
             string userNick = TextHelper.EscapeHtml(dbUser.UserNick);
             string level = "Lv Err";
@@ -201,15 +96,19 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             sb.AppendLine($"拒绝数量: <code>{dbUser.RejetCount}</code>");
             sb.AppendLine($"审核数量: <code>{dbUser.ReviewCount}</code>");
 
-            return sb.ToString();
+            msgs.Add(await botClient.AutoReplyAsync(sb.ToString(), message));
         }
 
+
         /// <summary>
-        /// 获取用户权限
+        /// 获取自己的权限
         /// </summary>
+        /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <param name="msgs"></param>
         /// <returns></returns>
-        internal static string ResponseMyRight(Users dbUser)
+        internal static async Task ResponseMyRight(ITelegramBotClient botClient, Users dbUser, Message message, List<Message> msgs)
         {
             var right = dbUser.Right;
             bool superCmd = right.HasFlag(UserRights.SuperCmd);
@@ -239,36 +138,36 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             if (normalCmd) { functions.Add("普通命令"); }
             if (functions.Count == 0) { functions.Add("无"); }
 
-
-
             StringBuilder sb = new();
             sb.AppendLine($"用户名: <code>{userNick}</code>");
             sb.AppendLine($"用户组: <code>{group}</code>");
             sb.AppendLine($"功能: <code>{string.Join(", ", functions)}</code>");
             sb.AppendLine($"命令: <code>{string.Join(", ", commands)}</code>");
 
-            return sb.ToString();
+            msgs.Add(await botClient.AutoReplyAsync(sb.ToString(), message));
         }
 
         /// <summary>
         /// 艾特群管理
         /// </summary>
         /// <param name="botClient"></param>
-        /// <param name="dbUser"></param>
         /// <param name="message"></param>
+        /// <param name="msgs"></param>
         /// <returns></returns>
-        internal static async Task<string> ResponseCallAdmins(ITelegramBotClient botClient, Users dbUser, Message message)
+        internal static async Task ResponseCallAdmins(ITelegramBotClient botClient, Message message, List<Message> msgs)
         {
             if (message.Chat.Type != ChatType.Group && message.Chat.Type != ChatType.Supergroup)
             {
-                return "该命令仅在群组内有效";
+                msgs.Add(await botClient.AutoReplyAsync("该命令仅在群组内有效", message));
+                return;
             }
 
             ChatMember[] admins = await botClient.GetChatAdministratorsAsync(message.Chat.Id);
 
             var adminsStr = admins.Where(x => !(x.User.IsBot || string.IsNullOrEmpty(x.User.Username))).Select(x => $"@{x.User.Username}");
 
-            return string.Join('\n', adminsStr);
+            string text = string.Join('\n', adminsStr);
+            msgs.Add(await botClient.AutoReplyAsync(text, message));
         }
     }
 }

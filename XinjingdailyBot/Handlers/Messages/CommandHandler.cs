@@ -23,26 +23,28 @@ namespace XinjingdailyBot.Handlers.Messages
 
             bool inGroup = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
 
-            string answer = await ExecCommand(botClient, dbUser, message) ?? "未知命令";
+            List<Message> replyMessages = new() { message };
 
-            if (!string.IsNullOrEmpty(answer))
+            await ExecCommand(botClient, dbUser, message, replyMessages);
+
+            //定时删除群组中的命令消息
+            if (inGroup)
             {
-                if (inGroup && !message.Text!.Contains(BotName) && answer == "未知命令")
+                _ = Task.Run(async () =>
                 {
-                    return;
-                }
-
-                var msg = await botClient.SendTextMessageAsync(chatID, answer, ParseMode.Html, replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
-
-                if (inGroup) //定时删除命令消息
-                {
-                    _ = Task.Run(async () =>
+                    await Task.Delay(TimeSpan.FromSeconds(30));
+                    foreach (var msg in replyMessages)
                     {
-                        await Task.Delay(TimeSpan.FromSeconds(30));
-                        await botClient.DeleteMessageAsync(chatID, message.MessageId);
-                        await botClient.DeleteMessageAsync(chatID, msg.MessageId);
-                    });
-                }
+                        try
+                        {
+                            await botClient.DeleteMessageAsync(chatID, msg.MessageId);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Error(ex);
+                        }
+                    }
+                });
             }
         }
 
@@ -51,20 +53,20 @@ namespace XinjingdailyBot.Handlers.Messages
         /// </summary>
         /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
-        /// <param name="message"></param>
+        /// <param name="message">用户消息原文</param>
+        /// <param name="replyMessages">回复的消息,用于自动删除</param>
         /// <returns></returns>
-        private static async Task<string?> ExecCommand(ITelegramBotClient botClient, Users dbUser, Message message)
+        private static async Task ExecCommand(ITelegramBotClient botClient, Users dbUser, Message message, List<Message> replyMessages)
         {
             string input = message.Text![1..];
 
             string[] args = input.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
 
-            if (!args.Any()) { return null; }
-
-            int argsLen = args.Length;
+            if (!args.Any()) { return; }
 
             string cmd = args.First();
             args = args[1..];
+            string payload = string.Join(' ', args);
 
             //判断是不是自己的命令
             int index = cmd.IndexOf('@');
@@ -73,122 +75,96 @@ namespace XinjingdailyBot.Handlers.Messages
                 string botName = cmd[(index + 1)..];
                 if (!botName.Equals(BotName, StringComparison.OrdinalIgnoreCase))
                 {
-                    return "";
+                    return;
                 }
                 cmd = cmd[..index];
             }
-            cmd = cmd.ToUpperInvariant();
 
             bool super = dbUser.Right.HasFlag(UserRights.SuperCmd);
             bool admin = dbUser.Right.HasFlag(UserRights.AdminCmd) || super;
             bool normal = dbUser.Right.HasFlag(UserRights.NormalCmd) || admin;
 
-            switch (argsLen)
+            //响应命令
+            switch (cmd.ToUpperInvariant())
             {
-                case 0:
+                //Common - 通用命令, 不鉴权
+                case "HELP" when normal:
+                    await CommonCmd.ResponseHelp(botClient, dbUser, message, replyMessages);
+                    return;
+
+                case "START":
+                    await CommonCmd.ResponseStart(botClient, dbUser, message, replyMessages);
+                    return;
+
+                case "VERSION":
+                    await CommonCmd.ResponseVersion(botClient, message, replyMessages);
+                    return;
+
+                case "MYBAN":
+                    await CommonCmd.ResponseMyBan(botClient, dbUser, message, replyMessages);
+                    return;
+
+                //Normal - 普通命令
+                case "PING" when normal:
+                    await NormalCmd.ResponsePing(botClient, message, replyMessages);
+                    return;
+
+                case "ANONYMOUS" when normal:
+                    await NormalCmd.ResponseAnymouse(botClient, dbUser, message, replyMessages);
+                    return;
+
+                case "NOTIFICATION" when normal:
+                    await NormalCmd.ResponseNotification(botClient, dbUser, message, replyMessages);
+                    return;
+
+                case "MYINFO" when normal:
+                    await NormalCmd.ResponseMyInfo(botClient, dbUser, message, replyMessages);
+                    return;
+
+                case "MYRIGHT" when normal:
+                    await NormalCmd.ResponseMyRight(botClient, dbUser, message, replyMessages);
+                    return;
+
+                case "ADMIN" when normal:
+                case "ADMINS" when normal:
+                    await NormalCmd.ResponseCallAdmins(botClient, message, replyMessages);
+                    return;
+
+
+                //Admin - 管理员命令
+                case "GROUPINFO" when admin:
+                    await AdminCmd.ResponseGroupInfo(botClient, message, replyMessages);
+                    return;
+
+                case "USERINFO" when admin:
+                    return await AdminCmd.ResponseUserInfo(botClient, dbUser, message, args);
+
+                case "NO" when admin:
+                    return await AdminCmd.ResponseNo(botClient, dbUser, message, args);
+
+                case "BAN" when admin:
+                    return await AdminCmd.ResponseBan(botClient, dbUser, message, args);
+
+                case "UNBAN" when admin:
+                    return await AdminCmd.ResponseUnban(botClient, dbUser, message, args);
+
+                case "QUERYBAN":
+                    return await AdminCmd.ResponseQueryBan(botClient, dbUser, message, args);
+
+                //case "YES" when admin:
+                //    return await AdminCmd.ResponseYes(botClient, dbUser, message, payload);
+
+                //Super
+                case "SETUSERGROUP" when super:
+                    return await SuperCmd.SetUserGroup(botClient, dbUser, message, args);
+
+                case "RESTART" when super:
+                    return await SuperCmd.ResponseRestart(botClient, dbUser, message);
+
+                default:
                     return null;
-
-                case 1://不带参数
-                    switch (cmd)
-                    {
-                        case "VERSION":
-                            return NormalCmd.ResponseVersion();
-                        case "START":
-                            return NormalCmd.ResponseStart();
-
-                        //Normal
-                        case "HELP" when normal:
-                            return NormalCmd.ResponseHelp(dbUser);
-
-                        case "ANYMOUSE" when normal:
-                        case "ANONYMOUS" when normal:
-                            return await NormalCmd.ResponseAnymouse(dbUser);
-
-                        case "NOTIFICATION" when normal:
-                            return await NormalCmd.ResponseNotification(dbUser);
-
-                        case "MYINFO" when normal:
-                            return NormalCmd.ResponseMyInfo(dbUser);
-
-                        case "MYRIGHT" when normal:
-                            return NormalCmd.ResponseMyRight(dbUser);
-
-                        case "ADMIN" when normal:
-                        case "ADMINS" when normal:
-                            return await NormalCmd.ResponseCallAdmins(botClient, dbUser, message);
-
-                        case "PING" when normal:
-                            return NormalCmd.ResponsePing();
-
-                        //Admin
-                        case "REVIEWHELP" when admin:
-                            return await AdminCmd.ResponseReviewHelp(dbUser);
-
-                        case "USERINFO" when admin:
-                            return await AdminCmd.ResponseUserInfo(botClient, dbUser, message, null);
-
-                        case "NO" when admin:
-                            return await AdminCmd.ResponseNo(botClient, dbUser, message, null);
-                        //case "YES" when admin:
-                        //    return await AdminCmd.ResponseYes(botClient, dbUser, message, null);
-
-                        case "GROUPINFO" when admin:
-                            return AdminCmd.ResponseGroupInfo(dbUser, message);
-
-                        case "BAN" when admin:
-                            return await AdminCmd.ResponseBan(botClient, dbUser, message, null);
-
-                        case "UNBAN" when admin:
-                            return await AdminCmd.ResponseUnban(botClient, dbUser, message, null);
-
-                        case "QUERYBAN" when admin:
-                            return await AdminCmd.ResponseQueryBan(botClient, dbUser, message, null);
-
-                        //Super
-                        case "SETGROUP" when super:
-                            return await SuperCmd.SetUserGroup(botClient, dbUser, message, null);
-
-                        case "RESTART" when super:
-                            return await SuperCmd.ResponseRestart(botClient, dbUser, message);
-
-                        default:
-                            return null;
-                    }
-                default://带参数
-                    string payload = string.Join(" ", args[1..]);
-
-                    switch (cmd)
-                    {
-                        //Admin
-                        case "REVIEWHELP" when admin:
-                            return await AdminCmd.ResponseReviewHelp(dbUser);
-
-                        case "USERINFO" when admin:
-                            return await AdminCmd.ResponseUserInfo(botClient, dbUser, message, args);
-
-                        case "NO" when admin:
-                            return await AdminCmd.ResponseNo(botClient, dbUser, message, payload);
-
-                        case "BAN" when admin:
-                            return await AdminCmd.ResponseBan(botClient, dbUser, message, args);
-
-                        case "UNBAN" when admin:
-                            return await AdminCmd.ResponseUnban(botClient, dbUser, message, args);
-
-                        case "QUERYBAN":
-                            return await AdminCmd.ResponseQueryBan(botClient, dbUser, message, args);
-
-                        //case "YES" when admin:
-                        //    return await AdminCmd.ResponseYes(botClient, dbUser, message, payload);
-
-                        //Super
-                        case "SETUSERGROUP" when super:
-                            return await SuperCmd.SetUserGroup(botClient, dbUser, message, args);
-
-                        default:
-                            return null;
-                    }
             }
+
         }
     }
 }

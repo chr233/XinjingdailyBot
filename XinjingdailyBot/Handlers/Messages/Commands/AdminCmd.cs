@@ -14,13 +14,35 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
     internal static class AdminCmd
     {
         /// <summary>
-        /// 审核命令帮助
+        /// 获取群组信息
         /// </summary>
         /// <param name="dbUser"></param>
+        /// <param name="message"></param>
         /// <returns></returns>
-        internal static async Task<string?> ResponseReviewHelp(Users dbUser)
+        internal static async Task ResponseGroupInfo(ITelegramBotClient botClient, Users dbUser, Message message, List<Message> msgs)
         {
-            return "";
+            var chat = message.Chat;
+
+            if (chat.Type != ChatType.Group && chat.Type != ChatType.Supergroup)
+            {
+                return "该命令仅限群组内使用";
+            }
+
+            StringBuilder sb = new();
+            sb.AppendLine($"群组名: <code>{chat.Title ?? "无"}</code>");
+
+            if (string.IsNullOrEmpty(chat.Username))
+            {
+                sb.AppendLine("群组类型: <code>私聊</code>");
+                sb.AppendLine($"群组ID: <code>{chat.Id}</code>");
+            }
+            else
+            {
+                sb.AppendLine("群组类型: <code>公开</code>");
+                sb.AppendLine($"群组链接: <code>@{chat.Username ?? "无"}</code>");
+            }
+
+            return sb.ToString();
         }
 
         /// <summary>
@@ -31,7 +53,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <param name="message"></param>
         /// <param name="reason"></param>
         /// <returns></returns>
-        internal static async Task<string> ResponseNo(ITelegramBotClient botClient, Users dbUser, Message message, string? reason)
+        internal static async Task<string> ResponseNo(ITelegramBotClient botClient, Users dbUser, Message message, string[] args, List<Message> msgs)
         {
             if (!dbUser.Right.HasFlag(UserRights.ReviewPost))
             {
@@ -57,7 +79,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 return "未找到稿件";
             }
 
-            reason = reason?.Trim();
+            string reason = string.Join(' ', args).Trim();
 
             if (string.IsNullOrEmpty(reason))
             {
@@ -78,7 +100,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <param name="message"></param>
         /// <param name="reason"></param>
         /// <returns></returns>
-        internal static async Task<string> ResponseYes(ITelegramBotClient botClient, Users dbUser, Message message, string? reason)
+        internal static async Task<string> ResponseYes(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
         {
             if (!dbUser.Right.HasFlag(UserRights.ReviewPost))
             {
@@ -104,7 +126,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 return "未找到稿件";
             }
 
-            reason = reason?.Trim();
+            string reason = string.Join(' ', args).Trim();
 
             if (string.IsNullOrEmpty(reason))
             {
@@ -125,13 +147,13 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        internal static async Task<string> ResponseUserInfo(ITelegramBotClient botClient, Users dbUser, Message message, string[]? args)
+        internal static async Task<string> ResponseUserInfo(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
         {
             var targetUser = await FetchUserHelper.FetchTargetUser(message);
 
             if (targetUser == null)
             {
-                if (args != null && args.Any())
+                if (args.Any())
                 {
                     targetUser = await FetchUserHelper.FetchTargetUser(args.First());
                 }
@@ -177,13 +199,13 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        internal static async Task<string> ResponseBan(ITelegramBotClient botClient, Users dbUser, Message message, string[]? args)
+        internal static async Task<string> ResponseBan(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
         {
             var targetUser = await FetchUserHelper.FetchTargetUser(message);
 
             if (targetUser == null)
             {
-                if (args != null && args.Any())
+                if (args.Any())
                 {
                     targetUser = await FetchUserHelper.FetchTargetUser(args.First());
                     args = args[1..];
@@ -205,7 +227,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 return "无法对同级管理员进行此操作";
             }
 
-            string reason = args != null ? string.Join(' ', args) : "【未指定理由】";
+            string reason = args.Any() ? string.Join(' ', args) : "【未指定理由】";
 
             if (targetUser.IsBan)
             {
@@ -240,13 +262,13 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        internal static async Task<string> ResponseUnban(ITelegramBotClient botClient, Users dbUser, Message message, string[]? args)
+        internal static async Task<string> ResponseUnban(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
         {
             var targetUser = await FetchUserHelper.FetchTargetUser(message);
 
             if (targetUser == null)
             {
-                if (args != null && args.Any())
+                if (args.Any())
                 {
                     targetUser = await FetchUserHelper.FetchTargetUser(args.First());
                     args = args[1..];
@@ -268,7 +290,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 return "无法对同级管理员进行此操作";
             }
 
-            string reason = args != null ? string.Join(' ', args) : "【未指定理由】";
+            string reason = args.Any() ? string.Join(' ', args) : "【未指定理由】";
 
             if (!targetUser.IsBan)
             {
@@ -303,13 +325,13 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        internal static async Task<string> ResponseQueryBan(ITelegramBotClient botClient, Users dbUser, Message message, string[]? args)
+        internal static async Task<string> ResponseQueryBan(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
         {
             var targetUser = await FetchUserHelper.FetchTargetUser(message);
 
             if (targetUser == null)
             {
-                if (args != null && args.Any())
+                if (args.Any())
                 {
                     targetUser = await FetchUserHelper.FetchTargetUser(args.First());
                     args = args[1..];
@@ -331,7 +353,11 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             sb.AppendLine($"状态: <code>{status}</code>");
             sb.AppendLine();
 
-            if (records == null || !records.Any())
+            if (records == null)
+            {
+                sb.AppendLine("查询封禁/解封记录出错");
+            }
+            else if (!records.Any())
             {
                 sb.AppendLine("尚未查到封禁/解封记录");
             }
@@ -348,36 +374,6 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             return sb.ToString();
         }
 
-        /// <summary>
-        /// 获取群组信息
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        internal static string ResponseGroupInfo(Users dbUser, Message message)
-        {
-            var chat = message.Chat;
 
-            if (chat.Type != ChatType.Group && chat.Type != ChatType.Supergroup)
-            {
-                return "该命令仅限群组内使用";
-            }
-
-            StringBuilder sb = new();
-            sb.AppendLine($"群组名: <code>{chat.Title ?? "无"}</code>");
-
-            if (string.IsNullOrEmpty(chat.Username))
-            {
-                sb.AppendLine("群组类型: <code>私聊</code>");
-                sb.AppendLine($"群组ID: <code>{chat.Id}</code>");
-            }
-            else
-            {
-                sb.AppendLine("群组类型: <code>公开</code>");
-                sb.AppendLine($"群组链接: <code>@{chat.Username ?? "无"}</code>");
-            }
-
-            return sb.ToString();
-        }
     }
 }

@@ -28,16 +28,10 @@ namespace XinjingdailyBot.Handlers
                 return;
             }
 
-            if (dbUser.IsBan)
-            {
-                await botClient.AutoReplyAsync("无权访问", update, cancellationToken);
-                return;
-            }
-
-            if (BotConfig.Debug)
-            {
-                Logger.Debug($"Dispatcher {update.Type} {dbUser}");
-            }
+            //if (BotConfig.Debug)
+            //{
+            //    Logger.Debug($"Dispatcher {update.Type} {dbUser}");
+            //}
 
             var handler = update.Type switch
             {
@@ -66,6 +60,13 @@ namespace XinjingdailyBot.Handlers
             }
         }
 
+        /// <summary>
+        /// 处理消息
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         internal static async Task BotOnMessageReceived(ITelegramBotClient botClient, Users dbUser, Message message)
         {
             if (BotConfig.Debug)
@@ -103,9 +104,17 @@ namespace XinjingdailyBot.Handlers
                 return;
             }
 
+            bool isCommand = message.Text!.StartsWith("/");
+
+            //检查是否封禁
+            if (dbUser.IsBan && !isCommand)
+            {
+                return;
+            }
+
             switch (message.Type)
             {
-                case MessageType.Text when message.Text!.StartsWith("/"):
+                case MessageType.Text when isCommand:
                     await Messages.CommandHandler.HandleCommand(botClient, dbUser, message);
                     break;
 
@@ -139,11 +148,25 @@ namespace XinjingdailyBot.Handlers
             }
         }
 
+        /// <summary>
+        /// 处理CallbackQuery
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="callbackQuery"></param>
+        /// <returns></returns>
         private static async Task BotOnCallbackQueryReceived(ITelegramBotClient botClient, Users dbUser, CallbackQuery callbackQuery)
         {
             if (BotConfig.Debug)
             {
                 Logger.Debug($"Query {callbackQuery.Data} {dbUser}");
+            }
+
+            //检查是否封禁
+            if (dbUser.IsBan)
+            {
+                await botClient.AutoReplyAsync("无权访问", callbackQuery);
+                return;
             }
 
             string? data = callbackQuery.Data;
@@ -160,22 +183,28 @@ namespace XinjingdailyBot.Handlers
             switch (cmd)
             {
                 case "post":
-                    await Queries.PostHandler.HandleQuery(botClient, dbUser, callbackQuery);
+                    await Queries.PostHandler.HandleQuery(botClient, dbUser, callbackQuery).ConfigureAwait(false);
                     break;
 
                 case "revi":
                 case "reje":
-                    await Queries.ReviewHandler.HandleQuery(botClient, dbUser, callbackQuery);
+                    await Queries.ReviewHandler.HandleQuery(botClient, dbUser, callbackQuery).ConfigureAwait(false);
                     break;
 
-                //case "exec":
-                //    await 
+                case "exec":
+                case "menu":
+                    await Queries.ExecuteHandler.HandleQuery(botClient, dbUser, callbackQuery).ConfigureAwait(false);
+                    break;
+
+                default:
+                    break;
             }
         }
 
         private static Task BotOnInlineQueryReceived(ITelegramBotClient botClient, Users dbUser, InlineQuery inlineQuery)
         {
             Console.WriteLine($"Received inline query from: {inlineQuery.From.Id}");
+
             return Task.CompletedTask;
         }
 
