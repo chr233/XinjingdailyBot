@@ -188,7 +188,7 @@ namespace XinjingdailyBot.Handlers
         /// </summary>
         /// <param name="userID"></param>
         /// <returns></returns>
-        private static async Task<Users?> FetchDbUser(long? userID)
+        internal static async Task<Users?> FetchDbUser(long? userID)
         {
             if (userID == null)
             {
@@ -206,7 +206,7 @@ namespace XinjingdailyBot.Handlers
         /// </summary>
         /// <param name="userID"></param>
         /// <returns></returns>
-        private static async Task<Users?> FetchDbUser(string? userName)
+        internal static async Task<Users?> FetchDbUser(string? userName)
         {
             if (string.IsNullOrEmpty(userName))
             {

@@ -16,11 +16,10 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// </summary>
         /// <param name="botClient"></param>
         /// <param name="message"></param>
-        /// <param name="msgs"></param>
         /// <returns></returns>
-        internal static async Task ResponsePing(ITelegramBotClient botClient, Message message, List<Message> msgs)
+        internal static async Task ResponsePing(ITelegramBotClient botClient, Message message)
         {
-            msgs.Add(await botClient.AutoReplyAsync("PONG!", message));
+            await botClient.SendCommandReply("PONG!", message);
         }
 
         /// <summary>
@@ -29,9 +28,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
-        /// <param name="msgs"></param>
         /// <returns></returns>
-        internal static async Task ResponseAnymouse(ITelegramBotClient botClient, Users dbUser, Message message, List<Message> msgs)
+        internal static async Task ResponseAnymouse(ITelegramBotClient botClient, Users dbUser, Message message)
         {
             bool anymouse = !dbUser.PreferAnymouse;
             dbUser.PreferAnymouse = anymouse;
@@ -40,7 +38,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             string mode = anymouse ? "匿名投稿" : "保留来源";
             string text = $"后续投稿将默认使用【{mode}】";
-            msgs.Add(await botClient.AutoReplyAsync(text, message));
+            await botClient.SendCommandReply(text, message);
         }
 
         /// <summary>
@@ -49,9 +47,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
-        /// <param name="msgs"></param>
         /// <returns></returns>
-        internal static async Task ResponseNotification(ITelegramBotClient botClient, Users dbUser, Message message, List<Message> msgs)
+        internal static async Task ResponseNotification(ITelegramBotClient botClient, Users dbUser, Message message)
         {
             bool notificationg = !dbUser.Notification;
             dbUser.Notification = notificationg;
@@ -60,7 +57,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             string mode = notificationg ? "发送通知" : "静默模式";
             string text = $"投稿通过或者拒绝后将【{mode}】";
-            msgs.Add(await botClient.AutoReplyAsync(text, message));
+            await botClient.SendCommandReply(text, message);
         }
 
 
@@ -70,9 +67,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
-        /// <param name="msgs"></param>
         /// <returns></returns>
-        internal static async Task ResponseMyInfo(ITelegramBotClient botClient, Users dbUser, Message message, List<Message> msgs)
+        internal static async Task ResponseMyInfo(ITelegramBotClient botClient, Users dbUser, Message message)
         {
             string userNick = TextHelper.EscapeHtml(dbUser.UserNick);
             string level = "Lv Err";
@@ -96,7 +92,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             sb.AppendLine($"拒绝数量: <code>{dbUser.RejetCount}</code>");
             sb.AppendLine($"审核数量: <code>{dbUser.ReviewCount}</code>");
 
-            msgs.Add(await botClient.AutoReplyAsync(sb.ToString(), message));
+            await botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
         }
 
 
@@ -106,9 +102,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
-        /// <param name="msgs"></param>
         /// <returns></returns>
-        internal static async Task ResponseMyRight(ITelegramBotClient botClient, Users dbUser, Message message, List<Message> msgs)
+        internal static async Task ResponseMyRight(ITelegramBotClient botClient, Users dbUser, Message message)
         {
             var right = dbUser.Right;
             bool superCmd = right.HasFlag(UserRights.SuperCmd);
@@ -144,7 +139,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             sb.AppendLine($"功能: <code>{string.Join(", ", functions)}</code>");
             sb.AppendLine($"命令: <code>{string.Join(", ", commands)}</code>");
 
-            msgs.Add(await botClient.AutoReplyAsync(sb.ToString(), message));
+            await botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
         }
 
         /// <summary>
@@ -152,22 +147,30 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// </summary>
         /// <param name="botClient"></param>
         /// <param name="message"></param>
-        /// <param name="msgs"></param>
         /// <returns></returns>
-        internal static async Task ResponseCallAdmins(ITelegramBotClient botClient, Message message, List<Message> msgs)
+        internal static async Task ResponseCallAdmins(ITelegramBotClient botClient, Message message)
         {
+            StringBuilder sb = new();
+
             if (message.Chat.Type != ChatType.Group && message.Chat.Type != ChatType.Supergroup)
             {
-                msgs.Add(await botClient.AutoReplyAsync("该命令仅在群组内有效", message));
-                return;
+                sb.AppendLine("该命令仅在群组内有效");
+            }
+            else
+            {
+                ChatMember[] admins = await botClient.GetChatAdministratorsAsync(message.Chat.Id);
+
+                foreach (var menber in admins)
+                {
+                    var admin = menber.User;
+                    if (!(admin.IsBot || string.IsNullOrEmpty(admin.Username)))
+                    {
+                        sb.AppendLine($"@{admin.Username}");
+                    }
+                }
             }
 
-            ChatMember[] admins = await botClient.GetChatAdministratorsAsync(message.Chat.Id);
-
-            var adminsStr = admins.Where(x => !(x.User.IsBot || string.IsNullOrEmpty(x.User.Username))).Select(x => $"@{x.User.Username}");
-
-            string text = string.Join('\n', adminsStr);
-            msgs.Add(await botClient.AutoReplyAsync(text, message));
+            await botClient.SendCommandReply(sb.ToString(), message);
         }
     }
 }

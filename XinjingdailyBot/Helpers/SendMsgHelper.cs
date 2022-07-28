@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
+using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Helpers
 {
@@ -34,14 +34,16 @@ namespace XinjingdailyBot.Helpers
                     await Task.Delay(TimeSpan.FromSeconds(30));
                     try
                     {
-                        await botClient.DeleteMessageAsync(msg.Chat.Id, msg.MessageId);
+                        await botClient.DeleteMessageAsync(msg.Chat.Id, msg.MessageId, cancellationToken);
                     }
                     catch
                     {
-                        
+                        Logger.Error($"删除消息 {msg.MessageId} 失败");
                     }
-                });
+                }, cancellationToken);
             }
+
+            return msg;
         }
     }
 }
