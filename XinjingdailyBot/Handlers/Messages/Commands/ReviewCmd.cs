@@ -98,7 +98,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 post.Text = string.Join(' ', args).Trim();
                 await DB.Updateable(post).UpdateColumns(x => new { x.Text }).ExecuteCommandAsync();
 
-                return $"成功修改稿件描述";
+                return $"稿件描述已更新(投稿预览不会更新)";
             }
 
             string text = await exec();
