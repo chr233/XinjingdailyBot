@@ -149,6 +149,11 @@ namespace XinjingdailyBot.Handlers.Messages
                     await AdminCmd.ResponseQueryBan(botClient, dbUser, message, args);
                     break;
 
+                case "ECHO":
+                    await AdminCmd.ResponseEcho(botClient, dbUser, message, args);
+                    handled = false; //不删除命令记录
+                    break;
+
                 //Super
                 case "SETUSERGROUP" when super:
                     await SuperCmd.SetUserGroup(botClient, dbUser, message, args);

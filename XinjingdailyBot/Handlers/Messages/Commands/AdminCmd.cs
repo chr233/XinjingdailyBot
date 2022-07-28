@@ -294,5 +294,81 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             await botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
         }
+
+        /// <summary>
+        /// 回复用户
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        internal static async Task ResponseEcho(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
+        {
+            bool autoDelete = true;
+            async Task<string> exec()
+            {
+                var targetUser = await FetchUserHelper.FetchTargetUser(message);
+
+                if (targetUser == null)
+                {
+                    if (args.Any())
+                    {
+                        targetUser = await FetchUserHelper.FetchTargetUser(args.First());
+                        args = args[1..];
+                    }
+                }
+
+                if (targetUser == null)
+                {
+                    return "找不到指定用户";
+                }
+
+                if (targetUser.PrivateChatID <= 0)
+                {
+                    return "该用户尚未私聊过机器人, 无法发送消息";
+                }
+
+                string msg = string.Join(' ', args).Trim();
+
+                if (string.IsNullOrEmpty(msg))
+                {
+                    return "请输入回复内容";
+                }
+
+                autoDelete = false;
+                try
+                {
+                    msg = TextHelper.EscapeHtml(msg);
+                    await botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"来自管理员的消息:\n<code>{msg}</code>", ParseMode.Html);
+                    return "消息发送成功";
+                }
+                catch (Exception ex)
+                {
+                    return $"消息发送失败 {ex.Message}";
+                }
+            }
+
+            string text = await exec();
+            await botClient.SendCommandReply(text, message, autoDelete);
+        }
+
+        /// <summary>
+        /// 搜索用户
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        internal static async Task ResponseSearchUser(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
+        {
+            //HashSet<Users> users = new();
+
+            //foreach(var arg in args)
+            //{
+            //    if(long.TryParse()
+            //}
+        }
     }
 }
