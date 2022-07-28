@@ -49,12 +49,13 @@ namespace XinjingdailyBot.Helpers
                 throw;
             }
 
-            try { 
+            try
+            {
 
                 RejectChannel = await botClient.GetChatAsync(BotConfig.RejectChannel);
                 Logger.Info($"拒稿存档频道: {RejectChannel.ChatProfile()}");
             }
-            catch 
+            catch
             {
                 Logger.Error("未找到指定的拒稿存档频道, 请检查拼写是否正确");
                 throw;

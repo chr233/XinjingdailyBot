@@ -58,12 +58,24 @@ namespace XinjingdailyBot.Helpers
             return tags;
         }
 
+        /// <summary>
+        /// Html格式的用户链接
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         internal static string HtmlUserLink(Users user)
         {
             string userNick = user.UserNick;
             return HtmlUserLink(user.UserID, user.UserName, userNick);
         }
 
+        /// <summary>
+        /// Html格式的用户链接
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="userName"></param>
+        /// <param name="userNick"></param>
+        /// <returns></returns>
         internal static string HtmlUserLink(long userId, string userName, string userNick)
         {
             string nick = EscapeHtml(userNick);
@@ -78,11 +90,23 @@ namespace XinjingdailyBot.Helpers
             }
         }
 
+        /// <summary>
+        /// HTML格式的消息链接
+        /// </summary>
+        /// <param name="messageID"></param>
+        /// <param name="chatName"></param>
+        /// <param name="linkName"></param>
+        /// <returns></returns>
         internal static string HtmlMessageLink(long messageID, string chatName, string linkName)
         {
             return $"<a href=\"https://t.me/{chatName}/{messageID}\">{linkName}</a>";
         }
 
+        /// <summary>
+        /// HTML转义
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         internal static string EscapeHtml(string text)
         {
             string escapedText = text.Replace("<", "&lt;")
@@ -232,6 +256,12 @@ namespace XinjingdailyBot.Helpers
             return string.Join(' ', tag);
         }
 
+        /// <summary>
+        /// 生成投稿人信息
+        /// </summary>
+        /// <param name="post"></param>
+        /// <param name="poster"></param>
+        /// <returns></returns>
         internal static string MakePoster(Posts post, Users poster)
         {
             string user = HtmlUserLink(poster);

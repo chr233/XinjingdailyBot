@@ -1,7 +1,6 @@
 ﻿using SqlSugar;
 using Telegram.Bot.Types;
 using XinjingdailyBot.Helpers;
-using XinjingdailyBot.Models;
 using XinjingdailyBot.Storage;
 
 namespace XinjingdailyBot
