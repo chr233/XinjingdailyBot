@@ -1,6 +1,5 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Enums;
 using XinjingdailyBot.Handlers.Queries;
 using XinjingdailyBot.Helpers;
@@ -56,7 +55,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             }
 
             string text = await exec();
-            await botClient.SendCommandReply(text, message);
+            await botClient.SendCommandReply(text, message,false);
         }
 
         /// <summary>
@@ -102,7 +101,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             }
 
             string text = await exec();
-            await botClient.SendCommandReply(text, message);
+            await botClient.SendCommandReply(text, message, false);
         }
     }
 }

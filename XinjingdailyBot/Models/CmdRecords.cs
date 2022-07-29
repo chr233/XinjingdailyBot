@@ -5,7 +5,7 @@ namespace XinjingdailyBot.Models
     [SugarTable("cmd", TableDescription = "命令回调")]
     [SugarIndex("index_cid", nameof(ChatID), OrderByType.Asc)]
     [SugarIndex("index_mid", nameof(MessageID), OrderByType.Asc)]
-    internal class CmdActions
+    internal class CmdRecords
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public long Id { get; set; }
@@ -18,26 +18,30 @@ namespace XinjingdailyBot.Models
         /// </summary>
         public long MessageID { get; set; }
         /// <summary>
-        /// 发起人UID
+        /// 调用者UID
         /// </summary>
-        public long OperatorUID { get; set; }
+        public long UserID { get; set; }
         /// <summary>
         /// 命令原文
         /// </summary>
         public string Command { get; set; } = "";
         /// <summary>
-        /// 目标用户UID
+        /// 错误消息
         /// </summary>
-        public long TargetUserID { get; set; } = -1;
+        public string Exception { get; set; } = "";
 
         /// <summary>
-        /// 命令执行是否结束
+        /// 命令成功执行
         /// </summary>
-        public bool IsDone { get; set; }
+        public bool Handled { get; set; }
+        /// <summary>
+        /// 命令执行出错
+        /// </summary>
+        public bool Error { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// 记录命令调用时间
         /// </summary>
-        public DateTime ExecTime { get; set; } = DateTime.Now;
+        public DateTime ExecuteAt { get; set; } = DateTime.Now;
     }
 }
