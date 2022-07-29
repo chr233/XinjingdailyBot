@@ -405,6 +405,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             }
             else
             {
+                const int pageCount = 30;
+                const int maxCount = 60;
                 int index = 1;
                 foreach (var user in userList)
                 {
@@ -418,10 +420,18 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                         sb.AppendLine($"{index++}. <code>{user.UserID}</code> {url} <code>@{user.UserName}</code>");
                     }
 
-                    if (index % 30 == 0)
+                    if (index % (pageCount + 1) == 0)
                     {
                         await botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
                         sb.Clear();
+                    }
+                    if (index > maxCount)
+                    {
+                        if (userList.Count > maxCount)
+                        {
+                            sb.AppendLine($"-- 共{userList.Count}条结果, 仅显示前{maxCount}条--");
+                        }
+                        break;
                     }
                 }
             }
