@@ -5,6 +5,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Helpers;
 using XinjingdailyBot.Models;
+using XinjingdailyBot.Enums;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Messages.Commands
@@ -405,6 +406,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             }
             else
             {
+                const int pageCount = 30;
+                const int maxCount = 60;
                 int index = 1;
                 foreach (var user in userList)
                 {
@@ -418,13 +421,48 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                         sb.AppendLine($"{index++}. <code>{user.UserID}</code> {url} <code>@{user.UserName}</code>");
                     }
 
-                    if (index % 30 == 0)
+                    if (index % (pageCount + 1) == 0)
                     {
                         await botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
                         sb.Clear();
                     }
+                    if (index > maxCount)
+                    {
+                        if (userList.Count > maxCount)
+                        {
+                            sb.AppendLine($"-- 共{userList.Count}条结果, 仅显示前{maxCount}条--");
+                        }
+                        break;
+                    }
                 }
             }
+
+            await botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
+        }
+
+        /// <summary>
+        /// 生成系统报表
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        internal static async Task ResponseSystemReport(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
+        {
+            StringBuilder sb = new();
+
+            var totalPost = await DB.Queryable<Posts>().SelectAll().CountAsync();
+            var totalAcceptPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Accepted).CountAsync();
+            var totalRejectPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Rejected).CountAsync();
+            sb.AppendLine("-- 累计投稿 --");
+            sb.AppendLine($"接受/拒绝: <code>{totalAcceptPost}</code>/<code>{totalRejectPost}</code>");
+            sb.AppendLine($"通过率: <code>{(100 * totalAcceptPost / totalPost).ToString("f2")}%</code>");
+            sb.AppendLine($"总计投稿: <code>{totalPost}</code>");
+
+            DateTime monthStart = DateTime.Now.AddDays(1-DateTime.Now.Day);
+
+            var totalOtherPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Rejected).CountAsync();
 
             await botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
         }
