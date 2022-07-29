@@ -28,6 +28,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             { "ban", "封禁指定用户" },
             { "unban", "解封指定用户" },
             { "queryban", "查询封禁记录" },
+            { "sysreport", "查询投稿详情" },
         };
 
         private static Dictionary<string, string> SuperCmds { get; } = new()

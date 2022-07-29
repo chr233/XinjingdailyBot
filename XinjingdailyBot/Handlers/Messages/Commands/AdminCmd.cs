@@ -452,17 +452,41 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         {
             StringBuilder sb = new();
 
-            var totalPost = await DB.Queryable<Posts>().SelectAll().CountAsync();
+            var totalPost = await DB.Queryable<Posts>().CountAsync();
             var totalAcceptPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Accepted).CountAsync();
             var totalRejectPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Rejected).CountAsync();
+
             sb.AppendLine("-- 累计投稿 --");
             sb.AppendLine($"接受/拒绝: <code>{totalAcceptPost}</code>/<code>{totalRejectPost}</code>");
-            sb.AppendLine($"通过率: <code>{(100 * totalAcceptPost / totalPost).ToString("f2")}%</code>");
+            if (totalPost > 0)
+            {
+                sb.AppendLine($"通过率: <code>{(100 * totalAcceptPost / totalPost).ToString("f2")}%</code>");
+            }
+            else
+            {
+                sb.AppendLine("通过率: <code> --%</code>");
+            }
             sb.AppendLine($"总计投稿: <code>{totalPost}</code>");
 
-            DateTime monthStart = DateTime.Now.AddDays(1-DateTime.Now.Day);
+            DateTime now = DateTime.Now;
+            DateTime monthStart = DateTime.Now.AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
 
-            var totalOtherPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Rejected).CountAsync();
+            var monthPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart).CountAsync();
+            var monthAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Accepted).CountAsync();
+            var monthRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Rejected).CountAsync();
+            
+            sb.AppendLine();
+            sb.AppendLine($"-- 自 {monthStart.ToString("yyyy-mm-dd")} 起 --");
+            sb.AppendLine($"接受/拒绝: <code>{monthAcceptPost}</code>/<code>{monthRejectPost}</code>");
+            if (monthPost > 0)
+            {
+                sb.AppendLine($"通过率: <code>{(100 * monthAcceptPost / monthPost).ToString("f2")}%</code>");
+            }
+            else
+            {
+                sb.AppendLine("通过率: <code> --%</code>");
+            }
+            sb.AppendLine($"总计投稿: <code>{monthPost}</code>");
 
             await botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
         }
