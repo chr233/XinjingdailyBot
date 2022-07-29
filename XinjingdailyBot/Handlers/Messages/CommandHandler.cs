@@ -185,7 +185,6 @@ namespace XinjingdailyBot.Handlers.Messages
 
                 case "SEARCHUSER" when admin:
                     await AdminCmd.ResponseSearchUser(botClient, dbUser, message, args);
-                    autoDelete = false; //不删除命令记录
                     break;
 
                 //Super

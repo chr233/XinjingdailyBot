@@ -64,10 +64,6 @@ namespace XinjingdailyBot.Handlers
         /// <returns></returns>
         internal static async Task BotOnMessageReceived(ITelegramBotClient botClient, Users dbUser, Message message)
         {
-            if (BotConfig.Debug)
-            {
-                Logger.Debug($"M {message.Type} {dbUser}");
-            }
 
             bool isMediaGroup = message.MediaGroupId != null;
             bool isPrivateChat = message.Chat.Type == ChatType.Private;
@@ -99,11 +95,14 @@ namespace XinjingdailyBot.Handlers
                 return;
             }
 
+            string text = message.Type == MessageType.Text ? message.Text! : "";
+
             //是否为命令
-            bool isCommand = false;
-            if (message.Type == MessageType.Text && !string.IsNullOrEmpty(message.Text))
+            bool isCommand = text.StartsWith('/');
+
+            if (BotConfig.Debug && !isCommand)
             {
-                isCommand = message.Text.StartsWith('/');
+                Logger.Debug($"M {message.Type} {dbUser} {text}");
             }
 
             //检查是否封禁, 封禁后仅能使用命令, 不响应其他消息
