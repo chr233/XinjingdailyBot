@@ -47,7 +47,7 @@ namespace XinjingdailyBot.Helpers
                 DB.CodeFirst.InitTables<Levels>();
                 DB.CodeFirst.InitTables<Groups>();
                 DB.CodeFirst.InitTables<Advertises>();
-                DB.CodeFirst.InitTables<CmdActions>();
+                DB.CodeFirst.InitTables<CmdRecords>();
                 DB.CodeFirst.InitTables<BanRecords>();
             }
 

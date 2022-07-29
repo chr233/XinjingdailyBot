@@ -1,6 +1,7 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Helpers
@@ -24,12 +25,13 @@ namespace XinjingdailyBot.Helpers
             Message message,
             bool? autoDelete = null,
             ParseMode? parsemode = null,
+            IReplyMarkup? replyMarkup = null,
             CancellationToken cancellationToken = default)
         {
             //私聊始终不删除消息, 群聊中默认删除消息, 但可以指定不删除
             bool delete = (autoDelete != null ? autoDelete.Value : (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup)) && message.Chat.Type != ChatType.Private;
 
-            var msg = await botClient.SendTextMessageAsync(message.Chat.Id, text, parsemode, replyToMessageId: message.MessageId, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
+            var msg = await botClient.SendTextMessageAsync(message.Chat.Id, text, parsemode, replyToMessageId: message.MessageId, replyMarkup: replyMarkup, disableWebPagePreview: true, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
 
             if (delete)
             {

@@ -4,7 +4,7 @@ using XinjingdailyBot.Models;
 
 namespace XinjingdailyBot.Handlers.Queries
 {
-    internal class ExecuteHandler
+    internal class CommandHandler
     {
         /// <summary>
         /// 处理CallbackQuery

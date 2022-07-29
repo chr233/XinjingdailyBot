@@ -3,8 +3,8 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Enums;
 using XinjingdailyBot.Handlers.Messages.Commands;
-using XinjingdailyBot.Models;
 using XinjingdailyBot.Helpers;
+using XinjingdailyBot.Models;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Messages
@@ -20,25 +20,50 @@ namespace XinjingdailyBot.Handlers.Messages
         /// <returns></returns>
         internal static async Task HandleCommand(ITelegramBotClient botClient, Users dbUser, Message message)
         {
-            bool inGroup = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
-
-            bool handled = await ExecCommand(botClient, dbUser, message);
-
-            //定时删除群组中的命令消息
-            if (inGroup && handled)
+            CmdRecords record = new()
             {
-                _ = Task.Run(async () =>
+                ChatID = message.Chat.Id,
+                MessageID = message.MessageId,
+                UserID = dbUser.UserID,
+                Command = message.Text![1..],
+                ExecuteAt = DateTime.Now,
+            };
+
+            try
+            {
+                (bool handled, bool autoDelete) = await ExecCommand(botClient, dbUser, message);
+
+                //定时删除命令消息
+                if (autoDelete)
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(30));
-                    try
+                    _ = Task.Run(async () =>
                     {
-                        await botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
-                    }
-                    catch
-                    {
-                        Logger.Error($"删除消息 {message.MessageId} 失败");
-                    }
-                });
+                        await Task.Delay(TimeSpan.FromSeconds(30));
+                        try
+                        {
+                            await botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+                        }
+                        catch
+                        {
+                            Logger.Error($"删除消息 {message.MessageId} 失败");
+                        }
+                    });
+                }
+
+                record.Handled = handled;
+            }
+            catch (Exception ex)
+            {
+                record = new()
+                {
+                    Exception = $"{ex.GetType} {ex.Message}",
+                    Error = true,
+                };
+                throw;
+            }
+            finally
+            {
+                await DB.Insertable(record).ExecuteCommandAsync();
             }
         }
 
@@ -48,20 +73,22 @@ namespace XinjingdailyBot.Handlers.Messages
         /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
         /// <param name="message">用户消息原文</param>
-        /// <returns></returns>
-        private static async Task<bool> ExecCommand(ITelegramBotClient botClient, Users dbUser, Message message)
+        /// <returns>handled,autoDelete</returns>
+        private static async Task<(bool, bool)> ExecCommand(ITelegramBotClient botClient, Users dbUser, Message message)
         {
+            //切分命令参数
             string[] args = message.Text!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
-
-            if (!args.Any()) { return false; }
+            if (!args.Any()) { return (false, false); }
 
             string cmd = args.First()[1..];
             args = args[1..];
 
-            //判断是不是自己的命令
+            bool inGroup = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
+
+            //判断是不是艾特机器人的命令
             bool isAtBot = false;
             int index = cmd.IndexOf('@');
-            if (index != -1)
+            if (inGroup && index != -1)
             {
                 string botName = cmd[(index + 1)..];
                 if (botName.Equals(BotName, StringComparison.OrdinalIgnoreCase))
@@ -71,7 +98,7 @@ namespace XinjingdailyBot.Handlers.Messages
                 }
                 else
                 {
-                    return false;
+                    return (false, false);
                 }
             }
 
@@ -81,7 +108,9 @@ namespace XinjingdailyBot.Handlers.Messages
             bool normal = dbUser.Right.HasFlag(UserRights.NormalCmd) || admin;
             bool reviewPost = dbUser.Right.HasFlag(UserRights.ReviewPost);
 
-            //响应命令
+            //是否自动删除消息
+            bool autoDelete = true;
+            //是否成功响应命令
             bool handled = true;
             switch (cmd.ToUpperInvariant())
             {
@@ -145,46 +174,55 @@ namespace XinjingdailyBot.Handlers.Messages
                     await AdminCmd.ResponseUnban(botClient, dbUser, message, args);
                     break;
 
-                case "QUERYBAN":
+                case "QUERYBAN" when admin:
                     await AdminCmd.ResponseQueryBan(botClient, dbUser, message, args);
                     break;
 
-                case "ECHO":
+                case "ECHO" when admin:
                     await AdminCmd.ResponseEcho(botClient, dbUser, message, args);
-                    handled = false; //不删除命令记录
+                    autoDelete = false; //不删除命令记录
+                    break;
+
+                case "SEARCHUSER" when admin:
+                    await AdminCmd.ResponseSearchUser(botClient, dbUser, message, args);
+                    autoDelete = false; //不删除命令记录
                     break;
 
                 //Super
-                case "SETUSERGROUP" when super:
-                    await SuperCmd.SetUserGroup(botClient, dbUser, message, args);
+                case "RESTART" when super:
+                    await SuperCmd.ResponseRestart(botClient, message);
                     break;
 
-                case "RESTART" when super:
-                    await SuperCmd.ResponseRestart(botClient, dbUser, message);
+                case "SETUSERGROUP" when super:
+                    await SuperCmd.SetUserGroup(botClient, dbUser, message, args);
                     break;
 
                 //Review - 审核命令
                 case "NO" when reviewPost:
                     await ReviewCmd.ResponseNo(botClient, dbUser, message, args);
+                    autoDelete = false;
                     break;
 
                 case "EDIT" when reviewPost:
                     await ReviewCmd.ResponseEditPost(botClient, dbUser, message, args);
+                    autoDelete = false;
                     break;
 
                 default:
                     //仅在私聊,或者艾特机器人时提示未知命令
-                    if (isAtBot || message.Chat.Type == ChatType.Private)
+                    if (isAtBot || !inGroup)
                     {
-                        await botClient.SendCommandReply("未知命令, 获取帮助 /help", message);
+                        await botClient.SendCommandReply("未知命令, 获取帮助 /help", message, false);
                     }
-                    else
-                    {
-                        handled = false;
-                    }
+                    handled = false;
                     break;
             }
-            return handled;
+
+            //自动删除命令的时机
+            //1.autoDelete = true
+            //2.在群组中
+            //3.成功执行命令
+            return (handled, autoDelete && inGroup && handled);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         //命令列表
         private static Dictionary<string, string> NormalCmds { get; } = new()
         {
-            { "anymouse", "设置投稿是否默认匿名" },
+            { "anonymous", "设置投稿是否默认匿名" },
             { "notification", "设置是否开启投稿通知" },
             { "admin", "呼叫群管理" },
             { "myinfo", "查询投稿数量" },

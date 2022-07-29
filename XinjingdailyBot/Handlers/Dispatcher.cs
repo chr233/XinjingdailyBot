@@ -28,11 +28,6 @@ namespace XinjingdailyBot.Handlers
                 return;
             }
 
-            //if (BotConfig.Debug)
-            //{
-            //    Logger.Debug($"Dispatcher {update.Type} {dbUser}");
-            //}
-
             var handler = update.Type switch
             {
                 // UpdateType.Unknown:
@@ -71,7 +66,7 @@ namespace XinjingdailyBot.Handlers
         {
             if (BotConfig.Debug)
             {
-                Logger.Debug($"Message {message.Type} {dbUser}");
+                Logger.Debug($"M {message.Type} {dbUser}");
             }
 
             bool isMediaGroup = message.MediaGroupId != null;
@@ -104,9 +99,14 @@ namespace XinjingdailyBot.Handlers
                 return;
             }
 
-            bool isCommand = message.Text!.StartsWith("/");
+            //是否为命令
+            bool isCommand = false;
+            if (message.Type == MessageType.Text && !string.IsNullOrEmpty(message.Text))
+            {
+                isCommand = message.Text.StartsWith('/');
+            }
 
-            //检查是否封禁
+            //检查是否封禁, 封禁后仅能使用命令, 不响应其他消息
             if (dbUser.IsBan && !isCommand)
             {
                 return;
@@ -159,7 +159,7 @@ namespace XinjingdailyBot.Handlers
         {
             if (BotConfig.Debug)
             {
-                Logger.Debug($"Query {callbackQuery.Data} {dbUser}");
+                Logger.Debug($"Q {callbackQuery.Data} {dbUser}");
             }
 
             //检查是否封禁
@@ -169,31 +169,34 @@ namespace XinjingdailyBot.Handlers
                 return;
             }
 
-            string? data = callbackQuery.Data;
             Message? message = callbackQuery.Message;
-            if (string.IsNullOrEmpty(data) || message == null)
+            string? data = callbackQuery.Data;
+
+            if (message == null || string.IsNullOrEmpty(data))
             {
                 await botClient.AutoReplyAsync("Payload 非法", callbackQuery);
                 await botClient.EditMessageReplyMarkupAsync(callbackQuery.InlineMessageId!);
                 return;
             }
 
-            string cmd = data[..4];
+            string[] args = data.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
+            if (!args.Any()) { return; }
+            string cmd = args.First();
 
             switch (cmd)
             {
                 case "post":
-                    await Queries.PostHandler.HandleQuery(botClient, dbUser, callbackQuery).ConfigureAwait(false);
+                    await Queries.PostHandler.HandleQuery(botClient, dbUser, callbackQuery);
                     break;
 
-                case "revi":
-                case "reje":
-                    await Queries.ReviewHandler.HandleQuery(botClient, dbUser, callbackQuery).ConfigureAwait(false);
+                case "review":
+                case "reject":
+                    await Queries.ReviewHandler.HandleQuery(botClient, dbUser, callbackQuery);
                     break;
 
-                case "exec":
+                case "execute":
                 case "menu":
-                    await Queries.ExecuteHandler.HandleQuery(botClient, dbUser, callbackQuery).ConfigureAwait(false);
+                    await Queries.CommandHandler.HandleQuery(botClient, dbUser, callbackQuery);
                     break;
 
                 default:

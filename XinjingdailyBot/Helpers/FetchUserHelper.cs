@@ -256,10 +256,10 @@ namespace XinjingdailyBot.Handlers
                     }
                 }
                 //在CMD回调表里查看
-                var cmdAction = await DB.Queryable<CmdActions>().FirstAsync(x => x.MessageID == replyToMsg.MessageId);
+                var cmdAction = await DB.Queryable<CmdRecords>().FirstAsync(x => x.MessageID == replyToMsg.MessageId);
                 if (cmdAction != null)
                 {
-                    return await FetchDbUser(cmdAction.OperatorUID);
+                    return await FetchDbUser(cmdAction.UserID);
                 }
 
                 return null;

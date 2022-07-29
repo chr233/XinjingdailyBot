@@ -129,11 +129,11 @@ namespace XinjingdailyBot.Helpers
             {
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData("普通用户", "setgroup user"),
+                    InlineKeyboardButton.WithCallbackData("普通用户", "usergroup user"),
                 },
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData("审核员", "setgroup reviewer"),
+                    InlineKeyboardButton.WithCallbackData("审核员", "setusergroup reviewer"),
                     InlineKeyboardButton.WithCallbackData("发布员", "setgroup poster"),
                 },
                 new []

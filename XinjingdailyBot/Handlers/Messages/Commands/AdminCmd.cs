@@ -363,12 +363,70 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <returns></returns>
         internal static async Task ResponseSearchUser(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
         {
-            //HashSet<Users> users = new();
+            HashSet<Users> userList = new();
 
-            //foreach(var arg in args)
-            //{
-            //    if(long.TryParse()
-            //}
+            foreach (var arg in args)
+            {
+                //根据userName查找用户
+                if (arg.StartsWith('@'))
+                {
+                    string word = arg[1..];
+                    var users = await DB.Queryable<Users>().Where(x => x.UserName.Contains(word)).ToListAsync();
+                    if (users != null && users.Any())
+                    {
+                        userList = userList.Concat(users).ToHashSet();
+                    }
+                }
+                else
+                {
+                    //根据userID查找用户
+                    if (long.TryParse(arg, out long userID))
+                    {
+                        var user = await DB.Queryable<Users>().Where(x => x.UserID == userID).FirstAsync();
+                        if (user != null)
+                        {
+                            userList.Add(user);
+                        }
+                    }
+
+                    //根据userName以及用户名查找用户
+                    var users = await DB.Queryable<Users>().Where(x => x.UserName.Contains(arg) || x.FirstName.Contains(arg) || x.LastName.Contains(arg)).ToListAsync();
+                    if (users != null && users.Any())
+                    {
+                        userList = userList.Concat(users).ToHashSet();
+                    }
+                }
+            }
+
+            StringBuilder sb = new();
+            if (!userList.Any())
+            {
+                sb.AppendLine("找不到符合条件的用户");
+            }
+            else
+            {
+                int index = 1;
+                foreach (var user in userList)
+                {
+                    string url = TextHelper.HtmlUserLink(user);
+                    if (string.IsNullOrEmpty(user.UserName))
+                    {
+                        sb.AppendLine($"{index++}. <code>{user.UserID}</code> {url}");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"{index++}. <code>{user.UserID}</code> {url} <code>@{user.UserName}</code>");
+                    }
+
+                    if (index % 30 == 0)
+                    {
+                        await botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
+                        sb.Clear();
+                    }
+                }
+            }
+
+            await botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
         }
     }
 }
