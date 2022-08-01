@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using Telegram.Bot;
-using Telegram.Bot.Extensions.Polling;
+using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Helpers;
 using static XinjingdailyBot.Utils;
@@ -9,12 +9,12 @@ namespace XinjingdailyBot
 {
     internal class Program
     {
-        [STAThread]
         /// <summary>
         /// 启动入口
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
+        [STAThread]
         static async Task Main(string[] args)
         {
             await ConfigHelper.LoadConfig();
@@ -22,39 +22,28 @@ namespace XinjingdailyBot
             ThreadPool.SetMinThreads(1, 1);
             ThreadPool.SetMaxThreads(10, 10);
 
-            TelegramBotClient bot;
-
+            //设置代理
+            HttpClient? httpClient = null;
             if (!string.IsNullOrEmpty(BotConfig.Proxy))
             {
-                WebProxy proxy = new()
-                {
-                    Address = new Uri(BotConfig.Proxy),
-                };
-
-                HttpClientHandler handler = new()
-                {
-                    Proxy = proxy
-                };
-
-                HttpClient httpClient = new(handler);
-
-                bot = new TelegramBotClient(BotConfig.BotToken, httpClient);
+                httpClient = new(
+                    new HttpClientHandler()
+                    {
+                        Proxy = new WebProxy() { Address = new Uri(BotConfig.Proxy) },
+                        UseProxy = true,
+                    }
+                );
             }
-            else
-            {
-                bot = new TelegramBotClient(BotConfig.BotToken);
-            }
+
+            TelegramBotClient bot = new TelegramBotClient(BotConfig.BotToken, httpClient);
 
             using var cts = new CancellationTokenSource();
-
             try
             {
                 Logger.Info("--读取基础信息--");
-
                 await ChannelHelper.VerifyChannelConfig(bot);
 
                 Logger.Info("--初始化数据库--");
-
                 await DataBaseHelper.Init();
 
                 DB.Ado.CommandTimeOut = 30;
@@ -66,7 +55,7 @@ namespace XinjingdailyBot
 
                 bot.StartReceiving(
                     updateHandler: Handlers.Dispatcher.HandleUpdateAsync,
-                    errorHandler: Handlers.Dispatcher.HandleErrorAsync,
+                    pollingErrorHandler: Handlers.Dispatcher.HandleErrorAsync,
                     receiverOptions: new ReceiverOptions()
                     {
                         AllowedUpdates = Array.Empty<UpdateType>()
