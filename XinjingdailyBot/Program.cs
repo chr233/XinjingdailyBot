@@ -15,7 +15,7 @@ namespace XinjingdailyBot
         /// <param name="args"></param>
         /// <returns></returns>
         [STAThread]
-        static async Task Main(string[] args)
+        static async Task Main()
         {
             await ConfigHelper.LoadConfig();
 
@@ -54,8 +54,8 @@ namespace XinjingdailyBot
                 }
 
                 bot.StartReceiving(
-                    updateHandler: Handlers.Dispatcher.HandleUpdateAsync,
-                    pollingErrorHandler: Handlers.Dispatcher.HandleErrorAsync,
+                    updateHandler: Handlers.UpdateDispatcher.HandleUpdateAsync,
+                    pollingErrorHandler: Handlers.UpdateDispatcher.HandleErrorAsync,
                     receiverOptions: new ReceiverOptions()
                     {
                         AllowedUpdates = Array.Empty<UpdateType>()

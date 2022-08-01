@@ -76,7 +76,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                     return ("无法对同级管理员进行此操作", null);
                 }
 
-                var keyboard = MarkupHelper.SetUserGroupKeyboard();
+                var keyboard = await MarkupHelper.SetUserGroupKeyboard(dbUser, targetUser);
                 return ("请选择新的用户组", keyboard);
             }
 

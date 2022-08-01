@@ -30,6 +30,12 @@ namespace XinjingdailyBot.Helpers
         /// 机器人用户信息
         /// </summary>
         internal static User BotUser { get; private set; } = new();
+        
+        /// <summary>
+        /// 验证频道设置
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <returns></returns>
         internal static async Task VerifyChannelConfig(ITelegramBotClient botClient)
         {
             BotUser = await botClient.GetMeAsync();
