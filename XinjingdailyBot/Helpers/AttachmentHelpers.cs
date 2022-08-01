@@ -6,6 +6,12 @@ namespace XinjingdailyBot.Helpers
 {
     internal static class AttachmentHelpers
     {
+        /// <summary>
+        /// 附件包装器
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="postID"></param>
+        /// <returns></returns>
         internal static Attachments? GenerateAttachment(Message message, long postID)
         {
             string? fileID, fileName, FileUid, mimeType;

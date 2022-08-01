@@ -46,12 +46,7 @@ namespace XinjingdailyBot.Handlers
         /// <returns></returns>
         internal static async Task<Users?> FetchDbUser(User? msgUser, Chat? msgChat)
         {
-            if (msgUser == null)
-            {
-                return null;
-            }
-
-            if (msgUser.Username == "GroupAnonymousBot")
+            if (msgUser == null || msgUser.Username == "GroupAnonymousBot")
             {
                 return null;
             }

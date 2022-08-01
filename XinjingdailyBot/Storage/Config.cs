@@ -13,7 +13,7 @@
         public string BotToken { get; set; } = "";
 
         /// <summary>
-        /// 代理
+        /// 代理链接
         /// </summary>
         public string? Proxy { get; set; }
 

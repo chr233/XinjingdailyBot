@@ -15,6 +15,10 @@ namespace XinjingdailyBot.Helpers
 
         public static Dictionary<int, Levels> ULevels = new();
 
+        /// <summary>
+        /// 初始化数据库
+        /// </summary>
+        /// <returns></returns>
         internal static async Task Init()
         {
             Storage.Config config = BotConfig;
@@ -59,6 +63,10 @@ namespace XinjingdailyBot.Helpers
             }
         }
 
+        /// <summary>
+        /// 读取等级和权限信息
+        /// </summary>
+        /// <returns></returns>
         internal static async Task LoadLevelsAndRights()
         {
             ULevels.Clear();
@@ -76,6 +84,10 @@ namespace XinjingdailyBot.Helpers
             }
         }
 
+        /// <summary>
+        /// 添加默认数据库字段
+        /// </summary>
+        /// <returns></returns>
         internal static async Task AddBuildInValues()
         {
             List<Levels> levels = new()
@@ -99,7 +111,7 @@ namespace XinjingdailyBot.Helpers
                 new() { Id = 2, Name = "审核员", DefaultRight = UserRights.SendPost | UserRights.ReviewPost | UserRights.NormalCmd },
                 new() { Id = 3, Name = "发布员", DefaultRight = UserRights.SendPost | UserRights.DirectPost | UserRights.NormalCmd },
                 new() { Id = 4, Name = "狗管理", DefaultRight = UserRights.SendPost | UserRights.ReviewPost | UserRights.DirectPost | UserRights.NormalCmd | UserRights.AdminCmd },
-                new() { Id = 5, Name = "超级狗管理", DefaultRight = UserRights.SendPost | UserRights.ReviewPost | UserRights.DirectPost | UserRights.NormalCmd | UserRights.AdminCmd | UserRights.SuperCmd },
+                new() { Id = 5, Name = "超级狗管理", DefaultRight = UserRights.ALL },
                 new() { Id = 6, Name = "封禁用户", DefaultRight = UserRights.None },
             };
 

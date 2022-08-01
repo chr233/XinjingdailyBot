@@ -2,6 +2,7 @@
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Enums;
+using XinjingdailyBot.Handlers.Messages;
 using XinjingdailyBot.Helpers;
 using XinjingdailyBot.Models;
 using static XinjingdailyBot.Utils;
@@ -275,7 +276,7 @@ namespace XinjingdailyBot.Handlers.Queries
             {
                 if (post.Tags.HasFlag(BuildInTags.NSFW))
                 {
-                    await botClient.SendTextMessageAsync(AcceptChannel.Id, Dispatcher.NSFWWrning, allowSendingWithoutReply: true);
+                    await botClient.SendTextMessageAsync(AcceptChannel.Id, MessageDispatcher.NSFWWrning, allowSendingWithoutReply: true);
                 }
 
                 Message msg;
@@ -331,7 +332,7 @@ namespace XinjingdailyBot.Handlers.Queries
 
                 if (post.Tags.HasFlag(BuildInTags.NSFW))
                 {
-                    await botClient.SendTextMessageAsync(AcceptChannel.Id, Dispatcher.NSFWWrning, allowSendingWithoutReply: true);
+                    await botClient.SendTextMessageAsync(AcceptChannel.Id, MessageDispatcher.NSFWWrning, allowSendingWithoutReply: true);
                 }
 
                 var messages = await botClient.SendMediaGroupAsync(AcceptChannel.Id, group);

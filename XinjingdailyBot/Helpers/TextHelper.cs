@@ -7,8 +7,8 @@ namespace XinjingdailyBot.Helpers
 {
     internal sealed class TextHelper
     {
-        private static readonly Regex MatchTag = new(@"(^#\S+)|(\s#\S+)");
-        private static readonly Regex MatchSpace = new(@"^\s*$");
+        private static Regex MatchTag { get; } = new(@"(^#\S+)|(\s#\S+)");
+        private static Regex MatchSpace { get; } = new(@"^\s*$");
 
         /// <summary>
         /// 去除无用文本内容

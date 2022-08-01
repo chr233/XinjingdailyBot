@@ -1,6 +1,8 @@
 ﻿using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Enums;
 using XinjingdailyBot.Localization;
+using XinjingdailyBot.Models;
+using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Helpers
 {
@@ -123,28 +125,46 @@ namespace XinjingdailyBot.Helpers
             return keyboard;
         }
 
-        internal static InlineKeyboardMarkup SetUserGroupKeyboard()
+        internal static async Task<InlineKeyboardMarkup> SetUserGroupKeyboard(Users dbUser, Users targetUser)
         {
-            InlineKeyboardMarkup keyboard = new(new[]
+            var groups = await DB.Queryable<Groups>().ToListAsync();
+
+            InlineKeyboardMarkup keyboard;
+
+            if (!groups.Any())
             {
-                new []
+                keyboard = new(new[]
                 {
-                    InlineKeyboardButton.WithCallbackData("普通用户", "usergroup user"),
-                },
-                new []
+                    new []
+                    {
+                        InlineKeyboardButton.WithCallbackData("普通用户", "usergroup user"),
+                    },
+                });
+            }
+            else
+            {
+                keyboard = new(new[]
                 {
-                    InlineKeyboardButton.WithCallbackData("审核员", "setusergroup reviewer"),
-                    InlineKeyboardButton.WithCallbackData("发布员", "setgroup poster"),
-                },
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData("狗管理", "setgroup admin"),
-                },
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData("超级狗管理", "setgroup super"),
-                },
-            });
+                    new []
+                    {
+                        InlineKeyboardButton.WithCallbackData("普通用户", "usergroup user"),
+                    },
+                    new []
+                    {
+                        InlineKeyboardButton.WithCallbackData("审核员", "usergroup reviewer"),
+                        InlineKeyboardButton.WithCallbackData("发布员", "usergroup poster"),
+                    },
+                    new []
+                    {
+                        InlineKeyboardButton.WithCallbackData("狗管理", "usergroup admin"),
+                    },
+                    new []
+                    {
+                        InlineKeyboardButton.WithCallbackData("超级狗管理", "usergroup super"),
+                    },
+                });
+            }
+
             return keyboard;
         }
     }

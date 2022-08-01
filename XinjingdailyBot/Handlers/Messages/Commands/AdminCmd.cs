@@ -402,7 +402,14 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             StringBuilder sb = new();
             if (!userList.Any())
             {
-                sb.AppendLine("找不到符合条件的用户");
+                if (args.Any())
+                {
+                    sb.AppendLine("找不到符合条件的用户");
+                }
+                else
+                {
+                    sb.AppendLine("请指定要搜索的用户昵称或者用户名或者用户ID");
+                }
             }
             else
             {
@@ -474,7 +481,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             var monthPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart).CountAsync();
             var monthAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Accepted).CountAsync();
             var monthRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Rejected).CountAsync();
-            
+
             sb.AppendLine();
             sb.AppendLine($"-- 自 {monthStart.ToString("yyyy-mm-dd")} 起 --");
             sb.AppendLine($"接受/拒绝: <code>{monthAcceptPost}</code>/<code>{monthRejectPost}</code>");
