@@ -64,7 +64,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             {
                 if (args.Any())
                 {
-                    targetUser = await FetchUserHelper.FetchTargetUser(args.First());
+                    targetUser = await FetchUserHelper.FetchDbUserByUserNameOrUserID(args.First());
                 }
             }
 
@@ -117,7 +117,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 {
                     if (args.Any())
                     {
-                        targetUser = await FetchUserHelper.FetchTargetUser(args.First());
+                        targetUser = await FetchUserHelper.FetchDbUserByUserNameOrUserID(args.First());
                         args = args[1..];
                     }
                 }
@@ -186,7 +186,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 {
                     if (args.Any())
                     {
-                        targetUser = await FetchUserHelper.FetchTargetUser(args.First());
+                        targetUser = await FetchUserHelper.FetchDbUserByUserNameOrUserID(args.First());
                         args = args[1..];
                     }
                 }
@@ -255,7 +255,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             {
                 if (args.Any())
                 {
-                    targetUser = await FetchUserHelper.FetchTargetUser(args.First());
+                    targetUser = await FetchUserHelper.FetchDbUserByUserNameOrUserID(args.First());
                     args = args[1..];
                 }
             }
@@ -315,7 +315,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 {
                     if (args.Any())
                     {
-                        targetUser = await FetchUserHelper.FetchTargetUser(args.First());
+                        targetUser = await FetchUserHelper.FetchDbUserByUserNameOrUserID(args.First());
                         args = args[1..];
                     }
                 }

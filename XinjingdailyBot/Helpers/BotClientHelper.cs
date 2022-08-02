@@ -87,6 +87,22 @@ namespace XinjingdailyBot.Helpers
         }
 
         /// <summary>
+        /// 删除消息Markup
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="message"></param>
+        /// <param name="replyMarkup"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        internal static async Task RemoveMessageReplyMarkupAsync(
+            this ITelegramBotClient botClient,
+            Message message,
+            CancellationToken cancellationToken = default)
+        {
+            await botClient.EditMessageReplyMarkupAsync(message.Chat.Id, message.MessageId, null, cancellationToken: cancellationToken);
+        }
+
+        /// <summary>
         /// 编辑消息
         /// </summary>
         /// <param name="botClient"></param>

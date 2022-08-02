@@ -37,6 +37,11 @@ namespace XinjingdailyBot.Models
         /// </summary>
         public bool IsBot { get; set; }
         /// <summary>
+        /// 是否为高级用户
+        /// </summary>
+        public bool IsVip { get; set; }
+
+        /// <summary>
         /// 默认开启匿名模式
         /// </summary>
         public bool PreferAnymouse { get; set; }
@@ -92,7 +97,14 @@ namespace XinjingdailyBot.Models
 
         public override string ToString()
         {
-            return $"{UserID} @{UserName} / {FirstName} {LastName}";
+            if (string.IsNullOrEmpty(UserName))
+            {
+                return $"{UserNick}(#{UserID})";
+            }
+            else
+            {
+                return $"{UserNick}(@{UserName})";
+            }
         }
     }
 }

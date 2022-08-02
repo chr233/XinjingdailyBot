@@ -11,7 +11,6 @@ namespace XinjingdailyBot.Handlers.Queries
 {
     internal static class ReviewHandler
     {
-
         /// <summary>
         /// 处理CallbackQuery
         /// </summary>
@@ -22,7 +21,6 @@ namespace XinjingdailyBot.Handlers.Queries
         internal static async Task HandleQuery(ITelegramBotClient botClient, Users dbUser, CallbackQuery callbackQuery)
         {
             Message message = callbackQuery.Message!;
-
             Posts? post = await DB.Queryable<Posts>().FirstAsync(x => x.ManageMsgID == message.MessageId);
 
             if (post == null)
@@ -91,7 +89,7 @@ namespace XinjingdailyBot.Handlers.Queries
                     break;
 
                 case "review anymouse":
-                    await PostHandler.SetAnymouse(botClient, post, dbUser, callbackQuery);
+                    await PostHandler.SetAnymouse(botClient, post, callbackQuery);
                     break;
 
                 case "review cancel":

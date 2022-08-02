@@ -25,6 +25,13 @@ namespace XinjingdailyBot.Handlers.Messages
             string msgText = msgType == MessageType.Text ? message.Text! : "";
 
             bool isCommand = msgText.StartsWith('/');
+
+            //检查是否封禁, 封禁后仅能使用命令, 不响应其他消息
+            if (dbUser.IsBan && !isCommand)
+            {
+                return;
+            }
+
             bool isMediaGroup = message.MediaGroupId != null;
             bool isPrivateChat = message.Chat.Type == ChatType.Private;
             bool isGroupChat = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
@@ -55,15 +62,9 @@ namespace XinjingdailyBot.Handlers.Messages
                 return;
             }
 
-            if (BotConfig.Debug && !isCommand)
+            if (BotConfig.Debug)
             {
-                Logger.Debug($"M {message.Type} {dbUser} {msgText}");
-            }
-
-            //检查是否封禁, 封禁后仅能使用命令, 不响应其他消息
-            if (dbUser.IsBan && !isCommand)
-            {
-                return;
+                Logger.LogMessage(message, dbUser);
             }
 
             switch (message.Type)
@@ -96,7 +97,7 @@ namespace XinjingdailyBot.Handlers.Messages
                 default:
                     if (isPrivateChat)
                     {
-                        await botClient.AutoReplyAsync("未处理的消息", message);
+                        await botClient.AutoReplyAsync("不支持的消息类型, 当前仅支持 文字/图片/视频/音频/文件 投稿", message);
                     }
                     break;
             }

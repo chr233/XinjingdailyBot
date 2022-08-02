@@ -53,6 +53,8 @@ namespace XinjingdailyBot
                     throw new Exception("数据库连接失败");
                 }
 
+                Logger.Info("数据库初始化完成");
+
                 bot.StartReceiving(
                     updateHandler: Handlers.UpdateDispatcher.HandleUpdateAsync,
                     pollingErrorHandler: Handlers.UpdateDispatcher.HandleErrorAsync,
@@ -63,9 +65,9 @@ namespace XinjingdailyBot
                     cancellationToken: cts.Token
                 );
 
-                Logger.Info("--开始运行, 回车键退出进程--");
+                Logger.Info("--开始运行, 回车键结束运行--");
                 Console.ReadLine();
-                Logger.Info("--即将退出--");
+                Logger.Info("--运行结束, 即将退出--");
                 cts.Cancel();
             }
             catch (Exception ex)

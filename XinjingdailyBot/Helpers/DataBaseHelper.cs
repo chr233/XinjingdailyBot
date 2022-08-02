@@ -15,6 +15,8 @@ namespace XinjingdailyBot.Helpers
 
         public static Dictionary<int, Levels> ULevels = new();
 
+        public static Groups DefaultGroup = new();
+
         /// <summary>
         /// 初始化数据库
         /// </summary>
@@ -59,7 +61,17 @@ namespace XinjingdailyBot.Helpers
 
             if (!ULevels.ContainsKey(1) || !UGroups.ContainsKey(1))
             {
+
                 await AddBuildInValues();
+            }
+
+            if (UGroups.TryGetValue(1, out var group))
+            {
+                DefaultGroup = group;
+            }
+            else
+            {
+                throw new Exception("不存在 Id 为 1 的权限组, 请重建数据库");
             }
         }
 
@@ -82,6 +94,7 @@ namespace XinjingdailyBot.Helpers
             {
                 UGroups.Add(right.Id, right);
             }
+
         }
 
         /// <summary>
@@ -90,8 +103,10 @@ namespace XinjingdailyBot.Helpers
         /// <returns></returns>
         internal static async Task AddBuildInValues()
         {
+            //请不要修改ID为0和1的字段
             List<Levels> levels = new()
             {
+                new() { Id = 0, Name = "Lv-" },
                 new() { Id = 1, Name = "Lv0", MinExp = 0, MaxExp = 10 },
                 new() { Id = 2, Name = "Lv1", MinExp = 11, MaxExp = 100 },
                 new() { Id = 3, Name = "Lv2", MinExp = 101, MaxExp = 500 },
@@ -100,22 +115,22 @@ namespace XinjingdailyBot.Helpers
                 new() { Id = 6, Name = "Lv5", MinExp = 2001, MaxExp = 5000 },
                 new() { Id = 7, Name = "Lv6", MinExp = 5001, MaxExp = 10000 },
                 new() { Id = 8, Name = "Lv6+", MinExp = 10001 },
-                new() { Id = 9, Name = "Lv-" },
             };
 
             await DB.Storageable(levels).ExecuteCommandAsync();
 
+            //请不要修改ID为0和1的字段
             List<Groups> rights = new()
             {
+                new() { Id = 0, Name = "封禁用户", DefaultRight = UserRights.None },
                 new() { Id = 1, Name = "普通用户", DefaultRight = UserRights.SendPost | UserRights.NormalCmd },
-                new() { Id = 2, Name = "审核员", DefaultRight = UserRights.SendPost | UserRights.ReviewPost | UserRights.NormalCmd },
-                new() { Id = 3, Name = "发布员", DefaultRight = UserRights.SendPost | UserRights.DirectPost | UserRights.NormalCmd },
-                new() { Id = 4, Name = "狗管理", DefaultRight = UserRights.SendPost | UserRights.ReviewPost | UserRights.DirectPost | UserRights.NormalCmd | UserRights.AdminCmd },
-                new() { Id = 5, Name = "超级狗管理", DefaultRight = UserRights.ALL },
-                new() { Id = 6, Name = "封禁用户", DefaultRight = UserRights.None },
+                new() { Id = 10, Name = "审核员", DefaultRight = UserRights.SendPost | UserRights.ReviewPost | UserRights.NormalCmd },
+                new() { Id = 11, Name = "发布员", DefaultRight = UserRights.SendPost | UserRights.DirectPost | UserRights.NormalCmd },
+                new() { Id = 20, Name = "狗管理", DefaultRight = UserRights.SendPost | UserRights.ReviewPost | UserRights.DirectPost | UserRights.NormalCmd | UserRights.AdminCmd },
+                new() { Id = 30, Name = "超级狗管理", DefaultRight = UserRights.ALL },
             };
 
-            await DB.Storageable(rights).ExecuteCommandAsync();
+            await DB.Storageable(rights).WhereColumns(x => x.Id).ExecuteCommandAsync();
 
             await LoadLevelsAndRights();
         }

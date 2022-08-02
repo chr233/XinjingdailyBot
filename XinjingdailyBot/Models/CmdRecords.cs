@@ -31,6 +31,10 @@ namespace XinjingdailyBot.Models
         public string Exception { get; set; } = "";
 
         /// <summary>
+        /// 是否为Query命令
+        /// </summary>
+        public bool IsQuery { get; set; } = false;
+        /// <summary>
         /// 命令成功执行
         /// </summary>
         public bool Handled { get; set; }

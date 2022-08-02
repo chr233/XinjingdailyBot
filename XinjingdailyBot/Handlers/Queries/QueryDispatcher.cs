@@ -25,36 +25,54 @@ namespace XinjingdailyBot.Handlers.Queries
             }
 
             Message? message = callbackQuery.Message;
-            string? data = callbackQuery.Data;
+            if (message == null)
+            {
+                await botClient.AutoReplyAsync("消息不存在", callbackQuery);
+                return;
+            }
 
-            if (message == null || string.IsNullOrEmpty(data))
+            string? data = callbackQuery.Data;
+            if (string.IsNullOrEmpty(data))
             {
                 await botClient.AutoReplyAsync("Payload 非法", callbackQuery);
-                await botClient.EditMessageReplyMarkupAsync(callbackQuery.InlineMessageId!);
+                await botClient.RemoveMessageReplyMarkupAsync(message);
                 return;
             }
 
             if (BotConfig.Debug)
             {
-                Logger.Debug($"Q {callbackQuery.Data} {dbUser}");
+                Logger.LogCallbackQuery(callbackQuery, dbUser);
             }
 
             string[] args = data.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
             if (!args.Any()) { return; }
+
             string cmd = args.First();
+            args = args[1..];
 
             switch (cmd)
             {
+                //投稿确认
                 case "post":
                     await PostHandler.HandleQuery(botClient, dbUser, callbackQuery);
                     break;
 
+                //审核相关
                 case "review":
                 case "reject":
                     await ReviewHandler.HandleQuery(botClient, dbUser, callbackQuery);
                     break;
 
-                
+                //命令回调
+                case "cmd":
+                    await CommandHandler.HandleQuery(botClient, dbUser, callbackQuery, args);
+                    break;
+
+                //取消操作
+                case "cancel":
+                    await botClient.AutoReplyAsync("操作已取消", callbackQuery);
+                    await botClient.EditMessageTextAsync(message, "操作已取消", replyMarkup: null);
+                    break;
 
                 default:
                     break;

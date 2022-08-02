@@ -26,12 +26,16 @@ namespace XinjingdailyBot.Handlers.Messages
                 MessageID = message.MessageId,
                 UserID = dbUser.UserID,
                 Command = message.Text![1..],
+                Handled = false,
+                IsQuery = false,
                 ExecuteAt = DateTime.Now,
             };
 
+            bool needRecord = true;
+
             try
             {
-                (bool handled, bool autoDelete) = await ExecCommand(botClient, dbUser, message);
+                (needRecord, record.Handled, bool autoDelete) = await ExecCommand(botClient, dbUser, message);
 
                 //定时删除命令消息
                 if (autoDelete)
@@ -49,21 +53,19 @@ namespace XinjingdailyBot.Handlers.Messages
                         }
                     });
                 }
-
-                record.Handled = handled;
             }
             catch (Exception ex)
             {
-                record = new()
-                {
-                    Exception = $"{ex.GetType} {ex.Message}",
-                    Error = true,
-                };
+                record.Exception = $"{ex.GetType} {ex.Message}";
+                record.Error = true;
                 throw;
             }
             finally
             {
-                await DB.Insertable(record).ExecuteCommandAsync();
+                if (needRecord)
+                {
+                    await DB.Insertable(record).ExecuteCommandAsync();
+                }
             }
         }
 
@@ -73,12 +75,12 @@ namespace XinjingdailyBot.Handlers.Messages
         /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
         /// <param name="message">用户消息原文</param>
-        /// <returns>handled,autoDelete</returns>
-        private static async Task<(bool, bool)> ExecCommand(ITelegramBotClient botClient, Users dbUser, Message message)
+        /// <returns>needRecord,handled,autoDelete</returns>
+        private static async Task<(bool, bool, bool)> ExecCommand(ITelegramBotClient botClient, Users dbUser, Message message)
         {
             //切分命令参数
             string[] args = message.Text!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
-            if (!args.Any()) { return (false, false); }
+            if (!args.Any()) { return (false, false, false); }
 
             string cmd = args.First()[1..];
             args = args[1..];
@@ -98,7 +100,7 @@ namespace XinjingdailyBot.Handlers.Messages
                 }
                 else
                 {
-                    return (false, false);
+                    return (false, false, false);
                 }
             }
 
@@ -115,7 +117,7 @@ namespace XinjingdailyBot.Handlers.Messages
             switch (cmd.ToUpperInvariant())
             {
                 //Common - 通用命令, 不鉴权
-                case "HELP" when normal:
+                case "HELP":
                     await CommonCmd.ResponseHelp(botClient, dbUser, message);
                     break;
 
@@ -180,7 +182,7 @@ namespace XinjingdailyBot.Handlers.Messages
 
                 case "ECHO" when admin:
                     await AdminCmd.ResponseEcho(botClient, dbUser, message, args);
-                    autoDelete = false; //不删除命令记录
+                    autoDelete = false;
                     break;
 
                 case "SEARCHUSER" when admin:
@@ -191,7 +193,7 @@ namespace XinjingdailyBot.Handlers.Messages
                     await AdminCmd.ResponseSystemReport(botClient, dbUser, message, args);
                     break;
 
-                //Super
+                //Super - 超级管理员命令
                 case "RESTART" when super:
                     await SuperCmd.ResponseRestart(botClient, message);
                     break;
@@ -225,7 +227,7 @@ namespace XinjingdailyBot.Handlers.Messages
             //1.autoDelete = true
             //2.在群组中
             //3.成功执行命令
-            return (handled, autoDelete && inGroup && handled);
+            return (true, handled, autoDelete && inGroup && handled);
         }
     }
 }

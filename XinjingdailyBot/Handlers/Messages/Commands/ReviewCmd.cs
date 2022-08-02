@@ -88,7 +88,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                     return "未找到稿件";
                 }
 
-                var postUser = await FetchUserHelper.FetchDbUser(post.PosterUID);
+                var postUser = await FetchUserHelper.FetchDbUserByUserID(post.PosterUID);
                 if (postUser == null)
                 {
                     return "未找到投稿用户";

@@ -8,6 +8,8 @@ namespace XinjingdailyBot.Handlers
 {
     internal static class FetchUserHelper
     {
+        private static TimeSpan UpdatePeriod { get; } = TimeSpan.FromDays(15);
+
         /// <summary>
         /// 根据Update获取发送消息的用户
         /// </summary>
@@ -57,12 +59,6 @@ namespace XinjingdailyBot.Handlers
 
             if (dbUser == null)
             {
-                if (!UGroups.TryGetValue(1, out var group))
-                {
-                    Logger.Error("不存在 Id 为 1 的权限组, 请重建数据库");
-                    return null;
-                }
-
                 dbUser = new()
                 {
                     UserID = msgUser.Id,
@@ -71,19 +67,17 @@ namespace XinjingdailyBot.Handlers
                     LastName = msgUser.LastName ?? "",
                     IsBot = msgUser.IsBot,
                     IsBan = false,
-                    GroupID = group.Id,
+                    IsVip = false,
+                    GroupID = DefaultGroup.Id,
                     PrivateChatID = chatID,
-                    Right = group.DefaultRight,
+                    Right = DefaultGroup.DefaultRight,
                     Level = 1,
                 };
 
                 try
                 {
                     await DB.Insertable(dbUser).ExecuteCommandAsync();
-                    if (IsDebug)
-                    {
-                        Logger.Debug($"创建用户 {dbUser} 成功");
-                    }
+                    Logger.Debug($"创建用户 {dbUser} 成功");
                 }
                 catch (Exception ex)
                 {
@@ -95,6 +89,7 @@ namespace XinjingdailyBot.Handlers
             else
             {
                 bool needUpdate = false;
+
                 //用户名不一致时更新
                 if (!(dbUser.UserName.Equals(msgUser.Username ?? "") && dbUser.FirstName.Equals(msgUser.FirstName) && dbUser.LastName.Equals(msgUser.LastName ?? "")))
                 {
@@ -122,15 +117,23 @@ namespace XinjingdailyBot.Handlers
                 //如果被封禁自动覆盖原用户组
                 if (dbUser.IsBan)
                 {
-                    dbUser.GroupID = 6;
+                    dbUser.GroupID = 0;
+                    dbUser.Level = 0;
+                }
+
+                //超过设定时间也触发更新
+                if (DateTime.Now > dbUser.ModifyAt + UpdatePeriod)
+                {
+                    needUpdate = true;
                 }
 
                 if (!UGroups.ContainsKey(dbUser.GroupID))
                 {
-                    dbUser.GroupID = 1;
+                    dbUser.GroupID = DefaultGroup.Id;
                     needUpdate = true;
                 }
 
+                //如果是配置文件中指定的管理员就覆盖用户组权限
                 if (BotConfig.SuperAdmins.Contains(dbUser.UserID))
                 {
                     dbUser.Right = UserRights.ALL;
@@ -183,7 +186,7 @@ namespace XinjingdailyBot.Handlers
         /// </summary>
         /// <param name="userID"></param>
         /// <returns></returns>
-        internal static async Task<Users?> FetchDbUser(long? userID)
+        internal static async Task<Users?> FetchDbUserByUserID(long? userID)
         {
             if (userID == null)
             {
@@ -201,7 +204,7 @@ namespace XinjingdailyBot.Handlers
         /// </summary>
         /// <param name="userID"></param>
         /// <returns></returns>
-        internal static async Task<Users?> FetchDbUser(string? userName)
+        internal static async Task<Users?> FetchDbUserByUserName(string? userName)
         {
             if (string.IsNullOrEmpty(userName))
             {
@@ -247,21 +250,21 @@ namespace XinjingdailyBot.Handlers
                     if (post != null)
                     {
                         //通过稿件读取用户信息
-                        return await FetchDbUser(post.PosterUID);
+                        return await FetchDbUserByUserID(post.PosterUID);
                     }
                 }
                 //在CMD回调表里查看
                 var cmdAction = await DB.Queryable<CmdRecords>().FirstAsync(x => x.MessageID == replyToMsg.MessageId);
                 if (cmdAction != null)
                 {
-                    return await FetchDbUser(cmdAction.UserID);
+                    return await FetchDbUserByUserID(cmdAction.UserID);
                 }
 
                 return null;
             }
 
             //获取消息发送人
-            return await FetchDbUser(replyToMsg.From.Id);
+            return await FetchDbUserByUserID(replyToMsg.From.Id);
         }
 
         /// <summary>
@@ -269,7 +272,7 @@ namespace XinjingdailyBot.Handlers
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        internal static async Task<Users?> FetchTargetUser(string? target)
+        internal static async Task<Users?> FetchDbUserByUserNameOrUserID(string? target)
         {
             if (string.IsNullOrEmpty(target))
             {
@@ -278,22 +281,37 @@ namespace XinjingdailyBot.Handlers
 
             if (target.StartsWith('@'))
             {
-                return await FetchDbUser(target.Substring(1));
+                return await FetchDbUserByUserName(target[1..]);
             }
 
             Users? dbUser = null;
 
             if (long.TryParse(target, out var userID))
             {
-                dbUser = await FetchDbUser(userID);
+                dbUser = await FetchDbUserByUserID(userID);
             }
 
             if (dbUser == null)
             {
-                dbUser = await FetchDbUser(target);
+                dbUser = await FetchDbUserByUserName(target);
             }
 
             return dbUser;
+        }
+
+        /// <summary>
+        /// 根据UserID查找指定用户
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        internal static async Task<Users?> FetchDbUserByUserID(string? target)
+        {
+            if (long.TryParse(target, out var userID))
+            {
+                return await FetchDbUserByUserID(userID);
+            }
+
+            return null;
         }
     }
 }

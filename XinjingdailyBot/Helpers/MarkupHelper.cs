@@ -125,47 +125,38 @@ namespace XinjingdailyBot.Helpers
             return keyboard;
         }
 
-        internal static async Task<InlineKeyboardMarkup> SetUserGroupKeyboard(Users dbUser, Users targetUser)
+        internal static async Task<InlineKeyboardMarkup?> SetUserGroupKeyboard(Users dbUser, Users targetUser)
         {
-            var groups = await DB.Queryable<Groups>().ToListAsync();
-
-            InlineKeyboardMarkup keyboard;
+            var groups = await DB.Queryable<Groups>().Where(x => x.Id > 0).ToListAsync();
 
             if (!groups.Any())
             {
-                keyboard = new(new[]
-                {
-                    new []
-                    {
-                        InlineKeyboardButton.WithCallbackData("普通用户", "usergroup user"),
-                    },
-                });
+                return null;
             }
             else
             {
-                keyboard = new(new[]
-                {
-                    new []
-                    {
-                        InlineKeyboardButton.WithCallbackData("普通用户", "usergroup user"),
-                    },
-                    new []
-                    {
-                        InlineKeyboardButton.WithCallbackData("审核员", "usergroup reviewer"),
-                        InlineKeyboardButton.WithCallbackData("发布员", "usergroup poster"),
-                    },
-                    new []
-                    {
-                        InlineKeyboardButton.WithCallbackData("狗管理", "usergroup admin"),
-                    },
-                    new []
-                    {
-                        InlineKeyboardButton.WithCallbackData("超级狗管理", "usergroup super"),
-                    },
-                });
-            }
+                List<List<InlineKeyboardButton>> btns = new();
 
-            return keyboard;
+                foreach (var group in groups)
+                {
+                    string name = targetUser.GroupID == group.Id ? $"当前用户组: [ {group.Name} ]" : group.Name;
+                    string data = $"cmd {dbUser.UserID} setusergroup {targetUser.UserID} {group.Id}";
+
+                    btns.Add(new()
+                    {
+                        InlineKeyboardButton.WithCallbackData(name, data),
+                    });
+                }
+
+                btns.Add(new()
+                {
+                        InlineKeyboardButton.WithCallbackData("取消操作", "cancel"),
+                });
+
+                InlineKeyboardMarkup keyboard = new(btns);
+
+                return keyboard;
+            }
         }
     }
 }
