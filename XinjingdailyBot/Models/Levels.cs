@@ -5,7 +5,7 @@ namespace XinjingdailyBot.Models
     [SugarTable("level", TableDescription = "等级组")]
     internal sealed class Levels
     {
-        [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
+        [SugarColumn(IsPrimaryKey = true)]
         public int Id { get; set; }
         /// <summary>
         /// 等级名称

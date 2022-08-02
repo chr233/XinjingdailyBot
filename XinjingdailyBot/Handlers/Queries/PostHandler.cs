@@ -20,7 +20,6 @@ namespace XinjingdailyBot.Handlers.Queries
         internal static async Task HandleQuery(ITelegramBotClient botClient, Users dbUser, CallbackQuery callbackQuery)
         {
             Message message = callbackQuery.Message!;
-
             Posts? post = await DB.Queryable<Posts>().FirstAsync(x => x.ActionMsgID == message.MessageId);
 
             if (post == null)
@@ -46,7 +45,7 @@ namespace XinjingdailyBot.Handlers.Queries
             switch (callbackQuery.Data)
             {
                 case "post anymouse":
-                    await SetAnymouse(botClient, post, dbUser, callbackQuery);
+                    await SetAnymouse(botClient, post, callbackQuery);
                     break;
                 case "post cancel":
                     await CancelPost(botClient, post, callbackQuery);
@@ -64,7 +63,7 @@ namespace XinjingdailyBot.Handlers.Queries
         /// <param name="post"></param>
         /// <param name="callbackQuery"></param>
         /// <returns></returns>
-        internal static async Task SetAnymouse(ITelegramBotClient botClient, Posts post, Users dbUser, CallbackQuery callbackQuery)
+        internal static async Task SetAnymouse(ITelegramBotClient botClient, Posts post, CallbackQuery callbackQuery)
         {
             await botClient.AutoReplyAsync("可以使用命令 /anymouse 切换默认匿名投稿", callbackQuery);
 

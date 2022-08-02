@@ -22,7 +22,10 @@ namespace XinjingdailyBot.Handlers
 
             if (dbUser == null)
             {
-                Logger.Error("获取用户出错");
+                if (IsDebug)
+                {
+                    Logger.Error("获取用户出错");
+                }
                 //await botClient.AutoReplyAsync(text: "意外错误", update, cancellationToken);
                 return;
             }
@@ -66,7 +69,7 @@ namespace XinjingdailyBot.Handlers
         /// <returns></returns>
         private static Task UnknownUpdateHandlerAsync(ITelegramBotClient botClient, Users dbUser, Update update)
         {
-            Logger.Debug($"U: {update.Type} ");
+            Logger.LogUpdate(update, dbUser);
             return Task.CompletedTask;
         }
 

@@ -6,7 +6,7 @@ namespace XinjingdailyBot.Models
     [SugarTable("group", TableDescription = "用户组")]
     internal sealed class Groups
     {
-        [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
+        [SugarColumn(IsPrimaryKey = true)]
         public int Id { get; set; }
         /// <summary>
         /// 权限名
