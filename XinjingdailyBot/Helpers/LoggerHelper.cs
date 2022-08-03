@@ -45,10 +45,10 @@ namespace XinjingdailyBot.Helpers
                 MessageType.Text => $"[文本] {message.Text}",
                 MessageType.Photo => $"[图片] {message.Caption}",
                 MessageType.Audio => $"[音频] {message.Caption}",
-                MessageType.Video => $"[视频] {message.Caption}]",
-                MessageType.Voice => $"[语音] {message.Caption}]",
-                MessageType.Document => $"[文件] {message.Caption}]",
-                MessageType.Sticker => $"[贴纸] {message.Sticker!.SetName}]",
+                MessageType.Video => $"[视频] {message.Caption}",
+                MessageType.Voice => $"[语音] {message.Caption}",
+                MessageType.Document => $"[文件] {message.Caption}",
+                MessageType.Sticker => $"[贴纸] {message.Sticker!.SetName}",
                 _ => "[其他消息]",
             };
 
