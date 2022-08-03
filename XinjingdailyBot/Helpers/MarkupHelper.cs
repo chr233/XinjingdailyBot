@@ -178,10 +178,10 @@ namespace XinjingdailyBot.Helpers
 
                 var btnPrev = current > 1 ?
                     InlineKeyboardButton.WithCallbackData("上一页", $"cmd {dbUser.UserID} searchuser {query} {current - 1}") :
-                    InlineKeyboardButton.WithCallbackData("到头了", $"cmd  {dbUser.UserID} say 到头了");
+                    InlineKeyboardButton.WithCallbackData("到头了", $"cmd {dbUser.UserID} say 到头了");
                 var btnNext = current < total ?
                     InlineKeyboardButton.WithCallbackData("下一页", $"cmd {dbUser.UserID} searchuser {query} {current + 1}") :
-                    InlineKeyboardButton.WithCallbackData("到头了", $"cmd  {dbUser.UserID} say 到头了");
+                    InlineKeyboardButton.WithCallbackData("到头了", $"cmd {dbUser.UserID} say 到头了");
 
                 InlineKeyboardMarkup keyboard = new(new[]
                 {

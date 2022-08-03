@@ -49,10 +49,22 @@ namespace XinjingdailyBot.Handlers
         /// </summary>
         /// <param name="msgUser"></param>
         /// <returns></returns>
-        internal static async Task<Users?> FetchDbUser(User? msgUser, Chat? msgChat)
+        private static async Task<Users?> FetchDbUser(User? msgUser, Chat? msgChat)
         {
-            if (msgUser == null || msgUser.Username == "GroupAnonymousBot")
+            if (msgUser == null)
             {
+                return null;
+            }
+
+            if (msgUser.Username == "GroupAnonymousBot")
+            {
+                if (IsDebug)
+                {
+                    if (msgChat != null)
+                    {
+                        Logger.Debug($"S 忽略群匿名用户 {msgChat.ChatProfile()}");
+                    }
+                }
                 return null;
             }
 
@@ -80,7 +92,10 @@ namespace XinjingdailyBot.Handlers
                 try
                 {
                     await DB.Insertable(dbUser).ExecuteCommandAsync();
-                    Logger.Debug($"S 创建用户 {dbUser} 成功");
+                    if (IsDebug)
+                    {
+                        Logger.Debug($"S 创建用户 {dbUser} 成功");
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -150,6 +165,7 @@ namespace XinjingdailyBot.Handlers
                 }
                 else
                 {
+                    Logger.Error($"S 读取用户 {dbUser} 权限组 {dbUser.GroupID} 失败");
                     return null;
                 }
 

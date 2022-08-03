@@ -22,11 +22,6 @@ namespace XinjingdailyBot.Handlers
 
             if (dbUser == null)
             {
-                if (IsDebug)
-                {
-                    Logger.Error("获取用户出错");
-                }
-                //await botClient.AutoReplyAsync(text: "意外错误", update, cancellationToken);
                 return;
             }
 

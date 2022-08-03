@@ -170,10 +170,12 @@ namespace XinjingdailyBot.Handlers.Messages
 
                 case "BAN" when admin:
                     await AdminCmd.ResponseBan(botClient, dbUser, message, args);
+                    autoDelete = false;
                     break;
 
                 case "UNBAN" when admin:
                     await AdminCmd.ResponseUnban(botClient, dbUser, message, args);
+                    autoDelete = false;
                     break;
 
                 case "QUERYBAN" when admin:
