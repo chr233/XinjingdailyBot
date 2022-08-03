@@ -17,6 +17,14 @@ namespace XinjingdailyBot
         [STAThread]
         static async Task Main()
         {
+            var exitEvent = new ManualResetEvent(false);
+
+            Console.CancelKeyPress += (sender, e) =>
+            {
+                e.Cancel = true;
+                exitEvent.Set();
+            };
+
             await ConfigHelper.LoadConfig();
 
             ThreadPool.SetMinThreads(1, 1);
@@ -38,6 +46,7 @@ namespace XinjingdailyBot
             TelegramBotClient bot = new TelegramBotClient(BotConfig.BotToken, httpClient);
 
             using var cts = new CancellationTokenSource();
+
             try
             {
                 Logger.Info("--读取基础信息--");
@@ -65,8 +74,8 @@ namespace XinjingdailyBot
                     cancellationToken: cts.Token
                 );
 
-                Logger.Info("--开始运行, 回车键结束运行--");
-                Console.ReadLine();
+                Logger.Info("--开始运行, Ctrl+C 结束运行--");
+                exitEvent.WaitOne();
                 Logger.Info("--运行结束, 即将退出--");
                 cts.Cancel();
             }
