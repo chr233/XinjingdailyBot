@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Helpers;

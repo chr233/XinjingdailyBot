@@ -84,43 +84,5 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             (string text, InlineKeyboardMarkup? kbd) = await exec();
             await botClient.SendCommandReply(text, message, autoDelete: false, replyMarkup: kbd);
         }
-
-        internal static async Task GrantVip(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
-        {
-            async Task<(string, InlineKeyboardMarkup?)> exec()
-            {
-                var targetUser = await FetchUserHelper.FetchTargetUser(message);
-
-                if (targetUser == null)
-                {
-                    if (args.Any())
-                    {
-                        targetUser = await FetchUserHelper.FetchDbUserByUserNameOrUserID(args.First());
-                    }
-                }
-
-                if (targetUser == null)
-                {
-                    return ("找不到指定用户", null);
-                }
-
-                if (targetUser.Id == dbUser.Id)
-                {
-                    return ("无法对自己进行操作", null);
-                }
-
-                if (targetUser.GroupID >= dbUser.GroupID)
-                {
-                    return ("无法对同级管理员进行此操作", null);
-                }
-
-                var keyboard = await MarkupHelper.SetUserGroupKeyboard(dbUser, targetUser);
-
-                return (keyboard != null ? "请选择新的用户组" : "获取可用用户组失败", keyboard);
-            }
-
-            (string text, InlineKeyboardMarkup? kbd) = await exec();
-            await botClient.SendCommandReply(text, message, autoDelete: false, replyMarkup: kbd);
-        }
     }
 }

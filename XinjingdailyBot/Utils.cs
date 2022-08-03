@@ -17,7 +17,7 @@ namespace XinjingdailyBot
 
         internal static Dictionary<int, Models.Groups> UGroups => DataBaseHelper.UGroups;
         internal static Dictionary<int, Models.Levels> ULevels => DataBaseHelper.ULevels;
-        internal static Models.Groups DefaultGroup =>DataBaseHelper.DefaultGroup;
+        internal static Models.Groups DefaultGroup => DataBaseHelper.DefaultGroup;
 
         internal static User BotUser => ChannelHelper.BotUser;
         internal static string BotName => BotUser.Username ?? "@114514";

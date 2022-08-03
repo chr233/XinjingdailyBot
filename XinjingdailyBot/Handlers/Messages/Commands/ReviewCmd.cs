@@ -55,7 +55,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             }
 
             string text = await exec();
-            await botClient.SendCommandReply(text, message,false);
+            await botClient.SendCommandReply(text, message, false);
         }
 
         /// <summary>

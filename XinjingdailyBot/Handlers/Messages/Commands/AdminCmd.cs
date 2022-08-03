@@ -3,9 +3,9 @@ using SqlSugar;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using XinjingdailyBot.Enums;
 using XinjingdailyBot.Helpers;
 using XinjingdailyBot.Models;
-using XinjingdailyBot.Enums;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Messages.Commands
@@ -419,14 +419,25 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 foreach (var user in userList)
                 {
                     string url = TextHelper.HtmlUserLink(user);
-                    if (string.IsNullOrEmpty(user.UserName))
+
+                    sb.Append($"{index++}. <code>{user.UserID}</code> {url}");
+
+                    if (!string.IsNullOrEmpty(user.UserName))
                     {
-                        sb.AppendLine($"{index++}. <code>{user.UserID}</code> {url}");
+                        sb.Append($" <code>@{user.UserName}</code>");
                     }
-                    else
+
+                    if (user.IsBan)
                     {
-                        sb.AppendLine($"{index++}. <code>{user.UserID}</code> {url} <code>@{user.UserName}</code>");
+                        sb.Append(" 已封禁");
                     }
+
+                    if (user.IsBot)
+                    {
+                        sb.Append(" 机器人");
+                    }
+
+                    sb.AppendLine();
 
                     if (index % (pageCount + 1) == 0)
                     {

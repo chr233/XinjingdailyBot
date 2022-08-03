@@ -127,7 +127,7 @@ namespace XinjingdailyBot.Helpers
 
         internal static async Task<InlineKeyboardMarkup?> SetUserGroupKeyboard(Users dbUser, Users targetUser)
         {
-            var groups = await DB.Queryable<Groups>().Where(x => x.Id > 0).ToListAsync();
+            var groups = await DB.Queryable<Groups>().Where(x => x.Id > 0 && x.Id < dbUser.GroupID).ToListAsync();
 
             if (!groups.Any())
             {
