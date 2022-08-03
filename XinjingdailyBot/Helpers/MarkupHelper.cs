@@ -150,7 +150,7 @@ namespace XinjingdailyBot.Helpers
 
                 btns.Add(new()
                 {
-                        InlineKeyboardButton.WithCallbackData("取消操作", "cancel"),
+                        InlineKeyboardButton.WithCallbackData("取消操作", $"cmd {dbUser.UserID} cancel"),
                 });
 
                 InlineKeyboardMarkup keyboard = new(btns);
@@ -168,7 +168,7 @@ namespace XinjingdailyBot.Helpers
         /// <returns></returns>
         internal static InlineKeyboardMarkup? UserListPageKeyboard(Users dbUser, string query, int current, int total)
         {
-            if (current == total)
+            if (total == 1)
             {
                 return null;
             }
@@ -191,7 +191,7 @@ namespace XinjingdailyBot.Helpers
                     },
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("取消操作", "cancel"),
+                        InlineKeyboardButton.WithCallbackData("取消操作", $"cmd {dbUser.UserID} cancel"),
                     },
                 });
 

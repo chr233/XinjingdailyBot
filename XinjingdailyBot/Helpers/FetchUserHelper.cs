@@ -388,7 +388,8 @@ namespace XinjingdailyBot.Handlers
                 sb.AppendLine();
             }
 
-            sb.AppendLine($"-- 共{userListCount}条, 当前显示{start}~{start + userList.Count - 1}条 --");
+            sb.AppendLine();
+            sb.AppendLine($"共 {userListCount} 条, 当前显示 {start}~{start + userList.Count - 1} 条");
 
             var keyboard = MarkupHelper.UserListPageKeyboard(dbUser, query, page, totalPages);
 
