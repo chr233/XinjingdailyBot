@@ -128,6 +128,7 @@ namespace XinjingdailyBot.Helpers
                 new() { Id = 11, Name = "发布员", DefaultRight = UserRights.SendPost | UserRights.DirectPost | UserRights.NormalCmd },
                 new() { Id = 20, Name = "狗管理", DefaultRight = UserRights.SendPost | UserRights.ReviewPost | UserRights.DirectPost | UserRights.NormalCmd | UserRights.AdminCmd },
                 new() { Id = 30, Name = "超级狗管理", DefaultRight = UserRights.ALL },
+                new() { Id = 50, Name = "*超级狗管理*", DefaultRight = UserRights.ALL },
             };
 
             await DB.Storageable(rights).WhereColumns(x => x.Id).ExecuteCommandAsync();

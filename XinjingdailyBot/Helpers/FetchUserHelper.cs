@@ -1,6 +1,5 @@
 ﻿using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using XinjingdailyBot.Enums;
 using XinjingdailyBot.Models;
 using static XinjingdailyBot.Utils;
 
@@ -77,11 +76,11 @@ namespace XinjingdailyBot.Handlers
                 try
                 {
                     await DB.Insertable(dbUser).ExecuteCommandAsync();
-                    Logger.Debug($"创建用户 {dbUser} 成功");
+                    Logger.Debug($"S 创建用户 {dbUser} 成功");
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"创建用户 {dbUser} 失败");
+                    Logger.Error($"S 创建用户 {dbUser} 失败");
                     Logger.Error(ex);
                     return null;
                 }
@@ -136,20 +135,21 @@ namespace XinjingdailyBot.Handlers
                 //如果是配置文件中指定的管理员就覆盖用户组权限
                 if (BotConfig.SuperAdmins.Contains(dbUser.UserID))
                 {
-                    dbUser.Right = UserRights.ALL;
+                    int maxGroupID = UGroups.Keys.Max();
+                    dbUser.GroupID = maxGroupID;
+                }
+
+                //根据GroupID设置用户权限信息
+                if (UGroups.TryGetValue(dbUser.GroupID, out var group))
+                {
+                    dbUser.Right = group.DefaultRight;
                 }
                 else
                 {
-                    if (UGroups.TryGetValue(dbUser.GroupID, out var group))
-                    {
-                        dbUser.Right = group.DefaultRight;
-                    }
-                    else
-                    {
-                        return null;
-                    }
+                    return null;
                 }
 
+                //需要更新用户数据
                 if (needUpdate)
                 {
                     try
@@ -167,12 +167,12 @@ namespace XinjingdailyBot.Handlers
                         }).ExecuteCommandAsync();
                         if (IsDebug)
                         {
-                            Logger.Debug($"更新用户 {dbUser} 成功");
+                            Logger.Debug($"S 更新用户 {dbUser} 成功");
                         }
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error($"更新用户 {dbUser} 失败");
+                        Logger.Error($"S 更新用户 {dbUser} 失败");
                         Logger.Error(ex);
                         return null;
                     }
@@ -244,7 +244,7 @@ namespace XinjingdailyBot.Handlers
                 {
                     int msgID = replyToMsg.MessageId;
 
-                    var post = await DB.Queryable<Posts>().FirstAsync(x => x.ReviewMsgID == msgID || x.ManageMsgID == msgID);
+                    var post = await DB.Queryable<Posts>().FirstAsync(x => (x.ReviewMsgID <= msgID && x.ManageMsgID > msgID) || x.ManageMsgID == msgID);
 
                     //判断是不是审核相关消息
                     if (post != null)
@@ -252,7 +252,9 @@ namespace XinjingdailyBot.Handlers
                         //通过稿件读取用户信息
                         return await FetchDbUserByUserID(post.PosterUID);
                     }
+
                 }
+
                 //在CMD回调表里查看
                 var cmdAction = await DB.Queryable<CmdRecords>().FirstAsync(x => x.MessageID == replyToMsg.MessageId);
                 if (cmdAction != null)

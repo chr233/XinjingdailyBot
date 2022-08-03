@@ -30,7 +30,7 @@ namespace XinjingdailyBot.Helpers
         /// 机器人用户信息
         /// </summary>
         internal static User BotUser { get; private set; } = new();
-        
+
         /// <summary>
         /// 验证频道设置
         /// </summary>
