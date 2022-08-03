@@ -69,7 +69,8 @@ namespace XinjingdailyBot.Handlers.Messages
 
             switch (message.Type)
             {
-                case MessageType.Text when isCommand:
+                case MessageType.Text when isPrivateChat && isCommand:
+                case MessageType.Text when (isCommentGroup || isSubGroup) && !dbUser.IsBot && isCommand:
                     await CommandHandler.HandleCommand(botClient, dbUser, message);
                     break;
 
@@ -92,6 +93,18 @@ namespace XinjingdailyBot.Handlers.Messages
 
                 case MessageType.Text when (isCommentGroup || isSubGroup) && !dbUser.IsBot:
                     await GroupHandler.HandlerGroupMessage(botClient, dbUser, message);
+                    break;
+
+                case MessageType.Photo when !isPrivateChat:
+                case MessageType.Audio when !isPrivateChat:
+                case MessageType.Video when !isPrivateChat:
+                case MessageType.Document when !isPrivateChat:
+                case MessageType.Text when !isPrivateChat:
+                    if (isGroupChat && !(isCommentGroup || isSubGroup) && BotConfig.AutoLeaveIrrelevantGroup)
+                    {
+                        Logger.Warn($"S 自动退出未设置的群组");
+                        await botClient.LeaveChatAsync(message.Chat);
+                    }
                     break;
 
                 default:

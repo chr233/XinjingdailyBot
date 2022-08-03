@@ -165,7 +165,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             }
 
             string text = await exec();
-            await botClient.SendCommandReply(text, message, parsemode: ParseMode.Html);
+            await botClient.SendCommandReply(text, message, false, parsemode: ParseMode.Html);
         }
 
         /// <summary>
@@ -234,7 +234,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             }
 
             string text = await exec();
-            await botClient.SendCommandReply(text, message, parsemode: ParseMode.Html);
+            await botClient.SendCommandReply(text, message, false, parsemode: ParseMode.Html);
         }
 
         /// <summary>

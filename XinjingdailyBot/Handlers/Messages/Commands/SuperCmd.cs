@@ -66,6 +66,11 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                     return ("找不到指定用户", null);
                 }
 
+                if (targetUser.IsBan)
+                {
+                    return ("该用户已被封禁, 无法执行此操作", null);
+                }
+
                 if (targetUser.Id == dbUser.Id)
                 {
                     return ("无法对自己进行操作", null);

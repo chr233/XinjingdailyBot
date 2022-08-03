@@ -56,5 +56,10 @@
         /// 拒稿频道
         /// </summary>
         public string RejectChannel { get; set; } = "";
+
+        /// <summary>
+        /// 自动退出未在配置文件中定义的群组和频道
+        /// </summary>
+        public bool AutoLeaveIrrelevantGroup { get; set; } = false;
     }
 }
