@@ -37,6 +37,8 @@ namespace XinjingdailyBot.Handlers.Messages
             bool isGroupChat = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
             bool isCommentGroup = isGroupChat && message.Chat.Id == CommentGroup.Id;
             bool isSubGroup = isGroupChat && message.Chat.Id == SubGroup.Id;
+            bool isReviewGroup = isGroupChat && message.Chat.Id == ReviewGroup.Id;
+            bool isConfigedGroup = isCommentGroup || isSubGroup || isReviewGroup;
 
             //取消绑定子频道的消息置顶
             if (dbUser.UserID == 777000)//Telegram
@@ -69,8 +71,7 @@ namespace XinjingdailyBot.Handlers.Messages
 
             switch (message.Type)
             {
-                case MessageType.Text when isPrivateChat && isCommand:
-                case MessageType.Text when (isCommentGroup || isSubGroup) && !dbUser.IsBot && isCommand:
+                case MessageType.Text when (isPrivateChat || isConfigedGroup) && isCommand:
                     await CommandHandler.HandleCommand(botClient, dbUser, message);
                     break;
 
@@ -91,7 +92,7 @@ namespace XinjingdailyBot.Handlers.Messages
                     await PostHandler.HandleMediaPosts(botClient, dbUser, message);
                     break;
 
-                case MessageType.Text when (isCommentGroup || isSubGroup) && !dbUser.IsBot:
+                case MessageType.Text when isConfigedGroup && !dbUser.IsBot:
                     await GroupHandler.HandlerGroupMessage(botClient, dbUser, message);
                     break;
 
@@ -100,7 +101,7 @@ namespace XinjingdailyBot.Handlers.Messages
                 case MessageType.Video when !isPrivateChat:
                 case MessageType.Document when !isPrivateChat:
                 case MessageType.Text when !isPrivateChat:
-                    if (isGroupChat && !(isCommentGroup || isSubGroup) && BotConfig.AutoLeaveIrrelevantGroup)
+                    if (isGroupChat && !isConfigedGroup && BotConfig.AutoLeaveIrrelevantGroup)
                     {
                         Logger.Warn($"S 自动退出未设置的群组");
                         await botClient.LeaveChatAsync(message.Chat);
