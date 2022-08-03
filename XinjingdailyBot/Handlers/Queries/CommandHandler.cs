@@ -109,6 +109,10 @@ namespace XinjingdailyBot.Handlers.Queries
                     await NormalCmd.ResponseSay(botClient, dbUser, callbackQuery, args);
                     break;
 
+                case "CANCEL" when normal:
+                    await NormalCmd.ResponseSay(botClient, dbUser, callbackQuery, args);
+                    break;
+
                 //Admin - 管理员命令
                 case "QUERYUSER" when admin:
                 case "SEARCHUSER" when admin:
