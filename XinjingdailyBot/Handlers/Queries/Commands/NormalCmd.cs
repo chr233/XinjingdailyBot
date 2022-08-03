@@ -16,7 +16,7 @@ namespace XinjingdailyBot.Handlers.Queries.Commands
         /// <param name="callbackQuery"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        internal static async Task ResponseSay(ITelegramBotClient botClient, Users dbUser, CallbackQuery callbackQuery, string[] args)
+        internal static async Task ResponseSay(ITelegramBotClient botClient, CallbackQuery callbackQuery, string[] args)
         {
             string exec()
             {
@@ -38,10 +38,20 @@ namespace XinjingdailyBot.Handlers.Queries.Commands
         /// <param name="callbackQuery"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        internal static async Task ResponseCancel(ITelegramBotClient botClient, Users dbUser, CallbackQuery callbackQuery, string[] args)
+        internal static async Task ResponseCancel(ITelegramBotClient botClient, CallbackQuery callbackQuery, string[] args)
         {
-            await botClient.AutoReplyAsync("操作已取消", callbackQuery);
-            await botClient.EditMessageTextAsync(callbackQuery.Message!, "操作已取消", replyMarkup: null);
+            string text;
+            if (args.Length > 1)
+            {
+                text = string.Join(' ', args[1..]);
+            }
+            else
+            {
+                text = "操作已取消";
+            }
+
+            await botClient.AutoReplyAsync(text, callbackQuery);
+            await botClient.EditMessageTextAsync(callbackQuery.Message!, text, replyMarkup: null);
         }
     }
 }
