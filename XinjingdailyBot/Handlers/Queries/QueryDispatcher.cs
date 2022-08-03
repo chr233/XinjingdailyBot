@@ -74,6 +74,11 @@ namespace XinjingdailyBot.Handlers.Queries
                     await botClient.EditMessageTextAsync(message, "操作已取消", replyMarkup: null);
                     break;
 
+                //无动作
+                case "none":
+                    await botClient.AutoReplyAsync("无", callbackQuery);
+                    break;
+
                 default:
                     break;
             }

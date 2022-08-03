@@ -364,98 +364,30 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <returns></returns>
         internal static async Task ResponseSearchUser(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
         {
-            HashSet<Users> userList = new();
-
-            foreach (var arg in args)
+            if (!args.Any())
             {
-                //根据userName查找用户
-                if (arg.StartsWith('@'))
-                {
-                    string word = arg[1..];
-                    var users = await DB.Queryable<Users>().Where(x => x.UserName.Contains(word)).ToListAsync();
-                    if (users != null && users.Any())
-                    {
-                        userList = userList.Concat(users).ToHashSet();
-                    }
-                }
-                else
-                {
-                    //根据userID查找用户
-                    if (long.TryParse(arg, out long userID))
-                    {
-                        var user = await DB.Queryable<Users>().Where(x => x.UserID == userID).FirstAsync();
-                        if (user != null)
-                        {
-                            userList.Add(user);
-                        }
-                    }
-
-                    //根据userName以及用户名查找用户
-                    var users = await DB.Queryable<Users>().Where(x => x.UserName.Contains(arg) || x.FirstName.Contains(arg) || x.LastName.Contains(arg)).ToListAsync();
-                    if (users != null && users.Any())
-                    {
-                        userList = userList.Concat(users).ToHashSet();
-                    }
-                }
+                await botClient.SendCommandReply("请指定 用户昵称/用户名/用户ID 作为查询参数", message, true);
+                return;
             }
 
-            StringBuilder sb = new();
-            if (!userList.Any())
+            string query = args.First();
+
+            int page;
+            if (args.Length >= 2)
             {
-                if (args.Any())
+                if (!int.TryParse(args[1], out page))
                 {
-                    sb.AppendLine("找不到符合条件的用户");
-                }
-                else
-                {
-                    sb.AppendLine("请指定要搜索的用户昵称或者用户名或者用户ID");
+                    page = 1;
                 }
             }
             else
             {
-                const int pageCount = 30;
-                const int maxCount = 60;
-                int index = 1;
-                foreach (var user in userList)
-                {
-                    string url = TextHelper.HtmlUserLink(user);
-
-                    sb.Append($"{index++}. <code>{user.UserID}</code> {url}");
-
-                    if (!string.IsNullOrEmpty(user.UserName))
-                    {
-                        sb.Append($" <code>@{user.UserName}</code>");
-                    }
-
-                    if (user.IsBan)
-                    {
-                        sb.Append(" 已封禁");
-                    }
-
-                    if (user.IsBot)
-                    {
-                        sb.Append(" 机器人");
-                    }
-
-                    sb.AppendLine();
-
-                    if (index % (pageCount + 1) == 0)
-                    {
-                        await botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
-                        sb.Clear();
-                    }
-                    if (index > maxCount)
-                    {
-                        if (userList.Count > maxCount)
-                        {
-                            sb.AppendLine($"-- 共{userList.Count}条结果, 仅显示前{maxCount}条--");
-                        }
-                        break;
-                    }
-                }
+                page = 1;
             }
 
-            await botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
+            (string text, var keyboard) = await FetchUserHelper.QueryUserList(dbUser, query, page);
+
+            await botClient.SendCommandReply(text, message, false, ParseMode.Html, keyboard);
         }
 
         /// <summary>

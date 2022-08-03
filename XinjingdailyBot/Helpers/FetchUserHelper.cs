@@ -1,5 +1,9 @@
-﻿using Telegram.Bot.Types;
+﻿using System.Text;
+using SqlSugar;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
+using XinjingdailyBot.Helpers;
 using XinjingdailyBot.Models;
 using static XinjingdailyBot.Utils;
 
@@ -314,6 +318,81 @@ namespace XinjingdailyBot.Handlers
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// 查找用户
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="page"></param>
+        /// <returns></returns>
+        internal static async Task<(string, InlineKeyboardMarkup?)> QueryUserList(Users dbUser, string query, int page)
+        {
+            //每页数量
+            const int pageSize = 30;
+
+            //SQL表达式
+            var exp = Expressionable.Create<Users>();
+
+            //根据userID查找用户
+            if (long.TryParse(query, out long userID))
+            {
+                exp.Or(x => x.UserID == userID);
+            }
+
+            //根据用户名查找用户
+            exp.Or(x => x.FirstName.Contains(query) || x.LastName.Contains(query));
+
+            //根据UserName查找用户
+            if (query.StartsWith('@'))
+            {
+                query = query[1..];
+            }
+            exp.Or(x => x.UserName.Contains(query));
+
+            var userListCount = await DB.Queryable<Users>().Where(exp.ToExpression()).CountAsync();
+
+            if (userListCount == 0)
+            {
+                return ("找不到符合条件的用户", null);
+            }
+
+            int totalPages = (userListCount / pageSize) + 1;
+
+            page = Math.Max(1, Math.Min(page, totalPages));
+
+            var userList = await DB.Queryable<Users>().Where(exp.ToExpression()).ToPageListAsync(page, pageSize);
+
+            StringBuilder sb = new();
+
+            int start = 1 + (page - 1) * pageSize;
+            int index = 0;
+            foreach (var user in userList)
+            {
+                string url = TextHelper.HtmlUserLink(user);
+
+                sb.Append($"{start + index++}. <code>{user.UserID}</code> {url}");
+
+                if (!string.IsNullOrEmpty(user.UserName))
+                {
+                    sb.Append($" <code>@{user.UserName}</code>");
+                }
+                if (user.IsBan)
+                {
+                    sb.Append(" 已封禁");
+                }
+                if (user.IsBot)
+                {
+                    sb.Append(" 机器人");
+                }
+                sb.AppendLine();
+            }
+
+            sb.AppendLine($"-- 共{userListCount}条, 当前显示{start}~{start + userList.Count - 1}条 --");
+
+            var keyboard = MarkupHelper.UserListPageKeyboard(dbUser, query, page, totalPages);
+
+            return (sb.ToString(), keyboard);
         }
     }
 }

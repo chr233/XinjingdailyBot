@@ -158,5 +158,45 @@ namespace XinjingdailyBot.Helpers
                 return keyboard;
             }
         }
+
+        /// <summary>
+        /// 生成用户列表键盘
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="current">当前页码</param>
+        /// <param name="total">总页码</param>
+        /// <returns></returns>
+        internal static InlineKeyboardMarkup? UserListPageKeyboard(Users dbUser, string query, int current, int total)
+        {
+            if (current == total)
+            {
+                return null;
+            }
+            else
+            {
+                var btnPage = InlineKeyboardButton.WithCallbackData($"{current} / {total}", $"cmd  {dbUser.UserID} say 当前 {current} 页, 共 {total} 页");
+
+                var btnPrev = current > 1 ?
+                    InlineKeyboardButton.WithCallbackData("上一页", $"cmd {dbUser.UserID} searchuser {query} {current - 1}") :
+                    InlineKeyboardButton.WithCallbackData("到头了", $"cmd  {dbUser.UserID} say 到头了");
+                var btnNext = current < total ?
+                    InlineKeyboardButton.WithCallbackData("下一页", $"cmd {dbUser.UserID} searchuser {query} {current + 1}") :
+                    InlineKeyboardButton.WithCallbackData("到头了", $"cmd  {dbUser.UserID} say 到头了");
+
+                InlineKeyboardMarkup keyboard = new(new[]
+                {
+                    new[]
+                    {
+                        btnPrev, btnPage, btnNext,
+                    },
+                    new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData("取消操作", "cancel"),
+                    },
+                });
+
+                return keyboard;
+            }
+        }
     }
 }

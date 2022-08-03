@@ -17,7 +17,7 @@ namespace XinjingdailyBot.Handlers.Queries.Commands
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        internal static async Task SetUserGroup(ITelegramBotClient botClient, Users dbUser, CallbackQuery callbackQuery, string[] args)
+        internal static async Task ResponseSetUserGroup(ITelegramBotClient botClient, Users dbUser, CallbackQuery callbackQuery, string[] args)
         {
             async Task<(string, InlineKeyboardMarkup?)> exec()
             {

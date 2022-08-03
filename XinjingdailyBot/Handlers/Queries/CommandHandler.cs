@@ -100,19 +100,25 @@ namespace XinjingdailyBot.Handlers.Queries
             bool autoDelete = true;
             //是否成功响应命令
             bool handled = true;
-            //是否移除键盘
-            bool removeKeyboard = true;
             switch (args[0].ToUpperInvariant())
             {
                 //Common - 通用命令, 不鉴权
 
                 //Normal - 普通命令
+                case "SAY" when normal:
+                    await NormalCmd.ResponseSay(botClient, dbUser, callbackQuery, args);
+                    break;
 
                 //Admin - 管理员命令
+                case "QUERYUSER" when admin:
+                case "SEARCHUSER" when admin:
+                    await AdminCmd.ResponseSearchUser(botClient, dbUser, callbackQuery, args);
+                    autoDelete = false;
+                    break;
 
                 //Super - 超级管理员命令
                 case "SETUSERGROUP" when super:
-                    await SuperCmd.SetUserGroup(botClient, dbUser, callbackQuery, args);
+                    await SuperCmd.ResponseSetUserGroup(botClient, dbUser, callbackQuery, args);
                     autoDelete = false;
                     break;
 
@@ -121,19 +127,6 @@ namespace XinjingdailyBot.Handlers.Queries
                     await botClient.SendCommandReply("未知命令, 获取帮助 /help", message, false);
                     handled = false;
                     break;
-            }
-
-            //移除消息装饰器(按钮)
-            if (removeKeyboard)
-            {
-                try
-                {
-                    await botClient.RemoveMessageReplyMarkupAsync(message);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error($"编辑消息失败 {message.MessageId} {ex.Message}");
-                }
             }
 
             //自动删除命令的时机
