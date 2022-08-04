@@ -12,21 +12,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: macos-latest
-            arch: osx-x64
-          - os: windows-latest
-            arch: win-x64
-          - os: windows-latest
-            arch: win-arm
-          - os: windows-latest
-            arch: win-arm64
-          - os: ubuntu-latest
-            arch: linux-x64
-          - os: ubuntu-latest
-            arch: linux-arm
+        arch: [win-x64, win-arm, win-arm64, osx-x64, linux-x64, linux-arm]
 
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
 
     steps:
       - name: Checkout code
@@ -42,16 +30,16 @@ jobs:
       - name: Verify .NET Core
         run: dotnet --info
 
-      - name: Restore packages in preparation for ${{ env.PROJECT_NAME }} publishing
+      - name: Restore packages in preparation for publishing
         run: dotnet restore ${{ env.PROJECT_NAME }} -p:ContinuousIntegrationBuild=true --nologo
 
-      - name: Publish ${{ matrix.os }} ${{ matrix.arch }}
+      - name: Publish
         run: dotnet publish ${{ env.PROJECT_NAME }} --runtime ${{ matrix.arch }} -p:PublishSingleFile=true --self-contained true -o ./tmp/${{ env.PROJECT_NAME }} -c Release
 
-      - name: zip files
+      - name: Zip files via 7z
         run: 7z a -bd -slp -tzip -mm=Deflate -mx=5 -mfb=150 -mpass=10 "./dist/${{ matrix.arch }}.zip" "./tmp/${{ env.PROJECT_NAME }}"
 
-      - name: Upload ${{ env.PROJECT_NAME }}-${{ matrix.arch }}
+      - name: Upload zip file
         continue-on-error: true
         uses: actions/upload-artifact@v3.0.0
         with:
@@ -102,7 +90,7 @@ jobs:
           name: linux-arm
           path: out
 
-      - name: Create ${{ env.PROJECT_NAME }} GitHub release
+      - name: Create GitHub release
         id: github_release
         uses: actions/create-release@v1.1.4
         env:
