@@ -1,0 +1,212 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - "*"
+env:
+  PROJECT_NAME: "XinjingdailyBot"
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3.0.2
+        with:
+          submodules: recursive
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v2.1.0
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Verify .NET Core
+        run: dotnet --info
+
+      - name: Restore packages in preparation for ${{ env.PROJECT_NAME }} publishing
+        run: dotnet restore ${{ env.PROJECT_NAME }} -p:ContinuousIntegrationBuild=true --nologo
+
+      - name: Publish Windows x64
+        run: dotnet publish ${{ env.PROJECT_NAME }} --runtime win-x64 -p:PublishSingleFile=true --self-contained true -o ./tmp/${{ env.PROJECT_NAME }}-win-x64 -c Release
+
+      - name: Publish Windows arm
+        run: dotnet publish ${{ env.PROJECT_NAME }} --runtime win-arm -p:PublishSingleFile=true --self-contained true -o ./tmp/${{ env.PROJECT_NAME }}-win-arm -c Release
+
+      - name: Publish Windows arm64
+        run: dotnet publish ${{ env.PROJECT_NAME }} --runtime win-arm64 -p:PublishSingleFile=true --self-contained true -o ./tmp/${{ env.PROJECT_NAME }}-win-arm64 -c Release
+      
+      - name: Publish OSX x64
+        run: dotnet publish ${{ env.PROJECT_NAME }} --runtime osx-x64 -p:PublishSingleFile=true --self-contained true -o ./tmp/${{ env.PROJECT_NAME }}-osx-x64 -c Release
+      
+      - name: Publish Linux x64
+        run: dotnet publish ${{ env.PROJECT_NAME }} --runtime linux-x64 -p:PublishSingleFile=true --self-contained true -o ./tmp/${{ env.PROJECT_NAME }}-linux-x64 -c Release
+      
+      - name: Publish Linux arm
+        run: dotnet publish ${{ env.PROJECT_NAME }} --runtime linux-arm -p:PublishSingleFile=true --self-contained true -o ./tmp/${{ env.PROJECT_NAME }}-linux-arm -c Release
+      
+      - name: zip files
+        run: |
+          7z a -bd -slp -tzip -mm=Deflate64 -mx=9 -mfb=258 -mpass=15 "./dist/win-x64.zip" "./tmp/${{ env.PROJECT_NAME }}-win-x64"
+          7z a -bd -slp -tzip -mm=Deflate64 -mx=9 -mfb=258 -mpass=15 "./dist/win-arm.zip" "./tmp/${{ env.PROJECT_NAME }}-win-arm"
+          7z a -bd -slp -tzip -mm=Deflate64 -mx=9 -mfb=258 -mpass=15 "./dist/win-arm64.zip" "./tmp/${{ env.PROJECT_NAME }}-win-arm64"
+          7z a -bd -slp -tzip -mm=Deflate64 -mx=9 -mfb=258 -mpass=15 "./dist/osx-x64.zip" "./tmp/${{ env.PROJECT_NAME }}-osx-x64"
+          7z a -bd -slp -tzip -mm=Deflate64 -mx=9 -mfb=258 -mpass=15 "./dist/linux-x64.zip" "./tmp/${{ env.PROJECT_NAME }}-linux-x64"
+          7z a -bd -slp -tzip -mm=Deflate64 -mx=9 -mfb=258 -mpass=15 "./dist/linux-arm.zip" "./tmp/${{ env.PROJECT_NAME }}-linux-arm"
+
+      - name: Upload ${{ env.PROJECT_NAME }}-win-x64
+        continue-on-error: true
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: win-x64
+          path: ./dist/win-x64.zip
+
+      - name: Upload ${{ env.PROJECT_NAME }}-win-arm
+        continue-on-error: true
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: win-arm
+          path: ./dist/win-arm.zip
+
+      - name: Upload ${{ env.PROJECT_NAME }}-win-arm64
+        continue-on-error: true
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: win-arm64
+          path: ./dist/win-arm64.zip
+
+      - name: Upload ${{ env.PROJECT_NAME }}-osx-x64
+        continue-on-error: true
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: osx-x64
+          path: ./dist/osx-x64.zip
+
+      - name: Upload ${{ env.PROJECT_NAME }}-linux-x64
+        continue-on-error: true
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: linux-x64
+          path: ./dist/linux-x64.zip
+
+      - name: Upload ${{ env.PROJECT_NAME }}-linux-arm
+        continue-on-error: true
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: linux-arm
+          path: ./dist/linux-arm.zip
+
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3.0.2
+
+      - name: Download win-x64 artifact
+        uses: actions/download-artifact@v3.0.0
+        with:
+          name: win-x64
+          path: out
+          
+      - name: Download win-arm artifact
+        uses: actions/download-artifact@v3.0.0
+        with:
+          name: win-arm
+          path: out
+          
+      - name: Download win-arm64 artifact
+        uses: actions/download-artifact@v3.0.0
+        with:
+          name: win-arm64
+          path: out
+          
+      - name: Download osx-x64 artifact
+        uses: actions/download-artifact@v3.0.0
+        with:
+          name: osx-x64
+          path: out
+          
+      - name: Download linux-x64 artifact
+        uses: actions/download-artifact@v3.0.0
+        with:
+          name: linux-x64
+          path: out
+          
+      - name: Download linux-arm artifact
+        uses: actions/download-artifact@v3.0.0
+        with:
+          name: linux-arm
+          path: out
+
+      - name: Create ${{ env.PROJECT_NAME }} GitHub release
+        id: github_release
+        uses: actions/create-release@v1.1.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ env.PROJECT_NAME }} ${{ github.ref }}
+          body: release created bt github actions
+          prerelease: true
+
+      - name: Upload win-x64 to GitHub release
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.github_release.outputs.upload_url }}
+          asset_path: out/win-x64.zip
+          asset_name: ${{ env.PROJECT_NAME }}-win-x64.zip
+          asset_content_type: application/zip
+
+      - name: Upload win-arm to GitHub release
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.github_release.outputs.upload_url }}
+          asset_path: out/win-arm.zip
+          asset_name: ${{ env.PROJECT_NAME }}-win-arm.zip
+          asset_content_type: application/zip
+
+      - name: Upload win-arm64 to GitHub release
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.github_release.outputs.upload_url }}
+          asset_path: out/win-arm64.zip
+          asset_name: ${{ env.PROJECT_NAME }}-win-arm64.zip
+          asset_content_type: application/zip
+
+      - name: Upload osx-x64 to GitHub release
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.github_release.outputs.upload_url }}
+          asset_path: out/osx-x64.zip
+          asset_name: ${{ env.PROJECT_NAME }}-osx-x64.zip
+          asset_content_type: application/zip
+
+      - name: Upload linux-x64 to GitHub release
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.github_release.outputs.upload_url }}
+          asset_path: out/linux-x64.zip
+          asset_name: ${{ env.PROJECT_NAME }}-linux-x64.zip
+          asset_content_type: application/zip
+
+      - name: Upload linux-arm to GitHub release
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.github_release.outputs.upload_url }}
+          asset_path: out/linux-arm.zip
+          asset_name: ${{ env.PROJECT_NAME }}-linux-arm.zip
+          asset_content_type: application/zip
