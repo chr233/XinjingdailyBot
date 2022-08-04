@@ -30,16 +30,16 @@ jobs:
       - name: Verify .NET Core
         run: dotnet --info
 
-      - name: Restore packages in preparation for publishing
+      - name: Restore packages in preparation for ${{ env.PROJECT_NAME }} publishing
         run: dotnet restore ${{ env.PROJECT_NAME }} -p:ContinuousIntegrationBuild=true --nologo
 
-      - name: Publish
+      - name: Publish ${{ env.PROJECT_NAME }} ${{ matrix.arch }}
         run: dotnet publish ${{ env.PROJECT_NAME }} --runtime ${{ matrix.arch }} -p:PublishSingleFile=true --self-contained true -o ./tmp/${{ env.PROJECT_NAME }} -c Release
 
-      - name: Zip files via 7z
+      - name: Zip files
         run: 7z a -bd -slp -tzip -mm=Deflate -mx=5 -mfb=150 -mpass=10 "./dist/${{ matrix.arch }}.zip" "./tmp/${{ env.PROJECT_NAME }}"
 
-      - name: Upload zip file
+      - name: Upload ${{ env.PROJECT_NAME }} ${{ matrix.arch }}
         continue-on-error: true
         uses: actions/upload-artifact@v3.0.0
         with:
@@ -90,7 +90,7 @@ jobs:
           name: linux-arm
           path: out
 
-      - name: Create GitHub release
+      - name: Create ${{ env.PROJECT_NAME }} GitHub release
         id: github_release
         uses: actions/create-release@v1.1.4
         env:
