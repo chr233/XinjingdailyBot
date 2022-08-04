@@ -408,34 +408,19 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <returns></returns>
         internal static async Task ResponseSystemReport(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
         {
-            StringBuilder sb = new();
-
-            var totalPost = await DB.Queryable<Posts>().CountAsync();
-            var totalAcceptPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Accepted).CountAsync();
-            var totalRejectPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Rejected).CountAsync();
-
-            sb.AppendLine("-- 累计投稿 --");
-            sb.AppendLine($"接受/拒绝: <code>{totalAcceptPost}</code>/<code>{totalRejectPost}</code>");
-            if (totalPost > 0)
-            {
-                sb.AppendLine($"通过率: <code>{(100 * totalAcceptPost / totalPost).ToString("f2")}%</code>");
-            }
-            else
-            {
-                sb.AppendLine("通过率: <code> --%</code>");
-            }
-            sb.AppendLine($"总计投稿: <code>{totalPost}</code>");
-
             DateTime now = DateTime.Now;
-            DateTime monthStart = DateTime.Now.AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+            DateTime monthStart = now.AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+            DateTime yearStart = now.AddMonths(1 - now.Month).AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+
+            StringBuilder sb = new();
 
             var monthPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart).CountAsync();
             var monthAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Accepted).CountAsync();
             var monthRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Rejected).CountAsync();
 
-            sb.AppendLine();
-            sb.AppendLine($"-- 自 {monthStart.ToString("yyyy-mm-dd")} 起 --");
-            sb.AppendLine($"接受/拒绝: <code>{monthAcceptPost}</code>/<code>{monthRejectPost}</code>");
+            sb.AppendLine($"-- {monthStart.ToString("MM")} 月度统计 --");
+            sb.AppendLine($"接受投稿: <code>{monthAcceptPost}</code>");
+            sb.AppendLine($"拒绝投稿: <code>{monthRejectPost}</code>");
             if (monthPost > 0)
             {
                 sb.AppendLine($"通过率: <code>{(100 * monthAcceptPost / monthPost).ToString("f2")}%</code>");
@@ -446,6 +431,43 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             }
             sb.AppendLine($"总计投稿: <code>{monthPost}</code>");
 
-            await botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
+            var yearPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= yearStart).CountAsync();
+            var yearAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= yearStart && x.Status == PostStatus.Accepted).CountAsync();
+            var yearRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= yearStart && x.Status == PostStatus.Rejected).CountAsync();
+
+            sb.AppendLine();
+            sb.AppendLine($"-- {yearStart.ToString("yyyy")} 年度统计 --");
+            sb.AppendLine($"接受投稿: <code>{yearAcceptPost}</code>");
+            sb.AppendLine($"拒绝投稿: <code>{yearRejectPost}</code>");
+            if (yearPost > 0)
+            {
+                sb.AppendLine($"通过率: <code>{(100 * monthAcceptPost / yearPost).ToString("f2")}%</code>");
+            }
+            else
+            {
+                sb.AppendLine("通过率: <code> --%</code>");
+            }
+            sb.AppendLine($"总计投稿: <code>{yearPost}</code>");
+
+            var totalPost = await DB.Queryable<Posts>().CountAsync();
+            var totalAcceptPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Accepted).CountAsync();
+            var totalRejectPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Rejected).CountAsync();
+
+            sb.AppendLine();
+            sb.AppendLine("-- 历史统计 --");
+            sb.AppendLine($"接受投稿: <code>{totalAcceptPost}</code>");
+            sb.AppendLine($"拒绝投稿: <code>{totalRejectPost}</code>");
+            if (totalPost > 0)
+            {
+                sb.AppendLine($"通过率: <code>{(100 * totalAcceptPost / totalPost).ToString("f2")}%</code>");
+            }
+            else
+            {
+                sb.AppendLine("通过率: <code> --%</code>");
+            }
+            sb.AppendLine($"总计投稿: <code>{totalPost}</code>");
+
+            await botClient.SendCommandReply(sb.ToString(), message, true, ParseMode.Html);
         }
+    }
 }
