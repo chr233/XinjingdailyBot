@@ -168,9 +168,19 @@ namespace XinjingdailyBot.Helpers
         /// <returns></returns>
         internal static InlineKeyboardMarkup? UserListPageKeyboard(Users dbUser, string query, int current, int total)
         {
+            var btnClose = InlineKeyboardButton.WithCallbackData("关闭", $"cmd {dbUser.UserID} cancelclose 已关闭");
+
             if (total == 1)
             {
-                return null;
+                InlineKeyboardMarkup keyboard = new(new[]
+                {
+                    new[]
+                    {
+                        btnClose,
+                    },
+                });
+
+                return keyboard;
             }
             else
             {
@@ -191,7 +201,7 @@ namespace XinjingdailyBot.Helpers
                     },
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("取消操作", $"cmd {dbUser.UserID} cancel"),
+                        btnClose,
                     },
                 });
 
