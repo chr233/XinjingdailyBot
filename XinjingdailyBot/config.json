@@ -1,7 +1,8 @@
 ﻿{
   "Debug": false,
   "BotToken": "",
-  "Proxy": "",
+  "Welcome": "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人",
+  "Proxy": null,
   "DBHost": "127.0.0.1",
   "DBPort": 3306,
   "DBName": "xjb_db",
@@ -10,7 +11,9 @@
   "DBGenerate": true,
   "SuperAdmins": [],
   "ReviewGroup": "",
+  "CommentGroup": "",
   "SubGroup": "",
   "AcceptChannel": "",
-  "RejectChannel": ""
+  "RejectChannel": "",
+  "AutoLeaveOtherGroup": false
 }

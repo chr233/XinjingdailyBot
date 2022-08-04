@@ -34,11 +34,6 @@
         SuperCmd = 0x40,
 
         /// <summary>
-        /// 高级用户
-        /// </summary>
-        Vip = 0x80,
-
-        /// <summary>
         /// 全部权限
         /// </summary>
         ALL = 0xFF,
