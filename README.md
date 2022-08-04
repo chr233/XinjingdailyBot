@@ -1,29 +1,171 @@
 # Xinjingdaily Bot
 
-环境要求:
+## 心惊报 [@xinjingdaily](https://t.me/xinjingdaily) 自主开发的投稿机器人
 
-- .net 6
-- mysql
+心惊报投稿机器人 [@xinjingdaily_bot](https://t.me/xinjingdaily_bot)
 
-使用方法:
+## 功能特性
 
-运行 Xinjingdaily, 编辑 config.json
+- [x] 支持文字/图片/音频/视频投稿
+- [x] 支持多图投稿
+- [x] 支持匿名投稿
+- [x] 支持直接发布投稿
+- [x] 支持编辑标签
+- [x] 支持过滤标签
+- [x] 简单用户管理
+  - [x] 设置用户组
+  - [x] 封禁/解封
+  - [x] 封禁记录查询
+  - [x] 查看用户投稿统计
+  - [x] 匿名回复
+  - [x] 检索用户
+- [ ] 审核超时自动拒绝
+- [ ] 稿件检索
+- [ ] 实装用户等级系统
+
+## 安装与使用
+
+从 [Releases](https://github.com/chr233/XinjingdailyBot/releases) 下载编译好的文件以后, 直接运行 XinjingDailyBot 即可
+
+### 环境依赖
+
+- .NET 6 [安装链接](https://dotnet.microsoft.com/zh-cn/download/dotnet/6.0)
+- MySQL
+
+### 配置说明
+
+默认配置如下:
 
 ```json
 {
   "Debug": false,
-  "LogLevel": 0,
   "BotToken": "",
-  "Proxy": "",
+  "Welcome": "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人",
+  "Proxy": null,
   "DBHost": "127.0.0.1",
   "DBPort": 3306,
   "DBName": "xjb_db",
   "DBUser": "root",
   "DBPassword": "123456",
-  "ReviewGroup": "", //审核群组
-  "SubGroup": "", //@开头为公开频道,也可以为数字(非公开群组)
-  "CommentGroup": "", //@开头为公开频道,也可以为数字(非公开群组)
+  "DBGenerate": true,
+  "SuperAdmins": [],
+  "ReviewGroup": "",
+  "CommentGroup": "",
+  "SubGroup": "",
   "AcceptChannel": "",
-  "RejectChannel": ""
+  "RejectChannel": "",
+  "AutoLeaveOtherGroup": false
 }
 ```
+
+| 配置项              | 类型   | 默认值                                         | 必须 | 说明                         |
+| ------------------- | ------ | ---------------------------------------------- | ---- | ---------------------------- |
+| Debug               | bool   | false                                          | √    | 是否开启调试模式             |
+| BotToken            | string | ""                                             | √    | 机器人 Token                 |
+| Welcome             | string | "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人" |      | 使用 /start 命令显示的欢迎语 |
+| Proxy               | string | null                                           | √    | 代理地址, 支持 http 和 sock5 |
+| DBHost              | string | "127.0.0.1"                                    | √    | MySQL 主机                   |
+| DBPort              | int    | 3306                                           | √    | MySQL 端口                   |
+| DBName              | string | "xjb_db"                                       | √    | 数据库名                     |
+| DBUser              | string | "root"                                         | √    | 数据库用户名                 |
+| DBPassword          | string | "123456"                                       | √    | 数据库密码                   |
+| DBGenerate          | bool   | true                                           |      | 是否自动生成数据库表         |
+| SuperAdmins         | int[]  | []                                             |      | 超级管理员 数字 ID 列表      |
+| ReviewGroup         | string | ""                                             |      | 审核群组 ID                  |
+| CommentGroup        | string | ""                                             |      | 评论群组 ID                  |
+| SubGroup            | string | ""                                             |      | 闲聊群组 ID                  |
+| AcceptChannel       | string | ""                                             | √    | 审核通过频道 ID              |
+| RejectChannel       | string | ""                                             | √    | 审核拒绝频道 ID              |
+| AutoLeaveOtherGroup | bool   | false                                          |      | 是否自动离开无关群组         |
+
+> SuperAdmins 机器人超级管理员的 UserID 列表, 覆盖数据库中的设定, 用户 UserID 可以使用命令 /myinfo 获取
+
+---
+
+> AcceptChannel 和 RejectChannel 必须为公开频道, 频道名需要加 `@`, 例如 `@xinjingdaily`
+
+---
+
+> ReviewGroup, CommentGroup, SubGroup 不一定需要是公开频道
+> 如果是公开群组, 群组名需要加 `@`, 例如 `@xinjingdailychatroom`
+> 如果是私有群组, 可以使用命令 /groupinfo 获取群组的信息, 然后设置为群组的 GroupID
+
+### 权限说明
+
+内置用户组权限如下
+
+| 组 ID | 组名           | 权限                                       | 说明                                                       |
+| ----- | -------------- | ------------------------------------------ | ---------------------------------------------------------- |
+| 0     | 封禁用户       | 无                                         | 无法直接设置用户到这个组, 被封禁的用户自动被视为此组的成员 |
+| 1     | 普通用户       | 投稿,普通命令                              | 默认的用户组                                               |
+| 10    | 审核员         | 投稿,审核投稿,普通命令                     | 具有审核权限的普通用户                                     |
+| 11    | 发布员         | 投稿,直接发布,普通命令                     | 具有直接发布权限的普通用户                                 |
+| 20    | 狗管理         | 投稿,审核投稿,直接发布,普通命令,管理员命令 | 具有所有投稿权限,可以使用普通管理员命令                    |
+| 30    | 超级狗管理     | 所有权限(狗管理的权限 + 超级管理员命令)    | 具有所有投稿权限,可以使用所有命令                          |
+| 50    | \*超级狗管理\* | 所有权限(狗管理的权限 + 超级管理员命令)    | 具有所有投稿权限,可以使用所有命令                          |
+
+> 管理员仅能对用户组 ID 比自己小的对象(除了自己)进行操作, 例如狗管理(组 ID 为 20)无法操作超级狗管理(组 ID 为 30)
+
+---
+
+> 在 `config.json` 的 `SuperAdmins` 项中定义的管理员拥有最高的权限(组 ID 为 50)
+> 虽然权限与超级狗管理(组 ID 为 30)相同, 但是因为具有更高的组 ID, 因此可以操作所有用户(除了自己)
+
+### 命令说明
+
+- 通用命令
+
+> 任何用户组都能使用, 包括封禁用户
+
+| 命令     | 参数 | 说明               |
+| -------- | ---- | ------------------ |
+| /start   | -    | 显示机器人欢迎语   |
+| /help    | -    | 显示当前可用的命令 |
+| /myban   | -    | 查询自己的封禁记录 |
+| /version | -    | 显示机器人版本信息 |
+
+- 普通命令
+
+> 拥有`普通命令`权限的用户组可用
+
+| 命令          | 参数 | 说明                                     |
+| ------------- | ---- | ---------------------------------------- |
+| /ping         | -    | 机器人存活测试                           |
+| /anonymous    | -    | 仅限私聊, 设置投稿时是否默认使用匿名模式 |
+| /notification | -    | 仅限私聊, 设置投稿被审核后是否接收通知   |
+| /myinfo       | -    | 显示自己的投稿统计信息                   |
+| /myright      | -    | 显示自己的权限信息                       |
+| /admin        | -    | 仅限群聊, 艾特群组中的所有管理员         |
+
+- 审核命令
+
+> 拥有`审核`权限的用户组可用
+
+| 命令  | 参数 | 说明                 |
+| ----- | ---- | -------------------- |
+| /no   | 理由 | 用自定义理由拒绝稿件 |
+| /edit | 描述 | 修改稿件的描述信息   |
+
+- 管理员命令
+
+> 拥有`管理员命令`权限的用户组可用
+
+| 命令       | 参数                     | 说明                         |
+| ---------- | ------------------------ | ---------------------------- |
+| /groupinfo | -                        | 仅限群聊使用, 查看群组信息   |
+| /userinfo  | \[UserName/UserID\]      | 获取指定用户的信息           |
+| /ban       | \[UserName/UserID\] 理由 | 封禁指定用户                 |
+| /unban     | \[UserName/UserID\] 理由 | 解封指定用户                 |
+| /queryban  | \[UserName/UserID\]      | 显示指定用户的封禁记录       |
+| /echo      | \[UserName/UserID\] 消息 | 通过机器人向指定用户发送消息 |
+| /queryuser | 关键词 \[页码\]          | 通过关键词查找用户           |
+| /sysreport | -                        | 查看机器人统计信息           |
+
+- 超级管理员命令
+
+> 拥有`超级管理员命令`权限的用户组可用
+
+| 命令          | 参数                | 说明                 |
+| ------------- | ------------------- | -------------------- |
+| /restart      | -                   | 重启机器人           |
+| /setusergroup | \[UserName/UserID\] | 修改指定用户的用户组 |
