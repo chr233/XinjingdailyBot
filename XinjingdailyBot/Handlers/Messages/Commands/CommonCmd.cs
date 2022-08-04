@@ -28,23 +28,27 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             { "ban", "封禁指定用户" },
             { "unban", "解封指定用户" },
             { "queryban", "查询封禁记录" },
-            { "sysreport", "查询投稿详情" },
+            { "sysreport", "查询系统统计数据" },
+            { "queryuser", "搜索用户" },
         };
 
         private static Dictionary<string, string> SuperCmds { get; } = new()
         {
             { "restart", "重启机器人" },
+            { "setusergroup", "修改用户组" },
         };
 
         private static Dictionary<string, string> ReviewCmds { get; } = new()
         {
             { "no", "自定义拒稿理由" },
             { "edit", "修改稿件描述" },
+            { "echo", "回复用户" },
         };
 
         private static Dictionary<string, string> CommonCmds { get; } = new()
         {
-            { "myban", "查询封禁记录" },
+            { "myban", "查询自己的封禁记录" },
+            { "help", "查看机器人帮助" },
         };
 
         /// <summary>

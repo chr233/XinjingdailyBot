@@ -165,7 +165,7 @@ namespace XinjingdailyBot.Handlers.Messages
                     break;
 
                 case "USERINFO" when admin:
-                    await AdminCmd.ResponseUserInfo(botClient, dbUser, message, args);
+                    await AdminCmd.ResponseUserInfo(botClient, message, args);
                     break;
 
                 case "BAN" when admin:
@@ -179,11 +179,11 @@ namespace XinjingdailyBot.Handlers.Messages
                     break;
 
                 case "QUERYBAN" when admin:
-                    await AdminCmd.ResponseQueryBan(botClient, dbUser, message, args);
+                    await AdminCmd.ResponseQueryBan(botClient, message, args);
                     break;
 
                 case "ECHO" when admin:
-                    await AdminCmd.ResponseEcho(botClient, dbUser, message, args);
+                    await AdminCmd.ResponseEcho(botClient, message, args);
                     autoDelete = false;
                     break;
 
@@ -193,7 +193,7 @@ namespace XinjingdailyBot.Handlers.Messages
                     break;
 
                 case "SYSREPORT" when admin:
-                    await AdminCmd.ResponseSystemReport(botClient, dbUser, message, args);
+                    await AdminCmd.ResponseSystemReport(botClient, message);
                     break;
 
                 //Super - 超级管理员命令

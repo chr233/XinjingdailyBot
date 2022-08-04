@@ -54,7 +54,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        internal static async Task ResponseUserInfo(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
+        internal static async Task ResponseUserInfo(ITelegramBotClient botClient, Message message, string[] args)
         {
             StringBuilder sb = new();
 
@@ -85,10 +85,12 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 {
                     group = g.Name;
                 }
+                string status = targetUser.IsBan ? "封禁中" : "正常";
 
                 sb.AppendLine($"用户名: <code>{userNick}</code>");
                 sb.AppendLine($"用户ID: <code>{targetUser.UserID}</code>");
                 sb.AppendLine($"用户组: <code>{group}</code>");
+                sb.AppendLine($"状态: <code>{status}</code>");
                 sb.AppendLine($"等级:  <code>{level}</code>");
                 sb.AppendLine($"投稿数量: <code>{targetUser.PostCount}</code>");
                 sb.AppendLine($"通过数量: <code>{targetUser.AcceptCount}</code>");
@@ -253,7 +255,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        internal static async Task ResponseQueryBan(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
+        internal static async Task ResponseQueryBan(ITelegramBotClient botClient, Message message, string[] args)
         {
             StringBuilder sb = new();
 
@@ -295,8 +297,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                     foreach (var record in records)
                     {
                         string date = record.BanTime.ToString("d");
-                        string operate = record.IsBan ? "受到封禁" : "被解封";
-                        sb.AppendLine($"在 <code>{date}</code> 因为 <code>{record.Reason}</code> {operate}");
+                        string operate = record.IsBan ? "封禁" : "解封";
+                        sb.AppendLine($"在 <code>{date}</code> 因为 <code>{record.Reason}</code> 被 <code>{record.OperatorUID}</code> {operate}");
                     }
                 }
             }
@@ -312,7 +314,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        internal static async Task ResponseEcho(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
+        internal static async Task ResponseEcho(ITelegramBotClient botClient, Message message, string[] args)
         {
             bool autoDelete = true;
             async Task<string> exec()
@@ -406,7 +408,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        internal static async Task ResponseSystemReport(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
+        internal static async Task ResponseSystemReport(ITelegramBotClient botClient, Message message)
         {
             DateTime now = DateTime.Now;
             DateTime monthStart = now.AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
