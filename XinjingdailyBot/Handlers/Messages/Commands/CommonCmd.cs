@@ -131,9 +131,13 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         {
             StringBuilder sb = new();
 
+            if (!string.IsNullOrEmpty(BotConfig.Welecome))
+            {
+                sb.AppendLine(BotConfig.Welecome);
+            }
+
             if (!dbUser.IsBan)
             {
-                sb.AppendLine("欢迎使用 心惊报 @xinjingdaily 专用投稿机器人");
                 sb.AppendLine("直接发送图片或者文字内容即可投稿");
             }
             else
@@ -154,8 +158,10 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <returns></returns>
         internal static async Task ResponseVersion(ITelegramBotClient botClient, Message message)
         {
-            string text = $"机器人版本: {MyVersion}";
-            await botClient.SendCommandReply(text, message);
+            StringBuilder sb = new();
+            sb.AppendLine($"当前机器人版本: {MyVersion}");
+            sb.AppendLine("获取开源程序: https://github.com/chr233/XinjingdailyBot");
+            await botClient.SendCommandReply(sb.ToString(), message);
         }
 
         /// <summary>

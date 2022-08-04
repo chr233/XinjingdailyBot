@@ -23,6 +23,12 @@ namespace XinjingdailyBot.Handlers.Messages
             if (!dbUser.Right.HasFlag(UserRights.SendPost))
             {
                 await botClient.AutoReplyAsync("没有权限", message);
+                return;
+            }
+            if (ReviewGroup.Id == -1)
+            {
+                await botClient.AutoReplyAsync("尚未设置投稿群组, 无法接收投稿", message);
+                return;
             }
 
             string? channelName = null, channelTitle = null;
@@ -81,6 +87,12 @@ namespace XinjingdailyBot.Handlers.Messages
             if (!dbUser.Right.HasFlag(UserRights.SendPost))
             {
                 await botClient.AutoReplyAsync("没有权限", message);
+                return;
+            }
+            if (ReviewGroup.Id == -1)
+            {
+                await botClient.AutoReplyAsync("尚未设置投稿群组, 无法接收投稿", message);
+                return;
             }
 
             string? channelName = null, channelTitle = null;
@@ -151,6 +163,12 @@ namespace XinjingdailyBot.Handlers.Messages
             if (!dbUser.Right.HasFlag(UserRights.SendPost))
             {
                 await botClient.AutoReplyAsync("没有权限", message);
+                return;
+            }
+            if (ReviewGroup.Id == -1)
+            {
+                await botClient.AutoReplyAsync("尚未设置投稿群组, 无法接收投稿", message);
+                return;
             }
 
             string mediaGroupId = message.MediaGroupId!;

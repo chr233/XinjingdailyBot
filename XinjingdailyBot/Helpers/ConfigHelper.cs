@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Text.Encodings.Web;
 using XinjingdailyBot.Converters;
 using XinjingdailyBot.Storage;
 using static XinjingdailyBot.Utils;
@@ -14,7 +15,7 @@ namespace XinjingdailyBot.Helpers
         /// 读取配置路径
         /// </summary>
         /// <returns></returns>
-        public static string GetConfigFilePath()
+        internal static string GetConfigFilePath()
         {
             string currentDir = Directory.GetCurrentDirectory();
             string cfgPath = Path.Combine(currentDir, Static.ConfigFileName);
@@ -22,23 +23,24 @@ namespace XinjingdailyBot.Helpers
         }
 
         /// <summary>
-        /// 读取配置
+        /// 保存配置
         /// </summary>
-        public static void SaveConfig()
+        internal static void SaveConfig()
         {
             string filePath = GetConfigFilePath();
             SaveConfig(filePath);
         }
 
         /// <summary>
-        /// 读取配置
+        /// 保存配置
         /// </summary>
         /// <param name="filePath"></param>
-        public static void SaveConfig(string filePath)
+        internal static void SaveConfig(string filePath)
         {
 
             JsonSerializerOptions options = new()
             {
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
                 WriteIndented = true,
             };
 
@@ -50,7 +52,7 @@ namespace XinjingdailyBot.Helpers
         /// <summary>
         /// 加载配置
         /// </summary>
-        public static async Task LoadConfig()
+        internal static async Task LoadConfig()
         {
             string filePath = GetConfigFilePath();
 
@@ -61,7 +63,7 @@ namespace XinjingdailyBot.Helpers
         /// 加载配置
         /// </summary>
         /// <param name="filePath"></param>
-        public static async Task LoadConfig(string filePath)
+        internal static async Task LoadConfig(string filePath)
         {
             if (File.Exists(filePath))
             {

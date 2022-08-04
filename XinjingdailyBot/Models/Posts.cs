@@ -10,6 +10,7 @@ namespace XinjingdailyBot.Models
     [SugarIndex("index_action_mid", nameof(ActionMsgID), OrderByType.Asc)]
     [SugarIndex("index_review_mid", nameof(ReviewMsgID), OrderByType.Asc)]
     [SugarIndex("index_manage_mid", nameof(ManageMsgID), OrderByType.Asc)]
+    [SugarIndex("index_review_mid_manage_mid", nameof(ReviewMsgID), OrderByType.Asc, nameof(ManageMsgID), OrderByType.Asc)]
     [SugarIndex("index_media_group_id", nameof(MediaGroupID), OrderByType.Asc)]
     [SugarIndex("index_posterid", nameof(PosterUID), OrderByType.Asc)]
     [SugarIndex("index_reviewerid", nameof(ReviewerUID), OrderByType.Asc)]

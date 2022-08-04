@@ -101,7 +101,7 @@ namespace XinjingdailyBot.Handlers.Messages
                 case MessageType.Video when !isPrivateChat:
                 case MessageType.Document when !isPrivateChat:
                 case MessageType.Text when !isPrivateChat:
-                    if (isGroupChat && !isConfigedGroup && BotConfig.AutoLeaveIrrelevantGroup)
+                    if (isGroupChat && !isConfigedGroup && BotConfig.AutoLeaveOtherGroup)
                     {
                         Logger.Warn($"S 自动退出未设置的群组");
                         await botClient.LeaveChatAsync(message.Chat);
