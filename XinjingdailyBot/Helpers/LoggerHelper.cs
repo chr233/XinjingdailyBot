@@ -49,7 +49,7 @@ namespace XinjingdailyBot.Helpers
                 MessageType.Voice => $"[语音] {message.Caption}",
                 MessageType.Document => $"[文件] {message.Caption}",
                 MessageType.Sticker => $"[贴纸] {message.Sticker!.SetName}",
-                _ => "[其他消息]",
+                _ => $"[其他消息] {message.Type}",
             };
 
             var chat = message.Chat;

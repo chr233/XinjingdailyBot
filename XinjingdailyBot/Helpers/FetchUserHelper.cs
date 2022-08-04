@@ -264,7 +264,21 @@ namespace XinjingdailyBot.Handlers
                 {
                     int msgID = replyToMsg.MessageId;
 
-                    var post = await DB.Queryable<Posts>().FirstAsync(x => (x.ReviewMsgID <= msgID && x.ManageMsgID > msgID) || x.ManageMsgID == msgID);
+                    var exp = Expressionable.Create<Posts>();
+                    exp.Or(x => x.ManageMsgID == msgID);
+
+                    if (string.IsNullOrEmpty(replyToMsg.MediaGroupId))
+                    {
+                        //普通消息
+                        exp.Or(x => x.ReviewMsgID == msgID);
+                    }
+                    else
+                    {
+                        //媒体组消息
+                        exp.Or(x => x.ReviewMsgID <= msgID && x.ManageMsgID > msgID);
+                    }
+
+                    var post = await DB.Queryable<Posts>().FirstAsync(exp.ToExpression());
 
                     //判断是不是审核相关消息
                     if (post != null)
@@ -272,7 +286,6 @@ namespace XinjingdailyBot.Handlers
                         //通过稿件读取用户信息
                         return await FetchDbUserByUserID(post.PosterUID);
                     }
-
                 }
 
                 //在CMD回调表里查看
@@ -373,7 +386,11 @@ namespace XinjingdailyBot.Handlers
                 return ("找不到符合条件的用户", null);
             }
 
-            int totalPages = (userListCount / pageSize) + 1;
+            int totalPages = userListCount / pageSize;
+            if (userListCount % pageSize > 0)
+            {
+                totalPages++;
+            }
 
             page = Math.Max(1, Math.Min(page, totalPages));
 

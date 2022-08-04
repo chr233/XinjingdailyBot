@@ -38,7 +38,7 @@ namespace XinjingdailyBot.Handlers.Queries.Commands
         /// <param name="callbackQuery"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        internal static async Task ResponseCancel(ITelegramBotClient botClient, CallbackQuery callbackQuery, string[] args)
+        internal static async Task ResponseCancel(ITelegramBotClient botClient, CallbackQuery callbackQuery, bool deleteMsg, string[] args)
         {
             string text;
             if (args.Length > 1)
@@ -47,11 +47,20 @@ namespace XinjingdailyBot.Handlers.Queries.Commands
             }
             else
             {
-                text = "操作已取消";
+                text = deleteMsg ? "关闭菜单" : "操作已取消";
             }
 
             await botClient.AutoReplyAsync(text, callbackQuery);
-            await botClient.EditMessageTextAsync(callbackQuery.Message!, text, replyMarkup: null);
+
+            if (deleteMsg)
+            {
+                var message = callbackQuery.Message!;
+                await botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+            }
+            else
+            {
+                await botClient.EditMessageTextAsync(callbackQuery.Message!, text, replyMarkup: null);
+            }
         }
     }
 }

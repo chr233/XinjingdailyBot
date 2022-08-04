@@ -110,7 +110,12 @@ namespace XinjingdailyBot.Handlers.Queries
                     break;
 
                 case "CANCEL" when normal:
-                    await NormalCmd.ResponseCancel(botClient, callbackQuery, args);
+                    await NormalCmd.ResponseCancel(botClient, callbackQuery, false, args);
+                    break;
+
+                case "CANCELCLOSE" when normal:
+                case "CANCELANDCLOSE" when normal:
+                    await NormalCmd.ResponseCancel(botClient, callbackQuery, true, args);
                     break;
 
                 //Admin - 管理员命令
@@ -128,7 +133,7 @@ namespace XinjingdailyBot.Handlers.Queries
 
                 default:
                     //提示未处理的命令
-                    await botClient.SendCommandReply("未知命令, 获取帮助 /help", message, false);
+                    await botClient.AutoReplyAsync("未知命令, 获取帮助 /help", message);
                     handled = false;
                     break;
             }

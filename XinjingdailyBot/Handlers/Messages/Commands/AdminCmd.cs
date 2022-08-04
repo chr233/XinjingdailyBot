@@ -160,7 +160,11 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
                     await DB.Insertable(record).ExecuteCommandAsync();
 
-                    return $"成功封禁该用户!\n理由: <code>{reason}</code>";
+                    StringBuilder sb = new();
+                    sb.AppendLine($"成功封禁 {TextHelper.HtmlUserLink(targetUser)}");
+                    sb.AppendLine($"操作员 {TextHelper.HtmlUserLink(dbUser)}");
+                    sb.AppendLine($"封禁理由 <code>{reason}</code>");
+                    return sb.ToString();
                 }
             }
 
@@ -229,7 +233,11 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
                     await DB.Insertable(record).ExecuteCommandAsync();
 
-                    return $"成功解封该用户!\n理由: <code>{reason}</code>";
+                    StringBuilder sb = new();
+                    sb.AppendLine($"成功解封 {TextHelper.HtmlUserLink(targetUser)}");
+                    sb.AppendLine($"操作员 {TextHelper.HtmlUserLink(dbUser)}");
+                    sb.AppendLine($"封禁理由 <code>{reason}</code>");
+                    return sb.ToString();
                 }
             }
 
@@ -440,5 +448,4 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             await botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
         }
-    }
 }
