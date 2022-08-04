@@ -443,7 +443,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             sb.AppendLine($"拒绝投稿: <code>{yearRejectPost}</code>");
             if (yearPost > 0)
             {
-                sb.AppendLine($"通过率: <code>{(100 * monthAcceptPost / yearPost).ToString("f2")}%</code>");
+                sb.AppendLine($"通过率: <code>{(100 * yearAcceptPost / yearPost).ToString("f2")}%</code>");
             }
             else
             {
