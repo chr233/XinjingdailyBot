@@ -1,5 +1,8 @@
 ﻿namespace XinjingdailyBot.Enums
 {
+    /// <summary>
+    /// 投稿Tag
+    /// </summary>
     [Flags]
     internal enum BuildInTags : byte
     {

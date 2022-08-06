@@ -1,7 +1,6 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 using XinjingdailyBot.Helpers;
-using XinjingdailyBot.Models;
 
 namespace XinjingdailyBot.Handlers.Queries.Commands
 {
@@ -12,7 +11,6 @@ namespace XinjingdailyBot.Handlers.Queries.Commands
         /// 显示命令回复
         /// </summary>
         /// <param name="botClient"></param>
-        /// <param name="dbUser"></param>
         /// <param name="callbackQuery"></param>
         /// <param name="args"></param>
         /// <returns></returns>
@@ -34,7 +32,6 @@ namespace XinjingdailyBot.Handlers.Queries.Commands
         /// 取消命令
         /// </summary>
         /// <param name="botClient"></param>
-        /// <param name="dbUser"></param>
         /// <param name="callbackQuery"></param>
         /// <param name="args"></param>
         /// <returns></returns>

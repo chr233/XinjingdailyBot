@@ -1,7 +1,18 @@
 ﻿namespace XinjingdailyBot.Enums
 {
+    /// <summary>
+    /// 稿件状态
+    /// </summary>
     internal enum PostStatus : int
     {
+        /// <summary>
+        /// 确认投稿超时
+        /// </summary>
+        ConfirmTimeout = -2,
+        /// <summary>
+        /// 审核超时
+        /// </summary>
+        ReviewTimeout = -1,
         /// <summary>
         /// 默认状态
         /// </summary>

@@ -50,7 +50,6 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// 获取用户信息
         /// </summary>
         /// <param name="botClient"></param>
-        /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
@@ -251,7 +250,6 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// 查询封禁记录
         /// </summary>
         /// <param name="botClient"></param>
-        /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
@@ -310,7 +308,6 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// 回复用户
         /// </summary>
         /// <param name="botClient"></param>
-        /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
@@ -404,19 +401,18 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// 生成系统报表
         /// </summary>
         /// <param name="botClient"></param>
-        /// <param name="dbUser"></param>
         /// <param name="message"></param>
-        /// <param name="args"></param>
         /// <returns></returns>
         internal static async Task ResponseSystemReport(ITelegramBotClient botClient, Message message)
         {
             DateTime now = DateTime.Now;
             DateTime monthStart = now.AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             DateTime yearStart = now.AddMonths(1 - now.Month).AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+            DateTime prev30Days = now.AddDays(-30);
 
             StringBuilder sb = new();
 
-            var monthPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart).CountAsync();
+            var monthPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status > PostStatus.Cancel).CountAsync();
             var monthAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Accepted).CountAsync();
             var monthRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Rejected).CountAsync();
 
@@ -431,9 +427,9 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             {
                 sb.AppendLine("通过率: <code> --%</code>");
             }
-            sb.AppendLine($"总计投稿: <code>{monthPost}</code>");
+            sb.AppendLine($"累计投稿: <code>{monthPost}</code>");
 
-            var yearPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= yearStart).CountAsync();
+            var yearPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= yearStart && x.Status > PostStatus.Cancel).CountAsync();
             var yearAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= yearStart && x.Status == PostStatus.Accepted).CountAsync();
             var yearRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= yearStart && x.Status == PostStatus.Rejected).CountAsync();
 
@@ -449,9 +445,9 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             {
                 sb.AppendLine("通过率: <code> --%</code>");
             }
-            sb.AppendLine($"总计投稿: <code>{yearPost}</code>");
+            sb.AppendLine($"累计投稿: <code>{yearPost}</code>");
 
-            var totalPost = await DB.Queryable<Posts>().CountAsync();
+            var totalPost = await DB.Queryable<Posts>().Where(x => x.Status > PostStatus.Cancel).CountAsync();
             var totalAcceptPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Accepted).CountAsync();
             var totalRejectPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Rejected).CountAsync();
 
@@ -467,7 +463,19 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             {
                 sb.AppendLine("通过率: <code> --%</code>");
             }
-            sb.AppendLine($"总计投稿: <code>{totalPost}</code>");
+            sb.AppendLine($"累计投稿: <code>{totalPost}</code>");
+
+            var totalUser = await DB.Queryable<Users>().CountAsync();
+            var banedUser = await DB.Queryable<Users>().Where(x => x.IsBan).CountAsync();
+            var activeUser = await DB.Queryable<Users>().Where(x => x.ModifyAt >= prev30Days).CountAsync();
+            var postedUser = await DB.Queryable<Users>().Where(x => x.PostCount > 0).CountAsync();
+
+            sb.AppendLine();
+            sb.AppendLine("-- 用户统计 --");
+            sb.AppendLine($"封禁用户: <code>{banedUser}</code>");
+            sb.AppendLine($"活跃用户: <code>{activeUser}</code>");
+            sb.AppendLine($"投稿用户: <code>{postedUser}</code>");
+            sb.AppendLine($"累计用户: <code>{totalUser}</code>");
 
             await botClient.SendCommandReply(sb.ToString(), message, true, ParseMode.Html);
         }

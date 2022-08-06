@@ -9,7 +9,7 @@ using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Messages
 {
-    internal sealed class PostHandler
+    internal static class PostHandler
     {
         /// <summary>
         /// 处理文字投稿

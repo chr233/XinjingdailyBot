@@ -10,17 +10,30 @@ namespace XinjingdailyBot.Handlers.Messages
 {
     internal static class GroupHandler
     {
-        private static Dictionary<string, string> OneToOneWords { get; } = new()
-        {
-            { "投稿", "如果想要投稿, 直接将稿件通过私信发给我即可." },
-        };
+        /// <summary>
+        /// 关键词设定
+        /// </summary>
+        private static Dictionary<string, string> OneToOneWords { get; }
 
-        private static Dictionary<string, List<string>> OneToManyWords { get; } = new()
+        /// <summary>
+        /// 关键词设定
+        /// </summary>
+        private static Dictionary<string, List<string>> OneToManyWords { get; }
+
+        static GroupHandler()
         {
-            { "丁真", new() { "一眼丁真, 鉴定为纯纯的RBQ", "到达美丽世界最高层理塘", "给大哥递烟" } },
-            { "24岁", new() { "事先辈", "要素察觉", "只有冰红茶可以吗", "事学生", "意味深" } },
-            { "女装", new() { "?", "??", "???", "????", "?????", "??????", "???????" } },
-        };
+            OneToOneWords = new()
+            {
+                { "投稿", "如果想要投稿, 直接将稿件通过私信发给我即可." },
+            };
+
+            OneToManyWords = new()
+            {
+                { "丁真", new() { "一眼丁真, 鉴定为纯纯的RBQ", "到达美丽世界最高层理塘", "给大哥递烟" } },
+                { "24岁", new() { "事先辈", "要素察觉", "只有冰红茶可以吗", "事学生", "意味深" } },
+                { "女装", new() { "?", "??", "???", "????", "?????", "??????", "???????" } },
+            };
+        }
 
         internal static async Task HandlerGroupMessage(ITelegramBotClient botClient, Users dbUser, Message message)
         {
