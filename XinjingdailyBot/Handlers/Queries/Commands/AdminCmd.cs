@@ -14,7 +14,6 @@ namespace XinjingdailyBot.Handlers.Queries.Commands
         /// </summary>
         /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
-        /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
         internal static async Task ResponseSearchUser(ITelegramBotClient botClient, Users dbUser, CallbackQuery callbackQuery, string[] args)

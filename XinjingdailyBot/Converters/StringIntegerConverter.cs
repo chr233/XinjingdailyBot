@@ -3,6 +3,9 @@ using System.Text.Json.Serialization;
 
 namespace XinjingdailyBot.Converters
 {
+    /// <summary>
+    /// 自定义JSON反序列化器, 处理字符串到整数的转换 
+    /// </summary>
     public class StringIntegerConverter : JsonConverter<string>
     {
         public override string Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -22,7 +25,6 @@ namespace XinjingdailyBot.Converters
                     return reader.GetSingle().ToString();
                 }
             }
-
             throw new JsonException($"{reader.GetString()} 无法转换为 {typeof(string)}");
         }
 

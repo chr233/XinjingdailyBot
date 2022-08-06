@@ -1,5 +1,8 @@
 ﻿namespace XinjingdailyBot.Enums
 {
+    /// <summary>
+    /// 用户权限
+    /// </summary>
     [Flags]
     internal enum UserRights : byte
     {
@@ -7,6 +10,7 @@
         /// 无权限
         /// </summary>
         None = 0x00,
+
         /// <summary>
         /// 投稿
         /// </summary>
