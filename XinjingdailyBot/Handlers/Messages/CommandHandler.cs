@@ -9,7 +9,7 @@ using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Messages
 {
-    internal class CommandHandler
+    internal static class CommandHandler
     {
         /// <summary>
         /// 响应命令

@@ -5,7 +5,7 @@ using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Helpers
 {
-    internal class DataBaseHelper
+    internal static class DataBaseHelper
     {
 #pragma warning disable CS8618// 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
         public static SqlSugarScope DB;
@@ -131,7 +131,7 @@ namespace XinjingdailyBot.Helpers
                 new() { Id = 50, Name = "*超级狗管理*", DefaultRight = UserRights.ALL },
             };
 
-            await DB.Storageable(rights).WhereColumns(x => x.Id).ExecuteCommandAsync();
+            await DB.Storageable(rights).ExecuteCommandAsync();
 
             await LoadLevelsAndRights();
         }

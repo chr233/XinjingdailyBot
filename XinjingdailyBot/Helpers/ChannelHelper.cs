@@ -4,7 +4,7 @@ using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Helpers
 {
-    internal sealed class ChannelHelper
+    internal static class ChannelHelper
     {
         /// <summary>
         /// 审核群组

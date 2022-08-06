@@ -3,9 +3,9 @@
     public class Config
     {
         /// <summary>
-        /// 调试模式
+        /// 调试模式, 默认 false
         /// </summary>
-        public bool Debug { get; set; } = false;
+        public bool Debug { get; set; }
 
         /// <summary>
         /// 机器人Token
@@ -18,7 +18,7 @@
         public string Welecome { get; set; } = "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人";
 
         /// <summary>
-        /// 代理链接
+        /// 代理链接, 默认 null
         /// </summary>
         public string? Proxy { get; set; }
 
@@ -31,7 +31,7 @@
         public string DBUser { get; set; } = "root";
         public string DBPassword { get; set; } = "123456";
         /// <summary>
-        /// 是否生成数据库字段(数据库结构变动时需要打开)
+        /// 是否生成数据库字段(数据库结构变动时需要打开), 默认 true
         /// </summary>
         public bool DBGenerate { get; set; } = true;
 
@@ -66,8 +66,8 @@
         public string RejectChannel { get; set; } = "";
 
         /// <summary>
-        /// 自动退出未在配置文件中定义的群组和频道
+        /// 自动退出未在配置文件中定义的群组和频道, 默认 false
         /// </summary>
-        public bool AutoLeaveOtherGroup { get; set; } = false;
+        public bool AutoLeaveOtherGroup { get; set; }
     }
 }
