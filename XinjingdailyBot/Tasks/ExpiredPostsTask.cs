@@ -83,6 +83,7 @@ namespace XinjingdailyBot.Tasks
             StringBuilder sb = new();
             foreach (var user in userList)
             {
+                sb.Clear();
                 if (expiredPostDict.TryGetValue(user.UserID, out int confirmTimeoutCount))
                 {
                     sb.AppendLine($"你有 <code>{confirmTimeoutCount}</code> 份稿件确认超时");
