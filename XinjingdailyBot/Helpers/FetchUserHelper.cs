@@ -11,7 +11,12 @@ namespace XinjingdailyBot.Handlers
 {
     internal static class FetchUserHelper
     {
-        private static TimeSpan UpdatePeriod { get; } = TimeSpan.FromDays(15);
+        private static TimeSpan UpdatePeriod { get; }
+
+        static FetchUserHelper()
+        {
+            UpdatePeriod = TimeSpan.FromDays(15);
+        }
 
         /// <summary>
         /// 根据Update获取发送消息的用户
@@ -151,24 +156,6 @@ namespace XinjingdailyBot.Handlers
                     needUpdate = true;
                 }
 
-                //如果是配置文件中指定的管理员就覆盖用户组权限
-                if (BotConfig.SuperAdmins.Contains(dbUser.UserID))
-                {
-                    int maxGroupID = UGroups.Keys.Max();
-                    dbUser.GroupID = maxGroupID;
-                }
-
-                //根据GroupID设置用户权限信息
-                if (UGroups.TryGetValue(dbUser.GroupID, out var group))
-                {
-                    dbUser.Right = group.DefaultRight;
-                }
-                else
-                {
-                    Logger.Error($"S 读取用户 {dbUser} 权限组 {dbUser.GroupID} 失败");
-                    return null;
-                }
-
                 //需要更新用户数据
                 if (needUpdate)
                 {
@@ -198,6 +185,25 @@ namespace XinjingdailyBot.Handlers
                     }
                 }
             }
+
+            //如果是配置文件中指定的管理员就覆盖用户组权限
+            if (BotConfig.SuperAdmins.Contains(dbUser.UserID))
+            {
+                int maxGroupID = UGroups.Keys.Max();
+                dbUser.GroupID = maxGroupID;
+            }
+
+            //根据GroupID设置用户权限信息
+            if (UGroups.TryGetValue(dbUser.GroupID, out var group))
+            {
+                dbUser.Right = group.DefaultRight;
+            }
+            else
+            {
+                Logger.Error($"S 读取用户 {dbUser} 权限组 {dbUser.GroupID} 失败");
+                return null;
+            }
+
             return dbUser;
         }
 

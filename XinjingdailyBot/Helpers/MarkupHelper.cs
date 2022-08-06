@@ -6,7 +6,7 @@ using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Helpers
 {
-    internal sealed class MarkupHelper
+    internal static class MarkupHelper
     {
         private static readonly string AnymouseOn = Emojis.Ghost + "匿名投稿";
         private static readonly string AnymouseOff = Emojis.Thinking + "保留来源";

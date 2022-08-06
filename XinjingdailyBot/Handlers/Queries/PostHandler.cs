@@ -8,7 +8,7 @@ using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Queries
 {
-    internal class PostHandler
+    internal static class PostHandler
     {
         /// <summary>
         /// 处理CallbackQuery

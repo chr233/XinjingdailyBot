@@ -9,7 +9,7 @@ using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Queries
 {
-    internal class CommandHandler
+    internal static class CommandHandler
     {
         /// <summary>
         /// 处理CallbackQuery

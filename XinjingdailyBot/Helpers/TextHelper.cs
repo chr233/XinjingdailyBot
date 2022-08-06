@@ -5,10 +5,16 @@ using XinjingdailyBot.Models;
 
 namespace XinjingdailyBot.Helpers
 {
-    internal sealed class TextHelper
+    internal static class TextHelper
     {
-        private static Regex MatchTag { get; } = new(@"(^#\S+)|(\s#\S+)");
-        private static Regex MatchSpace { get; } = new(@"^\s*$");
+        private static Regex MatchTag { get; }
+        private static Regex MatchSpace { get; }
+
+        static TextHelper()
+        {
+            MatchTag = new(@"(^#\S+)|(\s#\S+)");
+            MatchSpace = new(@"^\s*$");
+        }
 
         /// <summary>
         /// 去除无用文本内容
