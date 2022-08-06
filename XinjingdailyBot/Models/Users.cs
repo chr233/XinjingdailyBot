@@ -61,6 +61,11 @@ namespace XinjingdailyBot.Models
         /// </summary>
         public int RejetCount { get; set; }
         /// <summary>
+        /// 过期未被审核的稿件数量(统计时总投稿需要减去此字段)
+        /// </summary>
+        public int ExpiredPostCount { get; set; }
+
+        /// <summary>
         /// 投稿数量
         /// </summary>
         public int PostCount { get; set; }

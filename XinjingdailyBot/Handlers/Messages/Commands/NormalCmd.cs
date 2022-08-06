@@ -87,7 +87,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             sb.AppendLine($"用户ID: <code>{dbUser.UserID}</code>");
             sb.AppendLine($"用户组: <code>{group}</code>");
             sb.AppendLine($"等级:  <code>{level}</code>");
-            sb.AppendLine($"投稿数量: <code>{dbUser.PostCount}</code>");
+            sb.AppendLine($"投稿数量: <code>{dbUser.PostCount - dbUser.ExpiredPostCount}</code>");
             sb.AppendLine($"通过数量: <code>{dbUser.AcceptCount}</code>");
             sb.AppendLine($"拒绝数量: <code>{dbUser.RejetCount}</code>");
             sb.AppendLine($"审核数量: <code>{dbUser.ReviewCount}</code>");
