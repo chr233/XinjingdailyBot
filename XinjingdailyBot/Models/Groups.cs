@@ -3,6 +3,9 @@ using XinjingdailyBot.Enums;
 
 namespace XinjingdailyBot.Models
 {
+    /// <summary>
+    /// 用户权限组信息
+    /// </summary>
     [SugarTable("group", TableDescription = "用户组")]
     internal sealed class Groups
     {
