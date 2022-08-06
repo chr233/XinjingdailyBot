@@ -78,15 +78,19 @@
 | RejectChannel       | string | ""                                             | √    | 审核拒绝频道 ID              |
 | AutoLeaveOtherGroup | bool   | false                                          |      | 是否自动离开无关群组         |
 
-> SuperAdmins 机器人超级管理员的 UserID 列表, 覆盖数据库中的设定, 用户 UserID 可以使用命令 /myinfo 获取
+> 新安装或者数据库结构变动后一定要修改 `DBGenerate` 为 `true`, 会自动生成数据表
 
 ---
 
-> AcceptChannel 和 RejectChannel 必须为公开频道, 频道名需要加 `@`, 例如 `@xinjingdaily`
+> `SuperAdmins` 机器人超级管理员的 UserID 列表, 覆盖数据库中的设定, 用户 UserID 可以使用命令 /myinfo 获取
 
 ---
 
-> ReviewGroup, CommentGroup, SubGroup 不一定需要是公开频道
+> `AcceptChannel` 和 RejectChannel 必须为公开频道, 频道名需要加 `@`, 例如 `@xinjingdaily`
+
+---
+
+> `ReviewGroup`, `CommentGroup`, `SubGroup` 不一定需要是公开频道
 > 如果是公开群组, 群组名需要加 `@`, 例如 `@xinjingdailychatroom`
 > 如果是私有群组, 可以使用命令 /groupinfo 获取群组的信息, 然后设置为群组的 GroupID
 
