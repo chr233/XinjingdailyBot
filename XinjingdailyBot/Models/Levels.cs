@@ -2,6 +2,9 @@
 
 namespace XinjingdailyBot.Models
 {
+    /// <summary>
+    /// 用户等级表
+    /// </summary>
     [SugarTable("level", TableDescription = "等级组")]
     internal sealed class Levels
     {

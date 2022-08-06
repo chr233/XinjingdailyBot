@@ -2,6 +2,9 @@
 
 namespace XinjingdailyBot.Models
 {
+    /// <summary>
+    /// 用户封禁记录
+    /// </summary>
     [SugarTable("ban", TableDescription = "用户封禁记录户表")]
     [SugarIndex("index_userid", nameof(UserID), OrderByType.Asc, true)]
     [SugarIndex("index_operatorid", nameof(OperatorUID), OrderByType.Asc)]

@@ -4,7 +4,7 @@ using Telegram.Bot.Types.Enums;
 namespace XinjingdailyBot.Models
 {
     [SugarTable("attachment", TableDescription = "投稿附件")]
-    [SugarIndex("index_media_group_id", nameof(PostID), OrderByType.Asc)]
+    [SugarIndex("index_post_id", nameof(PostID), OrderByType.Asc)]
     internal sealed class Attachments
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]

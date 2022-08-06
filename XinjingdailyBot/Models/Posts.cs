@@ -14,6 +14,7 @@ namespace XinjingdailyBot.Models
     [SugarIndex("index_media_group_id", nameof(MediaGroupID), OrderByType.Asc)]
     [SugarIndex("index_posterid", nameof(PosterUID), OrderByType.Asc)]
     [SugarIndex("index_reviewerid", nameof(ReviewerUID), OrderByType.Asc)]
+    [SugarIndex("index_status_modifyat", nameof(Status), OrderByType.Asc, nameof(ModifyAt), OrderByType.Asc)]
     internal sealed class Posts
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]

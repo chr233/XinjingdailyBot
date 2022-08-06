@@ -3,6 +3,9 @@ using XinjingdailyBot.Enums;
 
 namespace XinjingdailyBot.Models
 {
+    /// <summary>
+    /// 用户表, 储存所有用户的基本信息, 权限设定, 以及投稿信息统计
+    /// </summary>
     [SugarTable("user", TableDescription = "用户表")]
     [SugarIndex("index_userid", nameof(UserID), OrderByType.Asc, true)]
     [SugarIndex("index_username", nameof(UserName), OrderByType.Asc)]
@@ -83,7 +86,7 @@ namespace XinjingdailyBot.Models
         /// </summary>
         public int GroupID { get; set; }
         /// <summary>
-        /// 私聊ChatID
+        /// 私聊ChatID, 默认 -1;
         /// </summary>
         public long PrivateChatID { get; set; } = -1;
         /// <summary>
