@@ -1,5 +1,21 @@
 # Xinjingdaily Bot
 
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/67ca08867b7a4afda91db3b70bcd303c)](https://www.codacy.com/gh/chr233/XinjingdailyBot/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=chr233/XinjingdailyBot&amp;utm_campaign=Badge_Grade)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/chr233/XinjingdailyBot/Publish?logo=github)
+[![License](https://img.shields.io/github/license/chr233/XinjingdailyBot?logo=apache)](https://github.com/chr233/XinjingdailyBot/blob/master/license)
+![GitHub last commit](https://img.shields.io/github/last-commit/chr233/XinjingdailyBot?logo=github)
+
+[![GitHub Release](https://img.shields.io/github/v/release/chr233/XinjingdailyBot?logo=github)](https://github.com/chr233/XinjingdailyBot/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/chr233/XinjingdailyBot?include_prereleases&label=pre-release&logo=github)](https://github.com/chr233/XinjingdailyBot/releases)
+[![GitHub Download](https://img.shields.io/github/downloads/chr233/XinjingdailyBot/total?logo=github)](https://img.shields.io/github/v/release/chr233/XinjingdailyBot)
+
+![GitHub Repo stars](https://img.shields.io/github/stars/chr233/XinjingdailyBot?logo=github)
+
+[![爱发电](https://img.shields.io/badge/爱发电-chr__-ea4aaa.svg?logo=github-sponsors)](https://afdian.net/@chr233)
+[![Bilibili](https://img.shields.io/badge/bilibili-Chr__-00A2D8.svg?logo=bilibili)](https://space.bilibili.com/5805394)
+[![Steam](https://img.shields.io/badge/steam-Chr__-1B2838.svg?logo=steam)](https://steamcommunity.com/id/Chr_)
+[![Steam](https://img.shields.io/badge/steam-donate-1B2838.svg?logo=steam)](https://steamcommunity.com/tradeoffer/new/?partner=221260487&token=xgqMgL-i)
+
 ## 心惊报 [@xinjingdaily](https://t.me/xinjingdaily) 自主开发的投稿机器人
 
 心惊报投稿机器人 [@xinjingdaily_bot](https://t.me/xinjingdaily_bot)
