@@ -3,11 +3,12 @@ using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Helpers;
+using XinjingdailyBot.Tasks;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot
 {
-    internal class Program
+    internal static class Program
     {
         /// <summary>
         /// 启动入口
@@ -15,7 +16,7 @@ namespace XinjingdailyBot
         /// <param name="args"></param>
         /// <returns></returns>
         [STAThread]
-        static async Task Main()
+        public static async Task Main()
         {
             var exitEvent = new ManualResetEvent(false);
 
@@ -25,32 +26,31 @@ namespace XinjingdailyBot
                 exitEvent.Set();
             };
 
-            await ConfigHelper.LoadConfig();
-
-            ThreadPool.SetMinThreads(1, 1);
-            ThreadPool.SetMaxThreads(10, 10);
-
-            //设置代理
-            HttpClient? httpClient = null;
-            if (!string.IsNullOrEmpty(BotConfig.Proxy))
-            {
-                httpClient = new(
-                    new HttpClientHandler()
-                    {
-                        Proxy = new WebProxy() { Address = new Uri(BotConfig.Proxy) },
-                        UseProxy = true,
-                    }
-                );
-            }
-
-            TelegramBotClient bot = new TelegramBotClient(BotConfig.BotToken, httpClient);
-
-            using var cts = new CancellationTokenSource();
-
             try
             {
+                Logger.Info("--系统初始化--");
+
+                await ConfigHelper.LoadConfig();
+
+                //设置代理
+                HttpClient? httpClient = null;
+                if (!string.IsNullOrEmpty(BotConfig.Proxy))
+                {
+                    httpClient = new(
+                        new HttpClientHandler()
+                        {
+                            Proxy = new WebProxy() { Address = new Uri(BotConfig.Proxy) },
+                            UseProxy = true,
+                        }
+                    );
+                }
+
+                var botClient = new TelegramBotClient(BotConfig.BotToken, httpClient);
+
+                using var cts = new CancellationTokenSource();
+
                 Logger.Info("--读取基础信息--");
-                await ChannelHelper.VerifyChannelConfig(bot);
+                await ChannelHelper.VerifyChannelConfig(botClient);
 
                 Logger.Info("--初始化数据库--");
                 await DataBaseHelper.Init();
@@ -64,7 +64,7 @@ namespace XinjingdailyBot
 
                 Logger.Info("数据库初始化完成");
 
-                bot.StartReceiving(
+                botClient.StartReceiving(
                     updateHandler: Handlers.UpdateDispatcher.HandleUpdateAsync,
                     pollingErrorHandler: Handlers.UpdateDispatcher.HandleErrorAsync,
                     receiverOptions: new ReceiverOptions()
@@ -73,6 +73,8 @@ namespace XinjingdailyBot
                     },
                     cancellationToken: cts.Token
                 );
+
+                TaskHelper.InitTasks(botClient);
 
                 Logger.Info("--开始运行, Ctrl+C 结束运行--");
                 exitEvent.WaitOne();
