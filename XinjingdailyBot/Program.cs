@@ -74,7 +74,7 @@ namespace XinjingdailyBot
                     cancellationToken: cts.Token
                 );
 
-                TaskHelper.InitTasks(botClient);
+                //TaskHelper.InitTasks(botClient);
 
                 Logger.Info("--开始运行, Ctrl+C 结束运行--");
                 exitEvent.WaitOne();
