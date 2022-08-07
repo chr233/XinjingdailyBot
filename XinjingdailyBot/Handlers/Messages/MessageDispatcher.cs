@@ -71,7 +71,7 @@ namespace XinjingdailyBot.Handlers.Messages
 
             switch (message.Type)
             {
-                case MessageType.Text when (isPrivateChat || isConfigedGroup) && isCommand:
+                case MessageType.Text when isCommand:
                     await CommandHandler.HandleCommand(botClient, dbUser, message);
                     break;
 
