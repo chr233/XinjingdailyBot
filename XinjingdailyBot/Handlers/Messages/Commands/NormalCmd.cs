@@ -55,8 +55,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             dbUser.ModifyAt = DateTime.Now;
             await DB.Updateable(dbUser).UpdateColumns(x => new { x.Notification, x.ModifyAt }).ExecuteCommandAsync();
 
-            string mode = notificationg ? "发送通知" : "静默模式";
-            string text = $"投稿通过或者拒绝后将【{mode}】";
+            string mode = notificationg ? "接收通知" : "静默模式";
+            string text = $"稿件被审核或者过期时将会尝试通知用户\n当前通知设置: {mode}";
             await botClient.SendCommandReply(text, message);
         }
 
