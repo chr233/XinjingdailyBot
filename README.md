@@ -1,6 +1,6 @@
 # Xinjingdaily Bot
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/67ca08867b7a4afda91db3b70bcd303c)](https://www.codacy.com/gh/chr233/XinjingdailyBot/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=chr233/XinjingdailyBot&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/67ca08867b7a4afda91db3b70bcd303c)](https://www.codacy.com/gh/chr233/XinjingdailyBot/dashboard?utm_source=github.com&utm_medium=referral&utm_content=chr233/XinjingdailyBot&utm_campaign=Badge_Grade)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/chr233/XinjingdailyBot/Publish?logo=github)
 [![License](https://img.shields.io/github/license/chr233/XinjingdailyBot?logo=apache)](https://github.com/chr233/XinjingdailyBot/blob/master/license)
 ![GitHub last commit](https://img.shields.io/github/last-commit/chr233/XinjingdailyBot?logo=github)
@@ -57,6 +57,7 @@
   "Debug": false,
   "BotToken": "",
   "Welcome": "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人",
+  "ThrowPendingUpdates": false,
   "Proxy": null,
   "DBHost": "127.0.0.1",
   "DBPort": 3306,
@@ -74,25 +75,26 @@
 }
 ```
 
-| 配置项              | 类型   | 默认值                                         | 必须 | 说明                         |
-| ------------------- | ------ | ---------------------------------------------- | ---- | ---------------------------- |
-| Debug               | bool   | false                                          | √    | 是否开启调试模式             |
-| BotToken            | string | ""                                             | √    | 机器人 Token                 |
-| Welcome             | string | "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人" |      | 使用 /start 命令显示的欢迎语 |
-| Proxy               | string | null                                           | √    | 代理地址, 支持 http 和 sock5 |
-| DBHost              | string | "127.0.0.1"                                    | √    | MySQL 主机                   |
-| DBPort              | int    | 3306                                           | √    | MySQL 端口                   |
-| DBName              | string | "xjb_db"                                       | √    | 数据库名                     |
-| DBUser              | string | "root"                                         | √    | 数据库用户名                 |
-| DBPassword          | string | "123456"                                       | √    | 数据库密码                   |
-| DBGenerate          | bool   | true                                           |      | 是否自动生成数据库表         |
-| SuperAdmins         | int[]  | []                                             |      | 超级管理员 数字 ID 列表      |
-| ReviewGroup         | string | ""                                             |      | 审核群组 ID                  |
-| CommentGroup        | string | ""                                             |      | 评论群组 ID                  |
-| SubGroup            | string | ""                                             |      | 闲聊群组 ID                  |
-| AcceptChannel       | string | ""                                             | √    | 审核通过频道 ID              |
-| RejectChannel       | string | ""                                             | √    | 审核拒绝频道 ID              |
-| AutoLeaveOtherGroup | bool   | false                                          |      | 是否自动离开无关群组         |
+| 配置项              | 类型   | 默认值                                         | 必须 | 说明                          |
+| ------------------- | ------ | ---------------------------------------------- | ---- | ----------------------------- |
+| Debug               | bool   | false                                          | √    | 是否开启调试模式              |
+| BotToken            | string | ""                                             | √    | 机器人 Token                  |
+| Welcome             | string | "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人" |      | 使用 /start 命令显示的欢迎语  |
+| ThrowPendingUpdates | bool   | false                                          |      | 启动时是否忽略机器人离线时产生的 Update |
+| Proxy               | string | null                                           | √    | 代理地址, 支持 http 和 sock5  |
+| DBHost              | string | "127.0.0.1"                                    | √    | MySQL 主机                    |
+| DBPort              | int    | 3306                                           | √    | MySQL 端口                    |
+| DBName              | string | "xjb_db"                                       | √    | 数据库名                      |
+| DBUser              | string | "root"                                         | √    | 数据库用户名                  |
+| DBPassword          | string | "123456"                                       | √    | 数据库密码                    |
+| DBGenerate          | bool   | true                                           |      | 是否自动生成数据库表          |
+| SuperAdmins         | int[]  | []                                             |      | 超级管理员 数字 ID 列表       |
+| ReviewGroup         | string | ""                                             |      | 审核群组 ID                   |
+| CommentGroup        | string | ""                                             |      | 评论群组 ID                   |
+| SubGroup            | string | ""                                             |      | 闲聊群组 ID                   |
+| AcceptChannel       | string | ""                                             | √    | 审核通过频道 ID               |
+| RejectChannel       | string | ""                                             | √    | 审核拒绝频道 ID               |
+| AutoLeaveOtherGroup | bool   | false                                          |      | 是否自动离开无关群组          |
 
 > 新安装或者数据库结构变动后一定要修改 `DBGenerate` 为 `true`, 会自动生成数据表
 
