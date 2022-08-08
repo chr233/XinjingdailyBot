@@ -75,26 +75,26 @@
 }
 ```
 
-| 配置项              | 类型   | 默认值                                         | 必须 | 说明                          |
-| ------------------- | ------ | ---------------------------------------------- | ---- | ----------------------------- |
-| Debug               | bool   | false                                          | √    | 是否开启调试模式              |
-| BotToken            | string | ""                                             | √    | 机器人 Token                  |
-| Welcome             | string | "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人" |      | 使用 /start 命令显示的欢迎语  |
+| 配置项              | 类型   | 默认值                                         | 必须 | 说明                                    |
+| ------------------- | ------ | ---------------------------------------------- | ---- | --------------------------------------- |
+| Debug               | bool   | false                                          | √    | 是否开启调试模式                        |
+| BotToken            | string | ""                                             | √    | 机器人 Token                            |
+| Welcome             | string | "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人" |      | 使用 /start 命令显示的欢迎语            |
 | ThrowPendingUpdates | bool   | false                                          |      | 启动时是否忽略机器人离线时产生的 Update |
-| Proxy               | string | null                                           | √    | 代理地址, 支持 http 和 sock5  |
-| DBHost              | string | "127.0.0.1"                                    | √    | MySQL 主机                    |
-| DBPort              | int    | 3306                                           | √    | MySQL 端口                    |
-| DBName              | string | "xjb_db"                                       | √    | 数据库名                      |
-| DBUser              | string | "root"                                         | √    | 数据库用户名                  |
-| DBPassword          | string | "123456"                                       | √    | 数据库密码                    |
-| DBGenerate          | bool   | true                                           |      | 是否自动生成数据库表          |
-| SuperAdmins         | int[]  | []                                             |      | 超级管理员 数字 ID 列表       |
-| ReviewGroup         | string | ""                                             |      | 审核群组 ID                   |
-| CommentGroup        | string | ""                                             |      | 评论群组 ID                   |
-| SubGroup            | string | ""                                             |      | 闲聊群组 ID                   |
-| AcceptChannel       | string | ""                                             | √    | 审核通过频道 ID               |
-| RejectChannel       | string | ""                                             | √    | 审核拒绝频道 ID               |
-| AutoLeaveOtherGroup | bool   | false                                          |      | 是否自动离开无关群组          |
+| Proxy               | string | null                                           | √    | 代理地址, 支持 http 和 sock5            |
+| DBHost              | string | "127.0.0.1"                                    | √    | MySQL 主机                              |
+| DBPort              | int    | 3306                                           | √    | MySQL 端口                              |
+| DBName              | string | "xjb_db"                                       | √    | 数据库名                                |
+| DBUser              | string | "root"                                         | √    | 数据库用户名                            |
+| DBPassword          | string | "123456"                                       | √    | 数据库密码                              |
+| DBGenerate          | bool   | true                                           |      | 是否自动生成数据库表                    |
+| SuperAdmins         | int[]  | []                                             |      | 超级管理员 数字 ID 列表                 |
+| ReviewGroup         | string | ""                                             |      | 审核群组 ID                             |
+| CommentGroup        | string | ""                                             |      | 评论群组 ID                             |
+| SubGroup            | string | ""                                             |      | 闲聊群组 ID                             |
+| AcceptChannel       | string | ""                                             | √    | 审核通过频道 ID                         |
+| RejectChannel       | string | ""                                             | √    | 审核拒绝频道 ID                         |
+| AutoLeaveOtherGroup | bool   | false                                          |      | 是否自动离开无关群组                    |
 
 > 新安装或者数据库结构变动后一定要修改 `DBGenerate` 为 `true`, 会自动生成数据表
 
@@ -182,6 +182,7 @@
 | /echo      | \[UserName/UserID\] 消息 | 通过机器人向指定用户发送消息 |
 | /queryuser | 关键词 \[页码\]          | 通过关键词查找用户           |
 | /sysreport | -                        | 查看机器人统计信息           |
+| /invite    | -                        | 生成审核群的邀请链接         |
 
 - 超级管理员命令
 
