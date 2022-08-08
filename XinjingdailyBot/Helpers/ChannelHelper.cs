@@ -120,6 +120,15 @@ namespace XinjingdailyBot.Helpers
                 Logger.Error("未找到指定的闲聊群组, 可以使用 /groupinfo 命令获取群组信息");
                 SubGroup = new() { Id = -1 };
             }
+
+            if (SubGroup.Id == -1 && CommentGroup.Id != -1)
+            {
+                SubGroup = CommentGroup;
+            }
+            else if (CommentGroup.Id == -1 && SubGroup.Id != -1)
+            {
+                CommentGroup = SubGroup;
+            }
         }
     }
 }
