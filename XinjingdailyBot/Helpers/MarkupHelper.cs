@@ -28,7 +28,7 @@ namespace XinjingdailyBot.Helpers
         private static readonly string RejectDuplicate = "重复";
         private static readonly string RejectBoring = "无趣";
         private static readonly string RejectConfusing = "没懂";
-        private static readonly string RejectQRCode = "二维码";
+        private static readonly string RejectQRCode = "广告";
         private static readonly string RejectDeny = "内容不合适";
         private static readonly string RejectOther = "其他原因";
 
@@ -139,7 +139,7 @@ namespace XinjingdailyBot.Helpers
 
                 foreach (var group in groups)
                 {
-                    string name = targetUser.GroupID == group.Id ? $"当前用户组: [ {group.Name} ]" : group.Name;
+                    string name = targetUser.GroupID == group.Id ? $"当前用户组: [ {group.Id}. {group.Name} ]" : group.Name;
                     string data = $"cmd {dbUser.UserID} setusergroup {targetUser.UserID} {group.Id}";
 
                     btns.Add(new()
