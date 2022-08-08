@@ -18,6 +18,11 @@
         public string Welecome { get; set; } = "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人";
 
         /// <summary>
+        /// 忽略机器人离线时的Update
+        /// </summary>
+        public bool ThrowPendingUpdates { get; set; } = false;
+
+        /// <summary>
         /// 代理链接, 默认 null
         /// </summary>
         public string? Proxy { get; set; }
