@@ -40,6 +40,12 @@ namespace XinjingdailyBot.Handlers.Messages
             bool isReviewGroup = isGroupChat && message.Chat.Id == ReviewGroup.Id;
             bool isConfigedGroup = isCommentGroup || isSubGroup || isReviewGroup;
 
+            //尚未设置评论群或者讨论群时始终处理所有群组的消息
+            if (CommentGroup.Id == -1 || SubGroup.Id == -1)
+            {
+                isConfigedGroup = isGroupChat;
+            }
+
             //取消绑定子频道的消息置顶
             if (dbUser.UserID == 777000)//Telegram
             {
@@ -71,7 +77,7 @@ namespace XinjingdailyBot.Handlers.Messages
 
             switch (message.Type)
             {
-                case MessageType.Text when isCommand:
+                case MessageType.Text when (isConfigedGroup || isPrivateChat) && isCommand:
                     await CommandHandler.HandleCommand(botClient, dbUser, message);
                     break;
 
@@ -104,7 +110,14 @@ namespace XinjingdailyBot.Handlers.Messages
                     if (isGroupChat && !isConfigedGroup && BotConfig.AutoLeaveOtherGroup)
                     {
                         Logger.Warn($"S 自动退出未设置的群组");
-                        await botClient.LeaveChatAsync(message.Chat);
+                        try
+                        {
+                            await botClient.LeaveChatAsync(message.Chat.Id);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Error($"S 自动退出群组 {message.Chat.ChatProfile()} 失败 {ex}");
+                        }
                     }
                     break;
 
