@@ -479,5 +479,46 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             await botClient.SendCommandReply(sb.ToString(), message, true, ParseMode.Html);
         }
+
+        /// <summary>
+        /// 创建审核群的邀请链接
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        internal static async Task ResponseInviteToReviewGroup(ITelegramBotClient botClient, Users dbUser, Message message)
+        {
+            if (ReviewGroup.Id == -1)
+            {
+                await botClient.SendCommandReply("尚未设置审核群, 无法完成此操作", message);
+                return;
+            }
+
+            if(message.Chat.Type != ChatType.Private)
+            {
+                await botClient.SendCommandReply("该命令仅限私聊使用", message);
+                return;
+            }
+
+            try
+            {
+                var inviteLink = await botClient.CreateChatInviteLinkAsync(ReviewGroup.Id,$"{dbUser} 创建的邀请链接", DateTime.Now.AddHours(1), 1, false);
+
+                StringBuilder sb = new();
+
+                sb.AppendLine($"创建 {ReviewGroup.Title} 的邀请链接成功, 一小时内有效, 仅限1人使用");
+                sb.AppendLine($"<a href=\"{inviteLink.InviteLink}\">{TextHelper.EscapeHtml(inviteLink.Name ?? inviteLink.InviteLink)}</a>");
+
+                Logger.Debug(sb.ToString());
+
+                await botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
+            }
+            catch
+            {
+                await botClient.SendCommandReply("创建邀请链接失败, 可能未给予机器人邀请权限", message);
+                throw;
+            }
+        }
     }
 }
