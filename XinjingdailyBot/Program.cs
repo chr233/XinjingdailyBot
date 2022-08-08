@@ -3,7 +3,6 @@ using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Helpers;
-using XinjingdailyBot.Tasks;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot
@@ -69,12 +68,13 @@ namespace XinjingdailyBot
                     pollingErrorHandler: Handlers.UpdateDispatcher.HandleErrorAsync,
                     receiverOptions: new ReceiverOptions()
                     {
-                        AllowedUpdates = Array.Empty<UpdateType>()
+                        AllowedUpdates = Array.Empty<UpdateType>(),
+                        ThrowPendingUpdates = BotConfig.ThrowPendingUpdates,
                     },
                     cancellationToken: cts.Token
                 );
 
-                //TaskHelper.InitTasks(botClient);
+                TaskHelper.InitTasks(botClient);
 
                 Logger.Info("--开始运行, Ctrl+C 结束运行--");
                 exitEvent.WaitOne();

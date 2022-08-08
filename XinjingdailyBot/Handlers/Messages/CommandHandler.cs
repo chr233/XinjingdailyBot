@@ -142,6 +142,7 @@ namespace XinjingdailyBot.Handlers.Messages
                     await NormalCmd.ResponseAnymouse(botClient, dbUser, message);
                     break;
 
+                case "NOTIFICATE" when normal:
                 case "NOTIFICATION" when normal:
                     await NormalCmd.ResponseNotification(botClient, dbUser, message);
                     break;
