@@ -11,6 +11,8 @@ namespace XinjingdailyBot.Handlers.Messages
 {
     internal static class PostHandler
     {
+        private static int MaxPostText { get; } = 2000;
+
         /// <summary>
         /// 处理文字投稿
         /// </summary>
@@ -28,6 +30,18 @@ namespace XinjingdailyBot.Handlers.Messages
             if (ReviewGroup.Id == -1)
             {
                 await botClient.AutoReplyAsync("尚未设置投稿群组, 无法接收投稿", message);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(message.Text))
+            {
+                await botClient.AutoReplyAsync("文本为空, 无法创建投稿", message);
+                return;
+            }
+
+            if (message.Text!.Length > MaxPostText)
+            {
+                await botClient.AutoReplyAsync($"文本长度超过上限 {MaxPostText}, 无法创建投稿", message);
                 return;
             }
 

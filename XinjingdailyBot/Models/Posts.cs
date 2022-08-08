@@ -58,12 +58,12 @@ namespace XinjingdailyBot.Models
         /// <summary>
         /// 投稿描述(过滤#标签和链接)
         /// </summary>
-        [SugarColumn(ColumnDataType = "Nvarchar(255)")]
+        [SugarColumn(ColumnDataType = "Nvarchar(2000)")]
         public string Text { get; set; } = "";
         /// <summary>
         /// 投稿原始描述
         /// </summary>
-        [SugarColumn(ColumnDataType = "Nvarchar(255)")]
+        [SugarColumn(ColumnDataType = "Nvarchar(2000)")]
         public string RawText { get; set; } = "";
 
         /// <summary>
