@@ -32,6 +32,7 @@ namespace XinjingdailyBot.Helpers
                 ConnectionString = dbString,
                 DbType = DbType.MySql,
                 IsAutoCloseConnection = true,
+                LanguageType = LanguageType.English,
             });
 
             if (config.Debug)//打印SQL (异步模式貌似没有用)
@@ -61,7 +62,7 @@ namespace XinjingdailyBot.Helpers
 
             if (!ULevels.ContainsKey(1) || !UGroups.ContainsKey(1))
             {
-
+                Logger.Info("添加默认权限组和等级组");
                 await AddBuildInValues();
             }
 
@@ -71,7 +72,7 @@ namespace XinjingdailyBot.Helpers
             }
             else
             {
-                throw new Exception("不存在 Id 为 1 的权限组, 请重建数据库");
+                throw new Exception("不存在 Id 为 1 的默认权限组, 请重建数据库");
             }
         }
 
@@ -94,7 +95,6 @@ namespace XinjingdailyBot.Helpers
             {
                 UGroups.Add(right.Id, right);
             }
-
         }
 
         /// <summary>
