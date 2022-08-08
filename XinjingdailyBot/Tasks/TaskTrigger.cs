@@ -1,5 +1,4 @@
 ﻿using Telegram.Bot;
-using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Tasks
 {
