@@ -13,6 +13,11 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
     internal static class AdminCmd
     {
         /// <summary>
+        /// 被警告超过此值自动封禁
+        /// </summary>
+        private const int WarningLimit = 3;
+
+        /// <summary>
         /// 获取群组信息
         /// </summary>
         /// <param name="dbUser"></param>
@@ -154,7 +159,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                     {
                         UserID = targetUser.UserID,
                         OperatorUID = dbUser.UserID,
-                        IsBan = true,
+                        Type = BanType.Ban,
                         BanTime = DateTime.Now,
                         Reason = reason,
                     };
@@ -227,7 +232,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                     {
                         UserID = targetUser.UserID,
                         OperatorUID = dbUser.UserID,
-                        IsBan = false,
+                        Type = BanType.UnBan,
                         BanTime = DateTime.Now,
                         Reason = reason,
                     };
@@ -237,7 +242,114 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                     StringBuilder sb = new();
                     sb.AppendLine($"成功解封 {TextHelper.HtmlUserLink(targetUser)}");
                     sb.AppendLine($"操作员 {TextHelper.HtmlUserLink(dbUser)}");
-                    sb.AppendLine($"封禁理由 <code>{reason}</code>");
+                    sb.AppendLine($"解封理由 <code>{reason}</code>");
+                    return sb.ToString();
+                }
+            }
+
+            string text = await exec();
+            await botClient.SendCommandReply(text, message, false, parsemode: ParseMode.Html);
+        }
+
+        /// <summary>
+        /// 警告用户
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        internal static async Task ResponseWarning(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
+        {
+            async Task<string> exec()
+            {
+                var targetUser = await FetchUserHelper.FetchTargetUser(message);
+
+                if (targetUser == null)
+                {
+                    if (args.Any())
+                    {
+                        targetUser = await FetchUserHelper.FetchDbUserByUserNameOrUserID(args.First());
+                        args = args[1..];
+                    }
+                }
+
+                if (targetUser == null)
+                {
+                    return "找不到指定用户";
+                }
+
+                if (targetUser.Id == dbUser.Id)
+                {
+                    return "无法对自己进行操作";
+                }
+
+                if (targetUser.GroupID >= dbUser.GroupID)
+                {
+                    return "无法对同级管理员进行此操作";
+                }
+
+                string reason = args.Any() ? string.Join(' ', args) : "【未指定理由】";
+
+                if (targetUser.IsBan)
+                {
+                    return "当前用户已被封禁, 无法再发送警告";
+                }
+                else
+                {
+                    //获取最近一条解封记录
+                    var lastUnbaned = await DB.Queryable<BanRecords>().Where(x => x.UserID == targetUser.UserID && (x.Type == BanType.UnBan || x.Type == BanType.Ban))
+                        .OrderByDescending(x => x.BanTime).FirstAsync();
+
+                    int warnCount;
+                    if (lastUnbaned == null)
+                    {
+                        warnCount = await DB.Queryable<BanRecords>().Where(x => x.UserID == targetUser.UserID && x.Type == BanType.Warning).CountAsync();
+                    }
+                    else
+                    {
+                        warnCount = await DB.Queryable<BanRecords>().Where(x => x.UserID == targetUser.UserID && x.Type == BanType.Warning && x.BanTime >= lastUnbaned.BanTime).CountAsync();
+                    }
+
+                    var record = new BanRecords()
+                    {
+                        UserID = targetUser.UserID,
+                        OperatorUID = dbUser.UserID,
+                        Type = BanType.Warning,
+                        BanTime = DateTime.Now,
+                        Reason = reason,
+                    };
+
+                    await DB.Insertable(record).ExecuteCommandAsync();
+
+                    warnCount++;
+
+                    StringBuilder sb = new();
+                    sb.AppendLine($"成功警告 {TextHelper.HtmlUserLink(targetUser)}");
+                    sb.AppendLine($"操作员 {TextHelper.HtmlUserLink(dbUser)}");
+                    sb.AppendLine($"警告理由 <code>{reason}</code>");
+                    sb.AppendLine($"累计警告 <code>{warnCount}</code> / <code>{WarningLimit}</code> 次");
+
+                    if (warnCount >= WarningLimit)
+                    {
+                        record = new BanRecords()
+                        {
+                            UserID = targetUser.UserID,
+                            OperatorUID = 0,
+                            Type = BanType.Ban,
+                            BanTime = DateTime.Now,
+                            Reason = $"受到警告过多, 系统自动封禁 {reason}",
+                        };
+
+                        await DB.Insertable(record).ExecuteCommandAsync();
+
+                        targetUser.IsBan = true;
+                        targetUser.ModifyAt = DateTime.Now;
+                        await DB.Updateable(targetUser).UpdateColumns(x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
+
+                        sb.AppendLine($"受到警告过多, 系统自动封禁该用户");
+                    }
+
                     return sb.ToString();
                 }
             }
@@ -292,11 +404,33 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 }
                 else
                 {
+                    var operators = records.Select(x => x.OperatorUID).Distinct();
+
+                    var users = await DB.Queryable<Users>().Where(x => operators.Contains(x.UserID)).Distinct().ToListAsync();
+
                     foreach (var record in records)
                     {
                         string date = record.BanTime.ToString("d");
-                        string operate = record.IsBan ? "封禁" : "解封";
-                        sb.AppendLine($"在 <code>{date}</code> 因为 <code>{record.Reason}</code> 被 <code>{record.OperatorUID}</code> {operate}");
+                        string operate = record.Type switch
+                        {
+                            BanType.UnBan => "解封",
+                            BanType.Ban => "封禁",
+                            BanType.Warning => "警告",
+                            _ => "未知",
+                        };
+
+                        string admin;
+                        if (record.OperatorUID == 0)
+                        {
+                            admin = "系统";
+                        }
+                        else
+                        {
+                            var user = users.Find(x => x.UserID == record.OperatorUID);
+                            admin = user != null ? user.UserNick : record.OperatorUID.ToString();
+                        }
+
+                        sb.AppendLine($"在 <code>{date}</code> 因为 <code>{record.Reason}</code> 被 <code>{admin}</code> {operate}");
                     }
                 }
             }
@@ -311,7 +445,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        internal static async Task ResponseEcho(ITelegramBotClient botClient, Message message, string[] args)
+        internal static async Task ResponseEcho(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
         {
             bool autoDelete = true;
             async Task<string> exec()
@@ -330,6 +464,11 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 if (targetUser == null)
                 {
                     return "找不到指定用户";
+                }
+
+                if (targetUser.UserID == dbUser.UserID)
+                {
+                    return "为什么有人想要自己回复自己?";
                 }
 
                 if (targetUser.PrivateChatID <= 0)
@@ -495,7 +634,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 return;
             }
 
-            if(message.Chat.Type != ChatType.Private)
+            if (message.Chat.Type != ChatType.Private)
             {
                 await botClient.SendCommandReply("该命令仅限私聊使用", message);
                 return;
@@ -503,7 +642,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             try
             {
-                var inviteLink = await botClient.CreateChatInviteLinkAsync(ReviewGroup.Id,$"{dbUser} 创建的邀请链接", DateTime.Now.AddHours(1), 1, false);
+                var inviteLink = await botClient.CreateChatInviteLinkAsync(ReviewGroup.Id, $"{dbUser} 创建的邀请链接", DateTime.Now.AddHours(1), 1, false);
 
                 StringBuilder sb = new();
 

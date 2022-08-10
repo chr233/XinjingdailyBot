@@ -7,8 +7,11 @@ namespace XinjingdailyBot.Models
     /// 用户封禁记录
     /// </summary>
     [SugarTable("ban", TableDescription = "用户封禁记录户表")]
-    [SugarIndex("index_userid", nameof(UserID), OrderByType.Asc, true)]
+    [SugarIndex("index_userid", nameof(UserID), OrderByType.Asc)]
     [SugarIndex("index_operatorid", nameof(OperatorUID), OrderByType.Asc)]
+    [SugarIndex("index_userid_type", nameof(UserID), OrderByType.Asc, nameof(Type), OrderByType.Asc)]
+    [SugarIndex("index_userid_bantime", nameof(UserID), OrderByType.Asc, nameof(BanTime), OrderByType.Desc)]
+
     internal sealed class BanRecords
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
