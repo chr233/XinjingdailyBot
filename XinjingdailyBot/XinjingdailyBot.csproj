@@ -22,7 +22,7 @@
   <ItemGroup>
     <PackageReference Include="MySql.Data" Version="8.0.30" />
     <PackageReference Include="NLog" Version="5.0.1" />
-    <PackageReference Include="SqlSugarCore" Version="5.1.0" />
+    <PackageReference Include="SqlSugarCore" Version="5.1.1" />
     <PackageReference Include="Telegram.Bot" Version="18.0.0" />
   </ItemGroup>
 
