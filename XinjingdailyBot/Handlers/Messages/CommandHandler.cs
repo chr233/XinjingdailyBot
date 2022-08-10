@@ -165,6 +165,8 @@ namespace XinjingdailyBot.Handlers.Messages
                     await AdminCmd.ResponseGroupInfo(botClient, message);
                     break;
 
+                case "INFO" when admin:
+                case "UINFO" when admin:
                 case "USERINFO" when admin:
                     await AdminCmd.ResponseUserInfo(botClient, message, args);
                     break;
@@ -179,15 +181,23 @@ namespace XinjingdailyBot.Handlers.Messages
                     autoDelete = false;
                     break;
 
+                case "WARN" when admin:
+                case "WARNING" when admin:
+                    await AdminCmd.ResponseWarning(botClient, dbUser, message, args);
+                    autoDelete = false;
+                    break;
+
+                case "QBAN" when admin:
                 case "QUERYBAN" when admin:
                     await AdminCmd.ResponseQueryBan(botClient, message, args);
                     break;
 
                 case "ECHO" when admin:
-                    await AdminCmd.ResponseEcho(botClient, message, args);
+                    await AdminCmd.ResponseEcho(botClient, dbUser,message, args);
                     autoDelete = false;
                     break;
 
+                case "QUSER" when admin:
                 case "QUERYUSER" when admin:
                 case "SEARCHUSER" when admin:
                     await AdminCmd.ResponseSearchUser(botClient, dbUser, message, args);

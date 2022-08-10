@@ -196,8 +196,14 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 foreach (var record in records)
                 {
                     string date = record.BanTime.ToString("d");
-                    string operate = record.IsBan ? "受到封禁" : "被解封";
-                    sb.AppendLine($"在 <code>{date}</code> 因为 <code>{record.Reason}</code> {operate}");
+                    string operate = record.Type switch
+                    {
+                        BanType.UnBan => "解封",
+                        BanType.Ban => "封禁",
+                        BanType.Warning => "警告",
+                        _ => "其他",
+                    };
+                    sb.AppendLine($"在 <code>{date}</code> 因为 <code>{record.Reason}</code> 被 {operate}");
                 }
             }
 
