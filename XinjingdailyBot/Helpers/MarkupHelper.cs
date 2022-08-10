@@ -139,7 +139,7 @@ namespace XinjingdailyBot.Helpers
 
                 foreach (var group in groups)
                 {
-                    string name = targetUser.GroupID == group.Id ? $"当前用户组: [ {group.Id}. {group.Name} ]" : group.Name;
+                    string name = targetUser.GroupID == group.Id ? $"当前用户组: [ {group.Id}. {group.Name} ]" : $"{group.Id}. {group.Name}";
                     string data = $"cmd {dbUser.UserID} setusergroup {targetUser.UserID} {group.Id}";
 
                     btns.Add(new()
