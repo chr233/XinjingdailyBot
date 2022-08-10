@@ -1,4 +1,5 @@
 ﻿using SqlSugar;
+using XinjingdailyBot.Enums;
 
 namespace XinjingdailyBot.Models
 {
@@ -8,7 +9,7 @@ namespace XinjingdailyBot.Models
     [SugarTable("ban", TableDescription = "用户封禁记录户表")]
     [SugarIndex("index_userid", nameof(UserID), OrderByType.Asc, true)]
     [SugarIndex("index_operatorid", nameof(OperatorUID), OrderByType.Asc)]
-    public class BanRecords
+    internal sealed class BanRecords
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public long Id { get; set; }
@@ -23,7 +24,7 @@ namespace XinjingdailyBot.Models
         /// <summary>
         /// 是否封禁 true: 封禁, false: 解封
         /// </summary>
-        public bool IsBan { get; set; } = true;
+        public BanType Type { get; set; } = BanType.UnBan;
         /// <summary>
         /// 封禁时间
         /// </summary>
