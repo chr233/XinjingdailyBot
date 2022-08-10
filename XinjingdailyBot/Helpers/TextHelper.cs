@@ -17,7 +17,7 @@ namespace XinjingdailyBot.Helpers
         }
 
         /// <summary>
-        /// 去除无用文本内容
+        /// 去除所有HashTag和连续换行
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -28,8 +28,10 @@ namespace XinjingdailyBot.Helpers
                 return "";
             }
 
+            //过滤HashTag
             text = MatchTag.Replace(text, "");
 
+            //过滤连续换行
             var parts = text.Split('\n', StringSplitOptions.RemoveEmptyEntries).Where(x => !MatchSpace.IsMatch(x)).Select(x => x.Trim());
 
             return string.Join('\n', parts);
@@ -113,12 +115,20 @@ namespace XinjingdailyBot.Helpers
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        internal static string EscapeHtml(string text)
+        internal static string EscapeHtml(string? text)
         {
-            string escapedText = text.Replace("<", "&lt;")
-                .Replace(">", "&gt;")
-                .Replace("&", "&amp;");
-            return escapedText;
+            if (string.IsNullOrEmpty(text))
+            {
+                return "";
+            }
+            else
+            {
+                string escapedText = text
+                    .Replace("<", "＜")
+                    .Replace(">", "＞")
+                    .Replace("&", "＆");
+                return escapedText;
+            }
         }
 
         /// <summary>
@@ -316,7 +326,7 @@ namespace XinjingdailyBot.Helpers
 
             if (!string.IsNullOrEmpty(post.Text))
             {
-                string text = EscapeHtml(post.Text);
+                string text = post.Text;
                 sb.AppendLine(text);
             }
 

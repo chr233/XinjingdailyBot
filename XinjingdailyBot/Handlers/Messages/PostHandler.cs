@@ -5,6 +5,7 @@ using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Enums;
 using XinjingdailyBot.Helpers;
 using XinjingdailyBot.Models;
+using XinjingdailyBot.Parser;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Messages
@@ -53,7 +54,7 @@ namespace XinjingdailyBot.Handlers.Messages
             }
 
             BuildInTags tags = TextHelper.FetchTags(message.Text);
-            string text = TextHelper.PureText(message.Text);
+            string text = MessageEntitiesParser.ParseMessage(message);
 
             bool anymouse = dbUser.PreferAnymouse;
 
@@ -117,7 +118,7 @@ namespace XinjingdailyBot.Handlers.Messages
             }
 
             BuildInTags tags = TextHelper.FetchTags(message.Caption);
-            string text = TextHelper.PureText(message.Caption);
+            string text = MessageEntitiesParser.ParseMessage(message);
 
             bool anymouse = dbUser.PreferAnymouse;
 
@@ -201,7 +202,7 @@ namespace XinjingdailyBot.Handlers.Messages
                     }
 
                     BuildInTags tags = TextHelper.FetchTags(message.Caption);
-                    string text = TextHelper.PureText(message.Caption);
+                    string text = MessageEntitiesParser.ParseMessage(message);
 
                     bool anymouse = dbUser.PreferAnymouse;
 
