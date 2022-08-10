@@ -9,7 +9,7 @@ namespace XinjingdailyBot.Models
     [SugarIndex("index_cid", nameof(ChatID), OrderByType.Asc)]
     [SugarIndex("index_mid", nameof(MessageID), OrderByType.Asc)]
     [SugarIndex("index_uid", nameof(UserID), OrderByType.Asc)]
-    internal class CmdRecords
+    internal sealed class CmdRecords
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public long Id { get; set; }

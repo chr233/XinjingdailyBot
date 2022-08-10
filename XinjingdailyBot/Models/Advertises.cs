@@ -3,7 +3,7 @@
 namespace XinjingdailyBot.Models
 {
     [SugarTable("ad", TableDescription = "广告投放")]
-    internal class Advertises
+    internal sealed class Advertises
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public long Id { get; set; }
