@@ -330,6 +330,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                     sb.AppendLine($"警告理由 <code>{reason}</code>");
                     sb.AppendLine($"累计警告 <code>{warnCount}</code> / <code>{WarningLimit}</code> 次");
 
+                    //TODO 添加用户提示
+
                     if (warnCount >= WarningLimit)
                     {
                         record = new BanRecords()
@@ -338,7 +340,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                             OperatorUID = 0,
                             Type = BanType.Ban,
                             BanTime = DateTime.Now,
-                            Reason = $"受到警告过多, 系统自动封禁 {reason}",
+                            Reason = "受到警告过多, 自动封禁",
                         };
 
                         await DB.Insertable(record).ExecuteCommandAsync();
