@@ -547,11 +547,29 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         internal static async Task ResponseSystemReport(ITelegramBotClient botClient, Message message)
         {
             DateTime now = DateTime.Now;
+            DateTime lastWeek = now.AddDays(7).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             DateTime monthStart = now.AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             DateTime yearStart = now.AddMonths(1 - now.Month).AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             DateTime prev30Days = now.AddDays(-30);
 
             StringBuilder sb = new();
+
+            var weekPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status > PostStatus.Cancel).CountAsync();
+            var weekAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status == PostStatus.Accepted).CountAsync();
+            var weekRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status == PostStatus.Rejected).CountAsync();
+
+            sb.AppendLine($"-- 最近7天统计 --");
+            sb.AppendLine($"接受投稿: <code>{weekAcceptPost}</code>");
+            sb.AppendLine($"拒绝投稿: <code>{weekRejectPost}</code>");
+            if (weekPost > 0)
+            {
+                sb.AppendLine($"通过率: <code>{(100 * weekAcceptPost / weekPost).ToString("f2")}%</code>");
+            }
+            else
+            {
+                sb.AppendLine("通过率: <code> --%</code>");
+            }
+            sb.AppendLine($"累计投稿: <code>{weekPost}</code>");
 
             var monthPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status > PostStatus.Cancel).CountAsync();
             var monthAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Accepted).CountAsync();
