@@ -25,11 +25,12 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         private static Dictionary<string, string> AdminCmds { get; } = new()
         {
             { "userinfo", "查询用户信息" },
+            { "warn", "警告指定用户" },
             { "ban", "封禁指定用户" },
             { "unban", "解封指定用户" },
             { "queryban", "查询封禁记录" },
-            { "sysreport", "查询系统统计数据" },
             { "queryuser", "搜索用户" },
+            { "sysreport", "查询系统统计数据" },
         };
 
         private static Dictionary<string, string> SuperCmds { get; } = new()
