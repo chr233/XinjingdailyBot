@@ -33,16 +33,17 @@ namespace XinjingdailyBot.Helpers
                 DbType = DbType.MySql,
                 IsAutoCloseConnection = true,
                 LanguageType = LanguageType.English,
-            });
-
-            if (config.Debug)//打印SQL (异步模式貌似没有用)
+            },
+            db =>
             {
-                DB.Aop.OnLogExecuted = (sql, pars) =>
+                if (config.Debug)//打印SQL (异步模式貌似没有用)
                 {
-                    //Logger.Debug(sql);
-                    Logger.Debug(UtilMethods.GetSqlString(DbType.SqlServer, sql, pars));
-                };
-            }
+                    db.Aop.OnLogExecuting = (sql, pars) =>
+                    {
+                        Logger.Debug(UtilMethods.GetSqlString(DbType.SqlServer, sql, pars));
+                    };
+                }
+            });
 
             if (config.DBGenerate)// 重建数据表
             {
