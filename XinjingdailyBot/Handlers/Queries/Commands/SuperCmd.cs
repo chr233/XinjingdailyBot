@@ -1,8 +1,5 @@
-﻿using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.ReplyMarkups;
+﻿using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Helpers;
-using XinjingdailyBot.Models;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Queries.Commands

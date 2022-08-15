@@ -1,6 +1,4 @@
-﻿using Telegram.Bot;
-using Telegram.Bot.Types;
-using static XinjingdailyBot.Utils;
+﻿using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Helpers
 {

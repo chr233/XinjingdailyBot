@@ -1,7 +1,4 @@
-﻿using System.Text;
-using System.Text.RegularExpressions;
-using XinjingdailyBot.Enums;
-using XinjingdailyBot.Models;
+﻿using System.Text.RegularExpressions;
 
 namespace XinjingdailyBot.Helpers
 {

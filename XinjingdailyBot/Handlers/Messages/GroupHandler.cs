@@ -1,9 +1,4 @@
-﻿using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using XinjingdailyBot.Enums;
-using XinjingdailyBot.Localization;
-using XinjingdailyBot.Models;
+﻿using XinjingdailyBot.Localization;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Messages

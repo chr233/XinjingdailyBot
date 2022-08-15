@@ -1,9 +1,4 @@
-﻿using System.Text;
-using Telegram.Bot;
-using Telegram.Bot.Types.Enums;
-using XinjingdailyBot.Enums;
-using XinjingdailyBot.Models;
-using static XinjingdailyBot.Utils;
+﻿using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Tasks
 {

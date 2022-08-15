@@ -1,8 +1,4 @@
-﻿using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using XinjingdailyBot.Models;
-
-namespace XinjingdailyBot.Helpers
+﻿namespace XinjingdailyBot.Helpers
 {
     internal static class AttachmentHelpers
     {

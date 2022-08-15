@@ -1,11 +1,5 @@
-﻿using System.Text;
-using SqlSugar;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using XinjingdailyBot.Enums;
+﻿using SqlSugar;
 using XinjingdailyBot.Helpers;
-using XinjingdailyBot.Models;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Messages.Commands

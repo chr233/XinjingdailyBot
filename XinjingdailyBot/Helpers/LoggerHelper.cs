@@ -1,7 +1,4 @@
 ﻿using NLog;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using XinjingdailyBot.Models;
 
 namespace XinjingdailyBot.Helpers
 {
