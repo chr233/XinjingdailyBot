@@ -1,6 +1,4 @@
-﻿using Telegram.Bot;
-
-namespace XinjingdailyBot.Tasks
+﻿namespace XinjingdailyBot.Tasks
 {
     internal static class TaskTrigger
     {

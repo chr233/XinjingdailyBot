@@ -1,5 +1,4 @@
-﻿using Telegram.Bot;
-using XinjingdailyBot.Tasks;
+﻿using XinjingdailyBot.Tasks;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Helpers

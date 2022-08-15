@@ -1,6 +1,4 @@
 ﻿using SqlSugar;
-using Telegram.Bot.Types.Enums;
-using XinjingdailyBot.Enums;
 
 namespace XinjingdailyBot.Models
 {

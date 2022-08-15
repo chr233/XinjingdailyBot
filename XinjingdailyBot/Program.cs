@@ -1,7 +1,5 @@
 ﻿using System.Net;
-using Telegram.Bot;
 using Telegram.Bot.Polling;
-using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Helpers;
 using static XinjingdailyBot.Utils;
 

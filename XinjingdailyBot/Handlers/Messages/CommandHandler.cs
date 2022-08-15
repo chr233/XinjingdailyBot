@@ -1,10 +1,5 @@
-﻿using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using XinjingdailyBot.Enums;
-using XinjingdailyBot.Handlers.Messages.Commands;
+﻿using XinjingdailyBot.Handlers.Messages.Commands;
 using XinjingdailyBot.Helpers;
-using XinjingdailyBot.Models;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Messages
@@ -193,7 +188,7 @@ namespace XinjingdailyBot.Handlers.Messages
                     break;
 
                 case "ECHO" when admin:
-                    await AdminCmd.ResponseEcho(botClient, dbUser,message, args);
+                    await AdminCmd.ResponseEcho(botClient, dbUser, message, args);
                     autoDelete = false;
                     break;
 

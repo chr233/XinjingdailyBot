@@ -1,6 +1,4 @@
-﻿using Telegram.Bot.Types;
-
-namespace XinjingdailyBot.Helpers
+﻿namespace XinjingdailyBot.Helpers
 {
     internal static class ChatHelper
     {

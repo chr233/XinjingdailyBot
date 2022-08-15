@@ -1,10 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using XinjingdailyBot.Enums;
 using XinjingdailyBot.Helpers;
-using XinjingdailyBot.Models;
 using XinjingdailyBot.Parser;
 using static XinjingdailyBot.Utils;
 

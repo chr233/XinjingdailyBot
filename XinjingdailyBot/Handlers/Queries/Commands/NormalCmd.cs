@@ -1,6 +1,4 @@
-﻿using Telegram.Bot;
-using Telegram.Bot.Types;
-using XinjingdailyBot.Helpers;
+﻿using XinjingdailyBot.Helpers;
 
 namespace XinjingdailyBot.Handlers.Queries.Commands
 {
