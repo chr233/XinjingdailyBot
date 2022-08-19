@@ -3,6 +3,7 @@ using System.Text.Json;
 using XinjingdailyBot.Converters;
 using XinjingdailyBot.Storage;
 using static XinjingdailyBot.Utils;
+using File = System.IO.File;
 
 namespace XinjingdailyBot.Helpers
 {
