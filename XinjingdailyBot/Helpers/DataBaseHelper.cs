@@ -1,4 +1,5 @@
-﻿using SqlSugar;
+﻿using Google.Protobuf.WellKnownTypes;
+using SqlSugar;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Helpers
@@ -38,7 +39,20 @@ namespace XinjingdailyBot.Helpers
                 {
                     db.Aop.OnLogExecuting = (sql, pars) =>
                     {
+                        if (sql.StartsWith("SELECT"))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                        }
+                        if (sql.StartsWith("UPDATE") || sql.StartsWith("INSERT"))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                        }
+                        if (sql.StartsWith("DELETE"))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                        }
                         Logger.Debug(UtilMethods.GetSqlString(DbType.SqlServer, sql, pars));
+                        Console.ForegroundColor = ConsoleColor.White;
                     };
                 }
             });
