@@ -1,5 +1,4 @@
 ﻿using XinjingdailyBot.Helpers;
-using XinjingdailyBot.Localization;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Handlers.Messages

@@ -1,5 +1,4 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using SqlSugar;
+﻿using SqlSugar;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Helpers
