@@ -122,10 +122,10 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             if (functions.Count == 0) { functions.Add("无"); }
 
             List<string> commands = new();
-            if (superCmd) { functions.Add("所有命令"); }
-            if (adminCmd) { functions.Add("管理员命令"); }
-            if (normalCmd) { functions.Add("普通命令"); }
-            if (functions.Count == 0) { functions.Add("无"); }
+            if (superCmd) { commands.Add("所有命令"); }
+            if (adminCmd) { commands.Add("管理员命令"); }
+            if (normalCmd) { commands.Add("普通命令"); }
+            if (functions.Count == 0) { commands.Add("无"); }
 
             StringBuilder sb = new();
             sb.AppendLine($"用户名: <code>{userNick}</code>");
