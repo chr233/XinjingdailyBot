@@ -137,7 +137,11 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                     return "无法对同级管理员进行此操作";
                 }
 
-                string reason = args.Any() ? string.Join(' ', args) : "【未指定理由】";
+                string reason = string.Join(' ', args);
+                if (string.IsNullOrEmpty(reason))
+                {
+                    return "请指定封禁理由";
+                }
 
                 if (targetUser.IsBan)
                 {
@@ -159,6 +163,24 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                     };
 
                     await DB.Insertable(record).ExecuteCommandAsync();
+
+                    try
+                    {
+                        if (targetUser.PrivateChatID > 0)
+                        {
+                            string msg = string.Format(Langs.BanedUserTips, "管理员", reason);
+                            await botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg);
+                            await botClient.SendTextMessageAsync(targetUser.PrivateChatID, Langs.QueryBanDescribe);
+                        }
+                        else
+                        {
+                            Logger.Info("用户未私聊过机器人, 无法发送消息");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"发送私聊消息失败, {ex.Message}");
+                    }
 
                     StringBuilder sb = new();
                     sb.AppendLine($"成功封禁 {TextHelper.HtmlUserLink(targetUser)}");
@@ -210,7 +232,11 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                     return "无法对同级管理员进行此操作";
                 }
 
-                string reason = args.Any() ? string.Join(' ', args) : "【未指定理由】";
+                string reason = string.Join(' ', args);
+                if (string.IsNullOrEmpty(reason))
+                {
+                    return "请指定解封理由";
+                }
 
                 if (!targetUser.IsBan)
                 {
@@ -232,6 +258,24 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                     };
 
                     await DB.Insertable(record).ExecuteCommandAsync();
+
+                    try
+                    {
+                        if (targetUser.PrivateChatID > 0)
+                        {
+                            string msg = string.Format(Langs.UnbanedUserTips, "管理员", reason);
+                            await botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg);
+                            await botClient.SendTextMessageAsync(targetUser.PrivateChatID, Langs.QueryBanDescribe);
+                        }
+                        else
+                        {
+                            Logger.Info("用户未私聊过机器人, 无法发送消息");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"发送私聊消息失败, {ex.Message}");
+                    }
 
                     StringBuilder sb = new();
                     sb.AppendLine($"成功解封 {TextHelper.HtmlUserLink(targetUser)}");
@@ -283,7 +327,11 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                     return "无法对同级管理员进行此操作";
                 }
 
-                string reason = args.Any() ? string.Join(' ', args) : "【未指定理由】";
+                string reason = string.Join(' ', args);
+                if (string.IsNullOrEmpty(reason))
+                {
+                    return "请指定警告理由";
+                }
 
                 if (targetUser.IsBan)
                 {
@@ -324,8 +372,6 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                     sb.AppendLine($"警告理由 <code>{reason}</code>");
                     sb.AppendLine($"累计警告 <code>{warnCount}</code> / <code>{WarningLimit}</code> 次");
 
-                    //TODO 添加用户提示
-
                     if (warnCount >= WarningLimit)
                     {
                         record = new BanRecords()
@@ -344,6 +390,31 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                         await DB.Updateable(targetUser).UpdateColumns(x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
 
                         sb.AppendLine($"受到警告过多, 系统自动封禁该用户");
+                    }
+
+                    try
+                    {
+                        if (targetUser.PrivateChatID > 0)
+                        {
+                            string msg = string.Format(Langs.WarnUserTips, reason, warnCount, WarningLimit);
+                            await botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg, ParseMode.Html);
+
+                            if (warnCount >= WarningLimit)
+                            {
+                                msg = string.Format(Langs.BanedUserTips, "系统", "自动封禁");
+                                await botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg);
+                            }
+
+                            await botClient.SendTextMessageAsync(targetUser.PrivateChatID, Langs.QueryBanDescribe);
+                        }
+                        else
+                        {
+                            Logger.Info("用户未私聊过机器人, 无法发送消息");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"发送私聊消息失败, {ex.Message}");
                     }
 
                     return sb.ToString();
@@ -551,10 +622,10 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             var weekPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status > PostStatus.Cancel).CountAsync();
             var weekAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status == PostStatus.Accepted).CountAsync();
             var weekRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status == PostStatus.Rejected).CountAsync();
+            var weekExpiredPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status < 0).CountAsync();
 
             sb.AppendLine($"-- 最近7天统计 --");
-            sb.AppendLine($"接受投稿: <code>{weekAcceptPost}</code>");
-            sb.AppendLine($"拒绝投稿: <code>{weekRejectPost}</code>");
+            sb.AppendLine($"接受/拒绝: <code>{weekAcceptPost}</code> / <code>{weekRejectPost}</code>");
             if (weekPost > 0)
             {
                 sb.AppendLine($"通过率: <code>{(100 * weekAcceptPost / weekPost).ToString("f2")}%</code>");
@@ -563,7 +634,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             {
                 sb.AppendLine("通过率: <code> --%</code>");
             }
-            sb.AppendLine($"累计投稿: <code>{weekPost}</code>");
+            sb.AppendLine($"过期投稿: <code>{weekExpiredPost}</code>");
+            sb.AppendLine($"累计投稿: <code>{weekPost + weekExpiredPost}</code>");
 
             var monthPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status > PostStatus.Cancel).CountAsync();
             var monthAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Accepted).CountAsync();
