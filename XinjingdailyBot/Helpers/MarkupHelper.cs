@@ -1,5 +1,4 @@
 ﻿using Telegram.Bot.Types.ReplyMarkups;
-using XinjingdailyBot.Localization;
 using static XinjingdailyBot.Utils;
 
 namespace XinjingdailyBot.Helpers

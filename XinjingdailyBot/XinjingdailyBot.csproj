@@ -32,12 +32,21 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Emojis.resx</DependentUpon>
     </Compile>
+    <Compile Update="Localization\Langs.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Langs.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Update="Localization\Emojis.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Emojis.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Langs.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Langs.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 
