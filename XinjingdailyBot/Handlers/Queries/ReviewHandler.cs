@@ -103,7 +103,6 @@ namespace XinjingdailyBot.Handlers.Queries
         /// <param name="post"></param>
         /// <param name="dbUser"></param>
         /// <param name="rejectReason"></param>
-        /// <param name="callbackQuery"></param>
         /// <returns></returns>
         private static async Task RejectPostHelper(ITelegramBotClient botClient, Posts post, Users dbUser, RejectReason rejectReason)
         {
@@ -356,15 +355,15 @@ namespace XinjingdailyBot.Handlers.Queries
             //通知投稿人
             bool directPost = post.ManageMsgID == post.ActionMsgID;
 
-            string posterMsg = TextHelper.MakeNotification(post.IsDirectPost);
+            string posterMsg = TextHelper.MakeNotification(post.IsDirectPost, post.PublicMsgID);
 
             if (poster.Notification && poster.UserID != dbUser.UserID)//启用通知并且审核与投稿不是同一个人
             {//单独发送通知消息
-                await botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true);
+                await botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, ParseMode.Html, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true);
             }
             else
             {//静默模式, 不单独发送通知消息
-                await botClient.EditMessageTextAsync(post.OriginChatID, (int)post.ActionMsgID, posterMsg);
+                await botClient.EditMessageTextAsync(post.OriginChatID, (int)post.ActionMsgID, posterMsg, ParseMode.Html);
             }
 
             //增加通过数量

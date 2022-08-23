@@ -225,9 +225,11 @@ namespace XinjingdailyBot.Helpers
         /// </summary>
         /// <param name="rejectReason"></param>
         /// <returns></returns>
-        internal static string MakeNotification(bool isDirect)
+        internal static string MakeNotification(bool isDirect, long messageID)
         {
-            return isDirect ? "稿件已发布" : "稿件已通过, 感谢您的支持";
+            string msgLink = HtmlMessageLink(messageID, Utils.AcceptChannel.Username ?? Utils.AcceptChannel.Id.ToString(), "消息直链");
+
+            return isDirect ? $"稿件已发布, {msgLink}" : $"稿件已通过, 感谢您的支持 {msgLink}";
         }
 
         /// <summary>
