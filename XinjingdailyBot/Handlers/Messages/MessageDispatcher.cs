@@ -65,10 +65,7 @@ namespace XinjingdailyBot.Handlers.Messages
                 return;
             }
 
-            if (BotConfig.Debug)
-            {
-                Logger.LogMessage(message, dbUser);
-            }
+            Logger.LogMessage(message, dbUser);
 
             switch (message.Type)
             {

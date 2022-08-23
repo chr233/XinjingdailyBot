@@ -614,7 +614,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         internal static async Task ResponseSystemReport(ITelegramBotClient botClient, Message message)
         {
             DateTime now = DateTime.Now;
-            DateTime lastWeek = now.AddDays(7).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+            DateTime lastWeek = now.AddDays(-7).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             DateTime monthStart = now.AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             DateTime yearStart = now.AddMonths(1 - now.Month).AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             DateTime prev30Days = now.AddDays(-30);

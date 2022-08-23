@@ -41,10 +41,7 @@ namespace XinjingdailyBot.Handlers.Queries
                 return;
             }
 
-            if (BotConfig.Debug)
-            {
-                Logger.LogCallbackQuery(callbackQuery, dbUser);
-            }
+            Logger.LogCallbackQuery(callbackQuery, dbUser);
 
             //忽略过旧的Query
             if (DateTime.Now - message.Date > IgnoreQueryOlderThan)
