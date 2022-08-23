@@ -1,4 +1,6 @@
-﻿using SqlSugar;
+﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
+using SqlSugar;
 using XinjingdailyBot.Helpers;
 using static XinjingdailyBot.Utils;
 
@@ -619,89 +621,73 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             StringBuilder sb = new();
 
-            var weekPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status > PostStatus.Cancel).CountAsync();
-            var weekAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status == PostStatus.Accepted).CountAsync();
-            var weekRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status == PostStatus.Rejected).CountAsync();
-            var weekExpiredPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status < 0).CountAsync();
+            int weekPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status > PostStatus.Cancel).CountAsync();
+            int weekAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status == PostStatus.Accepted).CountAsync();
+            int weekRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status == PostStatus.Rejected).CountAsync();
+            int weekExpiredPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status < 0).CountAsync();
 
-            sb.AppendLine($"-- 最近7天统计 --");
+            sb.AppendLine($"-- 最近7天投稿统计 --");
             sb.AppendLine($"接受/拒绝: <code>{weekAcceptPost}</code> / <code>{weekRejectPost}</code>");
-            if (weekPost > 0)
-            {
-                sb.AppendLine($"通过率: <code>{(100 * weekAcceptPost / weekPost).ToString("f2")}%</code>");
-            }
-            else
-            {
-                sb.AppendLine("通过率: <code> --%</code>");
-            }
+            sb.AppendLine($"通过率: <code>{(weekPost > 0 ? (100 * weekAcceptPost / weekPost).ToString("f2") : "--")}%</code>");
             sb.AppendLine($"过期投稿: <code>{weekExpiredPost}</code>");
             sb.AppendLine($"累计投稿: <code>{weekPost + weekExpiredPost}</code>");
 
-            var monthPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status > PostStatus.Cancel).CountAsync();
-            var monthAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Accepted).CountAsync();
-            var monthRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Rejected).CountAsync();
+            int monthPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status > PostStatus.Cancel).CountAsync();
+            int monthAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Accepted).CountAsync();
+            int monthRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Rejected).CountAsync();
+            int monthExpiredPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status < 0).CountAsync();
 
-            sb.AppendLine($"-- {monthStart.ToString("MM")} 月度统计 --");
-            sb.AppendLine($"接受投稿: <code>{monthAcceptPost}</code>");
-            sb.AppendLine($"拒绝投稿: <code>{monthRejectPost}</code>");
-            if (monthPost > 0)
-            {
-                sb.AppendLine($"通过率: <code>{(100 * monthAcceptPost / monthPost).ToString("f2")}%</code>");
-            }
-            else
-            {
-                sb.AppendLine("通过率: <code> --%</code>");
-            }
+            sb.AppendLine($"-- {monthStart.ToString("MM")} 月度投稿统计 --");
+            sb.AppendLine($"接受/拒绝: <code>{monthAcceptPost}</code> / <code>{monthRejectPost}</code>");
+            sb.AppendLine($"通过率: <code>{(monthPost > 0 ? (100 * monthAcceptPost / monthPost).ToString("f2") : "--")}%</code>");
+            sb.AppendLine($"过期投稿: <code>{monthExpiredPost}</code>");
             sb.AppendLine($"累计投稿: <code>{monthPost}</code>");
 
-            var yearPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= yearStart && x.Status > PostStatus.Cancel).CountAsync();
-            var yearAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= yearStart && x.Status == PostStatus.Accepted).CountAsync();
-            var yearRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= yearStart && x.Status == PostStatus.Rejected).CountAsync();
+            int yearPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= yearStart && x.Status > PostStatus.Cancel).CountAsync();
+            int yearAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= yearStart && x.Status == PostStatus.Accepted).CountAsync();
+            int yearRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= yearStart && x.Status == PostStatus.Rejected).CountAsync();
+            int yearExpiredPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= yearStart && x.Status < 0).CountAsync();
 
-            sb.AppendLine();
-            sb.AppendLine($"-- {yearStart.ToString("yyyy")} 年度统计 --");
-            sb.AppendLine($"接受投稿: <code>{yearAcceptPost}</code>");
-            sb.AppendLine($"拒绝投稿: <code>{yearRejectPost}</code>");
-            if (yearPost > 0)
-            {
-                sb.AppendLine($"通过率: <code>{(100 * yearAcceptPost / yearPost).ToString("f2")}%</code>");
-            }
-            else
-            {
-                sb.AppendLine("通过率: <code> --%</code>");
-            }
+            sb.AppendLine($"-- {yearStart.ToString("yyyy")} 年度投稿统计 --");
+            sb.AppendLine($"接受/拒绝: <code>{yearAcceptPost}</code> / <code>{yearRejectPost}</code>");
+            sb.AppendLine($"通过率: <code>{(yearPost > 0 ? (100 * yearAcceptPost / yearPost).ToString("f2") : "--")}%</code>");
+            sb.AppendLine($"过期投稿: <code>{yearExpiredPost}</code>");
             sb.AppendLine($"累计投稿: <code>{yearPost}</code>");
 
-            var totalPost = await DB.Queryable<Posts>().Where(x => x.Status > PostStatus.Cancel).CountAsync();
-            var totalAcceptPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Accepted).CountAsync();
-            var totalRejectPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Rejected).CountAsync();
+            int totalPost = await DB.Queryable<Posts>().Where(x => x.Status > PostStatus.Cancel).CountAsync();
+            int totalAcceptPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Accepted).CountAsync();
+            int totalRejectPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Rejected).CountAsync();
+            int totalExpiredPost = await DB.Queryable<Posts>().Where(x => x.Status < 0).CountAsync();
+            int totalAttachment = await DB.Queryable<Attachments>().CountAsync();
 
-            sb.AppendLine();
-            sb.AppendLine("-- 历史统计 --");
-            sb.AppendLine($"接受投稿: <code>{totalAcceptPost}</code>");
-            sb.AppendLine($"拒绝投稿: <code>{totalRejectPost}</code>");
-            if (totalPost > 0)
-            {
-                sb.AppendLine($"通过率: <code>{(100 * totalAcceptPost / totalPost).ToString("f2")}%</code>");
-            }
-            else
-            {
-                sb.AppendLine("通过率: <code> --%</code>");
-            }
+            sb.AppendLine("-- 历史投稿统计 --");
+            sb.AppendLine($"接受/拒绝: <code>{totalAcceptPost}</code> / <code>{totalRejectPost}</code>");
+            sb.AppendLine($"通过率: <code>{(totalPost > 0 ? (100 * totalAcceptPost / totalPost).ToString("f2") : "--")}%</code>");
+            sb.AppendLine($"过期投稿: <code>{totalExpiredPost}</code>");
             sb.AppendLine($"累计投稿: <code>{totalPost}</code>");
+            sb.AppendLine($"附件总数: <code>{totalAttachment}</code>");
 
-            var totalUser = await DB.Queryable<Users>().CountAsync();
-            var banedUser = await DB.Queryable<Users>().Where(x => x.IsBan).CountAsync();
-            var activeUser = await DB.Queryable<Users>().Where(x => x.ModifyAt >= prev30Days).CountAsync();
-            var postedUser = await DB.Queryable<Users>().Where(x => x.PostCount > 0).CountAsync();
+            int totalUser = await DB.Queryable<Users>().CountAsync();
+            int banedUser = await DB.Queryable<Users>().Where(x => x.IsBan).CountAsync();
+            int activeUser = await DB.Queryable<Users>().Where(x => x.ModifyAt >= prev30Days).CountAsync();
+            int postedUser = await DB.Queryable<Users>().Where(x => x.PostCount > 0).CountAsync();
 
-            sb.AppendLine();
             sb.AppendLine("-- 用户统计 --");
             sb.AppendLine($"封禁用户: <code>{banedUser}</code>");
             sb.AppendLine($"活跃用户: <code>{activeUser}</code>");
             sb.AppendLine($"投稿用户: <code>{postedUser}</code>");
             sb.AppendLine($"累计用户: <code>{totalUser}</code>");
 
+            Process? proc = Process.GetCurrentProcess();
+            double mem = proc.WorkingSet64 / 1024.0 / 1024.0;
+            TimeSpan cpu = proc.TotalProcessorTime;
+
+            sb.AppendLine("-- 系统状态统计 --");
+            sb.AppendLine($"占用内存: <code>{mem.ToString("f2")}</code> MB");
+            sb.AppendLine($"运行时间: <code>{cpu.TotalDays.ToString("f2")}</code> 天");
+            sb.AppendLine($".NET版本: <code>.Net {Environment.Version} {RuntimeInformation.OSArchitecture}</code>");
+            sb.AppendLine($"系统信息: <code>{RuntimeInformation.OSDescription}</code>");
+           
             await botClient.SendCommandReply(sb.ToString(), message, true, ParseMode.Html);
         }
 
