@@ -67,7 +67,6 @@ namespace XinjingdailyBot.Helpers
         /// 输出query
         /// </summary>
         /// <param name="logger"></param>
-        /// <param name="query"></param>
         /// <param name="dbUser"></param>
         internal static void LogCallbackQuery(this Logger logger, CallbackQuery callbackQuery, Users dbUser)
         {
