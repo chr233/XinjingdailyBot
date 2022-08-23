@@ -46,7 +46,7 @@ namespace XinjingdailyBot.Handlers.Queries
             //忽略过旧的Query
             if (DateTime.Now - message.Date > IgnoreQueryOlderThan)
             {
-                return;
+                //return;
             }
 
             string[] args = data.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
