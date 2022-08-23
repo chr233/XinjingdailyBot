@@ -5,6 +5,12 @@ namespace XinjingdailyBot.Handlers.Queries
 {
     internal static class QueryDispatcher
     {
+
+        /// <summary>
+        /// 忽略旧的CallbackQuery
+        /// </summary>
+        private static TimeSpan IgnoreQueryOlderThan { get; } = TimeSpan.FromSeconds(30);
+
         /// <summary>
         /// 处理CallbackQuery
         /// </summary>
@@ -31,7 +37,6 @@ namespace XinjingdailyBot.Handlers.Queries
             string? data = callbackQuery.Data;
             if (string.IsNullOrEmpty(data))
             {
-                await botClient.AutoReplyAsync("Payload 非法", callbackQuery);
                 await botClient.RemoveMessageReplyMarkupAsync(message);
                 return;
             }
@@ -39,6 +44,12 @@ namespace XinjingdailyBot.Handlers.Queries
             if (BotConfig.Debug)
             {
                 Logger.LogCallbackQuery(callbackQuery, dbUser);
+            }
+
+            //忽略过旧的Query
+            if (DateTime.Now - message.Date > IgnoreQueryOlderThan)
+            {
+                return;
             }
 
             string[] args = data.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
