@@ -66,7 +66,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         {
             async Task<string> exec()
             {
-                if (message.Chat.Id != ReviewGroup.Id)
+                if (message.Chat.Type != ChatType.Private && message.Chat.Id != ReviewGroup.Id)
                 {
                     return "该命令仅限审核群内使用";
                 }
