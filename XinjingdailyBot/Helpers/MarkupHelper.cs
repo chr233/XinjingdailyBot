@@ -31,6 +31,11 @@ namespace XinjingdailyBot.Helpers
 
         private static readonly string RejectCancel = Emojis.Back + "返回";
 
+        /// <summary>
+        /// 投稿键盘
+        /// </summary>
+        /// <param name="anymouse"></param>
+        /// <returns></returns>
         internal static InlineKeyboardMarkup PostKeyboard(bool anymouse)
         {
             InlineKeyboardMarkup keyboard = new(new[]
@@ -48,6 +53,12 @@ namespace XinjingdailyBot.Helpers
             return keyboard;
         }
 
+        /// <summary>
+        /// 直接发布投稿键盘
+        /// </summary>
+        /// <param name="anymouse"></param>
+        /// <param name="tag"></param>
+        /// <returns></returns>
         internal static InlineKeyboardMarkup DirectPostKeyboard(bool anymouse, BuildInTags tag)
         {
             InlineKeyboardMarkup keyboard = new(new[]
@@ -75,6 +86,11 @@ namespace XinjingdailyBot.Helpers
             return keyboard;
         }
 
+        /// <summary>
+        /// 审核键盘A(选择稿件Tag)
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <returns></returns>
         internal static InlineKeyboardMarkup ReviewKeyboardA(BuildInTags tag)
         {
             InlineKeyboardMarkup keyboard = new(new[]
@@ -97,6 +113,10 @@ namespace XinjingdailyBot.Helpers
             return keyboard;
         }
 
+        /// <summary>
+        /// 审核键盘B(选择拒绝理由)
+        /// </summary>
+        /// <returns></returns>
         internal static InlineKeyboardMarkup ReviewKeyboardB()
         {
             InlineKeyboardMarkup keyboard = new(new[]
@@ -122,6 +142,12 @@ namespace XinjingdailyBot.Helpers
             return keyboard;
         }
 
+        /// <summary>
+        /// 设置用户群组键盘
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="targetUser"></param>
+        /// <returns></returns>
         internal static async Task<InlineKeyboardMarkup?> SetUserGroupKeyboard(Users dbUser, Users targetUser)
         {
             var groups = await DB.Queryable<Groups>().Where(x => x.Id > 0 && x.Id < dbUser.GroupID).ToListAsync();
