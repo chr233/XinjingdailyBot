@@ -57,7 +57,8 @@ namespace XinjingdailyBot.Handlers.Messages
             bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
             //发送确认消息
             var keyboard = directPost ? MarkupHelper.DirectPostKeyboard(anymouse, tags) : MarkupHelper.PostKeyboard(anymouse);
-            Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, "真的要投稿吗?", replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+            string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
+            Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
             //存入数据库
             Posts newPost = new()
@@ -121,7 +122,8 @@ namespace XinjingdailyBot.Handlers.Messages
             bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
             //发送确认消息
             var keyboard = directPost ? MarkupHelper.DirectPostKeyboard(anymouse, tags) : MarkupHelper.PostKeyboard(anymouse);
-            Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, "真的要投稿吗?", replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+            string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
+            Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
             //存入数据库
             Posts newPost = new()
@@ -242,7 +244,8 @@ namespace XinjingdailyBot.Handlers.Messages
 
                         //发送确认消息
                         var keyboard = directPost ? MarkupHelper.DirectPostKeyboard(anymouse, tags) : MarkupHelper.PostKeyboard(anymouse);
-                        await botClient.EditMessageTextAsync(msg, "真的要投稿吗", replyMarkup: keyboard);
+                        string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
+                        await botClient.EditMessageTextAsync(msg, postText, replyMarkup: keyboard);
                     });
                 }
             }
