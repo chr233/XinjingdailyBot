@@ -84,9 +84,9 @@ namespace XinjingdailyBot.Handlers.Queries
             post.ModifyAt = DateTime.Now;
             await DB.Updateable(post).UpdateColumns(x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
 
-            await botClient.EditMessageTextAsync(callbackQuery.Message!, "投稿已取消", replyMarkup: null);
+            await botClient.EditMessageTextAsync(callbackQuery.Message!, Langs.PostCanceled, replyMarkup: null);
 
-            await botClient.AutoReplyAsync("投稿已取消", callbackQuery);
+            await botClient.AutoReplyAsync(Langs.PostCanceled, callbackQuery);
         }
 
         /// <summary>
@@ -114,12 +114,13 @@ namespace XinjingdailyBot.Handlers.Queries
                     {
                         attachmentType = post.PostType;
                     }
+
                     group[i] = attachmentType switch
                     {
-                        MessageType.Photo => new InputMediaPhoto(attachments[i].FileID),
-                        MessageType.Audio => new InputMediaAudio(attachments[i].FileID),
-                        MessageType.Video => new InputMediaVideo(attachments[i].FileID),
-                        MessageType.Document => new InputMediaDocument(attachments[i].FileID),
+                        MessageType.Photo => new InputMediaPhoto(attachments[i].FileID) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
+                        MessageType.Audio => new InputMediaAudio(attachments[i].FileID) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
+                        MessageType.Video => new InputMediaVideo(attachments[i].FileID) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
+                        MessageType.Document => new InputMediaDocument(attachments[i].FileID) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
                         _ => throw new Exception(),
                     };
                 }
@@ -139,15 +140,8 @@ namespace XinjingdailyBot.Handlers.Queries
             post.ModifyAt = DateTime.Now;
             await DB.Updateable(post).UpdateColumns(x => new { x.ReviewMsgID, x.ManageMsgID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
 
-            await botClient.AutoReplyAsync("稿件已投递", callbackQuery);
-            if (dbUser.Notification)
-            {
-                await botClient.EditMessageTextAsync(callbackQuery.Message!, "感谢您的投稿, 审核结果将会稍后通知", replyMarkup: null);
-            }
-            else
-            {
-                await botClient.EditMessageTextAsync(callbackQuery.Message!, "感谢您的投稿, 已开启静默模式", replyMarkup: null);
-            }
+            await botClient.AutoReplyAsync(Langs.PostSendSuccess, callbackQuery);
+            await botClient.EditMessageTextAsync(callbackQuery.Message!, Langs.ThanksForSendingPost, replyMarkup: null);
 
             dbUser.PostCount++;
             dbUser.ModifyAt = DateTime.Now;

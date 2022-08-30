@@ -20,18 +20,18 @@ namespace XinjingdailyBot.Handlers.Messages
         {
             if (!dbUser.Right.HasFlag(UserRights.SendPost))
             {
-                await botClient.AutoReplyAsync("没有权限", message);
+                await botClient.AutoReplyAsync(Langs.NoPostRight, message);
                 return;
             }
             if (ReviewGroup.Id == -1)
             {
-                await botClient.AutoReplyAsync("尚未设置投稿群组, 无法接收投稿", message);
+                await botClient.AutoReplyAsync(Langs.ReviewGroupNotSet, message);
                 return;
             }
 
             if (string.IsNullOrEmpty(message.Text))
             {
-                await botClient.AutoReplyAsync("文本为空, 无法创建投稿", message);
+                await botClient.AutoReplyAsync(Langs.TextPostCantBeNull, message);
                 return;
             }
 
