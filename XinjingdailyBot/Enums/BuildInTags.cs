@@ -23,8 +23,8 @@
         /// </summary>
         WanAn = 4,
         /// <summary>
-        /// 故事会
+        /// AI怪图
         /// </summary>
-        Story = 8,
+        AIGraph= 8,
     }
 }
