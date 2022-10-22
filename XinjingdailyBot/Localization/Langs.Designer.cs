@@ -70,11 +70,65 @@ namespace XinjingdailyBot.Localization {
         }
         
         /// <summary>
+        ///   查找类似 没有权限 的本地化字符串。
+        /// </summary>
+        internal static string NoPostRight {
+            get {
+                return ResourceManager.GetString("NoPostRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 投稿已取消 的本地化字符串。
+        /// </summary>
+        internal static string PostCanceled {
+            get {
+                return ResourceManager.GetString("PostCanceled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 稿件已成功投递 的本地化字符串。
+        /// </summary>
+        internal static string PostSendSuccess {
+            get {
+                return ResourceManager.GetString("PostSendSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 封禁记录自助查询: /myban\n\n如果对封禁记录有异议, 请联系频道管理员 的本地化字符串。
         /// </summary>
         internal static string QueryBanDescribe {
             get {
                 return ResourceManager.GetString("QueryBanDescribe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 尚未设置审核群组, 无法接收投稿 的本地化字符串。
+        /// </summary>
+        internal static string ReviewGroupNotSet {
+            get {
+                return ResourceManager.GetString("ReviewGroupNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 文本为空, 无法创建投稿 的本地化字符串。
+        /// </summary>
+        internal static string TextPostCantBeNull {
+            get {
+                return ResourceManager.GetString("TextPostCantBeNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 感谢您的投稿, 审核结果将会稍后通知 的本地化字符串。
+        /// </summary>
+        internal static string ThanksForSendingPost {
+            get {
+                return ResourceManager.GetString("ThanksForSendingPost", resourceCulture);
             }
         }
         
