@@ -56,6 +56,9 @@ namespace XinjingdailyBot.Handlers.Queries
                 case "review tag friend":
                     await SetPostTag(botClient, post, BuildInTags.Friend, callbackQuery);
                     break;
+                case "review tag ai":
+                    await SetPostTag(botClient, post, BuildInTags.AIGraph, callbackQuery);
+                    break;
 
                 case "reject fuzzy":
                     await RejectPostHelper(botClient, post, dbUser, RejectReason.Fuzzy);
@@ -162,6 +165,10 @@ namespace XinjingdailyBot.Handlers.Queries
             if (post.Tags.HasFlag(BuildInTags.Friend))
             {
                 tagNames.Add("我有一个朋友");
+            }
+            if (post.Tags.HasFlag(BuildInTags.AIGraph))
+            {
+                tagNames.Add("AI怪图");
             }
             if (post.Tags == BuildInTags.None)
             {

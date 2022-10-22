@@ -13,10 +13,12 @@ namespace XinjingdailyBot.Helpers
         private static readonly string TagNSFWOn = "#NSFW";
         private static readonly string TagFriendOn = "#我有一个朋友";
         private static readonly string TagWanAnOn = "#晚安";
+        private static readonly string TagAIGraphOn = "#AI怪图";
 
         private static readonly string TagNSFWOff = "#N___";
         private static readonly string TagFriendOff = "#我_____";
         private static readonly string TagWanAnOff = "#晚_";
+        private static readonly string TagAIGraphOff = "#A___";
 
         private static readonly string ReviewReject = Emojis.No + "拒绝";
         private static readonly string ReviewAccept = Emojis.Yes + "采用";
@@ -71,6 +73,7 @@ namespace XinjingdailyBot.Helpers
                 new []
                 {
                     InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? TagFriendOn:TagFriendOff, "review tag friend"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? TagAIGraphOn:TagAIGraphOff, "review tag ai"),
                 },
 
                 new []
@@ -99,6 +102,7 @@ namespace XinjingdailyBot.Helpers
                 {
                     InlineKeyboardButton.WithCallbackData( tag.HasFlag(BuildInTags.NSFW)? TagNSFWOn:TagNSFWOff, "review tag nsfw"),
                     InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.WanAn)? TagWanAnOn:TagWanAnOff, "review tag wanan"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? TagAIGraphOn:TagAIGraphOff, "review tag ai"),
                 },
                 new []
                 {

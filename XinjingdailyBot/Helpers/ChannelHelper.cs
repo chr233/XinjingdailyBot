@@ -30,6 +30,11 @@ namespace XinjingdailyBot.Helpers
         internal static User BotUser { get; private set; } = new();
 
         /// <summary>
+        /// 机器人相对TG服务器时间差
+        /// </summary>
+        internal static TimeSpan TimeOffset { get; private set; }
+
+        /// <summary>
         /// 验证频道设置
         /// </summary>
         /// <param name="botClient"></param>
@@ -41,6 +46,9 @@ namespace XinjingdailyBot.Helpers
             Logger.Info($"机器人ID: {BotUser.Id}");
             Logger.Info($"机器人昵称: {BotUser.NickName()}");
             Logger.Info($"机器人用户名: @{BotUser.Username}");
+
+            //var update = await botClient.GetUpdatesAsync(-1, 1);
+            //TimeOffset = update.
 
             try
             {
