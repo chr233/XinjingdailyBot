@@ -88,12 +88,15 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 }
                 string status = targetUser.IsBan ? "封禁中" : "正常";
 
+                int totalPost = targetUser.PostCount - targetUser.ExpiredPostCount;
+
                 sb.AppendLine($"用户名: <code>{userNick}</code>");
                 sb.AppendLine($"用户ID: <code>{targetUser.UserID}</code>");
                 sb.AppendLine($"用户组: <code>{group}</code>");
                 sb.AppendLine($"状态: <code>{status}</code>");
                 sb.AppendLine($"等级:  <code>{level}</code>");
-                sb.AppendLine($"投稿数量: <code>{targetUser.PostCount}</code>");
+                sb.AppendLine($"投稿数量: <code>{totalPost}</code>");
+                sb.AppendLine($"通过率: <code>{100.0 * targetUser.AcceptCount / totalPost}%</code>");
                 sb.AppendLine($"通过数量: <code>{targetUser.AcceptCount}</code>");
                 sb.AppendLine($"拒绝数量: <code>{targetUser.RejetCount}</code>");
                 sb.AppendLine($"审核数量: <code>{targetUser.ReviewCount}</code>");
@@ -735,17 +738,26 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             }
         }
 
+        /// <summary>
+        /// 查看用户排行榜
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         internal static async Task ResponseUserRank(ITelegramBotClient botClient, Users dbUser, Message message)
         {
             DateTime now = DateTime.Now;
             DateTime prev30Days = now.AddDays(-30).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
 
-            const int topCount = 5;
+            const int topCount = 8;
+            const int miniumPost = 10;
 
             StringBuilder sb = new();
 
             sb.AppendLine($"-- 用户投稿数量排名 --");
-            var userAcceptCountRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.ModifyAt >= prev30Days).OrderByDescending(x => x.AcceptCount).Take(topCount).ToListAsync();
+            var userAcceptCountRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
+                .OrderByDescending(x => x.AcceptCount).Take(topCount).ToListAsync();
             if (userAcceptCountRank?.Count > 0)
             {
                 int count = 1;
@@ -760,7 +772,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             }
 
             sb.AppendLine($"-- 用户投稿通过率排名 --");
-            var userAcceptRatioRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > 10 && x.ModifyAt >= prev30Days)
+            var userAcceptRatioRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
                 .Select(y => new { User = y, Ratio = 100.0 * y.AcceptCount / y.PostCount }).OrderByDescending(x => x.Ratio).Take(topCount).ToListAsync();
             if (userAcceptRatioRank?.Count > 0)
             {
@@ -768,7 +780,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 foreach (var data in userAcceptRatioRank)
                 {
                     var user = data.User;
-                    sb.AppendLine($"{count++}. {(!user.PreferAnymouse ? user.UserNick : "匿名用户")} {data.Ratio.ToString("0.00")}%");
+                    sb.AppendLine($"{count++}. {(!user.PreferAnymouse ? user.UserNick : "匿名用户")} {user.AcceptCount} / {user.PostCount} {data.Ratio.ToString("0.00")}%");
                 }
             }
             else
@@ -777,7 +789,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             }
 
             sb.AppendLine($"-- 管理员投稿数量排名 --");
-            var adminAcceptCountRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.ModifyAt >= prev30Days).OrderByDescending(x => x.AcceptCount).Take(topCount).ToListAsync();
+            var adminAcceptCountRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
+                .OrderByDescending(x => x.AcceptCount).Take(topCount).ToListAsync();
             if (adminAcceptCountRank?.Count > 0)
             {
                 int count = 1;
@@ -792,7 +805,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             }
 
             sb.AppendLine($"-- 管理员审核数量排名 --");
-            var adminReviewCountRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.ModifyAt >= prev30Days).OrderByDescending(x => x.AcceptCount).Take(topCount).ToListAsync();
+            var adminReviewCountRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.ReviewCount > miniumPost && x.ModifyAt >= prev30Days)
+                .OrderByDescending(x => x.ReviewCount).Take(topCount).ToListAsync();
             if (adminReviewCountRank?.Count > 0)
             {
                 int count = 1;
