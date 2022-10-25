@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
+using MySqlX.XDevAPI.Relational;
 using SqlSugar;
 using XinjingdailyBot.Helpers;
 using static XinjingdailyBot.Utils;
@@ -614,17 +615,17 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         internal static async Task ResponseSystemReport(ITelegramBotClient botClient, Message message)
         {
             DateTime now = DateTime.Now;
-            DateTime lastWeek = now.AddDays(-7).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+            DateTime prev7Days = now.AddDays(-7).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+            DateTime prev30Days = now.AddDays(-30).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             DateTime monthStart = now.AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             DateTime yearStart = now.AddMonths(1 - now.Month).AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
-            DateTime prev30Days = now.AddDays(-30);
 
             StringBuilder sb = new();
 
-            int weekPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status > PostStatus.Cancel).CountAsync();
-            int weekAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status == PostStatus.Accepted).CountAsync();
-            int weekRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status == PostStatus.Rejected).CountAsync();
-            int weekExpiredPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= lastWeek && x.Status < 0).CountAsync();
+            int weekPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev7Days && x.Status > PostStatus.Cancel).CountAsync();
+            int weekAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev7Days && x.Status == PostStatus.Accepted).CountAsync();
+            int weekRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev7Days && x.Status == PostStatus.Rejected).CountAsync();
+            int weekExpiredPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev7Days && x.Status < 0).CountAsync();
 
             sb.AppendLine($"-- 最近7天投稿统计 --");
             sb.AppendLine($"接受/拒绝: <code>{weekAcceptPost}</code> / <code>{weekRejectPost}</code>");
@@ -669,12 +670,14 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             int totalUser = await DB.Queryable<Users>().CountAsync();
             int banedUser = await DB.Queryable<Users>().Where(x => x.IsBan).CountAsync();
-            int activeUser = await DB.Queryable<Users>().Where(x => x.ModifyAt >= prev30Days).CountAsync();
+            int weekActiveUser = await DB.Queryable<Users>().Where(x => x.ModifyAt >= prev7Days).CountAsync();
+            int MonthActiveUser = await DB.Queryable<Users>().Where(x => x.ModifyAt >= prev30Days).CountAsync();
             int postedUser = await DB.Queryable<Users>().Where(x => x.PostCount > 0).CountAsync();
 
             sb.AppendLine("-- 用户统计 --");
             sb.AppendLine($"封禁用户: <code>{banedUser}</code>");
-            sb.AppendLine($"活跃用户: <code>{activeUser}</code>");
+            sb.AppendLine($"周活用户: <code>{weekActiveUser}</code>");
+            sb.AppendLine($"月活用户: <code>{MonthActiveUser}</code>");
             sb.AppendLine($"投稿用户: <code>{postedUser}</code>");
             sb.AppendLine($"累计用户: <code>{totalUser}</code>");
 
@@ -684,10 +687,10 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             sb.AppendLine("-- 系统状态统计 --");
             sb.AppendLine($"占用内存: <code>{mem.ToString("f2")}</code> MB");
-            sb.AppendLine($"运行时间: <code>{cpu.TotalDays.ToString("f2")}</code> 天");
+            sb.AppendLine($"运行时间: <code>{cpu.TotalMinutes.ToString("0.00")}</code> 天");
             sb.AppendLine($".NET版本: <code>.Net {Environment.Version} {RuntimeInformation.OSArchitecture}</code>");
-            sb.AppendLine($"系统信息: <code>{RuntimeInformation.OSDescription}</code>");
-           
+            sb.AppendLine($"系统信息: <code>{RuntimeInformation.FrameworkDescription}</code>");
+
             await botClient.SendCommandReply(sb.ToString(), message, true, ParseMode.Html);
         }
 
@@ -730,6 +733,80 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 await botClient.SendCommandReply("创建邀请链接失败, 可能未给予机器人邀请权限", message);
                 throw;
             }
+        }
+
+        internal static async Task ResponseUserRank(ITelegramBotClient botClient, Users dbUser, Message message)
+        {
+            DateTime now = DateTime.Now;
+            DateTime prev30Days = now.AddDays(-30).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+
+            const int topCount = 5;
+
+            StringBuilder sb = new();
+
+            sb.AppendLine($"-- 用户投稿数量排名 --");
+            var userAcceptCountRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.ModifyAt >= prev30Days).OrderByDescending(x => x.AcceptCount).Take(topCount).ToListAsync();
+            if (userAcceptCountRank?.Count > 0)
+            {
+                int count = 1;
+                foreach (var user in userAcceptCountRank)
+                {
+                    sb.AppendLine($"{count++}. {(!user.PreferAnymouse ? user.UserNick : "匿名用户")} {user.AcceptCount}");
+                }
+            }
+            else
+            {
+                sb.AppendLine("暂无数据");
+            }
+
+            sb.AppendLine($"-- 用户投稿通过率排名 --");
+            var userAcceptRatioRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > 10 && x.ModifyAt >= prev30Days)
+                .Select(y => new { User = y, Ratio = 100.0 * y.AcceptCount / y.PostCount }).OrderByDescending(x => x.Ratio).Take(topCount).ToListAsync();
+            if (userAcceptRatioRank?.Count > 0)
+            {
+                int count = 1;
+                foreach (var data in userAcceptRatioRank)
+                {
+                    var user = data.User;
+                    sb.AppendLine($"{count++}. {(!user.PreferAnymouse ? user.UserNick : "匿名用户")} {data.Ratio.ToString("0.00")}%");
+                }
+            }
+            else
+            {
+                sb.AppendLine("暂无数据");
+            }
+
+            sb.AppendLine($"-- 管理员投稿数量排名 --");
+            var adminAcceptCountRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.ModifyAt >= prev30Days).OrderByDescending(x => x.AcceptCount).Take(topCount).ToListAsync();
+            if (adminAcceptCountRank?.Count > 0)
+            {
+                int count = 1;
+                foreach (var user in adminAcceptCountRank)
+                {
+                    sb.AppendLine($"{count++}. {(!user.PreferAnymouse ? user.UserNick : "匿名管理员")} {user.AcceptCount}");
+                }
+            }
+            else
+            {
+                sb.AppendLine("暂无数据");
+            }
+
+            sb.AppendLine($"-- 管理员审核数量排名 --");
+            var adminReviewCountRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.ModifyAt >= prev30Days).OrderByDescending(x => x.AcceptCount).Take(topCount).ToListAsync();
+            if (adminReviewCountRank?.Count > 0)
+            {
+                int count = 1;
+                foreach (var user in adminReviewCountRank)
+                {
+                    sb.AppendLine($"{count++}. {(!user.PreferAnymouse ? user.UserNick : "匿名管理员")} {user.ReviewCount}");
+                }
+            }
+            else
+            {
+                sb.AppendLine("暂无数据");
+            }
+
+            await botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
         }
     }
 }
