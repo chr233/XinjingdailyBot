@@ -76,15 +76,51 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 group = g.Name;
             }
 
+            int totalPost = dbUser.PostCount - dbUser.ExpiredPostCount;
+
             StringBuilder sb = new();
+
+            sb.AppendLine($"-- 基础信息 --");
             sb.AppendLine($"用户名: <code>{userNick}</code>");
             sb.AppendLine($"用户ID: <code>{dbUser.UserID}</code>");
             sb.AppendLine($"用户组: <code>{group}</code>");
             sb.AppendLine($"等级:  <code>{level}</code>");
-            sb.AppendLine($"投稿数量: <code>{dbUser.PostCount - dbUser.ExpiredPostCount}</code>");
+            sb.AppendLine($"投稿数量: <code>{totalPost}</code>");
+            sb.AppendLine($"通过率: <code>{(100.0 * dbUser.AcceptCount / totalPost).ToString("0.00")}%</code>");
             sb.AppendLine($"通过数量: <code>{dbUser.AcceptCount}</code>");
             sb.AppendLine($"拒绝数量: <code>{dbUser.RejetCount}</code>");
             sb.AppendLine($"审核数量: <code>{dbUser.ReviewCount}</code>");
+            sb.AppendLine($"-- 用户排名 --");
+
+            DateTime now = DateTime.Now;
+            DateTime prev30Days = now.AddDays(-30).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+
+            if (dbUser.AcceptCount > 10 && dbUser.GroupID == 1)
+            {
+                int activeUser = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.ModifyAt >= prev30Days).CountAsync();
+                int acceptCountRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > dbUser.AcceptCount && x.ModifyAt >= prev30Days).CountAsync() + 1;
+
+                double ratio = 1.0 * dbUser.AcceptCount / dbUser.PostCount;
+
+                int acceptRatioRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > 10 && x.ModifyAt >= prev30Days)
+                  .Select(y => new { Ratio = y.AcceptCount / y.PostCount }).Where(x => x.Ratio > ratio).CountAsync() + 1;
+
+                sb.AppendLine($"通过数量: <code>{acceptCountRank}</code>");
+                sb.AppendLine($"通过率: <code>{acceptRatioRank}</code>");
+                sb.AppendLine($"活跃用户: <code>{activeUser}</code>");
+            }
+            else
+            {
+                if (dbUser.GroupID != 1)
+                {
+                    sb.AppendLine($"管理员不参与用户排名");
+                    sb.AppendLine($"可以使用命令 /userrank 查看管理员排名");
+                }
+                else
+                {
+                    sb.AppendLine("稿件数量太少, 未进入排行榜");
+                }
+            }
 
             await botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
         }
