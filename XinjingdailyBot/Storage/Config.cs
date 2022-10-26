@@ -28,6 +28,11 @@
         public string? Proxy { get; set; }
 
         /// <summary>
+        /// 是否使用MySQL数据库, true:MySQL, false:SQLite
+        /// </summary>
+        public bool UseMysql { get; set; } = true;
+
+        /// <summary>
         /// MySQL连接设定
         /// </summary>
         public string DBHost { get; set; } = "127.0.0.1";

@@ -1,9 +1,10 @@
 ﻿{
   "Debug": false,
   "BotToken": "",
-  "Welcome": "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人",
+  "Welecome": "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人",
   "ThrowPendingUpdates": false,
   "Proxy": null,
+  "UseMysql": true,
   "DBHost": "127.0.0.1",
   "DBPort": 3306,
   "DBName": "xjb_db",
