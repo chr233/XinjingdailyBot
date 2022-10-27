@@ -60,6 +60,10 @@ namespace XinjingdailyBot.Helpers
             {
                 tags |= BuildInTags.WanAn | BuildInTags.NSFW;
             }
+            if (text.Contains("#ai", StringComparison.InvariantCultureIgnoreCase))
+            {
+                tags |= BuildInTags.AIGraph;
+            }
             return tags;
         }
 
@@ -267,6 +271,10 @@ namespace XinjingdailyBot.Helpers
             if (tags.HasFlag(BuildInTags.WanAn))
             {
                 tag.Add("#晚安");
+            }
+            if (tags.HasFlag(BuildInTags.AIGraph))
+            {
+                tag.Add("#AI怪图");
             }
             return string.Join(' ', tag);
         }

@@ -23,12 +23,13 @@ namespace XinjingdailyBot.Helpers
         {
             Storage.Config config = BotConfig;
 
-            string dbString = $"Host={config.DBHost};Port={config.DBPort};Database={config.DBName};UserID={config.DBUser};Password={config.DBPassword};CharSet=utf8mb4;AllowZeroDateTime=true";
-
+            string dbString = config.UseMysql
+                ? $"Host={config.DBHost};Port={config.DBPort};Database={config.DBName};UserID={config.DBUser};Password={config.DBPassword};CharSet=utf8mb4;AllowZeroDateTime=true"
+                : "DataSource=bot.db";
             DB = new SqlSugarScope(new ConnectionConfig()
             {
                 ConnectionString = dbString,
-                DbType = DbType.MySql,
+                DbType =  config.UseMysql? DbType.MySql:DbType.Sqlite,
                 IsAutoCloseConnection = true,
                 LanguageType = LanguageType.English,
             },
