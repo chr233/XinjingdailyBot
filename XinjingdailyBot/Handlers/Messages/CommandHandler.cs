@@ -206,6 +206,11 @@ namespace XinjingdailyBot.Handlers.Messages
                     await AdminCmd.ResponseInviteToReviewGroup(botClient, dbUser, message);
                     break;
 
+                case "URANK" when admin:
+                case "USERRANK" when admin:
+                    await AdminCmd.ResponseUserRank(botClient,dbUser, message);
+                    break;
+
                 //Super - 超级管理员命令
                 case "RESTART" when super:
                     await SuperCmd.ResponseRestart(botClient, message);
