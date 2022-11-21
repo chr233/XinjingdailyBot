@@ -610,12 +610,12 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         }
 
         /// <summary>
-        /// 生成系统报表
+        /// 生成投稿统计信息
         /// </summary>
         /// <param name="botClient"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        internal static async Task ResponseSystemReport(ITelegramBotClient botClient, Message message)
+        internal static async Task ResponsePostReport(ITelegramBotClient botClient, Message message)
         {
             DateTime now = DateTime.Now;
             DateTime prev7Days = now.AddDays(-7).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
@@ -683,6 +683,19 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             sb.AppendLine($"月活用户: <code>{MonthActiveUser}</code>");
             sb.AppendLine($"投稿用户: <code>{postedUser}</code>");
             sb.AppendLine($"累计用户: <code>{totalUser}</code>");
+
+            await botClient.SendCommandReply(sb.ToString(), message, true, ParseMode.Html);
+        }
+
+        /// <summary>
+        /// 生成系统报表
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        internal static async Task ResponseSystemReport(ITelegramBotClient botClient, Message message)
+        {
+            StringBuilder sb = new();
 
             Process? proc = Process.GetCurrentProcess();
             double mem = proc.WorkingSet64 / 1024.0 / 1024.0;
