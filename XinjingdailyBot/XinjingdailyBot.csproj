@@ -59,8 +59,4 @@
     </None>
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="powershell -Command &quot;&amp;'$(ProjectDir)scripts\Pre-Build.ps1' '$(ProjectDir)'&quot;" />
-  </Target>
-
 </Project>
