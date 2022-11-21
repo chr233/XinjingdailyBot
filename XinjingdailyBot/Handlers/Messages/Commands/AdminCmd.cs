@@ -4,6 +4,8 @@ using MySqlX.XDevAPI.Relational;
 using SqlSugar;
 using XinjingdailyBot.Helpers;
 using static XinjingdailyBot.Utils;
+using System.IO;
+using System;
 
 namespace XinjingdailyBot.Handlers.Messages.Commands
 {
@@ -618,6 +620,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         internal static async Task ResponsePostReport(ITelegramBotClient botClient, Message message)
         {
             DateTime now = DateTime.Now;
+            DateTime prev1Day = now.AddDays(-1).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             DateTime prev7Days = now.AddDays(-7).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             DateTime prev30Days = now.AddDays(-30).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             DateTime monthStart = now.AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
@@ -625,12 +628,24 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             StringBuilder sb = new();
 
+            int todayPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev1Day && x.Status > PostStatus.Cancel).CountAsync();
+            int todayAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev1Day && x.Status == PostStatus.Accepted).CountAsync();
+            int todayRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev1Day && x.Status == PostStatus.Rejected).CountAsync();
+            int todayExpiredPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev1Day && x.Status < 0).CountAsync();
+
+            sb.AppendLine("-- 24小时投稿统计 --");
+            sb.AppendLine($"接受/拒绝: <code>{todayAcceptPost}</code> / <code>{todayRejectPost}</code>");
+            sb.AppendLine($"通过率: <code>{(todayPost > 0 ? (100 * todayAcceptPost / todayPost).ToString("f2") : "--")}%</code>");
+            sb.AppendLine($"过期投稿: <code>{todayExpiredPost}</code>");
+            sb.AppendLine($"累计投稿: <code>{todayPost + todayExpiredPost}</code>");
+
             int weekPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev7Days && x.Status > PostStatus.Cancel).CountAsync();
             int weekAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev7Days && x.Status == PostStatus.Accepted).CountAsync();
             int weekRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev7Days && x.Status == PostStatus.Rejected).CountAsync();
             int weekExpiredPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev7Days && x.Status < 0).CountAsync();
 
-            sb.AppendLine($"-- 最近7天投稿统计 --");
+            sb.AppendLine();
+            sb.AppendLine("-- 7日投稿统计 --");
             sb.AppendLine($"接受/拒绝: <code>{weekAcceptPost}</code> / <code>{weekRejectPost}</code>");
             sb.AppendLine($"通过率: <code>{(weekPost > 0 ? (100 * weekAcceptPost / weekPost).ToString("f2") : "--")}%</code>");
             sb.AppendLine($"过期投稿: <code>{weekExpiredPost}</code>");
@@ -641,7 +656,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             int monthRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Rejected).CountAsync();
             int monthExpiredPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status < 0).CountAsync();
 
-            sb.AppendLine($"-- {monthStart.ToString("MM")} 月度投稿统计 --");
+            sb.AppendLine();
+            sb.AppendLine($"-- {monthStart.ToString("MM")}月投稿统计 --");
             sb.AppendLine($"接受/拒绝: <code>{monthAcceptPost}</code> / <code>{monthRejectPost}</code>");
             sb.AppendLine($"通过率: <code>{(monthPost > 0 ? (100 * monthAcceptPost / monthPost).ToString("f2") : "--")}%</code>");
             sb.AppendLine($"过期投稿: <code>{monthExpiredPost}</code>");
@@ -652,7 +668,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             int yearRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= yearStart && x.Status == PostStatus.Rejected).CountAsync();
             int yearExpiredPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= yearStart && x.Status < 0).CountAsync();
 
-            sb.AppendLine($"-- {yearStart.ToString("yyyy")} 年度投稿统计 --");
+            sb.AppendLine();
+            sb.AppendLine($"-- {yearStart.ToString("yyyy")}年投稿统计 --");
             sb.AppendLine($"接受/拒绝: <code>{yearAcceptPost}</code> / <code>{yearRejectPost}</code>");
             sb.AppendLine($"通过率: <code>{(yearPost > 0 ? (100 * yearAcceptPost / yearPost).ToString("f2") : "--")}%</code>");
             sb.AppendLine($"过期投稿: <code>{yearExpiredPost}</code>");
@@ -664,6 +681,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             int totalExpiredPost = await DB.Queryable<Posts>().Where(x => x.Status < 0).CountAsync();
             int totalAttachment = await DB.Queryable<Attachments>().CountAsync();
 
+            sb.AppendLine();
             sb.AppendLine("-- 历史投稿统计 --");
             sb.AppendLine($"接受/拒绝: <code>{totalAcceptPost}</code> / <code>{totalRejectPost}</code>");
             sb.AppendLine($"通过率: <code>{(totalPost > 0 ? (100 * totalAcceptPost / totalPost).ToString("f2") : "--")}%</code>");
@@ -677,6 +695,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             int MonthActiveUser = await DB.Queryable<Users>().Where(x => x.ModifyAt >= prev30Days).CountAsync();
             int postedUser = await DB.Queryable<Users>().Where(x => x.PostCount > 0).CountAsync();
 
+            sb.AppendLine();
             sb.AppendLine("-- 用户统计 --");
             sb.AppendLine($"封禁用户: <code>{banedUser}</code>");
             sb.AppendLine($"周活用户: <code>{weekActiveUser}</code>");
@@ -697,11 +716,29 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         {
             StringBuilder sb = new();
 
-            Process? proc = Process.GetCurrentProcess();
+            var drivers = DriveInfo.GetDrives();
+
+            sb.AppendLine("-- 硬盘信息 --");
+            foreach (var d in drivers)
+            {
+                if (d.IsReady)
+                {
+                    double freeSpacePerc = (d.AvailableFreeSpace / (float)d.TotalSize) * 100;
+
+                    // Ouput drive information
+                    sb.AppendLine($"Drive: {d.Name} ({d.DriveFormat}, {d.DriveType})");
+
+                    sb.AppendLine($"Percentage free space: {freeSpacePerc:0.00}%.")                        ;
+
+                }
+            }
+
+
+            var proc = Process.GetCurrentProcess();
             double mem = proc.WorkingSet64 / 1024.0 / 1024.0;
             TimeSpan cpu = proc.TotalProcessorTime;
 
-            sb.AppendLine("-- 系统状态统计 --");
+            sb.AppendLine("-- 运行环境 --");
             sb.AppendLine($"占用内存: <code>{mem.ToString("f2")}</code> MB");
             sb.AppendLine($"运行时间: <code>{cpu.TotalMinutes.ToString("0.00")}</code> 天");
             sb.AppendLine($".NET版本: <code>.Net {Environment.Version} {RuntimeInformation.OSArchitecture}</code>");
