@@ -198,6 +198,10 @@ namespace XinjingdailyBot.Handlers.Messages
                     await AdminCmd.ResponseSearchUser(botClient, dbUser, message, args);
                     break;
 
+                case "POSTREPORT" when admin:
+                    await AdminCmd.ResponsePostReport(botClient, message);
+                    break;
+
                 case "SYSREPORT" when admin:
                     await AdminCmd.ResponseSystemReport(botClient, message);
                     break;

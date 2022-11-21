@@ -29,6 +29,12 @@ namespace XinjingdailyBot
 
                 await ConfigHelper.LoadConfig();
 
+                if (string.IsNullOrEmpty(BotConfig.BotToken))
+                {
+                    Logger.Error("未填写 BotToken");
+                    return;
+                }
+
                 //设置代理
                 HttpClient? httpClient = null;
                 if (!string.IsNullOrEmpty(BotConfig.Proxy))
