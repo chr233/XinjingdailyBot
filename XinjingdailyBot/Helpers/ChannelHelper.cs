@@ -9,6 +9,10 @@ namespace XinjingdailyBot.Helpers
         /// </summary>
         internal static Chat ReviewGroup { get; private set; } = new();
         /// <summary>
+        /// 审核群组
+        /// </summary>
+        internal static Chat ReviewLogChannel { get; private set; } = new();
+        /// <summary>
         /// 评论区群组
         /// </summary>
         internal static Chat CommentGroup { get; private set; } = new();
