@@ -726,9 +726,9 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                     double freeSpacePerc = (d.AvailableFreeSpace / (float)d.TotalSize) * 100;
 
                     // Ouput drive information
-                    sb.AppendLine($"Drive: {d.Name} ({d.DriveFormat}, {d.DriveType})");
+                    sb.AppendLine($"{d.Name} ({d.DriveFormat}, {d.DriveType})");
 
-                    sb.AppendLine($"Percentage free space: {freeSpacePerc:0.00}%.")                        ;
+                    sb.AppendLine($"Percentage free space: {freeSpacePerc:0.00}%.");
 
                 }
             }
@@ -805,7 +805,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             StringBuilder sb = new();
 
-            sb.AppendLine($"-- 用户投稿数量排名 --");
+            sb.AppendLine("-- 用户投稿数量排名 --");
             var userAcceptCountRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
                 .OrderByDescending(x => x.AcceptCount).Take(topCount).ToListAsync();
             if (userAcceptCountRank?.Count > 0)
@@ -821,24 +821,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 sb.AppendLine("暂无数据");
             }
 
-            sb.AppendLine($"-- 用户投稿通过率排名 --");
-            var userAcceptRatioRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
-                .Select(y => new { User = y, Ratio = 100.0 * y.AcceptCount / y.PostCount }).OrderByDescending(x => x.Ratio).Take(topCount).ToListAsync();
-            if (userAcceptRatioRank?.Count > 0)
-            {
-                int count = 1;
-                foreach (var data in userAcceptRatioRank)
-                {
-                    var user = data.User;
-                    sb.AppendLine($"{count++}. {(!user.PreferAnymouse ? user.UserNick : "匿名用户")} {user.AcceptCount} / {user.PostCount} {data.Ratio.ToString("0.00")}%");
-                }
-            }
-            else
-            {
-                sb.AppendLine("暂无数据");
-            }
-
-            sb.AppendLine($"-- 管理员投稿数量排名 --");
+            sb.AppendLine();
+            sb.AppendLine("-- 管理员投稿数量排名 --");
             var adminAcceptCountRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
                 .OrderByDescending(x => x.AcceptCount).Take(topCount).ToListAsync();
             if (adminAcceptCountRank?.Count > 0)
@@ -854,7 +838,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 sb.AppendLine("暂无数据");
             }
 
-            sb.AppendLine($"-- 管理员审核数量排名 --");
+            sb.AppendLine();
+            sb.AppendLine("-- 管理员审核数量排名 --");
             var adminReviewCountRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.ReviewCount > miniumPost && x.ModifyAt >= prev30Days)
                 .OrderByDescending(x => x.ReviewCount).Take(topCount).ToListAsync();
             if (adminReviewCountRank?.Count > 0)
