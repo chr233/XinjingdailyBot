@@ -1,5 +1,8 @@
 ﻿namespace XinjingdailyBot.Enums
 {
+    /// <summary>
+    /// 封禁类型
+    /// </summary>
     internal enum BanType : byte
     {
         /// <summary>
