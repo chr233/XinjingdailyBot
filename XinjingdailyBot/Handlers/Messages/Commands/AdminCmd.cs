@@ -716,33 +716,30 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         {
             StringBuilder sb = new();
 
-            var drivers = DriveInfo.GetDrives();
-
-            sb.AppendLine("-- 硬盘信息 --");
-            foreach (var d in drivers)
-            {
-                if (d.IsReady)
-                {
-                    double freeSpacePerc = (d.AvailableFreeSpace / (float)d.TotalSize) * 100;
-
-                    // Ouput drive information
-                    sb.AppendLine($"{d.Name} ({d.DriveFormat}, {d.DriveType})");
-
-                    sb.AppendLine($"Percentage free space: {freeSpacePerc:0.00}%.");
-
-                }
-            }
-
-
+            sb.AppendLine("-- 应用信息 --");
             var proc = Process.GetCurrentProcess();
             double mem = proc.WorkingSet64 / 1024.0 / 1024.0;
             TimeSpan cpu = proc.TotalProcessorTime;
-
-            sb.AppendLine("-- 运行环境 --");
+            sb.AppendLine($"当前机器人版本: {MyVersion}");
             sb.AppendLine($"占用内存: <code>{mem.ToString("f2")}</code> MB");
             sb.AppendLine($"运行时间: <code>{cpu.TotalMinutes.ToString("0.00")}</code> 天");
-            sb.AppendLine($".NET版本: <code>.Net {Environment.Version} {RuntimeInformation.OSArchitecture}</code>");
-            sb.AppendLine($"系统信息: <code>{RuntimeInformation.FrameworkDescription}</code>");
+
+            sb.AppendLine();
+            sb.AppendLine("-- 硬盘信息 --");
+            DriveInfo[] drives = DriveInfo.GetDrives();
+            foreach (var drive in drives)
+            {
+                if (drive.IsReady)
+                {
+                    double freeSpacePerc = (drive.AvailableFreeSpace / (float)drive.TotalSize) * 100;
+                    sb.AppendLine($"{drive.Name} {drive.DriveFormat} 已用: {freeSpacePerc:0.00}%");
+                }
+            }
+
+            sb.AppendLine();
+            sb.AppendLine("-- 系统环境 --");
+            sb.AppendLine($"框架版本: <code>DotNet {Environment.Version} {RuntimeInformation.OSArchitecture}</code>");
+            sb.AppendLine($"系统信息: <code>{RuntimeInformation.OSDescription}</code>");
 
             await botClient.SendCommandReply(sb.ToString(), message, true, ParseMode.Html);
         }
