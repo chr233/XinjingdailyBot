@@ -679,6 +679,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             int totalAcceptPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Accepted).CountAsync();
             int totalRejectPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Rejected).CountAsync();
             int totalExpiredPost = await DB.Queryable<Posts>().Where(x => x.Status < 0).CountAsync();
+            int totalChannel = await DB.Queryable<Channels>().CountAsync();
             int totalAttachment = await DB.Queryable<Attachments>().CountAsync();
 
             sb.AppendLine();
@@ -687,6 +688,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             sb.AppendLine($"通过率: <code>{(totalPost > 0 ? (100 * totalAcceptPost / totalPost).ToString("f2") : "--")}%</code>");
             sb.AppendLine($"过期投稿: <code>{totalExpiredPost}</code>");
             sb.AppendLine($"累计投稿: <code>{totalPost}</code>");
+            sb.AppendLine($"频道总数: <code>{totalChannel}</code>");
             sb.AppendLine($"附件总数: <code>{totalAttachment}</code>");
 
             int totalUser = await DB.Queryable<Users>().CountAsync();
@@ -720,7 +722,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             var proc = Process.GetCurrentProcess();
             double mem = proc.WorkingSet64 / 1024.0 / 1024.0;
             TimeSpan cpu = proc.TotalProcessorTime;
-            sb.AppendLine($"当前机器人版本: {MyVersion}");
+            sb.AppendLine($"当前版本: <code>{MyVersion}</code>");
             sb.AppendLine($"占用内存: <code>{mem.ToString("f2")}</code> MB");
             sb.AppendLine($"运行时间: <code>{cpu.TotalMinutes.ToString("0.00")}</code> 天");
 
@@ -731,7 +733,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             {
                 if (drive.IsReady)
                 {
-                    double freeSpacePerc = (drive.AvailableFreeSpace / (float)drive.TotalSize) * 100;
+                    double freeSpacePerc = (drive.TotalSize - drive.AvailableFreeSpace) / drive.TotalSize * 100.0;
                     sb.AppendLine($"{drive.Name} {drive.DriveFormat} 已用: {freeSpacePerc:0.00}%");
                 }
             }
@@ -853,6 +855,68 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             }
 
             await botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
+        }
+
+        /// <summary>
+        /// 来源频道设置
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="message"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        internal static async Task ResponseChannalOption(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
+        {
+            bool autoDelete = true;
+            async Task<string> exec()
+            {
+                var targetUser = await FetchUserHelper.FetchTargetUser(message);
+
+                if (targetUser == null)
+                {
+                    if (args.Any())
+                    {
+                        targetUser = await FetchUserHelper.FetchDbUserByUserNameOrUserID(args.First());
+                        args = args[1..];
+                    }
+                }
+
+                if (targetUser == null)
+                {
+                    return "找不到指定用户";
+                }
+
+                if (targetUser.UserID == dbUser.UserID)
+                {
+                    return "为什么有人想要自己回复自己?";
+                }
+
+                if (targetUser.PrivateChatID <= 0)
+                {
+                    return "该用户尚未私聊过机器人, 无法发送消息";
+                }
+
+                string msg = string.Join(' ', args).Trim();
+
+                if (string.IsNullOrEmpty(msg))
+                {
+                    return "请输入回复内容";
+                }
+
+                autoDelete = false;
+                try
+                {
+                    msg = TextHelper.EscapeHtml(msg);
+                    await botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"来自管理员的消息:\n<code>{msg}</code>", ParseMode.Html);
+                    return "消息发送成功";
+                }
+                catch (Exception ex)
+                {
+                    return $"消息发送失败 {ex.Message}";
+                }
+            }
+
+            string text = await exec();
+            await botClient.SendCommandReply(text, message, autoDelete);
         }
     }
 }
