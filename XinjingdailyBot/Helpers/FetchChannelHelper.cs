@@ -133,11 +133,7 @@ namespace XinjingdailyBot.Handlers
                     dbUser.Level = 0;
                 }
 
-                //超过设定时间也触发更新
-                if (DateTime.Now > dbUser.ModifyAt + UpdatePeriod)
-                {
-                    needUpdate = true;
-                }
+
 
                 if (!UGroups.ContainsKey(dbUser.GroupID))
                 {
@@ -193,7 +189,7 @@ namespace XinjingdailyBot.Handlers
                 return null;
             }
 
-            return dbUser;
+            return null;
         }
 
         /// <summary>
