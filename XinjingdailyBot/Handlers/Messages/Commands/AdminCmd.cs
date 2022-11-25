@@ -731,7 +731,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             DriveInfo[] drives = DriveInfo.GetDrives();
             foreach (var drive in drives)
             {
-                if (drive.IsReady)
+                if (drive.IsReady && drive.TotalSize > 0)
                 {
                     double freeSpacePerc = (drive.TotalSize - drive.AvailableFreeSpace) / drive.TotalSize * 100.0;
                     sb.AppendLine($"{drive.Name} {drive.DriveFormat} 已用: {freeSpacePerc:0.00}%");
