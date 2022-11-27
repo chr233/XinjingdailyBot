@@ -68,7 +68,7 @@ namespace XinjingdailyBot.Models
         /// 是否为频道转发
         /// </summary>
         [SugarColumn(IsIgnore = true)]
-        public bool IsFromChannel => !string.IsNullOrEmpty(ChannelName);
+        public bool IsFromChannel => !string.IsNullOrEmpty(ChannelName) && !ChannelName.EndsWith('~');
 
         /// <summary>
         /// 来源频道ID

@@ -22,7 +22,7 @@
   <ItemGroup>
     <PackageReference Include="MySql.Data" Version="8.0.31" />
     <PackageReference Include="NLog" Version="5.0.5" />
-    <PackageReference Include="SqlSugarCore" Version="5.1.3.29" />
+    <PackageReference Include="SqlSugarCore" Version="5.1.3.34" />
     <PackageReference Include="Telegram.Bot" Version="18.0.0" />
   </ItemGroup>
 
@@ -58,9 +58,5 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="powershell -Command &quot;&amp;'$(ProjectDir)scripts\Pre-Build.ps1' '$(ProjectDir)'&quot;" />
-  </Target>
 
 </Project>

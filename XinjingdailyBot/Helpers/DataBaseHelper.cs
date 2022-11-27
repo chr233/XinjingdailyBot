@@ -69,6 +69,7 @@ namespace XinjingdailyBot.Helpers
                 DB.CodeFirst.InitTables<Advertises>();
                 DB.CodeFirst.InitTables<CmdRecords>();
                 DB.CodeFirst.InitTables<BanRecords>();
+                DB.CodeFirst.InitTables<Channels>();
             }
 
             await LoadLevelsAndRights();
