@@ -4,6 +4,8 @@ using MySqlX.XDevAPI.Relational;
 using SqlSugar;
 using XinjingdailyBot.Helpers;
 using static XinjingdailyBot.Utils;
+using System.IO;
+using System;
 
 namespace XinjingdailyBot.Handlers.Messages.Commands
 {
@@ -618,6 +620,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         internal static async Task ResponsePostReport(ITelegramBotClient botClient, Message message)
         {
             DateTime now = DateTime.Now;
+            DateTime prev1Day = now.AddDays(-1).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             DateTime prev7Days = now.AddDays(-7).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             DateTime prev30Days = now.AddDays(-30).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             DateTime monthStart = now.AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
@@ -625,12 +628,24 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             StringBuilder sb = new();
 
+            int todayPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev1Day && x.Status > PostStatus.Cancel).CountAsync();
+            int todayAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev1Day && x.Status == PostStatus.Accepted).CountAsync();
+            int todayRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev1Day && x.Status == PostStatus.Rejected).CountAsync();
+            int todayExpiredPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev1Day && x.Status < 0).CountAsync();
+
+            sb.AppendLine("-- 24小时投稿统计 --");
+            sb.AppendLine($"接受/拒绝: <code>{todayAcceptPost}</code> / <code>{todayRejectPost}</code>");
+            sb.AppendLine($"通过率: <code>{(todayPost > 0 ? (100 * todayAcceptPost / todayPost).ToString("f2") : "--")}%</code>");
+            sb.AppendLine($"过期投稿: <code>{todayExpiredPost}</code>");
+            sb.AppendLine($"累计投稿: <code>{todayPost + todayExpiredPost}</code>");
+
             int weekPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev7Days && x.Status > PostStatus.Cancel).CountAsync();
             int weekAcceptPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev7Days && x.Status == PostStatus.Accepted).CountAsync();
             int weekRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev7Days && x.Status == PostStatus.Rejected).CountAsync();
             int weekExpiredPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= prev7Days && x.Status < 0).CountAsync();
 
-            sb.AppendLine($"-- 最近7天投稿统计 --");
+            sb.AppendLine();
+            sb.AppendLine("-- 7日投稿统计 --");
             sb.AppendLine($"接受/拒绝: <code>{weekAcceptPost}</code> / <code>{weekRejectPost}</code>");
             sb.AppendLine($"通过率: <code>{(weekPost > 0 ? (100 * weekAcceptPost / weekPost).ToString("f2") : "--")}%</code>");
             sb.AppendLine($"过期投稿: <code>{weekExpiredPost}</code>");
@@ -641,7 +656,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             int monthRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Rejected).CountAsync();
             int monthExpiredPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= monthStart && x.Status < 0).CountAsync();
 
-            sb.AppendLine($"-- {monthStart.ToString("MM")} 月度投稿统计 --");
+            sb.AppendLine();
+            sb.AppendLine($"-- {monthStart.ToString("MM")}月投稿统计 --");
             sb.AppendLine($"接受/拒绝: <code>{monthAcceptPost}</code> / <code>{monthRejectPost}</code>");
             sb.AppendLine($"通过率: <code>{(monthPost > 0 ? (100 * monthAcceptPost / monthPost).ToString("f2") : "--")}%</code>");
             sb.AppendLine($"过期投稿: <code>{monthExpiredPost}</code>");
@@ -652,7 +668,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             int yearRejectPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= yearStart && x.Status == PostStatus.Rejected).CountAsync();
             int yearExpiredPost = await DB.Queryable<Posts>().Where(x => x.CreateAt >= yearStart && x.Status < 0).CountAsync();
 
-            sb.AppendLine($"-- {yearStart.ToString("yyyy")} 年度投稿统计 --");
+            sb.AppendLine();
+            sb.AppendLine($"-- {yearStart.ToString("yyyy")}年投稿统计 --");
             sb.AppendLine($"接受/拒绝: <code>{yearAcceptPost}</code> / <code>{yearRejectPost}</code>");
             sb.AppendLine($"通过率: <code>{(yearPost > 0 ? (100 * yearAcceptPost / yearPost).ToString("f2") : "--")}%</code>");
             sb.AppendLine($"过期投稿: <code>{yearExpiredPost}</code>");
@@ -662,13 +679,16 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             int totalAcceptPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Accepted).CountAsync();
             int totalRejectPost = await DB.Queryable<Posts>().Where(x => x.Status == PostStatus.Rejected).CountAsync();
             int totalExpiredPost = await DB.Queryable<Posts>().Where(x => x.Status < 0).CountAsync();
+            int totalChannel = await DB.Queryable<Channels>().CountAsync();
             int totalAttachment = await DB.Queryable<Attachments>().CountAsync();
 
+            sb.AppendLine();
             sb.AppendLine("-- 历史投稿统计 --");
             sb.AppendLine($"接受/拒绝: <code>{totalAcceptPost}</code> / <code>{totalRejectPost}</code>");
             sb.AppendLine($"通过率: <code>{(totalPost > 0 ? (100 * totalAcceptPost / totalPost).ToString("f2") : "--")}%</code>");
             sb.AppendLine($"过期投稿: <code>{totalExpiredPost}</code>");
             sb.AppendLine($"累计投稿: <code>{totalPost}</code>");
+            sb.AppendLine($"频道总数: <code>{totalChannel}</code>");
             sb.AppendLine($"附件总数: <code>{totalAttachment}</code>");
 
             int totalUser = await DB.Queryable<Users>().CountAsync();
@@ -677,6 +697,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             int MonthActiveUser = await DB.Queryable<Users>().Where(x => x.ModifyAt >= prev30Days).CountAsync();
             int postedUser = await DB.Queryable<Users>().Where(x => x.PostCount > 0).CountAsync();
 
+            sb.AppendLine();
             sb.AppendLine("-- 用户统计 --");
             sb.AppendLine($"封禁用户: <code>{banedUser}</code>");
             sb.AppendLine($"周活用户: <code>{weekActiveUser}</code>");
@@ -697,15 +718,30 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         {
             StringBuilder sb = new();
 
-            Process? proc = Process.GetCurrentProcess();
+            sb.AppendLine("-- 应用信息 --");
+            var proc = Process.GetCurrentProcess();
             double mem = proc.WorkingSet64 / 1024.0 / 1024.0;
             TimeSpan cpu = proc.TotalProcessorTime;
-
-            sb.AppendLine("-- 系统状态统计 --");
+            sb.AppendLine($"当前版本: <code>{MyVersion}</code>");
             sb.AppendLine($"占用内存: <code>{mem.ToString("f2")}</code> MB");
             sb.AppendLine($"运行时间: <code>{cpu.TotalMinutes.ToString("0.00")}</code> 天");
-            sb.AppendLine($".NET版本: <code>.Net {Environment.Version} {RuntimeInformation.OSArchitecture}</code>");
-            sb.AppendLine($"系统信息: <code>{RuntimeInformation.FrameworkDescription}</code>");
+
+            sb.AppendLine();
+            sb.AppendLine("-- 硬盘信息 --");
+            DriveInfo[] drives = DriveInfo.GetDrives();
+            foreach (var drive in drives)
+            {
+                if (drive.IsReady && drive.TotalSize > 0)
+                {
+                    double freeSpacePerc = (drive.TotalSize - drive.AvailableFreeSpace) / drive.TotalSize * 100.0;
+                    sb.AppendLine($"{drive.Name} {drive.DriveFormat} 已用: {freeSpacePerc:0.00}%");
+                }
+            }
+
+            sb.AppendLine();
+            sb.AppendLine("-- 系统环境 --");
+            sb.AppendLine($"框架版本: <code>DotNet {Environment.Version} {RuntimeInformation.OSArchitecture}</code>");
+            sb.AppendLine($"系统信息: <code>{RuntimeInformation.OSDescription}</code>");
 
             await botClient.SendCommandReply(sb.ToString(), message, true, ParseMode.Html);
         }
@@ -768,7 +804,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
             StringBuilder sb = new();
 
-            sb.AppendLine($"-- 用户投稿数量排名 --");
+            sb.AppendLine("-- 用户投稿数量排名 --");
             var userAcceptCountRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
                 .OrderByDescending(x => x.AcceptCount).Take(topCount).ToListAsync();
             if (userAcceptCountRank?.Count > 0)
@@ -784,24 +820,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 sb.AppendLine("暂无数据");
             }
 
-            sb.AppendLine($"-- 用户投稿通过率排名 --");
-            var userAcceptRatioRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
-                .Select(y => new { User = y, Ratio = 100.0 * y.AcceptCount / y.PostCount }).OrderByDescending(x => x.Ratio).Take(topCount).ToListAsync();
-            if (userAcceptRatioRank?.Count > 0)
-            {
-                int count = 1;
-                foreach (var data in userAcceptRatioRank)
-                {
-                    var user = data.User;
-                    sb.AppendLine($"{count++}. {(!user.PreferAnymouse ? user.UserNick : "匿名用户")} {user.AcceptCount} / {user.PostCount} {data.Ratio.ToString("0.00")}%");
-                }
-            }
-            else
-            {
-                sb.AppendLine("暂无数据");
-            }
-
-            sb.AppendLine($"-- 管理员投稿数量排名 --");
+            sb.AppendLine();
+            sb.AppendLine("-- 管理员投稿数量排名 --");
             var adminAcceptCountRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
                 .OrderByDescending(x => x.AcceptCount).Take(topCount).ToListAsync();
             if (adminAcceptCountRank?.Count > 0)
@@ -817,7 +837,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 sb.AppendLine("暂无数据");
             }
 
-            sb.AppendLine($"-- 管理员审核数量排名 --");
+            sb.AppendLine();
+            sb.AppendLine("-- 管理员审核数量排名 --");
             var adminReviewCountRank = await DB.Queryable<Users>().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.ReviewCount > miniumPost && x.ModifyAt >= prev30Days)
                 .OrderByDescending(x => x.ReviewCount).Take(topCount).ToListAsync();
             if (adminReviewCountRank?.Count > 0)
@@ -834,6 +855,68 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             }
 
             await botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
+        }
+
+        /// <summary>
+        /// 来源频道设置
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="message"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        internal static async Task ResponseChannalOption(ITelegramBotClient botClient, Users dbUser, Message message, string[] args)
+        {
+            bool autoDelete = true;
+            async Task<string> exec()
+            {
+                var targetUser = await FetchUserHelper.FetchTargetUser(message);
+
+                if (targetUser == null)
+                {
+                    if (args.Any())
+                    {
+                        targetUser = await FetchUserHelper.FetchDbUserByUserNameOrUserID(args.First());
+                        args = args[1..];
+                    }
+                }
+
+                if (targetUser == null)
+                {
+                    return "找不到指定用户";
+                }
+
+                if (targetUser.UserID == dbUser.UserID)
+                {
+                    return "为什么有人想要自己回复自己?";
+                }
+
+                if (targetUser.PrivateChatID <= 0)
+                {
+                    return "该用户尚未私聊过机器人, 无法发送消息";
+                }
+
+                string msg = string.Join(' ', args).Trim();
+
+                if (string.IsNullOrEmpty(msg))
+                {
+                    return "请输入回复内容";
+                }
+
+                autoDelete = false;
+                try
+                {
+                    msg = TextHelper.EscapeHtml(msg);
+                    await botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"来自管理员的消息:\n<code>{msg}</code>", ParseMode.Html);
+                    return "消息发送成功";
+                }
+                catch (Exception ex)
+                {
+                    return $"消息发送失败 {ex.Message}";
+                }
+            }
+
+            string text = await exec();
+            await botClient.SendCommandReply(text, message, autoDelete);
         }
     }
 }
