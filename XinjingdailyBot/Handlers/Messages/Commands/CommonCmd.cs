@@ -173,7 +173,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             StringBuilder sb = new();
 
             string status = dbUser.IsBan ? "已封禁" : "正常";
-            sb.AppendLine($"用户名: <code>{dbUser.UserNick}</code>");
+            sb.AppendLine($"用户名: <code>{dbUser.EscapedNickName()}</code>");
             sb.AppendLine($"用户ID: <code>{dbUser.UserID}</code>");
             sb.AppendLine($"状态: <code>{status}</code>");
             sb.AppendLine();

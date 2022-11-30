@@ -14,7 +14,7 @@
 
         internal static string UserProfile(this User user)
         {
-            return $"{user.NickName()} {user.UserID()}";
+            return $"{user.EscapedUserName()} {user.UserID()}";
         }
     }
 }

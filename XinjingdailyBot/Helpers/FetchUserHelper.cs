@@ -404,7 +404,7 @@ namespace XinjingdailyBot.Handlers
             int index = 0;
             foreach (var user in userList)
             {
-                string url = TextHelper.HtmlUserLink(user);
+                string url = user.HtmlUserLink();
 
                 sb.Append($"{start + index++}. <code>{user.UserID}</code> {url}");
 
