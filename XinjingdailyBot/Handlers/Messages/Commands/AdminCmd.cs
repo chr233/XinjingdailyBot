@@ -19,7 +19,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <summary>
         /// 获取群组信息
         /// </summary>
-        /// <param name="dbUser"></param>
+        /// <param name="botClient"></param>
         /// <param name="message"></param>
         /// <returns></returns>
         internal static async Task ResponseGroupInfo(ITelegramBotClient botClient, Message message)
@@ -34,7 +34,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             }
             else
             {
-                sb.AppendLine($"群组名: <code>{chat.Title ?? "无"}</code>");
+                string groupTitle = chat.EscapedChatName();
+                sb.AppendLine($"群组名: <code>{groupTitle ?? "无"}</code>");
 
                 if (string.IsNullOrEmpty(chat.Username))
                 {
@@ -77,7 +78,6 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             }
             else
             {
-                string userNick = TextHelper.EscapeHtml(targetUser.UserNick);
                 string level = "Lv Err";
                 if (ULevels.TryGetValue(targetUser.Level, out var l))
                 {
@@ -92,7 +92,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
 
                 int totalPost = targetUser.PostCount - targetUser.ExpiredPostCount;
 
-                sb.AppendLine($"用户名: <code>{userNick}</code>");
+                sb.AppendLine($"用户名: <code>{targetUser.EscapedNickName()}</code>");
                 sb.AppendLine($"用户ID: <code>{targetUser.UserID}</code>");
                 sb.AppendLine($"用户组: <code>{group}</code>");
                 sb.AppendLine($"状态: <code>{status}</code>");
@@ -191,8 +191,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                     }
 
                     StringBuilder sb = new();
-                    sb.AppendLine($"成功封禁 {TextHelper.HtmlUserLink(targetUser)}");
-                    sb.AppendLine($"操作员 {TextHelper.HtmlUserLink(dbUser)}");
+                    sb.AppendLine($"成功封禁 {targetUser.HtmlUserLink()}");
+                    sb.AppendLine($"操作员 {dbUser.HtmlUserLink()}");
                     sb.AppendLine($"封禁理由 <code>{reason}</code>");
                     return sb.ToString();
                 }
@@ -286,8 +286,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                     }
 
                     StringBuilder sb = new();
-                    sb.AppendLine($"成功解封 {TextHelper.HtmlUserLink(targetUser)}");
-                    sb.AppendLine($"操作员 {TextHelper.HtmlUserLink(dbUser)}");
+                    sb.AppendLine($"成功解封 {targetUser.HtmlUserLink()}");
+                    sb.AppendLine($"操作员 {dbUser.HtmlUserLink()}");
                     sb.AppendLine($"解封理由 <code>{reason}</code>");
                     return sb.ToString();
                 }
@@ -375,8 +375,8 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                     warnCount++;
 
                     StringBuilder sb = new();
-                    sb.AppendLine($"成功警告 {TextHelper.HtmlUserLink(targetUser)}");
-                    sb.AppendLine($"操作员 {TextHelper.HtmlUserLink(dbUser)}");
+                    sb.AppendLine($"成功警告 {targetUser.HtmlUserLink()}");
+                    sb.AppendLine($"操作员 {dbUser.HtmlUserLink()}");
                     sb.AppendLine($"警告理由 <code>{reason}</code>");
                     sb.AppendLine($"累计警告 <code>{warnCount}</code> / <code>{WarningLimit}</code> 次");
 
@@ -464,7 +464,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 var records = await DB.Queryable<BanRecords>().Where(x => x.UserID == targetUser.UserID).ToListAsync();
 
                 string status = targetUser.IsBan ? "已封禁" : "正常";
-                sb.AppendLine($"用户名: <code>{targetUser.UserNick}</code>");
+                sb.AppendLine($"用户名: <code>{targetUser.EscapedNickName()}</code>");
                 sb.AppendLine($"用户ID: <code>{targetUser.UserID}</code>");
                 sb.AppendLine($"状态: <code>{status}</code>");
                 sb.AppendLine();
@@ -502,7 +502,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                         else
                         {
                             var user = users.Find(x => x.UserID == record.OperatorUID);
-                            admin = user != null ? user.UserNick : record.OperatorUID.ToString();
+                            admin = user != null ? user.EscapedNickName() : record.OperatorUID.ToString();
                         }
 
                         sb.AppendLine($"在 <code>{date}</code> 因为 <code>{record.Reason}</code> 被 <code>{admin}</code> {operate}");
@@ -794,7 +794,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        internal static async Task ResponseUserRank(ITelegramBotClient botClient, Users dbUser, Message message)
+        internal static async Task ResponseUserRank(ITelegramBotClient botClient, Message message)
         {
             DateTime now = DateTime.Now;
             DateTime prev30Days = now.AddDays(-30).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
@@ -812,7 +812,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 int count = 1;
                 foreach (var user in userAcceptCountRank)
                 {
-                    sb.AppendLine($"{count++}. {(!user.PreferAnymouse ? user.UserNick : "匿名用户")} {user.AcceptCount}");
+                    sb.AppendLine($"{count++}. {(!user.PreferAnymouse ? user.EscapedNickName() : "匿名用户")} {user.AcceptCount}");
                 }
             }
             else
@@ -829,7 +829,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 int count = 1;
                 foreach (var user in adminAcceptCountRank)
                 {
-                    sb.AppendLine($"{count++}. {(!user.PreferAnymouse ? user.UserNick : "匿名管理员")} {user.AcceptCount}");
+                    sb.AppendLine($"{count++}. {(!user.PreferAnymouse ? user.EscapedNickName() : "匿名管理员")} {user.AcceptCount}");
                 }
             }
             else
@@ -846,7 +846,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
                 int count = 1;
                 foreach (var user in adminReviewCountRank)
                 {
-                    sb.AppendLine($"{count++}. {(!user.PreferAnymouse ? user.UserNick : "匿名管理员")} {user.ReviewCount}");
+                    sb.AppendLine($"{count++}. {(!user.PreferAnymouse ? user.EscapedNickName() : "匿名管理员")} {user.ReviewCount}");
                 }
             }
             else
