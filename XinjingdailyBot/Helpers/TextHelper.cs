@@ -1,4 +1,6 @@
 ﻿using System.Text.RegularExpressions;
+using Telegram.Bot.Types;
+using XinjingdailyBot.Models;
 
 namespace XinjingdailyBot.Helpers
 {
@@ -72,10 +74,9 @@ namespace XinjingdailyBot.Helpers
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        internal static string HtmlUserLink(Users user)
+        internal static string HtmlUserLink(this Users user)
         {
-            string userNick = user.UserNick;
-            return HtmlUserLink(user.UserID, user.UserName, userNick);
+            return HtmlUserLink(user.UserID, user.UserName, user.UserNick);
         }
 
         /// <summary>
@@ -130,6 +131,36 @@ namespace XinjingdailyBot.Helpers
                     .Replace("&", "＆");
                 return escapedText;
             }
+        }
+
+        /// <summary>
+        /// HTML转义后的用户名
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        internal static string EscapedNickName(this Users user)
+        {
+            return EscapeHtml(user.UserNick);
+        }
+
+        /// <summary>
+        /// HTML转义后的聊天名
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        internal static string EscapedChatName(this Chat chat)
+        {
+            return EscapeHtml(chat.Title);
+        }
+
+        /// <summary>
+        /// HTML转义后的用户名
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        internal static string EscapedUserName(this User user)
+        {
+            return EscapeHtml(user.NickName());
         }
 
         /// <summary>

@@ -48,7 +48,7 @@ namespace XinjingdailyBot.Helpers
             BotUser = await botClient.GetMeAsync();
 
             Logger.Info($"机器人ID: {BotUser.Id}");
-            Logger.Info($"机器人昵称: {BotUser.NickName()}");
+            Logger.Info($"机器人昵称: {BotUser.EscapedUserName()}");
             Logger.Info($"机器人用户名: @{BotUser.Username}");
 
             //var update = await botClient.GetUpdatesAsync(-1, 1);

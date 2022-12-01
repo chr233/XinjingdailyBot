@@ -212,7 +212,7 @@ namespace XinjingdailyBot.Handlers.Messages
 
                 case "URANK" when admin:
                 case "USERRANK" when admin:
-                    await AdminCmd.ResponseUserRank(botClient,dbUser, message);
+                    await AdminCmd.ResponseUserRank(botClient, message);
                     break;
 
                 //Super - 超级管理员命令
