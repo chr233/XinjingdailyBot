@@ -64,7 +64,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
         /// <returns></returns>
         internal static async Task ResponseMyInfo(ITelegramBotClient botClient, Users dbUser, Message message)
         {
-            string userNick = TextHelper.EscapeHtml(dbUser.UserNick);
+            string userNick = dbUser.EscapedNickName();
             string level = "Lv Err";
             if (ULevels.TryGetValue(dbUser.Level, out var l))
             {
@@ -146,7 +146,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             bool reviewPost = right.HasFlag(UserRights.ReviewPost);
             bool directPost = right.HasFlag(UserRights.DirectPost);
 
-            string userNick = TextHelper.EscapeHtml(dbUser.UserNick);
+            string userNick =dbUser.EscapedNickName();
 
             string group = "???";
             if (UGroups.TryGetValue(dbUser.GroupID, out var g))
