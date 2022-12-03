@@ -65,7 +65,7 @@ namespace XinjingdailyBot.Handlers.Queries
             }
             catch (Exception ex)
             {
-                record.Exception = $"{ex.GetType} {ex.Message}";
+                record.Exception = $"{ex.GetType()} {ex.Message}";
                 record.Error = true;
                 throw;
             }
@@ -84,12 +84,12 @@ namespace XinjingdailyBot.Handlers.Queries
         /// <returns>handled,autoDelete</returns>
         private static async Task<(bool, bool)> ExecCommand(ITelegramBotClient botClient, Users dbUser, CallbackQuery callbackQuery, Message message, string[] args)
         {
-            bool inGroup = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
+            bool inGroup = message.Chat.Type is ChatType.Group or ChatType.Supergroup;
 
             //检查权限
             bool super = dbUser.Right.HasFlag(UserRights.SuperCmd);
-            bool admin = dbUser.Right.HasFlag(UserRights.AdminCmd) || super;
-            bool normal = dbUser.Right.HasFlag(UserRights.NormalCmd) || admin;
+            bool admin = dbUser.Right.HasFlag(UserRights.AdminCmd);
+            bool normal = dbUser.Right.HasFlag(UserRights.NormalCmd);
 
             //是否自动删除消息
             bool autoDelete = true;
