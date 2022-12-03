@@ -51,7 +51,7 @@ namespace XinjingdailyBot.Handlers.Messages
             }
             catch (Exception ex)
             {
-                record.Exception = $"{ex.GetType} {ex.Message}";
+                record.Exception = $"{ex.GetType()} {ex.Message}";
                 record.Error = true;
                 throw;
             }
@@ -80,7 +80,7 @@ namespace XinjingdailyBot.Handlers.Messages
             string cmd = args.First()[1..];
             args = args[1..];
 
-            bool inGroup = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
+            bool inGroup = message.Chat.Type is ChatType.Group or ChatType.Supergroup;
 
             //判断是不是艾特机器人的命令
             bool isAtBot = false;
@@ -101,9 +101,10 @@ namespace XinjingdailyBot.Handlers.Messages
 
             //检查权限
             bool super = dbUser.Right.HasFlag(UserRights.SuperCmd);
-            bool admin = dbUser.Right.HasFlag(UserRights.AdminCmd) || super;
-            bool normal = dbUser.Right.HasFlag(UserRights.NormalCmd) || admin;
+            bool admin = dbUser.Right.HasFlag(UserRights.AdminCmd);
+            bool normal = dbUser.Right.HasFlag(UserRights.NormalCmd);
             bool reviewPost = dbUser.Right.HasFlag(UserRights.ReviewPost);
+            bool theMartian = dbUser.Right.HasFlag(UserRights.Mars);
 
             //是否自动删除消息
             bool autoDelete = true;
@@ -232,6 +233,12 @@ namespace XinjingdailyBot.Handlers.Messages
 
                 case "EDIT" when reviewPost:
                     await ReviewCmd.ResponseEditPost(botClient, dbUser, message, args);
+                    autoDelete = false;
+                    break;
+                
+                //Mars - 火星救员
+                case "MARS" when theMartian:
+                    await TheMartianCmd.ResponseMars(botClient, dbUser, message);
                     autoDelete = false;
                     break;
 
