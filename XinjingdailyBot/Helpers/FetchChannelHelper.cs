@@ -1,9 +1,8 @@
 ﻿using SqlSugar;
 using Telegram.Bot.Types.ReplyMarkups;
-using XinjingdailyBot.Helpers;
 using static XinjingdailyBot.Utils;
 
-namespace XinjingdailyBot.Handlers
+namespace XinjingdailyBot.Helpers
 {
     internal static class FetchChannelHelper
     {
@@ -14,7 +13,7 @@ namespace XinjingdailyBot.Handlers
         /// <returns></returns>
         internal static async Task<Channels?> FetchDbChannel(Update update)
         {
-            User? msgUser = update.Type switch
+            var msgUser = update.Type switch
             {
                 UpdateType.ChannelPost => update.ChannelPost!.From,
                 UpdateType.EditedChannelPost => update.EditedChannelPost!.From,
@@ -26,7 +25,7 @@ namespace XinjingdailyBot.Handlers
                 _ => null
             };
 
-            Chat? msgChat = update.Type switch
+            var msgChat = update.Type switch
             {
                 UpdateType.ChannelPost => update.ChannelPost!.Chat,
                 UpdateType.EditedChannelPost => update.EditedChannelPost!.Chat,
@@ -62,9 +61,9 @@ namespace XinjingdailyBot.Handlers
                 return null;
             }
 
-            Users? dbUser = await DB.Queryable<Users>().FirstAsync(x => x.UserID == msgUser.Id);
+            var dbUser = await DB.Queryable<Users>().FirstAsync(x => x.UserID == msgUser.Id);
 
-            long chatID = (msgChat?.Type == ChatType.Private) ? msgChat.Id : -1;
+            var chatID = msgChat?.Type == ChatType.Private ? msgChat.Id : -1;
 
             if (dbUser == null)
             {
@@ -100,7 +99,7 @@ namespace XinjingdailyBot.Handlers
             }
             else
             {
-                bool needUpdate = false;
+                var needUpdate = false;
 
                 //用户名不一致时更新
                 if (!(dbUser.UserName.Equals(msgUser.Username ?? "") && dbUser.FirstName.Equals(msgUser.FirstName) && dbUser.LastName.Equals(msgUser.LastName ?? "")))
@@ -174,7 +173,7 @@ namespace XinjingdailyBot.Handlers
             //如果是配置文件中指定的管理员就覆盖用户组权限
             if (BotConfig.SuperAdmins.Contains(dbUser.UserID))
             {
-                int maxGroupID = UGroups.Keys.Max();
+                var maxGroupID = UGroups.Keys.Max();
                 dbUser.GroupID = maxGroupID;
             }
 
@@ -240,7 +239,7 @@ namespace XinjingdailyBot.Handlers
                 return null;
             }
 
-            Message replyToMsg = message.ReplyToMessage;
+            var replyToMsg = message.ReplyToMessage;
 
             if (replyToMsg.From == null)
             {
@@ -253,7 +252,7 @@ namespace XinjingdailyBot.Handlers
                 //在审核群内
                 if (message.Chat.Id == ReviewGroup.Id)
                 {
-                    int msgID = replyToMsg.MessageId;
+                    var msgID = replyToMsg.MessageId;
 
                     var exp = Expressionable.Create<Posts>();
                     exp.Or(x => x.ManageMsgID == msgID);
@@ -355,7 +354,7 @@ namespace XinjingdailyBot.Handlers
             var exp = Expressionable.Create<Users>();
 
             //根据userID查找用户
-            if (long.TryParse(query, out long userID))
+            if (long.TryParse(query, out var userID))
             {
                 exp.Or(x => x.UserID == userID);
             }
@@ -377,7 +376,7 @@ namespace XinjingdailyBot.Handlers
                 return ("找不到符合条件的用户", null);
             }
 
-            int totalPages = userListCount / pageSize;
+            var totalPages = userListCount / pageSize;
             if (userListCount % pageSize > 0)
             {
                 totalPages++;
@@ -389,11 +388,11 @@ namespace XinjingdailyBot.Handlers
 
             StringBuilder sb = new();
 
-            int start = 1 + (page - 1) * pageSize;
-            int index = 0;
+            var start = 1 + (page - 1) * pageSize;
+            var index = 0;
             foreach (var user in userList)
             {
-                string url = user.HtmlUserLink();
+                var url = user.HtmlUserLink();
 
                 sb.Append($"{start + index++}. <code>{user.UserID}</code> {url}");
 

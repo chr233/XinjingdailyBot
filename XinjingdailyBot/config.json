@@ -5,12 +5,7 @@
   "ThrowPendingUpdates": false,
   "Proxy": null,
   "UseMysql": true,
-  "DBHost": "127.0.0.1",
-  "DBPort": 3306,
-  "DBName": "xjb_db",
-  "DBUser": "root",
-  "DBPassword": "123456",
-  "DBGenerate": true,
+
   "SuperAdmins": [],
   "ReviewGroup": "",
   "CommentGroup": "",
