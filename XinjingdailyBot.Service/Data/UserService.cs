@@ -1,18 +1,16 @@
-﻿using SqlSugar.IOC;
+﻿using System.Text;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SqlSugar;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
-using System.Text;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
+using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using XinjingdailyBot.Infrastructure;
 
 namespace XinjingdailyBot.Service.Data
 {
@@ -24,14 +22,20 @@ namespace XinjingdailyBot.Service.Data
         private readonly UserRepository _userRepository;
         private readonly CmdRecordRepository _cmdRecordRepository;
         private readonly PostRepository _postRepository;
+        private readonly GroupRepository _groupRepository;
 
+        /// <summary>
+        /// 更新周期
+        /// </summary>
+        private readonly TimeSpan UpdatePeriod = TimeSpan.FromDays(15);
 
         public UserService(
             ILogger<UserService> logger,
             IOptions<OptionsSetting> configuration,
             UserRepository userRepository,
             CmdRecordRepository cmdRecordRepository,
-            PostRepository postRepository
+            PostRepository postRepository,
+            GroupRepository groupRepository
         )
         {
             _logger = logger;
@@ -39,6 +43,7 @@ namespace XinjingdailyBot.Service.Data
             _userRepository = userRepository;
             _cmdRecordRepository = cmdRecordRepository;
             _postRepository = postRepository;
+            _groupRepository = groupRepository;
         }
 
         /// <summary>
@@ -84,24 +89,34 @@ namespace XinjingdailyBot.Service.Data
                 return null;
             }
 
+            bool isDebug = _optionsSetting.Debug;
+
             if (msgUser.Username == "GroupAnonymousBot")
             {
-                if (_optionsSetting.Debug)
+                if (isDebug)
                 {
                     if (msgChat != null)
                     {
-                        Logger.Debug($"S 忽略群匿名用户 {msgChat.ChatProfile()}");
+                        _logger.LogDebug($"S 忽略群匿名用户 {msgChat.ChatProfile()}");
                     }
                 }
                 return null;
             }
 
-            var dbUser = await DB.Queryable<Users>().FirstAsync(x => x.UserID == msgUser.Id);
+            var dbUser = await _userRepository.Queryable().FirstAsync(x => x.UserID == msgUser.Id);
 
             var chatID = msgChat?.Type == ChatType.Private ? msgChat.Id : -1;
 
             if (dbUser == null)
             {
+                var defaultGroup = await _groupRepository.GetDefaultGroup();
+
+                if (defaultGroup == null)
+                {
+                    _logger.LogError("未设置默认群组");
+                    return null;
+                }
+
                 dbUser = new()
                 {
                     UserID = msgUser.Id,
@@ -111,24 +126,23 @@ namespace XinjingdailyBot.Service.Data
                     IsBot = msgUser.IsBot,
                     IsBan = false,
                     IsVip = false,
-                    GroupID = DefaultGroup.Id,
+                    GroupID = defaultGroup.Id,
                     PrivateChatID = chatID,
-                    Right = DefaultGroup.DefaultRight,
+                    Right = defaultGroup.DefaultRight,
                     Level = 1,
                 };
 
                 try
                 {
-                    await DB.Insertable(dbUser).ExecuteCommandAsync();
-                    if (IsDebug)
+                    await _userRepository.Insertable(dbUser).ExecuteCommandAsync();
+                    if (isDebug)
                     {
-                        Logger.Debug($"S 创建用户 {dbUser} 成功");
+                        _logger.LogDebug("创建用户 {dbUser} 成功", dbUser);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"S 创建用户 {dbUser} 失败");
-                    Logger.Error(ex);
+                    _logger.LogError(ex, "创建用户 {dbUser} 失败", dbUser);
                     return null;
                 }
             }
@@ -173,9 +187,15 @@ namespace XinjingdailyBot.Service.Data
                     needUpdate = true;
                 }
 
-                if (!UGroups.ContainsKey(dbUser.GroupID))
+                if (!await _groupRepository.HasGroupId(dbUser.GroupID))
                 {
-                    dbUser.GroupID = DefaultGroup.Id;
+                    var defaultGroup = await _groupRepository.GetDefaultGroup();
+                    if (defaultGroup == null)
+                    {
+                        _logger.LogError("未设置默认群组");
+                        return null;
+                    }
+                    dbUser.GroupID = defaultGroup.Id;
                     needUpdate = true;
                 }
 
@@ -185,7 +205,7 @@ namespace XinjingdailyBot.Service.Data
                     try
                     {
                         dbUser.ModifyAt = DateTime.Now;
-                        await DB.Updateable(dbUser).UpdateColumns(x => new
+                        await _userRepository.Updateable(dbUser).UpdateColumns(x => new
                         {
                             x.UserName,
                             x.FirstName,
@@ -195,35 +215,36 @@ namespace XinjingdailyBot.Service.Data
                             x.PrivateChatID,
                             x.ModifyAt
                         }).ExecuteCommandAsync();
-                        if (IsDebug)
+                        if (isDebug)
                         {
-                            Logger.Debug($"S 更新用户 {dbUser} 成功");
+                            _logger.LogDebug("更新用户 {dbUser} 成功", dbUser);
                         }
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error($"S 更新用户 {dbUser} 失败");
-                        Logger.Error(ex);
+                        _logger.LogError(ex, "更新用户 {dbUser} 失败", dbUser);
                         return null;
                     }
                 }
             }
 
             //如果是配置文件中指定的管理员就覆盖用户组权限
-            if (BotConfig.SuperAdmins.Contains(dbUser.UserID))
+            if (_optionsSetting.Bot.SuperAdmins?.Contains(dbUser.UserID) ?? false)
             {
-                var maxGroupID = UGroups.Keys.Max();
+                var maxGroupID = await _groupRepository.GetMaxGroupId();
                 dbUser.GroupID = maxGroupID;
             }
 
             //根据GroupID设置用户权限信息
-            if (UGroups.TryGetValue(dbUser.GroupID, out var group))
+            var group = await _groupRepository.GetGroupById(dbUser.GroupID);
+
+            if (group != null)
             {
                 dbUser.Right = group.DefaultRight;
             }
             else
             {
-                Logger.Error($"S 读取用户 {dbUser} 权限组 {dbUser.GroupID} 失败");
+                _logger.LogError($"读取用户 {dbUser} 权限组 {dbUser.GroupID} 失败", dbUser, dbUser.GroupID);
                 return null;
             }
 
@@ -243,7 +264,7 @@ namespace XinjingdailyBot.Service.Data
             }
             else
             {
-                var dbUser = await DB.Queryable<Users>().FirstAsync(x => x.UserID == userID);
+                var dbUser = await _userRepository.Queryable().FirstAsync(x => x.UserID == userID);
                 return dbUser;
             }
         }
@@ -261,7 +282,7 @@ namespace XinjingdailyBot.Service.Data
             }
             else
             {
-                var dbUser = await DB.Queryable<Users>().FirstAsync(x => x.UserName == userName);
+                var dbUser = await _userRepository.Queryable().FirstAsync(x => x.UserName == userName);
                 return dbUser;
             }
         }
@@ -286,46 +307,46 @@ namespace XinjingdailyBot.Service.Data
             }
 
             //被回复的消息是Bot发的消息
-            if (replyToMsg.From.Id == BotUser.Id)
-            {
-                //在审核群内
-                if (message.Chat.Id == ReviewGroup.Id)
-                {
-                    var msgID = replyToMsg.MessageId;
+            //if (replyToMsg.From.Id == BotUser.Id)
+            //{
+            //    //在审核群内
+            //    if (message.Chat.Id == ReviewGroup.Id)
+            //    {
+            //        var msgID = replyToMsg.MessageId;
 
-                    var exp = Expressionable.Create<Posts>();
-                    exp.Or(x => x.ManageMsgID == msgID);
+            //        var exp = Expressionable.Create<Posts>();
+            //        exp.Or(x => x.ManageMsgID == msgID);
 
-                    if (string.IsNullOrEmpty(replyToMsg.MediaGroupId))
-                    {
-                        //普通消息
-                        exp.Or(x => x.ReviewMsgID == msgID);
-                    }
-                    else
-                    {
-                        //媒体组消息
-                        exp.Or(x => x.ReviewMsgID <= msgID && x.ManageMsgID > msgID);
-                    }
+            //        if (string.IsNullOrEmpty(replyToMsg.MediaGroupId))
+            //        {
+            //            //普通消息
+            //            exp.Or(x => x.ReviewMsgID == msgID);
+            //        }
+            //        else
+            //        {
+            //            //媒体组消息
+            //            exp.Or(x => x.ReviewMsgID <= msgID && x.ManageMsgID > msgID);
+            //        }
 
-                    var post = await _userRepository.Queryable<Posts>().FirstAsync(exp.ToExpression());
+            //        var post = await _userRepository.Queryable<Posts>().FirstAsync(exp.ToExpression());
 
-                    //判断是不是审核相关消息
-                    if (post != null)
-                    {
-                        //通过稿件读取用户信息
-                        return await FetchDbUserByUserID(post.PosterUID);
-                    }
-                }
+            //        //判断是不是审核相关消息
+            //        if (post != null)
+            //        {
+            //            //通过稿件读取用户信息
+            //            return await FetchDbUserByUserID(post.PosterUID);
+            //        }
+            //    }
 
-                //在CMD回调表里查看
-                var cmdAction = await _userRepository.Queryable<CmdRecords>().FirstAsync(x => x.MessageID == replyToMsg.MessageId);
-                if (cmdAction != null)
-                {
-                    return await FetchDbUserByUserID(cmdAction.UserID);
-                }
+            //    //在CMD回调表里查看
+            //    var cmdAction = await _userRepository.Queryable<CmdRecords>().FirstAsync(x => x.MessageID == replyToMsg.MessageId);
+            //    if (cmdAction != null)
+            //    {
+            //        return await FetchDbUserByUserID(cmdAction.UserID);
+            //    }
 
-                return null;
-            }
+            //    return null;
+            //}
 
             //获取消息发送人
             return await FetchDbUserByUserID(replyToMsg.From.Id);
@@ -431,31 +452,32 @@ namespace XinjingdailyBot.Service.Data
             var index = 0;
             foreach (var user in userList)
             {
-                var url = user.HtmlUserLink();
+                //var url = user.HtmlUserLink();
 
-                sb.Append($"{start + index++}. <code>{user.UserID}</code> {url}");
+                //sb.Append($"{start + index++}. <code>{user.UserID}</code> {url}");
 
-                if (!string.IsNullOrEmpty(user.UserName))
-                {
-                    sb.Append($" <code>@{user.UserName}</code>");
-                }
-                if (user.IsBan)
-                {
-                    sb.Append(" 已封禁");
-                }
-                if (user.IsBot)
-                {
-                    sb.Append(" 机器人");
-                }
+                //if (!string.IsNullOrEmpty(user.UserName))
+                //{
+                //    sb.Append($" <code>@{user.UserName}</code>");
+                //}
+                //if (user.IsBan)
+                //{
+                //    sb.Append(" 已封禁");
+                //}
+                //if (user.IsBot)
+                //{
+                //    sb.Append(" 机器人");
+                //}
                 sb.AppendLine();
             }
 
             sb.AppendLine();
             sb.AppendLine($"共 {userListCount} 条, 当前显示 {start}~{start + userList.Count - 1} 条");
 
-            var keyboard = MarkupHelper.UserListPageKeyboard(dbUser, query, page, totalPages);
+            //var keyboard = MarkupHelper.UserListPageKeyboard(dbUser, query, page, totalPages);
 
-            return (sb.ToString(), keyboard);
+            return (sb.ToString(), null);
+            //return (sb.ToString(), keyboard);
         }
     }
 }

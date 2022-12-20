@@ -13,7 +13,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
         /// <param name="services"></param>
         public static void AddAppService(this IServiceCollection services)
         {
-            string[] cls = new string[] { "TrxTradeBot.Repository", "TrxTradeBot.Service", "TrxTradeBot.Infrastructure" };
+            string[] cls = new string[] { "XinjingdailyBot.Repository", "XinjingdailyBot.Service", "XinjingdailyBot.Infrastructure" };
             foreach (var item in cls)
             {
                 Assembly assembly = Assembly.Load(item);

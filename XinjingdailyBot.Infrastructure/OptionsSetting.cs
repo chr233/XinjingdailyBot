@@ -36,7 +36,7 @@
             /// <summary>
             /// 超级管理员(覆盖数据库配置)
             /// </summary>
-            public HashSet<uint>? SuperAdmins { get; set; }
+            public HashSet<long>? SuperAdmins { get; set; }
         }
 
         public sealed record ChannelOption

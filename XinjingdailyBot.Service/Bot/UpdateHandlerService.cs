@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -8,25 +8,33 @@ using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface;
+using XinjingdailyBot.Interface.Data;
 
 namespace XinjingdailyBot.Service.Bot;
 
 [AppService(ServiceType = typeof(IUpdateHandler), ServiceLifetime = LifeTime.Transient)]
-public class UpdateHandler : IUpdateHandler
+public class UpdateHandlerService : IUpdateHandler
 {
     private readonly ITelegramBotClient _botClient;
-    private readonly ILogger<UpdateHandler> _logger;
+    private readonly ILogger<UpdateHandlerService> _logger;
+    private readonly IUserService _userService;
 
-    //private readonly IUserse
-
-    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger)
+    public UpdateHandlerService(
+        ITelegramBotClient botClient,
+        ILogger<UpdateHandlerService> logger,
+        IUserService userService        )
     {
         _botClient = botClient;
         _logger = logger;
+        _userService = userService;
     }
 
     public async Task HandleUpdateAsync(ITelegramBotClient _, Update update, CancellationToken cancellationToken)
     {
+        var dbuser = await _userService.FetchUser(update);
+
+        await _botClient.SendTextMessageAsync(update.Message.Chat, "Hello World!");
+
         //var handler = update switch
         //{
         //    // UpdateType.Unknown:
