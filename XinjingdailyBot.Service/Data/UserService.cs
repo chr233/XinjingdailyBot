@@ -1,16 +1,44 @@
-﻿using SqlSugar;
+﻿using SqlSugar.IOC;
+using SqlSugar;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
+using System.Text;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
-using static XinjingdailyBot.Utils;
+using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Interface.Data;
+using XinjingdailyBot.Model.Models;
+using XinjingdailyBot.Repository;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using XinjingdailyBot.Infrastructure;
 
-namespace XinjingdailyBot.Helpers
+namespace XinjingdailyBot.Service.Data
 {
-    internal static class FetchUserHelper
+    [AppService(ServiceType = typeof(IUserService), ServiceLifetime = LifeTime.Transient)]
+    public class UserService : BaseService<Users>, IUserService
     {
-        private static TimeSpan UpdatePeriod { get; }
+        private readonly ILogger<UserService> _logger;
+        private readonly OptionsSetting _optionsSetting;
+        private readonly UserRepository _userRepository;
+        private readonly CmdRecordRepository _cmdRecordRepository;
+        private readonly PostRepository _postRepository;
 
-        static FetchUserHelper()
+
+        public UserService(
+            ILogger<UserService> logger,
+            IOptions<OptionsSetting> configuration,
+            UserRepository userRepository,
+            CmdRecordRepository cmdRecordRepository,
+            PostRepository postRepository
+        )
         {
-            UpdatePeriod = TimeSpan.FromDays(15);
+            _logger = logger;
+            _optionsSetting = configuration.Value;
+            _userRepository = userRepository;
+            _cmdRecordRepository = cmdRecordRepository;
+            _postRepository = postRepository;
         }
 
         /// <summary>
@@ -18,7 +46,7 @@ namespace XinjingdailyBot.Helpers
         /// </summary>
         /// <param name="update"></param>
         /// <returns></returns>
-        internal static async Task<Users?> FetchDbUser(Update update)
+        public async Task<Users?> FetchUser(Update update)
         {
             var msgUser = update.Type switch
             {
@@ -41,7 +69,7 @@ namespace XinjingdailyBot.Helpers
                 _ => null
             };
 
-            return await FetchDbUser(msgUser, msgChat);
+            return await FetchUser(msgUser, msgChat);
         }
 
         /// <summary>
@@ -49,7 +77,7 @@ namespace XinjingdailyBot.Helpers
         /// </summary>
         /// <param name="msgUser"></param>
         /// <returns></returns>
-        private static async Task<Users?> FetchDbUser(User? msgUser, Chat? msgChat)
+        private async Task<Users?> FetchUser(User? msgUser, Chat? msgChat)
         {
             if (msgUser == null)
             {
@@ -58,7 +86,7 @@ namespace XinjingdailyBot.Helpers
 
             if (msgUser.Username == "GroupAnonymousBot")
             {
-                if (IsDebug)
+                if (_optionsSetting.Debug)
                 {
                     if (msgChat != null)
                     {
@@ -207,7 +235,7 @@ namespace XinjingdailyBot.Helpers
         /// </summary>
         /// <param name="userID"></param>
         /// <returns></returns>
-        internal static async Task<Users?> FetchDbUserByUserID(long? userID)
+        internal async Task<Users?> FetchDbUserByUserID(long? userID)
         {
             if (userID == null)
             {
@@ -225,7 +253,7 @@ namespace XinjingdailyBot.Helpers
         /// </summary>
         /// <param name="userID"></param>
         /// <returns></returns>
-        internal static async Task<Users?> FetchDbUserByUserName(string? userName)
+        internal async Task<Users?> FetchDbUserByUserName(string? userName)
         {
             if (string.IsNullOrEmpty(userName))
             {
@@ -243,7 +271,7 @@ namespace XinjingdailyBot.Helpers
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        internal static async Task<Users?> FetchTargetUser(Message message)
+        internal async Task<Users?> FetchTargetUser(Message message)
         {
             if (message.ReplyToMessage == null)
             {
@@ -279,7 +307,7 @@ namespace XinjingdailyBot.Helpers
                         exp.Or(x => x.ReviewMsgID <= msgID && x.ManageMsgID > msgID);
                     }
 
-                    var post = await DB.Queryable<Posts>().FirstAsync(exp.ToExpression());
+                    var post = await _userRepository.Queryable<Posts>().FirstAsync(exp.ToExpression());
 
                     //判断是不是审核相关消息
                     if (post != null)
@@ -290,7 +318,7 @@ namespace XinjingdailyBot.Helpers
                 }
 
                 //在CMD回调表里查看
-                var cmdAction = await DB.Queryable<CmdRecords>().FirstAsync(x => x.MessageID == replyToMsg.MessageId);
+                var cmdAction = await _userRepository.Queryable<CmdRecords>().FirstAsync(x => x.MessageID == replyToMsg.MessageId);
                 if (cmdAction != null)
                 {
                     return await FetchDbUserByUserID(cmdAction.UserID);
@@ -308,7 +336,7 @@ namespace XinjingdailyBot.Helpers
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        internal static async Task<Users?> FetchDbUserByUserNameOrUserID(string? target)
+        internal async Task<Users?> FetchDbUserByUserNameOrUserID(string? target)
         {
             if (string.IsNullOrEmpty(target))
             {
@@ -340,7 +368,7 @@ namespace XinjingdailyBot.Helpers
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        internal static async Task<Users?> FetchDbUserByUserID(string? target)
+        internal async Task<Users?> FetchDbUserByUserID(string? target)
         {
             if (long.TryParse(target, out var userID))
             {
@@ -356,7 +384,7 @@ namespace XinjingdailyBot.Helpers
         /// <param name="query"></param>
         /// <param name="page"></param>
         /// <returns></returns>
-        internal static async Task<(string, InlineKeyboardMarkup?)> QueryUserList(Users dbUser, string query, int page)
+        internal async Task<(string, InlineKeyboardMarkup?)> QueryUserList(Users dbUser, string query, int page)
         {
             //每页数量
             const int pageSize = 30;
@@ -380,7 +408,7 @@ namespace XinjingdailyBot.Helpers
             }
             exp.Or(x => x.UserName.Contains(query));
 
-            var userListCount = await DB.Queryable<Users>().Where(exp.ToExpression()).CountAsync();
+            var userListCount = await _userRepository.Queryable().Where(exp.ToExpression()).CountAsync();
 
             if (userListCount == 0)
             {
@@ -395,7 +423,7 @@ namespace XinjingdailyBot.Helpers
 
             page = Math.Max(1, Math.Min(page, totalPages));
 
-            var userList = await DB.Queryable<Users>().Where(exp.ToExpression()).ToPageListAsync(page, pageSize);
+            var userList = await _userRepository.Queryable().Where(exp.ToExpression()).ToPageListAsync(page, pageSize);
 
             StringBuilder sb = new();
 
