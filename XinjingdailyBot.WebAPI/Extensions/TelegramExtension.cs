@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Options;
+Ôªøusing Microsoft.Extensions.Options;
 using System.Net;
 using Telegram.Bot;
 using XinjingdailyBot.Infrastructure;
@@ -34,7 +34,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
 
                 if (string.IsNullOrEmpty(token))
                 {
-                    _logger.Error("Telegram bot token ≤ªƒ‹Œ™ø’");
+                    _logger.Error("Telegram bot token ‰∏çËÉΩ‰∏∫Á©∫");
                     Environment.Exit(1);
                 }
 

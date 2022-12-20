@@ -1,4 +1,4 @@
-using SqlSugar;
+ï»¿using SqlSugar;
 using SqlSugar.IOC;
 using System.Reflection;
 using XinjingdailyBot.Infrastructure;
@@ -18,7 +18,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
 
             if (dbConfig == null)
             {
-                _logger.Error("Êý¾Ý¿âÅäÖÃ²»ÄÜÎª¿Õ");
+                _logger.Error("æ•°æ®åº“é…ç½®ä¸èƒ½ä¸ºç©º");
                 Environment.Exit(1);
             }
 
@@ -31,7 +31,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 ConfigId = 0,
                 ConnectionString = connStr,
                 DbType =dbConfig.UseMySQL ? IocDbType.MySql : IocDbType.Sqlite,
-                IsAutoCloseConnection = true//×Ô¶¯ÊÍ·Å
+                IsAutoCloseConnection = true//è‡ªåŠ¨é‡Šæ”¾
             });
 
             SugarIocServices.ConfigurationSugar(db =>
@@ -42,34 +42,34 @@ namespace XinjingdailyBot.WebAPI.Extensions
                     {
                         var param = db.GetConnectionScope(0).Utilities.SerializeObject(pars.ToDictionary(it => it.ParameterName, it => it.Value));
 
-                        _logger.Info($"{sql}£¬{param}\n");
+                        _logger.Info($"{sql}ï¼Œ{param}\n");
                     };
 
                     db.Aop.OnError = (e) =>
                     {
-                        _logger.Error(e, $"Ö´ÐÐSQL³ö´í£º{e.Message}");
+                        _logger.Error(e, $"æ‰§è¡ŒSQLå‡ºé”™ï¼š{e.Message}");
                     };
-                    //SQLÖ´ÐÐÍê
+                    //SQLæ‰§è¡Œå®Œ
                     db.Aop.OnLogExecuted = (sql, pars) =>
                     {
-                        //Ö´ÐÐÍêÁË¿ÉÒÔÊä³öSQLÖ´ÐÐÊ±¼ä(OnLogExecutedDelegate) 
+                        //æ‰§è¡Œå®Œäº†å¯ä»¥è¾“å‡ºSQLæ‰§è¡Œæ—¶é—´(OnLogExecutedDelegate) 
                     };
                 }
 
                 if (dbConfig.Generate && IsFirstLoad)
                 {
-                    _logger.Info("¿ªÊ¼´´½¨Êý¾Ý¿â");
-                    //´´½¨Êý¾Ý¿â
+                    _logger.Info("å¼€å§‹åˆ›å»ºæ•°æ®åº“");
+                    //åˆ›å»ºæ•°æ®åº“
                     db.DbMaintenance.CreateDatabase(dbConfig.DbName);
 
-                    //´´½¨Êý¾Ý±í
-                    Assembly assembly = Assembly.Load("TrxTradeBot.Model");
+                    //åˆ›å»ºæ•°æ®è¡¨
+                    Assembly assembly = Assembly.Load("XinjingdailyBot.Model");
                     var types = assembly.GetTypes()
                         .Where(x => x.GetCustomAttribute<SugarTable>() != null);
 
                     foreach (var type in types)
                     {
-                        _logger.Info($"¿ªÊ¼´´½¨ {type} ±í");
+                        _logger.Info($"å¼€å§‹åˆ›å»º {type} è¡¨");
                         db.CodeFirst.InitTables(type);
                     }
                 }

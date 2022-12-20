@@ -1,6 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Bot;
 
@@ -11,20 +12,25 @@ namespace XinjingdailyBot.Service.Bot;
 public class PollingService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger _logger;
+    private readonly ILogger<PollingService> _logger;
+    private readonly IChannelService _channelService;
 
     public PollingService(
         IServiceProvider serviceProvider,
-        ILogger<PollingService> logger)
+        ILogger<PollingService> logger,
+        IChannelService channelService)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
+        _channelService = channelService;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("��ʼ���� Bot");
+        _logger.LogInformation("读取基础信息");
+        await _channelService.InitChannelInfo();
 
+        _logger.LogInformation("开始运行 Bot");
         await DoWork(stoppingToken);
     }
 
