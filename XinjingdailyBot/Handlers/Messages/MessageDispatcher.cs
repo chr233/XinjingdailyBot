@@ -29,7 +29,7 @@ namespace XinjingdailyBot.Handlers.Messages
 
             bool isMediaGroup = message.MediaGroupId != null;
             bool isPrivateChat = message.Chat.Type == ChatType.Private;
-            bool isGroupChat = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
+            bool isGroupChat = message.Chat.Type is ChatType.Group or ChatType.Supergroup;
             bool isCommentGroup = isGroupChat && message.Chat.Id == CommentGroup.Id;
             bool isSubGroup = isGroupChat && message.Chat.Id == SubGroup.Id;
             bool isReviewGroup = isGroupChat && message.Chat.Id == ReviewGroup.Id;

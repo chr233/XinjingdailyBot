@@ -137,12 +137,13 @@ namespace XinjingdailyBot.Helpers
             List<Groups> rights = new()
             {
                 new() { Id = 0, Name = "封禁用户", DefaultRight = UserRights.None },
-                new() { Id = 1, Name = "普通用户", DefaultRight = UserRights.SendPost | UserRights.NormalCmd },
-                new() { Id = 10, Name = "审核员", DefaultRight = UserRights.SendPost | UserRights.ReviewPost | UserRights.NormalCmd },
-                new() { Id = 11, Name = "发布员", DefaultRight = UserRights.SendPost | UserRights.DirectPost | UserRights.NormalCmd },
-                new() { Id = 20, Name = "狗管理", DefaultRight = UserRights.SendPost | UserRights.ReviewPost | UserRights.DirectPost | UserRights.NormalCmd | UserRights.AdminCmd },
-                new() { Id = 30, Name = "超级狗管理", DefaultRight = UserRights.ALL },
-                new() { Id = 50, Name = "*超级狗管理*", DefaultRight = UserRights.ALL },
+                new() { Id = 1, Name = "普通用户", DefaultRight = UserRights.NormalUser },
+                new() { Id = 10, Name = "审核员", DefaultRight = UserRights.Reviewer },
+                new() { Id = 11, Name = "发布员", DefaultRight = UserRights.Poster }, 
+                new() { Id = 12, Name = "火星救员", DefaultRight = UserRights.Poster },
+                new() { Id = 20, Name = "狗管理", DefaultRight = UserRights.Admin },
+                new() { Id = 30, Name = "超级狗管理", DefaultRight = UserRights.SuperAdmin },
+                new() { Id = 50, Name = "*超级狗管理*", DefaultRight = UserRights.SuperAdmin },
             };
 
             await DB.Storageable(rights).ExecuteCommandAsync();
