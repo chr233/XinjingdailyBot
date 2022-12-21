@@ -1,17 +1,15 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
-using XinjingdailyBot.Model.Enums;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
 

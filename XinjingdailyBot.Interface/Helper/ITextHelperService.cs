@@ -6,6 +6,7 @@ namespace XinjingdailyBot.Interface.Helper
 {
     public interface ITextHelperService
     {
+        string NSFWWrning { get; }
         string EscapeHtml(string? text);
         BuildInTags FetchTags(string? text);
         string HtmlMessageLink(long messageID, string chatName, string linkName);

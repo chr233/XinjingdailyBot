@@ -1,25 +1,13 @@
-﻿using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using NLog;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types;
-using Telegram.Bot;
-using XinjingdailyBot.Infrastructure;
+﻿using Microsoft.Extensions.Logging;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Enums;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
-using XinjingdailyBot.Infrastructure.Extensions;
-using XinjingdailyBot.Infrastructure.Localization;
-using XinjingdailyBot.Service.Bot;
-using XinjingdailyBot.Interface.Bot;
-using XinjingdailyBot.Interface.Helper;
 
 namespace XinjingdailyBot.Service.Data
 {
-    [AppService(ServiceType = typeof(IPostService), ServiceLifetime = LifeTime.Transient)]
+    [AppService(ServiceType = typeof(IChannelOptionService), ServiceLifetime = LifeTime.Transient)]
     public sealed class ChannelOptionService : BaseService<ChannelOptions>, IChannelOptionService
     {
         private readonly ILogger<ChannelOptionService> _logger;

@@ -1,5 +1,5 @@
 ﻿using SqlSugar;
-using XinjingdailyBot.Model.Enums.Base;
+using XinjingdailyBot.Model.Base;
 
 namespace XinjingdailyBot.Model.Models
 {

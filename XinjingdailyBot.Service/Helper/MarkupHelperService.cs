@@ -1,8 +1,8 @@
 ﻿using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Interface.Helper;
-using XinjingdailyBot.Model.Enums;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
 

@@ -1,4 +1,4 @@
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 
 namespace XinjingdailyBot.WebAPI.Extensions
 {
@@ -12,7 +12,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 options.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1",
-                    Title = "TrxTradeBot API",
+                    Title = "XinjingdailyBot API",
                     Description = "An ASP.NET Core Web API for managing ToDo items",
                     TermsOfService = new Uri("https://example.com/terms"),
                     Contact = new OpenApiContact

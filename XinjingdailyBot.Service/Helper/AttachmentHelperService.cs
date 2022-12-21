@@ -1,12 +1,8 @@
-﻿using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.ReplyMarkups;
+﻿using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Interface.Helper;
-using XinjingdailyBot.Model.Enums;
 using XinjingdailyBot.Model.Models;
-using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Helper
 {

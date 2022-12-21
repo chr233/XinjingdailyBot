@@ -1,15 +1,14 @@
-﻿using System.Text.RegularExpressions;
-using System.Text;
+﻿using System.Text;
+using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Localization;
+using XinjingdailyBot.Infrastructure.Model;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Enums;
 using XinjingdailyBot.Model.Models;
-using XinjingdailyBot.Service.Data;
-using XinjingdailyBot.Service.Bot;
-using XinjingdailyBot.Interface.Bot;
-using Telegram.Bot.Types.Enums;
-using XinjingdailyBot.Infrastructure.Model;
 
 namespace XinjingdailyBot.Service.Helper
 {
@@ -21,11 +20,14 @@ namespace XinjingdailyBot.Service.Helper
         private static readonly Regex MatchTag = new(@"(^#\S+)|(\s#\S+)");
         private static readonly Regex MatchSpace = new(@"^\s*$");
 
+        private static readonly string NSFWWrning = $"{Emojis.Warning} NSFW 提前预警 {Emojis.Warning}";
 
         public TextHelperService(IChannelService channelService)
         {
             _channelService = channelService;
         }
+
+        string ITextHelperService.NSFWWrning { get => NSFWWrning; }
 
         /// <summary>
         /// 去除所有HashTag和连续换行
