@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text;
 using XinjingdailyBot.Infrastructure.Attribute;
 
 namespace XinjingdailyBot.WebAPI.Extensions
@@ -13,7 +14,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
         /// <param name="services"></param>
         public static void AddAppService(this IServiceCollection services)
         {
-            string[] cls = new string[] { "XinjingdailyBot.Repository", "XinjingdailyBot.Service", "XinjingdailyBot.Infrastructure" };
+            string[] cls = new string[] { "XinjingdailyBot.Repository", "XinjingdailyBot.Service" };
             foreach (var item in cls)
             {
                 Assembly assembly = Assembly.Load(item);
@@ -23,12 +24,16 @@ namespace XinjingdailyBot.WebAPI.Extensions
 
         private static void Register(IServiceCollection services, Assembly assembly)
         {
+            StringBuilder sb = new();
+            sb.AppendLine("===== 开始注册服务 =====");
+            int count = 0;
             foreach (var type in assembly.GetTypes())
             {
                 var serviceAttribute = type.GetCustomAttribute<AppServiceAttribute>();
 
                 if (serviceAttribute != null)
                 {
+                    count += 1;
                     var serviceType = serviceAttribute.ServiceType;
                     //情况1 适用于依赖抽象编程，注意这里只获取第一个
                     if (serviceType == null && serviceAttribute.InterfaceServiceType)
@@ -41,7 +46,8 @@ namespace XinjingdailyBot.WebAPI.Extensions
                         serviceType = type;
                     }
 
-                    switch (serviceAttribute.ServiceLifetime)
+                    var lifetime = serviceAttribute.ServiceLifetime;
+                    switch (lifetime)
                     {
                         case LifeTime.Singleton:
                             services.AddSingleton(serviceType, type);
@@ -56,9 +62,13 @@ namespace XinjingdailyBot.WebAPI.Extensions
                             services.AddTransient(serviceType, type);
                             break;
                     }
-                    _logger.Debug($"注册服务：{serviceType}");
+
+                    sb.AppendLine($"[{lifetime}]：{serviceType}");
                 }
             }
+            sb.Append($"      ===== 注册了 {count} 个服务 =====");
+
+            _logger.Debug(sb.ToString());
         }
     }
 }

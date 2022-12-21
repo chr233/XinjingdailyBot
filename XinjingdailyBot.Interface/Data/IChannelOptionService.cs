@@ -1,6 +1,6 @@
 ﻿using XinjingdailyBot.Model.Enums;
 
-namespace XinjingdailyBot.Service.Data
+namespace XinjingdailyBot.Interface.Data
 {
     public interface IChannelOptionService
     {

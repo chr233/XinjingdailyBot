@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using SqlSugar;
 using SqlSugar.IOC;
-using XinjingdailyBot.Model.Enums.Base;
+using XinjingdailyBot.Model.Base;
 
 namespace XinjingdailyBot.Repository.Base
 {

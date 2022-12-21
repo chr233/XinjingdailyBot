@@ -34,6 +34,10 @@
             /// </summary>
             public bool ThrowPendingUpdates { get; set; }
             /// <summary>
+            /// 自动退出未在配置文件中定义的群组和频道, 默认 false
+            /// </summary>
+            public bool AutoLeaveOtherGroup { get; set; }
+            /// <summary>
             /// 超级管理员(覆盖数据库配置)
             /// </summary>
             public HashSet<long>? SuperAdmins { get; set; }

@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Telegram.Bot;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
-using Telegram.Bot.Types;
-using Telegram.Bot;
 
 namespace XinjingdailyBot.Infrastructure.Extensions
 {
     public static class BotClientExtension
     {
+        private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// 自动选择回复方式
         /// </summary>
@@ -128,6 +125,49 @@ namespace XinjingdailyBot.Infrastructure.Extensions
             CancellationToken cancellationToken = default)
         {
             return await botClient.EditMessageTextAsync(message.Chat.Id, message.MessageId, text, parseMode: parseMode, disableWebPagePreview: disableWebPagePreview, replyMarkup: replyMarkup, cancellationToken: cancellationToken);
+        }
+
+        /// <summary>
+        /// 发送命令回复
+        /// </summary>
+        /// <param name="botClient"></param>
+        /// <param name="text"></param>
+        /// <param name="message"></param>
+        /// <param name="autoDelete">私聊始终不删除消息, 群聊中默认删除消息, 但可以指定不删除</param>
+        /// <param name="parsemode"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public static async Task<Message> SendCommandReply(
+            this ITelegramBotClient botClient,
+            string text,
+            Message message,
+            bool? autoDelete = null,
+            ParseMode? parsemode = null,
+            IReplyMarkup? replyMarkup = null,
+            CancellationToken cancellationToken = default)
+        {
+            //私聊始终不删除消息, 群聊中默认删除消息, 但可以指定不删除
+            bool delete = (autoDelete != null ? autoDelete.Value : (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup)) && message.Chat.Type != ChatType.Private;
+
+            var msg = await botClient.SendTextMessageAsync(message.Chat.Id, text, parsemode, replyToMessageId: message.MessageId, replyMarkup: replyMarkup, disableWebPagePreview: true, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
+
+            if (delete)
+            {
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(30));
+                    try
+                    {
+                        await botClient.DeleteMessageAsync(msg.Chat.Id, msg.MessageId, cancellationToken);
+                    }
+                    catch
+                    {
+                        _logger.Error("删除消息 {messageId} 失败", msg.MessageId);
+                    }
+                }, cancellationToken);
+            }
+
+            return msg;
         }
     }
 }

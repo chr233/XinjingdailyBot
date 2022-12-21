@@ -1,4 +1,4 @@
-﻿namespace XinjingdailyBot.Model.Enums
+﻿namespace XinjingdailyBot.Infrastructure.Enums
 {
     /// <summary>
     /// 拒稿原因

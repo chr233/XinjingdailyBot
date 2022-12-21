@@ -1,4 +1,4 @@
-﻿namespace XinjingdailyBot.Model.Enums.Base
+﻿namespace XinjingdailyBot.Model.Base
 {
     /// <summary>
     /// 实体类基类
