@@ -16,13 +16,15 @@ namespace XinjingdailyBot.Service.Data
             _cmdRecordRepository = cmdRecordRepository;
         }
 
-
         /// <summary>
-        /// 获取频道设定
+        /// 新增命令调用记录
         /// </summary>
-        /// <param name="channelId"></param>
-        /// <param name="channelName"></param>
-        /// <param name="channelTitle"></param>
+        /// <param name="message"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="command"></param>
+        /// <param name="handled"></param>
+        /// <param name="isQuery"></param>
+        /// <param name="exception"></param>
         /// <returns></returns>
         public async Task AddCmdRecord(Message message, Users dbUser, string command, bool handled, bool isQuery, string? exception = null)
         {

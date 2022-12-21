@@ -5,12 +5,12 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Dispatcher;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
-using XinjingdailyBot.Model.Enums;
 using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Dispatcher
