@@ -1,4 +1,4 @@
-﻿namespace XinjingdailyBot.Model.Base
+﻿namespace XinjingdailyBot.Model.Enums.Base
 {
     /// <summary>
     /// 分页参数

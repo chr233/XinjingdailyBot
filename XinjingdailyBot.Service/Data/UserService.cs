@@ -9,13 +9,14 @@ using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Interface.Data;
+using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Data
 {
     [AppService(ServiceType = typeof(IUserService), ServiceLifetime = LifeTime.Transient)]
-    public class UserService : BaseService<Users>, IUserService
+    public sealed class UserService : BaseService<Users>, IUserService
     {
         private readonly ILogger<UserService> _logger;
         private readonly OptionsSetting _optionsSetting;
@@ -27,7 +28,7 @@ namespace XinjingdailyBot.Service.Data
         /// <summary>
         /// 更新周期
         /// </summary>
-        private readonly TimeSpan UpdatePeriod = TimeSpan.FromDays(15);
+        private static readonly TimeSpan UpdatePeriod = TimeSpan.FromDays(15);
 
         public UserService(
             ILogger<UserService> logger,

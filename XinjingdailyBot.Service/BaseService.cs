@@ -1,6 +1,4 @@
-﻿using XinjingdailyBot.Model.Base;
-using XinjingdailyBot.Model.Models;
-using XinjingdailyBot.Repository;
+﻿using XinjingdailyBot.Model.Enums.Base;
 using XinjingdailyBot.Repository.Base;
 
 namespace XinjingdailyBot.Service

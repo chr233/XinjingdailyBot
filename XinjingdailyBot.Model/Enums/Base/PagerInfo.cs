@@ -1,4 +1,4 @@
-﻿namespace XinjingdailyBot.Model.Base
+﻿namespace XinjingdailyBot.Model.Enums.Base
 {
     public class PagerInfo
     {

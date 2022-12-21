@@ -1,6 +1,5 @@
-﻿using XinjingdailyBot.Model.Models;
-using XinjingdailyBot.Interface;
-using Telegram.Bot.Types;
+﻿using Telegram.Bot.Types;
+using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Data
 {

@@ -1,10 +1,8 @@
-﻿using SqlSugar;
-using SqlSugar.IOC;
-using System.Data;
+﻿using System.Data;
 using System.Linq.Expressions;
-using XinjingdailyBot.Model.Base;
-using XinjingdailyBot.Model.Models;
-
+using SqlSugar;
+using SqlSugar.IOC;
+using XinjingdailyBot.Model.Enums.Base;
 
 namespace XinjingdailyBot.Repository.Base
 {

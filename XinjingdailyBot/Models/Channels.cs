@@ -24,7 +24,7 @@ namespace XinjingdailyBot.Models
         /// 封禁类型
         /// </summary>
         public ChannelOption Option { get; set; } = ChannelOption.Normal;
-        
+
         public DateTime CreateAt { get; set; } = DateTime.Now;
 
         public DateTime ModifyAt { get; set; } = DateTime.Now;

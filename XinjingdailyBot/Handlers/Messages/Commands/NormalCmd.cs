@@ -146,7 +146,7 @@ namespace XinjingdailyBot.Handlers.Messages.Commands
             bool reviewPost = right.HasFlag(UserRights.ReviewPost);
             bool directPost = right.HasFlag(UserRights.DirectPost);
 
-            string userNick =dbUser.EscapedNickName();
+            string userNick = dbUser.EscapedNickName();
 
             string group = "???";
             if (UGroups.TryGetValue(dbUser.GroupID, out var g))
