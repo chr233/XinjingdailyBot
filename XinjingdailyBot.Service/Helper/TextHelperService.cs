@@ -3,11 +3,11 @@ using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Infrastructure.Model;
 using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Helper;
-using XinjingdailyBot.Model.Enums;
 using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Helper

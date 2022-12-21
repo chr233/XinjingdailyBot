@@ -1,4 +1,4 @@
-﻿using XinjingdailyBot.Model.Enums;
+﻿using XinjingdailyBot.Infrastructure.Enums;
 
 namespace XinjingdailyBot.Interface.Data
 {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Data;
-using XinjingdailyBot.Model.Enums;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
 

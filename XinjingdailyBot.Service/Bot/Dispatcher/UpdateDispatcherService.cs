@@ -60,7 +60,7 @@ public class UpdateDispatcherService : IUpdateHandler
             _ => UnknownUpdateHandlerAsync(dbUser, update)
         };
 
-        //await handler;
+        await handler;
     }
 
     private Task UnknownUpdateHandlerAsync(Users dbUser, Update update)

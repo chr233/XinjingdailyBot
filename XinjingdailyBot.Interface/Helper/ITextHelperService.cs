@@ -1,5 +1,5 @@
 ﻿using Telegram.Bot.Types;
-using XinjingdailyBot.Model.Enums;
+using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Helper

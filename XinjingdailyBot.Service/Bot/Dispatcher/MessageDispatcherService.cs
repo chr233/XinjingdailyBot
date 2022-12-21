@@ -14,7 +14,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Dispatcher
 {
-    [AppService(ServiceType = typeof(IMessageDispatcherService), ServiceLifetime = LifeTime.Transient)]
+    [AppService(ServiceType = typeof(IMessageDispatcherService), ServiceLifetime = LifeTime.Scoped)]
     public class MessageDispatcherService : IMessageDispatcherService
     {
         private readonly ILogger<MessageDispatcherService> _logger;
