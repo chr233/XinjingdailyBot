@@ -1,9 +1,8 @@
-﻿using SqlSugar;
+﻿using Microsoft.Extensions.Logging;
+using SqlSugar;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository.Base;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
 
 namespace XinjingdailyBot.Repository
 {

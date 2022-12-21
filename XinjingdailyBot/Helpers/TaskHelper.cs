@@ -1,7 +1,4 @@
-﻿using XinjingdailyBot.Tasks;
-using static XinjingdailyBot.Utils;
-
-namespace XinjingdailyBot.Helpers
+﻿namespace XinjingdailyBot.Helpers
 {
     internal static class TaskHelper
     {

@@ -1,8 +1,7 @@
-﻿using Microsoft.Extensions.Options;
-using System.Net;
+﻿using System.Net;
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using XinjingdailyBot.Infrastructure;
-using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Service.Bot;
 
 namespace XinjingdailyBot.WebAPI.Extensions

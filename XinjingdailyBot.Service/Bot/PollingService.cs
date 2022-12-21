@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Bot;
 

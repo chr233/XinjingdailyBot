@@ -355,7 +355,7 @@ namespace Infrastructure.Extensions
                 }
                 else
                 {
-                    return obj.ToString();
+                    return obj?.ToString() ?? "";
                 }
             }
             catch

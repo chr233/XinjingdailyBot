@@ -29,7 +29,7 @@ namespace XinjingdailyBot.Helpers
             DB = new SqlSugarScope(new ConnectionConfig()
             {
                 ConnectionString = dbString,
-                DbType =  config.UseMysql? DbType.MySql:DbType.Sqlite,
+                DbType = config.UseMysql ? DbType.MySql : DbType.Sqlite,
                 IsAutoCloseConnection = true,
                 LanguageType = LanguageType.English,
             },

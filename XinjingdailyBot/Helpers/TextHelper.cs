@@ -1,6 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using Telegram.Bot.Types;
-using XinjingdailyBot.Models;
 
 namespace XinjingdailyBot.Helpers
 {

@@ -1,18 +1,19 @@
 ﻿using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using XinjingdailyBot.Interface.Data;
+using XinjingdailyBot.Interface.Bot.Handler;
+using XinjingdailyBot.Interface.Helper;
 
-namespace XinjingdailyBot.Interface.Bot.Handler
+namespace XinjingdailyBot.Service.Bot.Handler
 {
     public class UpdateDispatcher : IUpdateDispatcher
     {
         private readonly ILogger<UpdateDispatcher> _logger;
-        private readonly IUserService _userService;
+        private readonly ITextHelperService _userService;
 
         public UpdateDispatcher(
             ILogger<UpdateDispatcher> logger,
-             IUserService userService
+             ITextHelperService userService
             )
         {
             _logger = logger;

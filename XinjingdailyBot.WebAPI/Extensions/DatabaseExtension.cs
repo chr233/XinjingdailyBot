@@ -1,6 +1,6 @@
-﻿using SqlSugar;
+﻿using System.Reflection;
+using SqlSugar;
 using SqlSugar.IOC;
-using System.Reflection;
 using XinjingdailyBot.Infrastructure;
 
 namespace XinjingdailyBot.WebAPI.Extensions
@@ -30,7 +30,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
             {
                 ConfigId = 0,
                 ConnectionString = connStr,
-                DbType =dbConfig.UseMySQL ? IocDbType.MySql : IocDbType.Sqlite,
+                DbType = dbConfig.UseMySQL ? IocDbType.MySql : IocDbType.Sqlite,
                 IsAutoCloseConnection = true//自动释放
             });
 

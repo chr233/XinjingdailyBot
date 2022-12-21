@@ -1,11 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
-using MySqlX.XDevAPI.Relational;
 using SqlSugar;
 using XinjingdailyBot.Helpers;
 using static XinjingdailyBot.Utils;
-using System.IO;
-using System;
 
 namespace XinjingdailyBot.Handlers.Messages.Commands
 {

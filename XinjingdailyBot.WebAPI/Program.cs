@@ -1,7 +1,7 @@
 
+using NLog.Extensions.Logging;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.WebAPI.Extensions;
-using NLog.Extensions.Logging;
 
 namespace XinjingdailyBot.WebAPI
 {

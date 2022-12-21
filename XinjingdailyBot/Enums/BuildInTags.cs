@@ -25,6 +25,6 @@
         /// <summary>
         /// AI怪图
         /// </summary>
-        AIGraph= 8,
+        AIGraph = 8,
     }
 }
