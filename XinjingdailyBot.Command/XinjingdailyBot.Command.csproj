@@ -13,4 +13,14 @@
     <PackageReference Include="Telegram.Bot" Version="18.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\XinjingdailyBot.Infrastructure\XinjingdailyBot.Infrastructure.csproj" />
+    <ProjectReference Include="..\XinjingdailyBot.Model\XinjingdailyBot.Model.csproj" />
+    <ProjectReference Include="..\XinjingdailyBot.Repository\XinjingdailyBot.Repository.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Query\" />
+  </ItemGroup>
+
 </Project>

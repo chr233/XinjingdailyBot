@@ -4,10 +4,11 @@
     {
         public int Code { get; set; }
         public string Msg { get; set; }
-        public string LogMsg { get; set; }
+        public string? LogMsg { get; set; }
 
         public CustomException(string msg) : base(msg)
         {
+            Msg = msg;
         }
         public CustomException(int code, string msg) : base(msg)
         {
@@ -17,6 +18,7 @@
 
         public CustomException(ResultCode resultCode, string msg) : base(msg)
         {
+            Msg = msg;
             Code = (int)resultCode;
         }
 
@@ -29,6 +31,7 @@
         public CustomException(ResultCode resultCode, string msg, object errorMsg) : base(msg)
         {
             Code = (int)resultCode;
+            Msg = msg;
             LogMsg = errorMsg.ToString();
         }
     }
