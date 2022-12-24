@@ -1,9 +1,7 @@
-namespace XinjingdailyBot.Interface.Bot;
-
-/// <summary>
-/// A marker interface for Update Receiver service
-/// </summary>
-public interface IReceiverService
+﻿namespace XinjingdailyBot.Interface.Bot
 {
-    Task ReceiveAsync(CancellationToken stoppingToken);
+    public interface IReceiverService
+    {
+        Task ReceiveAsync(CancellationToken stoppingToken);
+    }
 }
