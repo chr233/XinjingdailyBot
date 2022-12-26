@@ -6,27 +6,24 @@ namespace XinjingdailyBot.Infrastructure.Extensions
 {
     public static class LoggerExtensions
     {
-        private static readonly ILogger _logger = (ILogger)NLog.LogManager.GetCurrentClassLogger();
-
         /// <summary>
         /// 输出update
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="update"></param>
-        /// <param name="dbUser"></param>
         public static void LogUpdate(this ILogger logger, Update update)
         {
             switch (update.Type)
             {
                 case UpdateType.Message:
                 case UpdateType.EditedMessage:
-                    _logger.LogMessage(update.Message!);
+                    logger.LogMessage(update.Message!);
                     break;
                 case UpdateType.CallbackQuery:
-                    _logger.LogCallbackQuery(update.CallbackQuery!);
+                    logger.LogCallbackQuery(update.CallbackQuery!);
                     break;
                 default:
-                    _logger.LogDebug($"U 未知消息 {update.Type}");
+                    logger.LogDebug($"U 未知消息 {update.Type}");
                     break;
             }
         }
@@ -36,7 +33,6 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="message"></param>
-        /// <param name="dbUser"></param>
         public static void LogMessage(this ILogger logger, Message message)
         {
             string content = message.Type switch
@@ -62,17 +58,20 @@ namespace XinjingdailyBot.Infrastructure.Extensions
                 _ => $"未知-{chat.Title}",
             };
 
-            _logger.LogInformation($"M {chatFrom}  {content}");
+            string user = message.From?.NickName() ?? "未知";
+
+            logger.LogInformation($"M {chatFrom} {user} {content}");
         }
 
         /// <summary>
         /// 输出query
         /// </summary>
         /// <param name="logger"></param>
-        /// <param name="dbUser"></param>
         public static void LogCallbackQuery(this ILogger logger, CallbackQuery callbackQuery)
         {
-            _logger.LogDebug($"Q {callbackQuery.Id}  [数据] {callbackQuery.Data}");
+            string user = callbackQuery.From.NickName();
+
+            logger.LogDebug($"Q {callbackQuery.Id} [数据] {user} {callbackQuery.Data}");
         }
     }
 }

@@ -5,9 +5,9 @@ using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Extensions;
-using XinjingdailyBot.Interface.Bot;
+using XinjingdailyBot.Interface.Bot.Common;
 
-namespace XinjingdailyBot.Service.Bot;
+namespace XinjingdailyBot.Service.Bot.Common;
 
 
 [AppService(ServiceType = typeof(IChannelService), ServiceLifetime = LifeTime.Singleton)]
@@ -73,7 +73,7 @@ public class ChannelService : IChannelService
 
         try
         {
-            if (long.TryParse(channelOption.ReviewGroup, out long groupId))
+            if (long.TryParse(channelOption.ReviewGroup, out var groupId))
             {
                 _reviewGroup = await _botClient.GetChatAsync(groupId);
             }
@@ -91,7 +91,7 @@ public class ChannelService : IChannelService
 
         try
         {
-            if (long.TryParse(channelOption.CommentGroup, out long subGroupId))
+            if (long.TryParse(channelOption.CommentGroup, out var subGroupId))
             {
                 _commentGroup = await _botClient.GetChatAsync(subGroupId);
             }
@@ -109,7 +109,7 @@ public class ChannelService : IChannelService
 
         try
         {
-            if (long.TryParse(channelOption.SubGroup, out long subGroupId))
+            if (long.TryParse(channelOption.SubGroup, out var subGroupId))
             {
                 _subGroup = await _botClient.GetChatAsync(subGroupId);
             }

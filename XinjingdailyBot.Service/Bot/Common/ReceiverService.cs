@@ -5,26 +5,26 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Interface.Bot;
+using XinjingdailyBot.Interface.Bot.Common;
 
-namespace XinjingdailyBot.Service.Bot;
+namespace XinjingdailyBot.Service.Bot.Common;
 
 [AppService(ServiceType = typeof(IReceiverService), ServiceLifetime = LifeTime.Transient)]
 public class ReceiverService : IReceiverService
 {
     private readonly ITelegramBotClient _botClient;
-    private readonly IUpdateHandler _updateHandlers;
+    private readonly IUpdateService _updateService;
     private readonly ILogger<ReceiverService> _logger;
     private readonly OptionsSetting _optionsSetting;
 
     public ReceiverService(
         ITelegramBotClient botClient,
-        IUpdateHandler updateHandler,
+        IUpdateService updateService,
         ILogger<ReceiverService> logger,
         IOptions<OptionsSetting> options)
     {
         _botClient = botClient;
-        _updateHandlers = updateHandler;
+        _updateService = updateService;
         _logger = logger;
         _optionsSetting = options.Value;
     }
@@ -37,11 +37,10 @@ public class ReceiverService : IReceiverService
             ThrowPendingUpdates = _optionsSetting.Bot.ThrowPendingUpdates,
         };
 
-        var me = await _botClient.GetMeAsync(stoppingToken);
-        _logger.LogInformation("Start receiving updates for {BotName}", me.Username ?? "My Awesome Bot");
+        _logger.LogInformation("接收服务运行中...");
 
         await _botClient.ReceiveAsync(
-            updateHandler: _updateHandlers,
+            updateHandler: _updateService,
             receiverOptions: receiverOptions,
             cancellationToken: stoppingToken);
     }

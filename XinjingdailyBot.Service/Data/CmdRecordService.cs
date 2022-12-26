@@ -6,7 +6,7 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Data
 {
-    [AppService(ServiceType = typeof(IChannelOptionService), ServiceLifetime = LifeTime.Transient)]
+    [AppService(ServiceType = typeof(ICmdRecordService), ServiceLifetime = LifeTime.Transient)]
     public sealed class CmdRecordService : BaseService<ChannelOptions>, ICmdRecordService
     {
         private readonly CmdRecordRepository _cmdRecordRepository;

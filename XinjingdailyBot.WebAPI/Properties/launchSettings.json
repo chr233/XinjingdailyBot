@@ -3,7 +3,6 @@
     "http": {
       "commandName": "Project",
       "workingDirectory": "bin\\Debug\\$(TargetFramework)",
-      "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

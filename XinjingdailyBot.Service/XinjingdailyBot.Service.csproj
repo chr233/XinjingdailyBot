@@ -21,8 +21,4 @@
     <ProjectReference Include="..\XinjingdailyBot.Repository\XinjingdailyBot.Repository.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Bot\Handler\" />
-  </ItemGroup>
-
 </Project>

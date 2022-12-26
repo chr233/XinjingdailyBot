@@ -1,4 +1,4 @@
-﻿namespace XinjingdailyBot.Interface.Bot
+﻿namespace XinjingdailyBot.Interface.Bot.Common
 {
     public interface IReceiverService
     {

@@ -14,7 +14,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
         /// <param name="services"></param>
         public static void AddAppService(this IServiceCollection services)
         {
-            string[] cls = new string[] { "XinjingdailyBot.Repository", "XinjingdailyBot.Service" };
+            string[] cls = new string[] { "XinjingdailyBot.Repository", "XinjingdailyBot.Service", "XinjingdailyBot.Command" };
             foreach (var item in cls)
             {
                 Assembly assembly = Assembly.Load(item);
@@ -25,12 +25,12 @@ namespace XinjingdailyBot.WebAPI.Extensions
         private static void Register(IServiceCollection services, Assembly assembly)
         {
             StringBuilder sb = new();
+            sb.AppendLine();
             sb.AppendLine("===== 开始注册服务 =====");
             int count = 0;
             foreach (var type in assembly.GetTypes())
             {
                 var serviceAttribute = type.GetCustomAttribute<AppServiceAttribute>();
-
                 if (serviceAttribute != null)
                 {
                     count += 1;
@@ -66,7 +66,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
                     sb.AppendLine($"[{lifetime}]：{serviceType}");
                 }
             }
-            sb.Append($"      ===== 注册了 {count} 个服务 =====");
+            sb.Append($"===== 注册了 {count} 个服务 =====");
 
             _logger.Debug(sb.ToString());
         }

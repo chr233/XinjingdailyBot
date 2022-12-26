@@ -6,18 +6,18 @@ using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Extensions;
-using XinjingdailyBot.Interface.Bot;
-using XinjingdailyBot.Interface.Bot.Dispatcher;
+using XinjingdailyBot.Interface.Bot.Common;
+using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 
-namespace XinjingdailyBot.Service.Bot.Dispatcher
+namespace XinjingdailyBot.Service.Bot.Handler
 {
-    [AppService(ServiceType = typeof(IMessageDispatcherService), ServiceLifetime = LifeTime.Scoped)]
-    public class MessageDispatcherService : IMessageDispatcherService
+    [AppService(ServiceType = typeof(IMessageHandler), ServiceLifetime = LifeTime.Scoped)]
+    public class MessageHandler : IMessageHandler
     {
-        private readonly ILogger<MessageDispatcherService> _logger;
+        private readonly ILogger<MessageHandler> _logger;
         private readonly ITelegramBotClient _botClient;
         private readonly ITextHelperService _userService;
         private readonly IChannelService _channelService;
@@ -25,8 +25,8 @@ namespace XinjingdailyBot.Service.Bot.Dispatcher
         private readonly IPostService _postService;
         private readonly OptionsSetting _optionsSetting;
 
-        public MessageDispatcherService(
-            ILogger<MessageDispatcherService> logger,
+        public MessageHandler(
+            ILogger<MessageHandler> logger,
             ITelegramBotClient botClient,
             ITextHelperService userService,
             IChannelService channelService,
@@ -46,16 +46,15 @@ namespace XinjingdailyBot.Service.Bot.Dispatcher
         /// <summary>
         /// 处理消息
         /// </summary>
-        /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
         public async Task OnMessageReceived(Users dbUser, Message message)
         {
-            MessageType msgType = message.Type;
-            string msgText = msgType == MessageType.Text ? message.Text! : "";
+            var msgType = message.Type;
+            var msgText = msgType == MessageType.Text ? message.Text! : "";
 
-            bool isCommand = msgText.StartsWith('/');
+            var isCommand = msgText.StartsWith('/');
 
             //检查是否封禁, 封禁后仅能使用命令, 不响应其他消息
             if (dbUser.IsBan && !isCommand)
@@ -63,13 +62,13 @@ namespace XinjingdailyBot.Service.Bot.Dispatcher
                 return;
             }
 
-            bool isMediaGroup = message.MediaGroupId != null;
-            bool isPrivateChat = message.Chat.Type == ChatType.Private;
-            bool isGroupChat = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
-            bool isCommentGroup = isGroupChat && message.Chat.Id == _channelService.CommentGroup.Id;
-            bool isSubGroup = isGroupChat && message.Chat.Id == _channelService.SubGroup.Id;
-            bool isReviewGroup = isGroupChat && message.Chat.Id == _channelService.ReviewGroup.Id;
-            bool isConfigedGroup = isCommentGroup || isSubGroup || isReviewGroup;
+            var isMediaGroup = message.MediaGroupId != null;
+            var isPrivateChat = message.Chat.Type == ChatType.Private;
+            var isGroupChat = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
+            var isCommentGroup = isGroupChat && message.Chat.Id == _channelService.CommentGroup.Id;
+            var isSubGroup = isGroupChat && message.Chat.Id == _channelService.SubGroup.Id;
+            var isReviewGroup = isGroupChat && message.Chat.Id == _channelService.ReviewGroup.Id;
+            var isConfigedGroup = isCommentGroup || isSubGroup || isReviewGroup;
 
             //尚未设置评论群或者讨论群时始终处理所有群组的消息
             if (_channelService.CommentGroup.Id == -1 || _channelService.SubGroup.Id == -1)
@@ -106,10 +105,6 @@ namespace XinjingdailyBot.Service.Bot.Dispatcher
 
             switch (message.Type)
             {
-                case MessageType.Text when (isConfigedGroup || isPrivateChat) && isCommand:
-                    await CommandHandler.HandleCommand(_botClient, dbUser, message);
-                    break;
-
                 case MessageType.Text when isPrivateChat:
                     await _postService.HandleTextPosts(_botClient, dbUser, message);
                     break;
@@ -128,7 +123,7 @@ namespace XinjingdailyBot.Service.Bot.Dispatcher
                     break;
 
                 case MessageType.Text when isConfigedGroup && !dbUser.IsBot:
-                    await GroupHandler.HandlerGroupMessage(_botClient, dbUser, message);
+                    //await GroupHandler.HandlerGroupMessage(_botClient, dbUser, message);
                     break;
 
                 case MessageType.Photo when !isPrivateChat:
@@ -157,6 +152,16 @@ namespace XinjingdailyBot.Service.Bot.Dispatcher
                     }
                     break;
             }
+        }
+
+        public async Task OnTextMessageReceived(Users dbUser, Message message)
+        {
+            //throw new NotImplementedException();
+        }
+
+        public async Task OnMediaMessageReceived(Users dbUser, Message message)
+        {
+            //throw new NotImplementedException();
         }
     }
 }
