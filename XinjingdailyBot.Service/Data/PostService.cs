@@ -7,7 +7,7 @@ using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Localization;
-using XinjingdailyBot.Interface.Bot;
+using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
