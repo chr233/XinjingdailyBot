@@ -21,8 +21,4 @@
     <ProjectReference Include="..\XinjingdailyBot.Service\XinjingdailyBot.Service.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Query\" />
-  </ItemGroup>
-
 </Project>

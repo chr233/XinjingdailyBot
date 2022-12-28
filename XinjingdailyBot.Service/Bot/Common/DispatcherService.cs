@@ -54,7 +54,7 @@ namespace XinjingdailyBot.Service.Bot.Common
             {
                 MessageType.Text => message.Text!.StartsWith("/") ?
                     _commandHandler.OnCommandReceived(dbUser, message) :
-                   _messageHandler.OnTextMessageReceived(dbUser, message),
+                    _messageHandler.OnTextMessageReceived(dbUser, message),
                 MessageType.Photo => _messageHandler.OnMediaMessageReceived(dbUser, message),
                 MessageType.Audio => _messageHandler.OnMediaMessageReceived(dbUser, message),
                 MessageType.Video => _messageHandler.OnMediaMessageReceived(dbUser, message),

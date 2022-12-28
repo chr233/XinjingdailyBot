@@ -439,10 +439,10 @@ namespace XinjingdailyBot.Service.Data
         /// 拒绝投稿
         /// </summary>
         /// <param name="post"></param>
+        /// <param name="dbUser"></param>
         /// <param name="rejectReason"></param>
-        /// <param name="callbackQuery"></param>
         /// <returns></returns>
-        public async Task RejetPost(ITelegramBotClient botClient, Posts post, Users dbUser, string rejectReason)
+        public async Task RejetPost(Posts post, Users dbUser, string rejectReason)
         {
             post.ReviewerUID = dbUser.UserID;
             post.Status = PostStatus.Rejected;
@@ -453,12 +453,12 @@ namespace XinjingdailyBot.Service.Data
 
             //修改审核群消息
             string reviewMsg = _textHelperService.MakeReviewMessage(poster, dbUser, post.Anonymous, rejectReason);
-            await botClient.EditMessageTextAsync(_channelService.ReviewGroup.Id, (int)post.ManageMsgID, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
+            await _botClient.EditMessageTextAsync(_channelService.ReviewGroup.Id, (int)post.ManageMsgID, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
 
             //拒稿频道发布消息
             if (!post.IsMediaGroup)
             {
-                await botClient.CopyMessageAsync(_channelService.RejectChannel.Id, _channelService.ReviewGroup.Id, (int)post.ReviewMsgID);
+                await _botClient.CopyMessageAsync(_channelService.RejectChannel.Id, _channelService.ReviewGroup.Id, (int)post.ReviewMsgID);
             }
             else
             {
@@ -480,18 +480,18 @@ namespace XinjingdailyBot.Service.Data
                         _ => throw new Exception(),
                     };
                 }
-                var messages = await botClient.SendMediaGroupAsync(_channelService.RejectChannel.Id, group);
+                var messages = await _botClient.SendMediaGroupAsync(_channelService.RejectChannel.Id, group);
             }
 
             //通知投稿人
             string posterMsg = _textHelperService.MakeNotification(rejectReason);
             if (poster.Notification)
             {
-                await botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true);
+                await _botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true);
             }
             else
             {
-                await botClient.EditMessageTextAsync(post.OriginChatID, (int)post.ActionMsgID, posterMsg);
+                await _botClient.EditMessageTextAsync(post.OriginChatID, (int)post.ActionMsgID, posterMsg);
             }
 
             poster.RejetCount++;
@@ -509,12 +509,11 @@ namespace XinjingdailyBot.Service.Data
         /// <summary>
         /// 接受投稿
         /// </summary>
-        /// <param name="botClient"></param>
         /// <param name="post"></param>
         /// <param name="dbUser"></param>
         /// <param name="callbackQuery"></param>
         /// <returns></returns>
-        public  async Task AcceptPost(ITelegramBotClient botClient, Posts post, Users dbUser, CallbackQuery callbackQuery)
+        public async Task AcceptPost(Posts post, Users dbUser, CallbackQuery callbackQuery)
         {
             Users poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
 
@@ -525,13 +524,13 @@ namespace XinjingdailyBot.Service.Data
             {
                 if (post.Tags.HasFlag(BuildInTags.NSFW))
                 {
-                    await botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, _textHelperService.NSFWWrning, allowSendingWithoutReply: true);
+                    await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, _textHelperService.NSFWWrning, allowSendingWithoutReply: true);
                 }
 
                 Message msg;
                 if (post.PostType == MessageType.Text)
                 {
-                    msg = await botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, postText, ParseMode.Html, disableWebPagePreview: true);
+                    msg = await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, postText, ParseMode.Html, disableWebPagePreview: true);
                 }
                 else
                 {
@@ -540,19 +539,19 @@ namespace XinjingdailyBot.Service.Data
                     switch (post.PostType)
                     {
                         case MessageType.Photo:
-                            msg = await botClient.SendPhotoAsync(_channelService.AcceptChannel.Id, attachment.FileID, postText, ParseMode.Html);
+                            msg = await _botClient.SendPhotoAsync(_channelService.AcceptChannel.Id, attachment.FileID, postText, ParseMode.Html);
                             break;
                         case MessageType.Audio:
-                            msg = await botClient.SendAudioAsync(_channelService.AcceptChannel.Id, attachment.FileID, postText, ParseMode.Html, title: attachment.FileName);
+                            msg = await _botClient.SendAudioAsync(_channelService.AcceptChannel.Id, attachment.FileID, postText, ParseMode.Html, title: attachment.FileName);
                             break;
                         case MessageType.Video:
-                            msg = await botClient.SendVideoAsync(_channelService.AcceptChannel.Id, attachment.FileID, caption: postText, parseMode: ParseMode.Html);
+                            msg = await _botClient.SendVideoAsync(_channelService.AcceptChannel.Id, attachment.FileID, caption: postText, parseMode: ParseMode.Html);
                             break;
                         case MessageType.Document:
-                            msg = await botClient.SendDocumentAsync(_channelService.AcceptChannel.Id, attachment.FileID, caption: postText, parseMode: ParseMode.Html);
+                            msg = await _botClient.SendDocumentAsync(_channelService.AcceptChannel.Id, attachment.FileID, caption: postText, parseMode: ParseMode.Html);
                             break;
                         default:
-                            await botClient.AutoReplyAsync($"不支持的稿件类型: {post.PostType}", callbackQuery);
+                            await _botClient.AutoReplyAsync($"不支持的稿件类型: {post.PostType}", callbackQuery);
                             return;
                     }
                 }
@@ -581,14 +580,14 @@ namespace XinjingdailyBot.Service.Data
 
                 if (post.Tags.HasFlag(BuildInTags.NSFW))
                 {
-                    await botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, _textHelperService.NSFWWrning, allowSendingWithoutReply: true);
+                    await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, _textHelperService.NSFWWrning, allowSendingWithoutReply: true);
                 }
 
-                var messages = await botClient.SendMediaGroupAsync(_channelService.AcceptChannel.Id, group);
+                var messages = await _botClient.SendMediaGroupAsync(_channelService.AcceptChannel.Id, group);
                 post.PublicMsgID = messages.First().MessageId;
             }
 
-            await botClient.AutoReplyAsync("稿件已发布", callbackQuery);
+            await _botClient.AutoReplyAsync("稿件已发布", callbackQuery);
 
             post.ReviewerUID = dbUser.UserID;
             post.Status = PostStatus.Accepted;
@@ -598,12 +597,12 @@ namespace XinjingdailyBot.Service.Data
             if (!post.IsDirectPost) // 非直接投稿
             {
                 string reviewMsg = _textHelperService.MakeReviewMessage(poster, dbUser, post.Anonymous);
-                await botClient.EditMessageTextAsync(callbackQuery.Message!, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
+                await _botClient.EditMessageTextAsync(callbackQuery.Message!, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
             }
             else //直接投稿, 在审核群留档
             {
                 string reviewMsg = _textHelperService.MakeReviewMessage(poster, post.PublicMsgID, post.Anonymous);
-                var msg = await botClient.SendTextMessageAsync(_channelService. ReviewGroup.Id, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
+                var msg = await _botClient.SendTextMessageAsync(_channelService.ReviewGroup.Id, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
                 post.ReviewMsgID = msg.MessageId;
             }
 
@@ -616,11 +615,11 @@ namespace XinjingdailyBot.Service.Data
 
             if (poster.Notification && poster.UserID != dbUser.UserID)//启用通知并且审核与投稿不是同一个人
             {//单独发送通知消息
-                await botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, ParseMode.Html, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true, disableWebPagePreview: true);
+                await _botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, ParseMode.Html, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true, disableWebPagePreview: true);
             }
             else
             {//静默模式, 不单独发送通知消息
-                await botClient.EditMessageTextAsync(post.OriginChatID, (int)post.ActionMsgID, posterMsg, ParseMode.Html, disableWebPagePreview: true);
+                await _botClient.EditMessageTextAsync(post.OriginChatID, (int)post.ActionMsgID, posterMsg, ParseMode.Html, disableWebPagePreview: true);
             }
 
             //增加通过数量

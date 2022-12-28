@@ -10,7 +10,7 @@ using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
 
-namespace XinjingdailyBot.Command.Command
+namespace XinjingdailyBot.Command
 {
     [AppService(ServiceLifetime = LifeTime.Scoped)]
     public class ReviewCommand
@@ -63,7 +63,7 @@ namespace XinjingdailyBot.Command.Command
                     return "请回复审核消息并输入拒绝理由";
                 }
 
-                int messageId = message.ReplyToMessage.MessageId;
+                var messageId = message.ReplyToMessage.MessageId;
 
                 var post = await _postService.Queryable().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
 
@@ -72,7 +72,7 @@ namespace XinjingdailyBot.Command.Command
                     return "未找到稿件";
                 }
 
-                string reason = string.Join(' ', args).Trim();
+                var reason = string.Join(' ', args).Trim();
 
                 if (string.IsNullOrEmpty(reason))
                 {
@@ -80,12 +80,12 @@ namespace XinjingdailyBot.Command.Command
                 }
 
                 post.Reason = RejectReason.CustomReason;
-                await ReviewHandler.RejetPost(botClient, post, dbUser, reason);
+                await _postService.RejetPost(post, dbUser, reason);
 
                 return $"已拒绝该稿件, 理由: {reason}";
             }
 
-            string text = await exec();
+            var text = await exec();
             await _botClient.SendCommandReply(text, message, false);
         }
 
@@ -111,7 +111,7 @@ namespace XinjingdailyBot.Command.Command
                     return "请回复审核消息并输入拒绝理由";
                 }
 
-                int messageId = message.ReplyToMessage.MessageId;
+                var messageId = message.ReplyToMessage.MessageId;
 
                 var post = await _postService.Queryable().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
                 if (post == null)
@@ -131,7 +131,7 @@ namespace XinjingdailyBot.Command.Command
                 return $"稿件描述已更新(投稿预览不会更新)";
             }
 
-            string text = await exec();
+            var text = await exec();
             await _botClient.SendCommandReply(text, message, false);
         }
     }

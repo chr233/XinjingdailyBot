@@ -6,7 +6,7 @@ using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
 
-namespace XinjingdailyBot.Command.Command
+namespace XinjingdailyBot.Command
 {
     [AppService(ServiceLifetime = LifeTime.Scoped)]
     public class SuperCommand
@@ -48,7 +48,7 @@ namespace XinjingdailyBot.Command.Command
                 Environment.Exit(0);
             });
 
-            string text = "机器人即将重启";
+            var text = "机器人即将重启";
             await _botClient.SendCommandReply(text, message);
         }
     }
