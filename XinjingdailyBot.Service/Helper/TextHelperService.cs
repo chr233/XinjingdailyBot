@@ -17,15 +17,15 @@ namespace XinjingdailyBot.Service.Helper
     {
         private readonly IChannelService _channelService;
 
-        private static readonly Regex MatchTag = new(@"(^#\S+)|(\s#\S+)");
-        private static readonly Regex MatchSpace = new(@"^\s*$");
-
-        private static readonly string NSFWWrning = $"{Emojis.Warning} NSFW 提前预警 {Emojis.Warning}";
-
         public TextHelperService(IChannelService channelService)
         {
             _channelService = channelService;
         }
+
+        private static readonly Regex MatchTag = new(@"(^#\S+)|(\s#\S+)");
+        private static readonly Regex MatchSpace = new(@"^\s*$");
+
+        private static readonly string NSFWWrning = $"{Emojis.Warning} NSFW 提前预警 {Emojis.Warning}";
 
         string ITextHelperService.NSFWWrning { get => NSFWWrning; }
 

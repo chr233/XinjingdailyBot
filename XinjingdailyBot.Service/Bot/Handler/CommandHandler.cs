@@ -1,9 +1,11 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Model;
@@ -23,19 +25,22 @@ public class CommandHandler : ICommandHandler
     private readonly ITelegramBotClient _botClient;
     private readonly IServiceScope _serviceScope;
     private readonly ICmdRecordService _cmdRecordService;
+    private readonly OptionsSetting _optionsSetting;
 
     public CommandHandler(
         ILogger<CommandHandler> logger,
         IChannelService channelService,
         IServiceProvider serviceProvider,
         ITelegramBotClient botClient,
-        ICmdRecordService cmdRecordService)
+        ICmdRecordService cmdRecordService,
+        IOptions<OptionsSetting> options)
     {
         _logger = logger;
         _channelService = channelService;
         _serviceScope = serviceProvider.CreateScope();
         _botClient = botClient;
         _cmdRecordService = cmdRecordService;
+        _optionsSetting = options.Value;
     }
 
     /// <summary>
@@ -97,9 +102,11 @@ public class CommandHandler : ICommandHandler
                 {
                     await CallCommandAsync(dbUser, message, type, method);
                 }
-                catch (Exception ex) //TODO
+                catch (Exception ex)
                 {
                     errorMsg = $"{ex.GetType} {ex.Message}";
+
+                    await _botClient.SendCommandReply(_optionsSetting.Debug ? errorMsg : "遇到内部错误", message);
                 }
                 handled = true;
                 break;
@@ -138,7 +145,13 @@ public class CommandHandler : ICommandHandler
                 case nameof(Message):
                     methodParameters.Add(message);
                     break;
+                case "String[]":
+                    string[] args = message.Text!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
+                    methodParameters.Add(args[1..]);
+                    break;
+
                 default:
+                    _logger.LogDebug(parameter.ParameterType.Name);
                     break;
             }
         }

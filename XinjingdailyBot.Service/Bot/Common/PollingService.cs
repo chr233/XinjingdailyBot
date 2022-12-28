@@ -38,7 +38,7 @@ public class PollingService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogDebug("注册可用命令");
-        await _commandHandler.InitCommands();
+        _commandHandler.InitCommands();
 
         _logger.LogInformation("读取基础信息");
         await _channelService.InitChannelInfo();

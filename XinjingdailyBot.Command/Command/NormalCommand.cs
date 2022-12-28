@@ -12,7 +12,7 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Command.Command
 {
-    [AppService(ServiceLifetime = LifeTime.Transient)]
+    [AppService(ServiceLifetime = LifeTime.Scoped)]
     public class NormalCommand
     {
         private readonly ILogger<NormalCommand> _logger;
