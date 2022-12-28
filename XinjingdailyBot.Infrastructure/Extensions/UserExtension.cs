@@ -16,38 +16,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
 
         public static string UserProfile(this User user)
         {
-            return $"{user.EscapedUserName()} {user.UserID()}";
-        }
-
-        /// <summary>
-        /// HTML转义
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        public static string EscapeHtml(string? text)
-        {
-            if (string.IsNullOrEmpty(text))
-            {
-                return "";
-            }
-            else
-            {
-                var escapedText = text
-                    .Replace("<", "＜")
-                    .Replace(">", "＞")
-                    .Replace("&", "＆");
-                return escapedText;
-            }
-        }
-
-        /// <summary>
-        /// HTML转义后的聊天名
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        public static string EscapedChatName(this Chat chat)
-        {
-            return EscapeHtml(chat.Title);
+            return $"{user.EscapedNickName()} {user.UserID()}";
         }
 
         /// <summary>
@@ -55,9 +24,28 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public static string EscapedUserName(this User user)
+        public static string EscapedNickName(this User user)
         {
-            return EscapeHtml(user.NickName());
+            return user.NickName().EscapeHtml();
+        }
+
+        /// <summary>
+        /// Html格式的用户链接
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public static string HtmlUserLink(this User user)
+        {
+            string nick = user.EscapedNickName();
+
+            if (string.IsNullOrEmpty(user.Username))
+            {
+                return $"<a href=\"tg://user?id={user.UserID}\">{nick}</a>";
+            }
+            else
+            {
+                return $"<a href=\"https://t.me/{user.Username}\">{nick}</a>";
+            }
         }
 
     }

@@ -8,7 +8,9 @@ using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Extensions;
+using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
+using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
 
@@ -19,10 +21,11 @@ namespace XinjingdailyBot.Service.Data
     {
         private readonly ILogger<UserService> _logger;
         private readonly OptionsSetting _optionsSetting;
-        private readonly UserRepository _userRepository;
-        private readonly CmdRecordRepository _cmdRecordRepository;
-        private readonly PostRepository _postRepository;
         private readonly GroupRepository _groupRepository;
+        private readonly IMarkupHelperService _markupHelperService;
+        private readonly IChannelService _channelService;
+        private readonly ICmdRecordService _cmdRecordService;
+        private readonly PostRepository _postRepository;
 
         /// <summary>
         /// 更新周期
@@ -32,18 +35,19 @@ namespace XinjingdailyBot.Service.Data
         public UserService(
             ILogger<UserService> logger,
             IOptions<OptionsSetting> configuration,
-            UserRepository userRepository,
-            CmdRecordRepository cmdRecordRepository,
-            PostRepository postRepository,
-            GroupRepository groupRepository
-        )
+            GroupRepository groupRepository,
+            IMarkupHelperService markupHelperService,
+            IChannelService channelService,
+            ICmdRecordService cmdRecordService,
+           PostRepository postRepository)
         {
             _logger = logger;
             _optionsSetting = configuration.Value;
-            _userRepository = userRepository;
-            _cmdRecordRepository = cmdRecordRepository;
-            _postRepository = postRepository;
             _groupRepository = groupRepository;
+            _markupHelperService = markupHelperService;
+            _channelService = channelService;
+            _cmdRecordService = cmdRecordService;
+            _postRepository = postRepository;
         }
 
         /// <summary>
@@ -51,7 +55,7 @@ namespace XinjingdailyBot.Service.Data
         /// </summary>
         /// <param name="update"></param>
         /// <returns></returns>
-        public async Task<Users?> FetchUser(Update update)
+        public async Task<Users?> FetchUserFromUpdate(Update update)
         {
             var msgUser = update.Type switch
             {
@@ -74,7 +78,7 @@ namespace XinjingdailyBot.Service.Data
                 _ => null
             };
 
-            return await FetchUser(msgUser, msgChat);
+            return await QueryUser(msgUser, msgChat);
         }
 
         /// <summary>
@@ -82,7 +86,7 @@ namespace XinjingdailyBot.Service.Data
         /// </summary>
         /// <param name="msgUser"></param>
         /// <returns></returns>
-        private async Task<Users?> FetchUser(User? msgUser, Chat? msgChat)
+        private async Task<Users?> QueryUser(User? msgUser, Chat? msgChat)
         {
             if (msgUser == null)
             {
@@ -97,19 +101,19 @@ namespace XinjingdailyBot.Service.Data
                 {
                     if (msgChat != null)
                     {
-                        _logger.LogDebug($"S 忽略群匿名用户 {msgChat.ChatProfile()}");
+                        _logger.LogDebug("忽略群匿名用户 {chatProfile}", msgChat.ChatProfile());
                     }
                 }
                 return null;
             }
 
-            var dbUser = await _userRepository.Queryable().FirstAsync(x => x.UserID == msgUser.Id);
+            var dbUser = await Queryable().FirstAsync(x => x.UserID == msgUser.Id);
 
             var chatID = msgChat?.Type == ChatType.Private ? msgChat.Id : -1;
 
             if (dbUser == null)
             {
-                var defaultGroup = await _groupRepository.GetDefaultGroup();
+                var defaultGroup = _groupRepository.GetDefaultGroup();
 
                 if (defaultGroup == null)
                 {
@@ -134,7 +138,7 @@ namespace XinjingdailyBot.Service.Data
 
                 try
                 {
-                    await _userRepository.Insertable(dbUser).ExecuteCommandAsync();
+                    await Insertable(dbUser).ExecuteCommandAsync();
                     if (isDebug)
                     {
                         _logger.LogDebug("创建用户 {dbUser} 成功", dbUser);
@@ -187,9 +191,9 @@ namespace XinjingdailyBot.Service.Data
                     needUpdate = true;
                 }
 
-                if (!await _groupRepository.HasGroupId(dbUser.GroupID))
+                if (!_groupRepository.HasGroupId(dbUser.GroupID))
                 {
-                    var defaultGroup = await _groupRepository.GetDefaultGroup();
+                    var defaultGroup = _groupRepository.GetDefaultGroup();
                     if (defaultGroup == null)
                     {
                         _logger.LogError("未设置默认群组");
@@ -205,7 +209,7 @@ namespace XinjingdailyBot.Service.Data
                     try
                     {
                         dbUser.ModifyAt = DateTime.Now;
-                        await _userRepository.Updateable(dbUser).UpdateColumns(x => new
+                        await Updateable(dbUser).UpdateColumns(x => new
                         {
                             x.UserName,
                             x.FirstName,
@@ -231,12 +235,12 @@ namespace XinjingdailyBot.Service.Data
             //如果是配置文件中指定的管理员就覆盖用户组权限
             if (_optionsSetting.Bot.SuperAdmins?.Contains(dbUser.UserID) ?? false)
             {
-                var maxGroupID = await _groupRepository.GetMaxGroupId();
+                var maxGroupID = _groupRepository.GetMaxGroupId();
                 dbUser.GroupID = maxGroupID;
             }
 
             //根据GroupID设置用户权限信息
-            var group = await _groupRepository.GetGroupById(dbUser.GroupID);
+            var group = _groupRepository.GetGroupById(dbUser.GroupID);
 
             if (group != null)
             {
@@ -244,7 +248,7 @@ namespace XinjingdailyBot.Service.Data
             }
             else
             {
-                _logger.LogError($"读取用户 {dbUser} 权限组 {dbUser.GroupID} 失败", dbUser, dbUser.GroupID);
+                _logger.LogError("读取用户 {dbUser} 权限组 {GroupID} 失败", dbUser, dbUser.GroupID);
                 return null;
             }
 
@@ -256,17 +260,10 @@ namespace XinjingdailyBot.Service.Data
         /// </summary>
         /// <param name="userID"></param>
         /// <returns></returns>
-        internal async Task<Users?> FetchDbUserByUserID(long? userID)
+        public async Task<Users?> FetchUserByUserID(long userID)
         {
-            if (userID == null)
-            {
-                return null;
-            }
-            else
-            {
-                var dbUser = await _userRepository.Queryable().FirstAsync(x => x.UserID == userID);
-                return dbUser;
-            }
+            var dbUser = await Queryable().FirstAsync(x => x.UserID == userID);
+            return dbUser;
         }
 
         /// <summary>
@@ -274,7 +271,7 @@ namespace XinjingdailyBot.Service.Data
         /// </summary>
         /// <param name="userID"></param>
         /// <returns></returns>
-        internal async Task<Users?> FetchDbUserByUserName(string? userName)
+        public async Task<Users?> FetchUserByUserName(string? userName)
         {
             if (string.IsNullOrEmpty(userName))
             {
@@ -282,7 +279,7 @@ namespace XinjingdailyBot.Service.Data
             }
             else
             {
-                var dbUser = await _userRepository.Queryable().FirstAsync(x => x.UserName == userName);
+                var dbUser = await Queryable().FirstAsync(x => x.UserName == userName);
                 return dbUser;
             }
         }
@@ -292,7 +289,7 @@ namespace XinjingdailyBot.Service.Data
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        internal async Task<Users?> FetchTargetUser(Message message)
+        public async Task<Users?> FetchTargetUser(Message message)
         {
             if (message.ReplyToMessage == null)
             {
@@ -307,49 +304,49 @@ namespace XinjingdailyBot.Service.Data
             }
 
             //被回复的消息是Bot发的消息
-            //if (replyToMsg.From.Id == BotUser.Id)
-            //{
-            //    //在审核群内
-            //    if (message.Chat.Id == ReviewGroup.Id)
-            //    {
-            //        var msgID = replyToMsg.MessageId;
+            if (replyToMsg.From.Id == _channelService.BotUser.Id)
+            {
+                //在审核群内
+                if (message.Chat.Id == _channelService.ReviewGroup.Id)
+                {
+                    var msgID = replyToMsg.MessageId;
 
-            //        var exp = Expressionable.Create<Posts>();
-            //        exp.Or(x => x.ManageMsgID == msgID);
+                    var exp = Expressionable.Create<Posts>();
+                    exp.Or(x => x.ManageMsgID == msgID);
 
-            //        if (string.IsNullOrEmpty(replyToMsg.MediaGroupId))
-            //        {
-            //            //普通消息
-            //            exp.Or(x => x.ReviewMsgID == msgID);
-            //        }
-            //        else
-            //        {
-            //            //媒体组消息
-            //            exp.Or(x => x.ReviewMsgID <= msgID && x.ManageMsgID > msgID);
-            //        }
+                    if (string.IsNullOrEmpty(replyToMsg.MediaGroupId))
+                    {
+                        //普通消息
+                        exp.Or(x => x.ReviewMsgID == msgID);
+                    }
+                    else
+                    {
+                        //媒体组消息
+                        exp.Or(x => x.ReviewMsgID <= msgID && x.ManageMsgID > msgID);
+                    }
 
-            //        var post = await _userRepository.Queryable<Posts>().FirstAsync(exp.ToExpression());
+                    var post = await _postRepository.Queryable().FirstAsync(exp.ToExpression());
 
-            //        //判断是不是审核相关消息
-            //        if (post != null)
-            //        {
-            //            //通过稿件读取用户信息
-            //            return await FetchDbUserByUserID(post.PosterUID);
-            //        }
-            //    }
+                    //判断是不是审核相关消息
+                    if (post != null)
+                    {
+                        //通过稿件读取用户信息
+                        return await FetchUserByUserID(post.PosterUID);
+                    }
+                }
 
-            //    //在CMD回调表里查看
-            //    var cmdAction = await _userRepository.Queryable<CmdRecords>().FirstAsync(x => x.MessageID == replyToMsg.MessageId);
-            //    if (cmdAction != null)
-            //    {
-            //        return await FetchDbUserByUserID(cmdAction.UserID);
-            //    }
+                //在CMD回调表里查看
+                var cmdAction = await _cmdRecordService.Queryable().FirstAsync(x => x.MessageID == replyToMsg.MessageId);
+                if (cmdAction != null)
+                {
+                    return await FetchUserByUserID(cmdAction.UserID);
+                }
 
-            //    return null;
-            //}
+                return null;
+            }
 
             //获取消息发送人
-            return await FetchDbUserByUserID(replyToMsg.From.Id);
+            return await FetchUserByUserID(replyToMsg.From.Id);
         }
 
         /// <summary>
@@ -357,7 +354,7 @@ namespace XinjingdailyBot.Service.Data
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        internal async Task<Users?> FetchDbUserByUserNameOrUserID(string? target)
+        public async Task<Users?> FetchUserByUserNameOrUserID(string? target)
         {
             if (string.IsNullOrEmpty(target))
             {
@@ -366,22 +363,18 @@ namespace XinjingdailyBot.Service.Data
 
             if (target.StartsWith('@'))
             {
-                return await FetchDbUserByUserName(target[1..]);
+                return await FetchUserByUserName(target[1..]);
             }
 
-            Users? dbUser = null;
 
             if (long.TryParse(target, out var userID))
             {
-                dbUser = await FetchDbUserByUserID(userID);
+                return await FetchUserByUserID(userID) ?? await FetchUserByUserName(target);
             }
-
-            if (dbUser == null)
+            else
             {
-                dbUser = await FetchDbUserByUserName(target);
+                return await FetchUserByUserName(target);
             }
-
-            return dbUser;
         }
 
         /// <summary>
@@ -389,11 +382,11 @@ namespace XinjingdailyBot.Service.Data
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        internal async Task<Users?> FetchDbUserByUserID(string? target)
+        public async Task<Users?> FetchDbUserByUserID(string? target)
         {
             if (long.TryParse(target, out var userID))
             {
-                return await FetchDbUserByUserID(userID);
+                return await FetchUserByUserID(userID);
             }
 
             return null;
@@ -405,7 +398,7 @@ namespace XinjingdailyBot.Service.Data
         /// <param name="query"></param>
         /// <param name="page"></param>
         /// <returns></returns>
-        internal async Task<(string, InlineKeyboardMarkup?)> QueryUserList(Users dbUser, string query, int page)
+        public async Task<(string, InlineKeyboardMarkup?)> QueryUserList(Users dbUser, string query, int page)
         {
             //每页数量
             const int pageSize = 30;
@@ -429,7 +422,7 @@ namespace XinjingdailyBot.Service.Data
             }
             exp.Or(x => x.UserName.Contains(query));
 
-            var userListCount = await _userRepository.Queryable().Where(exp.ToExpression()).CountAsync();
+            var userListCount = await Queryable().Where(exp.ToExpression()).CountAsync();
 
             if (userListCount == 0)
             {
@@ -444,7 +437,7 @@ namespace XinjingdailyBot.Service.Data
 
             page = Math.Max(1, Math.Min(page, totalPages));
 
-            var userList = await _userRepository.Queryable().Where(exp.ToExpression()).ToPageListAsync(page, pageSize);
+            var userList = await Queryable().Where(exp.ToExpression()).ToPageListAsync(page, pageSize);
 
             StringBuilder sb = new();
 
@@ -452,32 +445,31 @@ namespace XinjingdailyBot.Service.Data
             var index = 0;
             foreach (var user in userList)
             {
-                //var url = user.HtmlUserLink();
+                var url = user.HtmlUserLink();
 
-                //sb.Append($"{start + index++}. <code>{user.UserID}</code> {url}");
+                sb.Append($"{start + index++}. <code>{user.UserID}</code> {url}");
 
-                //if (!string.IsNullOrEmpty(user.UserName))
-                //{
-                //    sb.Append($" <code>@{user.UserName}</code>");
-                //}
-                //if (user.IsBan)
-                //{
-                //    sb.Append(" 已封禁");
-                //}
-                //if (user.IsBot)
-                //{
-                //    sb.Append(" 机器人");
-                //}
+                if (!string.IsNullOrEmpty(user.UserName))
+                {
+                    sb.Append($" <code>@{user.UserName}</code>");
+                }
+                if (user.IsBan)
+                {
+                    sb.Append(" 已封禁");
+                }
+                if (user.IsBot)
+                {
+                    sb.Append(" 机器人");
+                }
                 sb.AppendLine();
             }
 
             sb.AppendLine();
             sb.AppendLine($"共 {userListCount} 条, 当前显示 {start}~{start + userList.Count - 1} 条");
 
-            //var keyboard = MarkupHelper.UserListPageKeyboard(dbUser, query, page, totalPages);
+            var keyboard = _markupHelperService.UserListPageKeyboard(dbUser, query, page, totalPages);
 
-            return (sb.ToString(), null);
-            //return (sb.ToString(), keyboard);
+            return (sb.ToString(), keyboard);
         }
     }
 }

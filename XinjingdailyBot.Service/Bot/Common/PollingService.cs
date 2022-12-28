@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
+using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Bot.Common;
 
@@ -15,17 +16,23 @@ public class PollingService : BackgroundService
     private readonly ILogger<PollingService> _logger;
     private readonly IChannelService _channelService;
     private readonly ICommandHandler _commandHandler;
+    private readonly GroupRepository _groupRepository;
+    private readonly LevelRepository _levelRepository;
 
     public PollingService(
         IServiceProvider serviceProvider,
         ILogger<PollingService> logger,
         IChannelService channelService,
-        ICommandHandler commandHandler)
+        ICommandHandler commandHandler,
+        GroupRepository groupRepository,
+        LevelRepository levelRepository)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
         _channelService = channelService;
         _commandHandler = commandHandler;
+        _groupRepository = groupRepository;
+        _levelRepository = levelRepository;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -35,6 +42,10 @@ public class PollingService : BackgroundService
 
         _logger.LogInformation("读取基础信息");
         await _channelService.InitChannelInfo();
+
+        _logger.LogInformation("读取群组和等级设定");
+        await _groupRepository.InitGroupCache();
+        await _levelRepository.InitLevelCache();
 
         _logger.LogInformation("开始运行 Bot");
         await DoWork(stoppingToken);

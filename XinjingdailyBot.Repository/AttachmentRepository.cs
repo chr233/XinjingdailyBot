@@ -7,6 +7,5 @@ namespace XinjingdailyBot.Repository
     [AppService(ServiceLifetime = LifeTime.Transient)]
     public class AttachmentRepository : BaseRepository<Attachments>
     {
-
     }
 }

@@ -111,7 +111,7 @@ namespace XinjingdailyBot.Service.Helper
         /// <returns></returns>
         public string HtmlUserLink(Users user)
         {
-            return HtmlUserLink(user.UserID, user.UserName, user.UserNick);
+            return HtmlUserLink(user.UserID, user.UserName, user.FullName);
         }
 
         /// <summary>
@@ -307,7 +307,7 @@ namespace XinjingdailyBot.Service.Helper
             if (post.IsFromChannel)
             {
                 var channel = HtmlUserLink(0, post.ChannelName, post.ChannelTitle);
-                if (post.Anymouse)
+                if (post.Anonymous)
                 {
                     return $"<i>from</i> {channel}";
                 }
@@ -318,7 +318,7 @@ namespace XinjingdailyBot.Service.Helper
             }
             else
             {
-                if (post.Anymouse)
+                if (post.Anonymous)
                 {
                     return $"<i>via</i> 匿名";
                 }

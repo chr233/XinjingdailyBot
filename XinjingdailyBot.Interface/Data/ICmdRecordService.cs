@@ -3,8 +3,8 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Data
 {
-    public interface ICmdRecordService
+    public interface ICmdRecordService : IBaseService<CmdRecords>
     {
-        Task AddCmdRecord(Message message, Users dbUser, string command, bool handled, bool isQuery, string? exception = null);
+        Task AddCmdRecord(Message message, Users dbUser, bool handled, bool isQuery, string? exception = null);
     }
 }

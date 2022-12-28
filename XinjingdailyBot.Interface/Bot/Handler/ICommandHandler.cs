@@ -5,7 +5,7 @@ namespace XinjingdailyBot.Interface.Bot.Handler
 {
     public interface ICommandHandler
     {
-        Task InitCommands();
+        void InitCommands();
         Task OnCommandReceived(Users dbUser, Message message);
     }
 }

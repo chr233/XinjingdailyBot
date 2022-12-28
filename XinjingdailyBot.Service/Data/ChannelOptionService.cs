@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using XinjingdailyBot.Infrastructure.Attribute;
+﻿using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
@@ -10,17 +9,13 @@ namespace XinjingdailyBot.Service.Data
     [AppService(ServiceType = typeof(IChannelOptionService), ServiceLifetime = LifeTime.Transient)]
     public sealed class ChannelOptionService : BaseService<ChannelOptions>, IChannelOptionService
     {
-        private readonly ILogger<ChannelOptionService> _logger;
         private readonly ChannelOptionRepository _channelOptionRepository;
 
         public ChannelOptionService(
-            ILogger<ChannelOptionService> logger,
             ChannelOptionRepository channelOptionRepository)
         {
-            _logger = logger;
             _channelOptionRepository = channelOptionRepository;
         }
-
 
         /// <summary>
         /// 获取频道设定

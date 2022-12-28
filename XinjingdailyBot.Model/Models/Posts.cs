@@ -54,7 +54,8 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 匿名投稿
         /// </summary>
-        public bool Anymouse { get; set; }
+        [SugarColumn(OldColumnName = "Anymouse")]
+        public bool Anonymous { get; set; }
 
         /// <summary>
         /// 投稿描述(过滤#标签和链接)

@@ -5,6 +5,26 @@ namespace XinjingdailyBot.Infrastructure.Extensions
 {
     public static class StringExtension
     {
+        /// <summary>
+        /// HTML转义
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string EscapeHtml(this string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return "";
+            }
+            else
+            {
+                var escapedText = text
+                    .Replace("<", "＜")
+                    .Replace(">", "＞")
+                    .Replace("&", "＆");
+                return escapedText;
+            }
+        }
 
         /// <summary>
         /// SQL条件拼接
@@ -36,7 +56,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         public static string ReplaceFirst(this string input, string oldValue, string newValue)
         {
             Regex regEx = new Regex(oldValue, RegexOptions.Multiline);
-            return regEx.Replace(input, newValue == null ? "" : newValue, 1);
+            return regEx.Replace(input, newValue ?? "", 1);
         }
 
         /// <summary>
