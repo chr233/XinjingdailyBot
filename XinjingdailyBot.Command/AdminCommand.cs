@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -652,6 +653,35 @@ namespace XinjingdailyBot.Command
         }
 
         /// <summary>
+        /// 搜索用户翻页
+        /// </summary>
+        /// <param name="callbackQuery"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        [QueryCmd("SEARCHUSER", UserRights.AdminCmd, Alias = "QUERYUSER", ValidUser = true)]
+        public async Task QResponseSearchUser(Users dbUser, CallbackQuery callbackQuery, string[] args)
+        {
+            async Task<(string, InlineKeyboardMarkup?)> exec()
+            {
+                if (args.Length < 3)
+                {
+                    return ("参数有误", null);
+                }
+
+                string query = args[1];
+
+                if (!int.TryParse(args[2], out int page))
+                {
+                    page = 1;
+                }
+
+                return await _userService.QueryUserList(dbUser, query, page);
+            }
+            (string text, var kbd) = await exec();
+            await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, ParseMode.Html, true, kbd);
+        }
+
+        /// <summary>
         /// 生成投稿统计信息
         /// </summary>
         /// <param name="message"></param>
@@ -897,7 +927,6 @@ namespace XinjingdailyBot.Command
             await _botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
         }
 
-
         /// <summary>
         /// 设置用户组
         /// </summary>
@@ -949,6 +978,57 @@ namespace XinjingdailyBot.Command
             await _botClient.SendCommandReply(text, message, autoDelete: false, replyMarkup: kbd);
         }
 
+        /// <summary>
+        /// 设置用户组
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        [QueryCmd("SETUSERGROUP", UserRights.NormalCmd, ValidUser = true)]
+        public async Task QResponseSetUserGroup(Users dbUser, CallbackQuery callbackQuery, string[] args)
+        {
+            async Task<(string, InlineKeyboardMarkup?)> exec()
+            {
+                if (args.Length < 3)
+                {
+                    return ("参数有误", null);
+                }
+
+                var targetUser = await _userService.FetchUserByUserName(args[1]);
+
+                if (targetUser == null)
+                {
+                    return ("找不到指定用户", null);
+                }
+
+                if (targetUser.Id == dbUser.Id)
+                {
+                    return ("无法对自己进行操作", null);
+                }
+
+                if (targetUser.GroupID >= dbUser.GroupID)
+                {
+                    return ("无法对同级管理员进行此操作", null);
+                }
+
+                if (int.TryParse(args[2], out int groupID))
+                {
+                    var group = _groupRepository.GetGroupById(groupID);
+                    if (group != null)
+                    {
+                        targetUser.GroupID = groupID;
+                        targetUser.ModifyAt = DateTime.Now;
+                        await _userService.Updateable(targetUser).UpdateColumns(x => new { x.GroupID, x.ModifyAt }).ExecuteCommandAsync();
+                        return ($"修改用户 {targetUser} 权限组成功, 当前权限组 {group.Name}", null);
+                    }
+                }
+
+                return ($"修改用户 {targetUser} 权限组失败, 找不到指定的权限组", null);
+            }
+
+            (string text, var kbd) = await exec();
+            await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, replyMarkup: kbd);
+        }
 
         /// <summary>
         /// 来源频道设置
@@ -1009,5 +1089,7 @@ namespace XinjingdailyBot.Command
         //    string text = await exec();
         //    await _botClient.SendCommandReply(text, message, autoDelete);
         //}
+
+
     }
 }
