@@ -6,13 +6,17 @@ namespace XinjingdailyBot.Infrastructure.Attribute
     /// <summary>
     /// 用于标记Query命令
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public sealed class QueryCmdAttribute : System.Attribute
     {
         /// <summary>
         /// 指令名称
         /// </summary>
         public string Command { get; set; } = "";
+        /// <summary>
+        /// 指令别名
+        /// </summary>
+        public string? Alias { get; set; }
         /// <summary>
         /// 需求的权限
         /// </summary>
