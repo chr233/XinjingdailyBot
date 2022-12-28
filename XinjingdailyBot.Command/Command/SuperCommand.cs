@@ -1,17 +1,10 @@
 ﻿using System.Diagnostics;
-using System.Text;
 using Microsoft.Extensions.Logging;
-using NLog;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
-using XinjingdailyBot.Interface.Data;
-using XinjingdailyBot.Model.Models;
-using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Command.Command
 {

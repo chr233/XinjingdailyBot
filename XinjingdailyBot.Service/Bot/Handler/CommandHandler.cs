@@ -159,6 +159,9 @@ public class CommandHandler : ICommandHandler
         method.Invoke(service, methodParameters.ToArray());
     }
 
+    /// <summary>
+    /// 注册命令
+    /// </summary>
     public void InitCommands()
     {
         //获取所有服务方法
