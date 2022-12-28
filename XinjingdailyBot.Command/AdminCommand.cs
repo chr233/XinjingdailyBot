@@ -17,7 +17,7 @@ using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
 
-namespace XinjingdailyBot.Command.Command
+namespace XinjingdailyBot.Command
 {
     [AppService(ServiceLifetime = LifeTime.Scoped)]
     public class AdminCommand
@@ -45,7 +45,7 @@ namespace XinjingdailyBot.Command.Command
             IAttachmentService attachmentService,
             IChannelOptionService channelOptionService,
             IChannelService channelService,
-             IMarkupHelperService markupHelperService)
+            IMarkupHelperService markupHelperService)
         {
             _logger = logger;
             _botClient = botClient;
@@ -83,7 +83,7 @@ namespace XinjingdailyBot.Command.Command
             }
             else
             {
-                string groupTitle = chat.EscapedChatName();
+                var groupTitle = chat.EscapedChatName();
                 sb.AppendLine($"群组名: <code>{groupTitle ?? "无"}</code>");
 
                 if (string.IsNullOrEmpty(chat.Username))
@@ -127,11 +127,11 @@ namespace XinjingdailyBot.Command.Command
             }
             else
             {
-                string level = _levelRepository.GetLevelName(targetUser.Level);
-                string group = _groupRepository.GetGroupName(targetUser.GroupID);
-                string status = targetUser.IsBan ? "封禁中" : "正常";
+                var level = _levelRepository.GetLevelName(targetUser.Level);
+                var group = _groupRepository.GetGroupName(targetUser.GroupID);
+                var status = targetUser.IsBan ? "封禁中" : "正常";
 
-                int totalPost = targetUser.PostCount - targetUser.ExpiredPostCount;
+                var totalPost = targetUser.PostCount - targetUser.ExpiredPostCount;
 
                 sb.AppendLine($"用户名: <code>{targetUser.EscapedFullName()}</code>");
                 sb.AppendLine($"用户ID: <code>{targetUser.UserID}</code>");
@@ -186,7 +186,7 @@ namespace XinjingdailyBot.Command.Command
                     return "无法对同级管理员进行此操作";
                 }
 
-                string reason = string.Join(' ', args);
+                var reason = string.Join(' ', args);
                 if (string.IsNullOrEmpty(reason))
                 {
                     return "请指定封禁理由";
@@ -217,7 +217,7 @@ namespace XinjingdailyBot.Command.Command
                     {
                         if (targetUser.PrivateChatID > 0)
                         {
-                            string msg = string.Format(Langs.BanedUserTips, "管理员", reason);
+                            var msg = string.Format(Langs.BanedUserTips, "管理员", reason);
                             await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg);
                             await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, Langs.QueryBanDescribe);
                         }
@@ -239,7 +239,7 @@ namespace XinjingdailyBot.Command.Command
                 }
             }
 
-            string text = await exec();
+            var text = await exec();
             await _botClient.SendCommandReply(text, message, false, parsemode: ParseMode.Html);
         }
 
@@ -281,7 +281,7 @@ namespace XinjingdailyBot.Command.Command
                     return "无法对同级管理员进行此操作";
                 }
 
-                string reason = string.Join(' ', args);
+                var reason = string.Join(' ', args);
                 if (string.IsNullOrEmpty(reason))
                 {
                     return "请指定解封理由";
@@ -312,7 +312,7 @@ namespace XinjingdailyBot.Command.Command
                     {
                         if (targetUser.PrivateChatID > 0)
                         {
-                            string msg = string.Format(Langs.UnbanedUserTips, "管理员", reason);
+                            var msg = string.Format(Langs.UnbanedUserTips, "管理员", reason);
                             await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg);
                             await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, Langs.QueryBanDescribe);
                         }
@@ -334,7 +334,7 @@ namespace XinjingdailyBot.Command.Command
                 }
             }
 
-            string text = await exec();
+            var text = await exec();
             await _botClient.SendCommandReply(text, message, false, parsemode: ParseMode.Html);
         }
 
@@ -376,7 +376,7 @@ namespace XinjingdailyBot.Command.Command
                     return "无法对同级管理员进行此操作";
                 }
 
-                string reason = string.Join(' ', args);
+                var reason = string.Join(' ', args);
                 if (string.IsNullOrEmpty(reason))
                 {
                     return "请指定警告理由";
@@ -445,7 +445,7 @@ namespace XinjingdailyBot.Command.Command
                     {
                         if (targetUser.PrivateChatID > 0)
                         {
-                            string msg = string.Format(Langs.WarnUserTips, reason, warnCount, WarningLimit);
+                            var msg = string.Format(Langs.WarnUserTips, reason, warnCount, WarningLimit);
                             await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg, ParseMode.Html);
 
                             if (warnCount >= WarningLimit)
@@ -470,7 +470,7 @@ namespace XinjingdailyBot.Command.Command
                 }
             }
 
-            string text = await exec();
+            var text = await exec();
             await _botClient.SendCommandReply(text, message, false, parsemode: ParseMode.Html);
         }
 
@@ -504,7 +504,7 @@ namespace XinjingdailyBot.Command.Command
             {
                 var records = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID).ToListAsync();
 
-                string status = targetUser.IsBan ? "已封禁" : "正常";
+                var status = targetUser.IsBan ? "已封禁" : "正常";
                 sb.AppendLine($"用户名: <code>{targetUser.EscapedFullName()}</code>");
                 sb.AppendLine($"用户ID: <code>{targetUser.UserID}</code>");
                 sb.AppendLine($"状态: <code>{status}</code>");
@@ -526,8 +526,8 @@ namespace XinjingdailyBot.Command.Command
 
                     foreach (var record in records)
                     {
-                        string date = record.BanTime.ToString("d");
-                        string operate = record.Type switch
+                        var date = record.BanTime.ToString("d");
+                        var operate = record.Type switch
                         {
                             BanType.UnBan => "解封",
                             BanType.Ban => "封禁",
@@ -563,7 +563,7 @@ namespace XinjingdailyBot.Command.Command
         [TextCmd("ECHO", UserRights.AdminCmd, Description = "回复用户")]
         public async Task ResponseEcho(Users dbUser, Message message, string[] args)
         {
-            bool autoDelete = true;
+            var autoDelete = true;
             async Task<string> exec()
             {
                 var targetUser = await _userService.FetchTargetUser(message);
@@ -592,7 +592,7 @@ namespace XinjingdailyBot.Command.Command
                     return "该用户尚未私聊过机器人, 无法发送消息";
                 }
 
-                string msg = string.Join(' ', args).Trim();
+                var msg = string.Join(' ', args).Trim();
 
                 if (string.IsNullOrEmpty(msg))
                 {
@@ -611,7 +611,7 @@ namespace XinjingdailyBot.Command.Command
                 }
             }
 
-            string text = await exec();
+            var text = await exec();
             await _botClient.SendCommandReply(text, message, autoDelete);
         }
 
@@ -631,7 +631,7 @@ namespace XinjingdailyBot.Command.Command
                 return;
             }
 
-            string query = args.First();
+            var query = args.First();
 
             int page;
             if (args.Length >= 2)
@@ -646,7 +646,7 @@ namespace XinjingdailyBot.Command.Command
                 page = 1;
             }
 
-            (string text, var keyboard) = await _userService.QueryUserList(dbUser, query, page);
+            (var text, var keyboard) = await _userService.QueryUserList(dbUser, query, page);
 
             await _botClient.SendCommandReply(text, message, false, ParseMode.Html, keyboard);
         }
@@ -659,19 +659,19 @@ namespace XinjingdailyBot.Command.Command
         [TextCmd("POSTREPORT", UserRights.AdminCmd, Alias = "POSTSTATUS", Description = "生成投稿统计信息")]
         public async Task ResponsePostReport(Message message)
         {
-            DateTime now = DateTime.Now;
-            DateTime prev1Day = now.AddDays(-1).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
-            DateTime prev7Days = now.AddDays(-7).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
-            DateTime prev30Days = now.AddDays(-30).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
-            DateTime monthStart = now.AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
-            DateTime yearStart = now.AddMonths(1 - now.Month).AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+            var now = DateTime.Now;
+            var prev1Day = now.AddDays(-1).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+            var prev7Days = now.AddDays(-7).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+            var prev30Days = now.AddDays(-30).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+            var monthStart = now.AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+            var yearStart = now.AddMonths(1 - now.Month).AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
 
             StringBuilder sb = new();
 
-            int todayPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status > PostStatus.Cancel).CountAsync();
-            int todayAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status == PostStatus.Accepted).CountAsync();
-            int todayRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status == PostStatus.Rejected).CountAsync();
-            int todayExpiredPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status < 0).CountAsync();
+            var todayPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status > PostStatus.Cancel).CountAsync();
+            var todayAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status == PostStatus.Accepted).CountAsync();
+            var todayRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status == PostStatus.Rejected).CountAsync();
+            var todayExpiredPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status < 0).CountAsync();
 
             sb.AppendLine("-- 24小时投稿统计 --");
             sb.AppendLine($"接受/拒绝: <code>{todayAcceptPost}</code> / <code>{todayRejectPost}</code>");
@@ -679,10 +679,10 @@ namespace XinjingdailyBot.Command.Command
             sb.AppendLine($"过期投稿: <code>{todayExpiredPost}</code>");
             sb.AppendLine($"累计投稿: <code>{todayPost + todayExpiredPost}</code>");
 
-            int weekPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status > PostStatus.Cancel).CountAsync();
-            int weekAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status == PostStatus.Accepted).CountAsync();
-            int weekRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status == PostStatus.Rejected).CountAsync();
-            int weekExpiredPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status < 0).CountAsync();
+            var weekPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status > PostStatus.Cancel).CountAsync();
+            var weekAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status == PostStatus.Accepted).CountAsync();
+            var weekRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status == PostStatus.Rejected).CountAsync();
+            var weekExpiredPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status < 0).CountAsync();
 
             sb.AppendLine();
             sb.AppendLine("-- 7日投稿统计 --");
@@ -691,10 +691,10 @@ namespace XinjingdailyBot.Command.Command
             sb.AppendLine($"过期投稿: <code>{weekExpiredPost}</code>");
             sb.AppendLine($"累计投稿: <code>{weekPost + weekExpiredPost}</code>");
 
-            int monthPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status > PostStatus.Cancel).CountAsync();
-            int monthAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Accepted).CountAsync();
-            int monthRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Rejected).CountAsync();
-            int monthExpiredPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status < 0).CountAsync();
+            var monthPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status > PostStatus.Cancel).CountAsync();
+            var monthAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Accepted).CountAsync();
+            var monthRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Rejected).CountAsync();
+            var monthExpiredPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status < 0).CountAsync();
 
             sb.AppendLine();
             sb.AppendLine($"-- {monthStart.ToString("MM")}月投稿统计 --");
@@ -703,10 +703,10 @@ namespace XinjingdailyBot.Command.Command
             sb.AppendLine($"过期投稿: <code>{monthExpiredPost}</code>");
             sb.AppendLine($"累计投稿: <code>{monthPost}</code>");
 
-            int yearPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status > PostStatus.Cancel).CountAsync();
-            int yearAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status == PostStatus.Accepted).CountAsync();
-            int yearRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status == PostStatus.Rejected).CountAsync();
-            int yearExpiredPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status < 0).CountAsync();
+            var yearPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status > PostStatus.Cancel).CountAsync();
+            var yearAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status == PostStatus.Accepted).CountAsync();
+            var yearRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status == PostStatus.Rejected).CountAsync();
+            var yearExpiredPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status < 0).CountAsync();
 
             sb.AppendLine();
             sb.AppendLine($"-- {yearStart.ToString("yyyy")}年投稿统计 --");
@@ -715,12 +715,12 @@ namespace XinjingdailyBot.Command.Command
             sb.AppendLine($"过期投稿: <code>{yearExpiredPost}</code>");
             sb.AppendLine($"累计投稿: <code>{yearPost}</code>");
 
-            int totalPost = await _postService.Queryable().Where(x => x.Status > PostStatus.Cancel).CountAsync();
-            int totalAcceptPost = await _postService.Queryable().Where(x => x.Status == PostStatus.Accepted).CountAsync();
-            int totalRejectPost = await _postService.Queryable().Where(x => x.Status == PostStatus.Rejected).CountAsync();
-            int totalExpiredPost = await _postService.Queryable().Where(x => x.Status < 0).CountAsync();
-            int totalChannel = await _channelOptionService.Queryable().CountAsync();
-            int totalAttachment = await _attachmentService.Queryable().CountAsync();
+            var totalPost = await _postService.Queryable().Where(x => x.Status > PostStatus.Cancel).CountAsync();
+            var totalAcceptPost = await _postService.Queryable().Where(x => x.Status == PostStatus.Accepted).CountAsync();
+            var totalRejectPost = await _postService.Queryable().Where(x => x.Status == PostStatus.Rejected).CountAsync();
+            var totalExpiredPost = await _postService.Queryable().Where(x => x.Status < 0).CountAsync();
+            var totalChannel = await _channelOptionService.Queryable().CountAsync();
+            var totalAttachment = await _attachmentService.Queryable().CountAsync();
 
             sb.AppendLine();
             sb.AppendLine("-- 历史投稿统计 --");
@@ -731,11 +731,11 @@ namespace XinjingdailyBot.Command.Command
             sb.AppendLine($"频道总数: <code>{totalChannel}</code>");
             sb.AppendLine($"附件总数: <code>{totalAttachment}</code>");
 
-            int totalUser = await _userService.Queryable().CountAsync();
-            int banedUser = await _userService.Queryable().Where(x => x.IsBan).CountAsync();
-            int weekActiveUser = await _userService.Queryable().Where(x => x.ModifyAt >= prev7Days).CountAsync();
-            int MonthActiveUser = await _userService.Queryable().Where(x => x.ModifyAt >= prev30Days).CountAsync();
-            int postedUser = await _userService.Queryable().Where(x => x.PostCount > 0).CountAsync();
+            var totalUser = await _userService.Queryable().CountAsync();
+            var banedUser = await _userService.Queryable().Where(x => x.IsBan).CountAsync();
+            var weekActiveUser = await _userService.Queryable().Where(x => x.ModifyAt >= prev7Days).CountAsync();
+            var MonthActiveUser = await _userService.Queryable().Where(x => x.ModifyAt >= prev30Days).CountAsync();
+            var postedUser = await _userService.Queryable().Where(x => x.PostCount > 0).CountAsync();
 
             sb.AppendLine();
             sb.AppendLine("-- 用户统计 --");
@@ -762,20 +762,20 @@ namespace XinjingdailyBot.Command.Command
 
             sb.AppendLine("-- 应用信息 --");
             var proc = Process.GetCurrentProcess();
-            double mem = proc.WorkingSet64 / 1024.0 / 1024.0;
-            TimeSpan cpu = proc.TotalProcessorTime;
+            var mem = proc.WorkingSet64 / 1024.0 / 1024.0;
+            var cpu = proc.TotalProcessorTime;
             sb.AppendLine($"当前版本: <code>{version}</code>");
             sb.AppendLine($"占用内存: <code>{mem.ToString("f2")}</code> MB");
             sb.AppendLine($"运行时间: <code>{cpu.TotalMinutes.ToString("0.00")}</code> 天");
 
             sb.AppendLine();
             sb.AppendLine("-- 硬盘信息 --");
-            DriveInfo[] drives = DriveInfo.GetDrives();
+            var drives = DriveInfo.GetDrives();
             foreach (var drive in drives)
             {
                 if (drive.IsReady && drive.TotalSize > 0)
                 {
-                    double freeSpacePerc = (drive.TotalSize - drive.AvailableFreeSpace) / drive.TotalSize * 100.0;
+                    var freeSpacePerc = (drive.TotalSize - drive.AvailableFreeSpace) / drive.TotalSize * 100.0;
                     sb.AppendLine($"{drive.Name} {drive.DriveFormat} 已用: {freeSpacePerc:0.00}%");
                 }
             }
@@ -836,8 +836,8 @@ namespace XinjingdailyBot.Command.Command
         [TextCmd("USERRANK", UserRights.AdminCmd, Alias = "URANK", Description = "查看用户排行榜")]
         public async Task ResponseUserRank(Message message)
         {
-            DateTime now = DateTime.Now;
-            DateTime prev30Days = now.AddDays(-30).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+            var now = DateTime.Now;
+            var prev30Days = now.AddDays(-30).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
 
             const int topCount = 8;
             const int miniumPost = 10;
@@ -849,7 +849,7 @@ namespace XinjingdailyBot.Command.Command
                 .OrderByDescending(x => x.AcceptCount).Take(topCount).ToListAsync();
             if (userAcceptCountRank?.Count > 0)
             {
-                int count = 1;
+                var count = 1;
                 foreach (var user in userAcceptCountRank)
                 {
                     sb.AppendLine($"{count++}. {(!user.PreferAnonymous ? user.EscapedFullName() : "匿名用户")} {user.AcceptCount}");
@@ -866,7 +866,7 @@ namespace XinjingdailyBot.Command.Command
                 .OrderByDescending(x => x.AcceptCount).Take(topCount).ToListAsync();
             if (adminAcceptCountRank?.Count > 0)
             {
-                int count = 1;
+                var count = 1;
                 foreach (var user in adminAcceptCountRank)
                 {
                     sb.AppendLine($"{count++}. {(!user.PreferAnonymous ? user.EscapedFullName() : "匿名管理员")} {user.AcceptCount}");
@@ -883,7 +883,7 @@ namespace XinjingdailyBot.Command.Command
                 .OrderByDescending(x => x.ReviewCount).Take(topCount).ToListAsync();
             if (adminReviewCountRank?.Count > 0)
             {
-                int count = 1;
+                var count = 1;
                 foreach (var user in adminReviewCountRank)
                 {
                     sb.AppendLine($"{count++}. {(!user.PreferAnonymous ? user.EscapedFullName() : "匿名用户")} {user.AcceptCount}");
@@ -945,7 +945,7 @@ namespace XinjingdailyBot.Command.Command
                 return (keyboard != null ? "请选择新的用户组" : "获取可用用户组失败", keyboard);
             }
 
-            (string text, InlineKeyboardMarkup? kbd) = await exec();
+            (var text, var kbd) = await exec();
             await _botClient.SendCommandReply(text, message, autoDelete: false, replyMarkup: kbd);
         }
 

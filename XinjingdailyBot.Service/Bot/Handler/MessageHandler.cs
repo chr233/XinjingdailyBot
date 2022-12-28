@@ -19,7 +19,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
     {
         private readonly ILogger<MessageHandler> _logger;
         private readonly ITelegramBotClient _botClient;
-        private readonly ITextHelperService _userService;
         private readonly IChannelService _channelService;
         private readonly ITextHelperService _textHelperService;
         private readonly IPostService _postService;
@@ -28,7 +27,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
         public MessageHandler(
             ILogger<MessageHandler> logger,
             ITelegramBotClient botClient,
-            ITextHelperService userService,
             IChannelService channelService,
             ITextHelperService textHelperService,
             IPostService postService,
@@ -36,7 +34,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
         {
             _logger = logger;
             _botClient = botClient;
-            _userService = userService;
             _channelService = channelService;
             _textHelperService = textHelperService;
             _postService = postService;

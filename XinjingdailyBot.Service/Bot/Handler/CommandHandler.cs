@@ -151,7 +151,7 @@ public class CommandHandler : ICommandHandler
                     break;
 
                 default:
-                    _logger.LogDebug(parameter.ParameterType.Name);
+                    _logger.LogDebug("{paramName}", parameter.ParameterType.Name);
                     break;
             }
         }
@@ -162,7 +162,7 @@ public class CommandHandler : ICommandHandler
     /// <summary>
     /// 注册命令
     /// </summary>
-    public void InitCommands()
+    public void InstallCommands()
     {
         //获取所有服务方法
         var assembly = Assembly.Load("XinjingdailyBot.Command");
