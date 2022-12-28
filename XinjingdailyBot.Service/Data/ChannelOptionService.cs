@@ -2,7 +2,6 @@
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
-using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Data
 {

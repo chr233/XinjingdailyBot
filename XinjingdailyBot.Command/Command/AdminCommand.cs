@@ -3,7 +3,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Extensions.Logging;
-using NLog;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
