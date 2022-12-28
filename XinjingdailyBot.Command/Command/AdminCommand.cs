@@ -7,6 +7,7 @@ using NLog;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
@@ -32,6 +33,7 @@ namespace XinjingdailyBot.Command.Command
         private readonly IAttachmentService _attachmentService;
         private readonly IChannelOptionService _channelOptionService;
         private readonly IChannelService _channelService;
+        private readonly IMarkupHelperService _markupHelperService;
 
         public AdminCommand(
             ILogger<AdminCommand> logger,
@@ -43,7 +45,8 @@ namespace XinjingdailyBot.Command.Command
             IPostService postService,
             IAttachmentService attachmentService,
             IChannelOptionService channelOptionService,
-            IChannelService channelService)
+            IChannelService channelService,
+             IMarkupHelperService markupHelperService)
         {
             _logger = logger;
             _botClient = botClient;
@@ -55,6 +58,7 @@ namespace XinjingdailyBot.Command.Command
             _attachmentService = attachmentService;
             _channelOptionService = channelOptionService;
             _channelService = channelService;
+            _markupHelperService = markupHelperService;
         }
 
         /// <summary>
@@ -65,9 +69,9 @@ namespace XinjingdailyBot.Command.Command
         /// <summary>
         /// 获取群组信息
         /// </summary>
-        /// <param name="botClient"></param>
         /// <param name="message"></param>
         /// <returns></returns>
+        [TextCmd("GROUPINFO", UserRights.AdminCmd, Description = "获取群组信息")]
         public async Task ResponseGroupInfo(Message message)
         {
             var chat = message.Chat;
@@ -100,10 +104,10 @@ namespace XinjingdailyBot.Command.Command
         /// <summary>
         /// 获取用户信息
         /// </summary>
-        /// <param name="botClient"></param>
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
+        [TextCmd("USERINFO", UserRights.AdminCmd, Alias = "UINFO", Description = "获取用户信息")]
         public async Task ResponseUserInfo(Message message, string[] args)
         {
             StringBuilder sb = new();
@@ -148,11 +152,11 @@ namespace XinjingdailyBot.Command.Command
         /// <summary>
         /// 封禁用户
         /// </summary>
-        /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
+        [TextCmd("BAN", UserRights.AdminCmd, Description = "封禁用户")]
         public async Task ResponseBan(Users dbUser, Message message, string[] args)
         {
             async Task<string> exec()
@@ -243,11 +247,11 @@ namespace XinjingdailyBot.Command.Command
         /// <summary>
         /// 解封用户
         /// </summary>
-        /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
+        [TextCmd("UNBAN", UserRights.AdminCmd, Description = "解封用户")]
         public async Task ResponseUnban(Users dbUser, Message message, string[] args)
         {
             async Task<string> exec()
@@ -338,11 +342,11 @@ namespace XinjingdailyBot.Command.Command
         /// <summary>
         /// 警告用户
         /// </summary>
-        /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
+        [TextCmd("WARN", UserRights.AdminCmd, Description = "警告用户")]
         public async Task ResponseWarning(Users dbUser, Message message, string[] args)
         {
             async Task<string> exec()
@@ -474,10 +478,10 @@ namespace XinjingdailyBot.Command.Command
         /// <summary>
         /// 查询封禁记录
         /// </summary>
-        /// <param name="botClient"></param>
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
+        [TextCmd("QUERYBAN", UserRights.AdminCmd, Alias = "QBAN", Description = "查询封禁记录")]
         public async Task ResponseQueryBan(Message message, string[] args)
         {
             StringBuilder sb = new();
@@ -554,10 +558,10 @@ namespace XinjingdailyBot.Command.Command
         /// <summary>
         /// 回复用户
         /// </summary>
-        /// <param name="botClient"></param>
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
+        [TextCmd("ECHO", UserRights.AdminCmd, Description = "回复用户")]
         public async Task ResponseEcho(Users dbUser, Message message, string[] args)
         {
             bool autoDelete = true;
@@ -615,11 +619,11 @@ namespace XinjingdailyBot.Command.Command
         /// <summary>
         /// 搜索用户
         /// </summary>
-        /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
+        [TextCmd("SEARCHUSER", UserRights.AdminCmd, Alias = "QUSER", Description = "搜索用户")]
         public async Task ResponseSearchUser(Users dbUser, Message message, string[] args)
         {
             if (!args.Any())
@@ -651,9 +655,9 @@ namespace XinjingdailyBot.Command.Command
         /// <summary>
         /// 生成投稿统计信息
         /// </summary>
-        /// <param name="botClient"></param>
         /// <param name="message"></param>
         /// <returns></returns>
+        [TextCmd("POSTREPORT", UserRights.AdminCmd, Alias = "POSTSTATUS", Description = "生成投稿统计信息")]
         public async Task ResponsePostReport(Message message)
         {
             DateTime now = DateTime.Now;
@@ -748,9 +752,9 @@ namespace XinjingdailyBot.Command.Command
         /// <summary>
         /// 生成系统报表
         /// </summary>
-        /// <param name="botClient"></param>
         /// <param name="message"></param>
         /// <returns></returns>
+        [TextCmd("SYSREPORT", UserRights.AdminCmd, Alias = "SYSSTATUS", Description = "生成系统报表")]
         public async Task ResponseSystemReport(Message message)
         {
             StringBuilder sb = new();
@@ -788,10 +792,10 @@ namespace XinjingdailyBot.Command.Command
         /// <summary>
         /// 创建审核群的邀请链接
         /// </summary>
-        /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
+        [TextCmd("INVITE", UserRights.AdminCmd, Description = "创建审核群的邀请链接")]
         public async Task ResponseInviteToReviewGroup(Users dbUser, Message message)
         {
             if (_channelService.ReviewGroup.Id == -1)
@@ -828,10 +832,9 @@ namespace XinjingdailyBot.Command.Command
         /// <summary>
         /// 查看用户排行榜
         /// </summary>
-        /// <param name="botClient"></param>
-        /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
+        [TextCmd("USERRANK", UserRights.AdminCmd, Alias = "URANK", Description = "查看用户排行榜")]
         public async Task ResponseUserRank(Message message)
         {
             DateTime now = DateTime.Now;
@@ -895,17 +898,18 @@ namespace XinjingdailyBot.Command.Command
             await _botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
         }
 
+
         /// <summary>
-        /// 来源频道设置
+        /// 设置用户组
         /// </summary>
-        /// <param name="botClient"></param>
+        /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        public async Task ResponseChannalOption(Users dbUser, Message message, string[] args)
+        [TextCmd("SETUSERGROUP", UserRights.AdminCmd, Alias = "SUGROUP", Description = "设置用户组")]
+        public async Task SetUserGroup(Users dbUser, Message message, string[] args)
         {
-            bool autoDelete = true;
-            async Task<string> exec()
+            async Task<(string, InlineKeyboardMarkup?)> exec()
             {
                 var targetUser = await _userService.FetchTargetUser(message);
 
@@ -914,47 +918,97 @@ namespace XinjingdailyBot.Command.Command
                     if (args.Any())
                     {
                         targetUser = await _userService.FetchUserByUserNameOrUserID(args.First());
-                        args = args[1..];
                     }
                 }
 
                 if (targetUser == null)
                 {
-                    return "找不到指定用户";
+                    return ("找不到指定用户", null);
                 }
 
-                if (targetUser.UserID == dbUser.UserID)
+                if (targetUser.IsBan)
                 {
-                    return "为什么有人想要自己回复自己?";
+                    return ("该用户已被封禁, 无法执行此操作", null);
                 }
 
-                if (targetUser.PrivateChatID <= 0)
+                if (targetUser.Id == dbUser.Id)
                 {
-                    return "该用户尚未私聊过机器人, 无法发送消息";
+                    return ("无法对自己进行操作", null);
                 }
 
-                string msg = string.Join(' ', args).Trim();
-
-                if (string.IsNullOrEmpty(msg))
+                if (targetUser.GroupID >= dbUser.GroupID)
                 {
-                    return "请输入回复内容";
+                    return ("无法对同级管理员进行此操作", null);
                 }
 
-                autoDelete = false;
-                try
-                {
-                    await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"来自管理员的消息:\n<code>{msg.EscapeHtml()}</code>", ParseMode.Html);
-                    return "消息发送成功";
-                }
-                catch (Exception ex)
-                {
-                    return $"消息发送失败 {ex.Message}";
-                }
+                var keyboard = await _markupHelperService.SetUserGroupKeyboard(dbUser, targetUser);
+
+                return (keyboard != null ? "请选择新的用户组" : "获取可用用户组失败", keyboard);
             }
 
-            string text = await exec();
-            await _botClient.SendCommandReply(text, message, autoDelete);
+            (string text, InlineKeyboardMarkup? kbd) = await exec();
+            await _botClient.SendCommandReply(text, message, autoDelete: false, replyMarkup: kbd);
         }
 
+
+        /// <summary>
+        /// 来源频道设置
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        //public async Task ResponseChannalOption(Users dbUser, Message message, string[] args)
+        //{
+        //    bool autoDelete = true;
+        //    async Task<string> exec()
+        //    {
+        //        var targetUser = await _userService.FetchTargetUser(message);
+
+        //        if (targetUser == null)
+        //        {
+        //            if (args.Any())
+        //            {
+        //                targetUser = await _userService.FetchUserByUserNameOrUserID(args.First());
+        //                args = args[1..];
+        //            }
+        //        }
+
+        //        if (targetUser == null)
+        //        {
+        //            return "找不到指定用户";
+        //        }
+
+        //        if (targetUser.UserID == dbUser.UserID)
+        //        {
+        //            return "为什么有人想要自己回复自己?";
+        //        }
+
+        //        if (targetUser.PrivateChatID <= 0)
+        //        {
+        //            return "该用户尚未私聊过机器人, 无法发送消息";
+        //        }
+
+        //        string msg = string.Join(' ', args).Trim();
+
+        //        if (string.IsNullOrEmpty(msg))
+        //        {
+        //            return "请输入回复内容";
+        //        }
+
+        //        autoDelete = false;
+        //        try
+        //        {
+        //            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"来自管理员的消息:\n<code>{msg.EscapeHtml()}</code>", ParseMode.Html);
+        //            return "消息发送成功";
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            return $"消息发送失败 {ex.Message}";
+        //        }
+        //    }
+
+        //    string text = await exec();
+        //    await _botClient.SendCommandReply(text, message, autoDelete);
+        //}
     }
 }

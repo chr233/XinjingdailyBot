@@ -67,13 +67,13 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         public static string ToSmallCamelCase(string name)
         {
             var stringBuilder = new StringBuilder();
-            stringBuilder.Append(name.Substring(0, 1).ToLower());
+            stringBuilder.Append(name[..1].ToLower());
 
             for (var i = 0; i < name.Length; i++)
             {
                 if (i == 0)
                 {
-                    stringBuilder.Append(name.Substring(0, 1).ToLower());
+                    stringBuilder.Append(name[..1].ToLower());
                 }
                 else
                 {
@@ -121,7 +121,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         /// <returns></returns>
         public static string FirstUpperCase(this string str)
         {
-            return string.IsNullOrEmpty(str) ? str : str.Substring(0, 1).ToUpper() + str[1..];
+            return string.IsNullOrEmpty(str) ? str : str[..1].ToUpper() + str[1..];
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         /// <returns></returns>
         public static string FirstLowerCase(this string str)
         {
-            return string.IsNullOrEmpty(str) ? str : str.Substring(0, 1).ToLower() + str[1..];
+            return string.IsNullOrEmpty(str) ? str : str[..1].ToLower() + str[1..];
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
                 startindex = sourse.IndexOf(startstr);
                 if (startindex == -1)
                     return result;
-                string tmpstr = sourse.Substring(startindex + startstr.Length);
+                string tmpstr = sourse[(startindex + startstr.Length)..];
                 endindex = tmpstr.IndexOf(endstr);
                 if (endindex == -1)
                     return result;
@@ -179,7 +179,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
                 foreach (var t in array)
                 {
                     //首字母大写
-                    result += t.Substring(0, 1).ToUpper() + t[1..];
+                    result += t[..1].ToUpper() + t[1..];
                 }
             }
             else if (string.IsNullOrWhiteSpace(fieldName))
@@ -192,11 +192,11 @@ namespace XinjingdailyBot.Infrastructure.Extensions
             }
             else if (fieldName.Length == fieldName.CountUpper())
             {
-                result = fieldName.Substring(0, 1).ToUpper() + fieldName[1..].ToLower();
+                result = fieldName[..1].ToUpper() + fieldName[1..].ToLower();
             }
             else
             {
-                result = fieldName.Substring(0, 1).ToUpper() + fieldName[1..];
+                result = fieldName[..1].ToUpper() + fieldName[1..];
             }
             return result;
         }
@@ -241,7 +241,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
             }
             else
             {
-                result = result.Substring(0, 1).ToLower() + result[1..];
+                result = result[..1].ToLower() + result[1..];
             }
 
             return result;

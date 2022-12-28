@@ -131,5 +131,10 @@ namespace XinjingdailyBot.Model.Models
                 return $"<a href=\"https://t.me/{UserName}\">{nick}</a>";
             }
         }
+
+        public string EscapedFullName()
+        {
+            return FullName.EscapeHtml();
+        }
     }
 }

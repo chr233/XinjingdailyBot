@@ -9,14 +9,6 @@ namespace XinjingdailyBot.Service.Data
     [AppService(ServiceType = typeof(IChannelOptionService), ServiceLifetime = LifeTime.Transient)]
     public sealed class ChannelOptionService : BaseService<ChannelOptions>, IChannelOptionService
     {
-        private readonly ChannelOptionRepository _channelOptionRepository;
-
-        public ChannelOptionService(
-            ChannelOptionRepository channelOptionRepository)
-        {
-            _channelOptionRepository = channelOptionRepository;
-        }
-
         /// <summary>
         /// 获取频道设定
         /// </summary>
@@ -26,7 +18,7 @@ namespace XinjingdailyBot.Service.Data
         /// <returns></returns>
         public async Task<ChannelOption> FetchChannelOption(long channelId, string? channelName, string? channelTitle)
         {
-            var channel = await _channelOptionRepository.Queryable().Where(x => x.ChannelID == channelId).FirstAsync();
+            var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync();
             if (channel == null)
             {
                 channel = new()
@@ -38,14 +30,14 @@ namespace XinjingdailyBot.Service.Data
                     CreateAt = DateTime.Now,
                     ModifyAt = DateTime.Now,
                 };
-                await _channelOptionRepository.Insertable(channel).ExecuteCommandAsync();
+                await Insertable(channel).ExecuteCommandAsync();
             }
             else if (channel.ChannelName != channelName || channel.ChannelTitle != channelTitle)
             {
                 channel.ChannelTitle = channelTitle ?? "";
                 channel.ChannelName = channelName ?? "";
                 channel.ModifyAt = DateTime.Now;
-                await _channelOptionRepository.Updateable(channel).ExecuteCommandAsync();
+                await Updateable(channel).ExecuteCommandAsync();
             }
 
             return channel.Option;
