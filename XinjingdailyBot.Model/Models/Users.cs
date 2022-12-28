@@ -1,5 +1,6 @@
 ﻿using SqlSugar;
 using XinjingdailyBot.Infrastructure.Enums;
+using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Model.Base;
 
 namespace XinjingdailyBot.Model.Models
@@ -31,7 +32,7 @@ namespace XinjingdailyBot.Model.Models
         /// 用户昵称
         /// </summary>
         [SugarColumn(IsIgnore = true)]
-        public string UserNick => string.IsNullOrEmpty(LastName) ? FirstName : $"{FirstName} {LastName}";
+        public string FullName => string.IsNullOrEmpty(LastName) ? FirstName : $"{FirstName} {LastName}";
         /// <summary>
         /// 是否封禁
         /// </summary>
@@ -48,7 +49,8 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 默认开启匿名模式
         /// </summary>
-        public bool PreferAnymouse { get; set; }
+        [SugarColumn(OldColumnName = "PreferAnymouse")]
+        public bool PreferAnonymous { get; set; }
         /// <summary>
         /// 是否开启通知
         /// </summary>
@@ -108,11 +110,25 @@ namespace XinjingdailyBot.Model.Models
         {
             if (string.IsNullOrEmpty(UserName))
             {
-                return $"{UserNick}(#{UserID})";
+                return $"{FullName}(#{UserID})";
             }
             else
             {
-                return $"{UserNick}(@{UserName})";
+                return $"{FullName}(@{UserName})";
+            }
+        }
+
+        public string HtmlUserLink()
+        {
+            string nick = FullName.EscapeHtml();
+
+            if (string.IsNullOrEmpty(UserName))
+            {
+                return $"<a href=\"tg://user?id={UserID}\">{nick}</a>";
+            }
+            else
+            {
+                return $"<a href=\"https://t.me/{UserName}\">{nick}</a>";
             }
         }
     }

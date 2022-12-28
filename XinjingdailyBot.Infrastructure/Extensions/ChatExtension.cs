@@ -13,5 +13,15 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         {
             return $"{chat.Title} {chat.ChatID()}";
         }
+
+        /// <summary>
+        /// HTML转义后的聊天名
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public static string EscapedChatName(this Chat chat)
+        {
+            return chat.Title?.EscapeHtml() ?? "";
+        }
     }
 }

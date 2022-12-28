@@ -19,7 +19,6 @@ namespace XinjingdailyBot.Service.Data
     public sealed class PostService : BaseService<Posts>, IPostService
     {
         private readonly ILogger<PostService> _logger;
-        private readonly PostRepository _postRepository;
         private readonly AttachmentRepository _attachmentRepository;
         private readonly IChannelService _channelService;
         private readonly IChannelOptionService _channelOptionService;
@@ -34,7 +33,6 @@ namespace XinjingdailyBot.Service.Data
 
         public PostService(
             ILogger<PostService> logger,
-            PostRepository postRepository,
             AttachmentRepository attachmentRepository,
             IChannelService channelService,
             IChannelOptionService channelOptionService,
@@ -43,7 +41,6 @@ namespace XinjingdailyBot.Service.Data
             IAttachmentHelperService attachmentHelperService)
         {
             _logger = logger;
-            _postRepository = postRepository;
             _attachmentRepository = attachmentRepository;
             _channelService = channelService;
             _channelOptionService = channelOptionService;
@@ -97,18 +94,18 @@ namespace XinjingdailyBot.Service.Data
             BuildInTags tags = _textHelperService.FetchTags(message.Text);
             string text = _textHelperService.ParseMessage(message);
 
-            bool anymouse = dbUser.PreferAnymouse;
+            bool anonymous = dbUser.PreferAnonymous;
 
             //直接发布模式
             bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
             //发送确认消息
-            var keyboard = directPost ? _markupHelperService.DirectPostKeyboard(anymouse, tags) : _markupHelperService.PostKeyboard(anymouse);
+            var keyboard = directPost ? _markupHelperService.DirectPostKeyboard(anonymous, tags) : _markupHelperService.PostKeyboard(anonymous);
             string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
             //生成数据库实体
             Posts newPost = new()
             {
-                Anymouse = anymouse,
+                Anonymous = anonymous,
                 Text = text,
                 RawText = message.Text ?? "",
                 ChannelName = channelName ?? "",
@@ -151,7 +148,7 @@ namespace XinjingdailyBot.Service.Data
                 newPost.ManageMsgID = msg.MessageId;
             }
 
-            await _postRepository.Insertable(newPost).ExecuteCommandAsync();
+            await Insertable(newPost).ExecuteCommandAsync();
         }
 
         /// <summary>
@@ -187,18 +184,18 @@ namespace XinjingdailyBot.Service.Data
             BuildInTags tags = _textHelperService.FetchTags(message.Caption);
             string text = _textHelperService.ParseMessage(message);
 
-            bool anymouse = dbUser.PreferAnymouse;
+            bool anonymous = dbUser.PreferAnonymous;
 
             //直接发布模式
             bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
             //发送确认消息
-            var keyboard = directPost ? _markupHelperService.DirectPostKeyboard(anymouse, tags) : _markupHelperService.PostKeyboard(anymouse);
+            var keyboard = directPost ? _markupHelperService.DirectPostKeyboard(anonymous, tags) : _markupHelperService.PostKeyboard(anonymous);
             string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
             //生成数据库实体
             Posts newPost = new()
             {
-                Anymouse = anymouse,
+                Anonymous = anonymous,
                 Text = text,
                 RawText = message.Text ?? "",
                 ChannelName = channelName ?? "",
@@ -241,7 +238,7 @@ namespace XinjingdailyBot.Service.Data
                 newPost.ManageMsgID = msg.MessageId;
             }
 
-            long postID = await _postRepository.Insertable(newPost).ExecuteReturnBigIdentityAsync();
+            long postID = await Insertable(newPost).ExecuteReturnBigIdentityAsync();
 
             Attachments? attachment = _attachmentHelperService.GenerateAttachment(message, postID);
 
@@ -281,7 +278,7 @@ namespace XinjingdailyBot.Service.Data
             {
                 MediaGroupIDs.TryAdd(mediaGroupId, -1);
 
-                bool exists = await _postRepository.Queryable().AnyAsync(x => x.MediaGroupID == mediaGroupId);
+                bool exists = await Queryable().AnyAsync(x => x.MediaGroupID == mediaGroupId);
                 if (!exists)
                 {
                     ChannelOption channelOption = ChannelOption.Normal;
@@ -297,13 +294,13 @@ namespace XinjingdailyBot.Service.Data
                     BuildInTags tags = _textHelperService.FetchTags(message.Caption);
                     string text = _textHelperService.ParseMessage(message);
 
-                    bool anymouse = dbUser.PreferAnymouse;
+                    bool anonymous = dbUser.PreferAnonymous;
 
                     //直接发布模式
                     bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
 
                     //发送确认消息
-                    var keyboard = directPost ? _markupHelperService.DirectPostKeyboard(anymouse, tags) : _markupHelperService.PostKeyboard(anymouse);
+                    var keyboard = directPost ? _markupHelperService.DirectPostKeyboard(anonymous, tags) : _markupHelperService.PostKeyboard(anonymous);
                     string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
                     Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, "处理中, 请稍后", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
@@ -314,7 +311,7 @@ namespace XinjingdailyBot.Service.Data
                         OriginChatID = message.Chat.Id,
                         OriginMsgID = message.MessageId,
                         ActionMsgID = msg.MessageId,
-                        Anymouse = anymouse,
+                        Anonymous = anonymous,
                         Text = text,
                         RawText = message.Text ?? "",
                         ChannelName = channelName ?? "",
@@ -351,7 +348,7 @@ namespace XinjingdailyBot.Service.Data
                         newPost.ManageMsgID = msg.MessageId;
                     }
 
-                    postID = await _postRepository.Insertable(newPost).ExecuteReturnBigIdentityAsync();
+                    postID = await Insertable(newPost).ExecuteReturnBigIdentityAsync();
 
                     MediaGroupIDs[mediaGroupId] = postID;
 

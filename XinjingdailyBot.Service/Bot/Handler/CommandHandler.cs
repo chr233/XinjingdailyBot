@@ -5,11 +5,11 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Model;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
+using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Handler;
@@ -22,17 +22,20 @@ public class CommandHandler : ICommandHandler
     private readonly IChannelService _channelService;
     private readonly ITelegramBotClient _botClient;
     private readonly IServiceScope _serviceScope;
+    private readonly ICmdRecordService _cmdRecordService;
 
     public CommandHandler(
         ILogger<CommandHandler> logger,
         IChannelService channelService,
         IServiceProvider serviceProvider,
-        ITelegramBotClient botClient)
+        ITelegramBotClient botClient,
+        ICmdRecordService cmdRecordService)
     {
         _logger = logger;
         _channelService = channelService;
         _serviceScope = serviceProvider.CreateScope();
         _botClient = botClient;
+        _cmdRecordService = cmdRecordService;
     }
 
     /// <summary>
@@ -43,8 +46,6 @@ public class CommandHandler : ICommandHandler
     /// 命令别名
     /// </summary>
     private readonly Dictionary<Type, Dictionary<string, string>> _commandAlias = new();
-
-    //private readonly Dictionary<
 
 
     public async Task OnCommandReceived(Users dbUser, Message message)
@@ -60,13 +61,15 @@ public class CommandHandler : ICommandHandler
         bool inGroup = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
 
         //判断是不是艾特机器人的命令
-        if (inGroup && cmd.Contains('@'))
+        bool IsAtMe = false;
+        int index = cmd.IndexOf('@');
+        if (inGroup && index > -1)
         {
-            int index = cmd.IndexOf('@');
             string botName = cmd[(index + 1)..];
             if (botName.Equals(_channelService.BotUser.Username, StringComparison.OrdinalIgnoreCase))
             {
                 cmd = cmd[..index];
+                IsAtMe = true;
             }
             else
             {
@@ -75,6 +78,7 @@ public class CommandHandler : ICommandHandler
         }
 
         bool handled = false;
+        string? errorMsg = null;
         //寻找注册的命令处理器
         foreach (var type in _commandClass.Keys)
         {
@@ -89,20 +93,30 @@ public class CommandHandler : ICommandHandler
             var allMethods = _commandClass[type];
             if (allMethods.TryGetValue(cmd, out var method))
             {
-                await CallCommand(dbUser, message, type, method);
-                handled=true;
+                try
+                {
+                    await CallCommandAsync(dbUser, message, type, method);
+                }
+                catch (Exception ex) //TODO
+                {
+                    errorMsg = $"{ex.GetType} {ex.Message}";
+                }
+                handled = true;
                 break;
             }
         }
 
-        if (!handled)
+        await _cmdRecordService.AddCmdRecord(message, dbUser, handled, false, errorMsg);
+
+        if (!handled && ((inGroup && IsAtMe) || (!inGroup)))
         {
             await _botClient.SendCommandReply("未知的命令", message);
         }
     }
 
-    private async Task CallCommand(Users dbUser, Message message, Type type, AssemblyMethod assemblyMethod)
+    private async Task CallCommandAsync(Users dbUser, Message message, Type type, AssemblyMethod assemblyMethod)
     {
+        //权限检查
         if (!dbUser.Right.HasFlag(assemblyMethod.Rights))
         {
             await _botClient.SendCommandReply("没有权限这么做", message);
@@ -132,9 +146,8 @@ public class CommandHandler : ICommandHandler
         method.Invoke(service, methodParameters.ToArray());
     }
 
-    public async Task InitCommands()
+    public void InitCommands()
     {
-
         //获取所有服务方法
         var assembly = Assembly.Load("XinjingdailyBot.Command");
         foreach (var type in assembly.GetTypes())
