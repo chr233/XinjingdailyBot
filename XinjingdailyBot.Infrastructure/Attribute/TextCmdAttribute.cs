@@ -30,8 +30,17 @@ namespace XinjingdailyBot.Infrastructure.Attribute
         /// 创建特性
         /// </summary>
         /// <param name="command"></param>
+        public TextCmdAttribute(string command)
+        {
+            Command = command;
+            Rights = UserRights.None;
+        }
+        /// <summary>
+        /// 创建特性
+        /// </summary>
+        /// <param name="command"></param>
         /// <param name="rights"></param>
-        public TextCmdAttribute(string command, UserRights rights = UserRights.None)
+        public TextCmdAttribute(string command, UserRights rights)
         {
             Command = command;
             Rights = rights;
