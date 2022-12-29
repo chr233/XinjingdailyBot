@@ -45,7 +45,7 @@ public class ChannelService : IChannelService
     {
         _botUser = await _botClient.GetMeAsync();
 
-        _logger.LogInformation("机器人信息: {Id} {nickName} @{userName}", _botUser.Id, _botUser.NickName(), _botUser.Username);
+        _logger.LogInformation("机器人信息: {Id} {nickName} @{userName}", _botUser.Id, _botUser.FullName(), _botUser.Username);
 
         var channelOption = _optionsSetting.Channel;
 

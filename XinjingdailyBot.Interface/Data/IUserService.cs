@@ -11,6 +11,7 @@ namespace XinjingdailyBot.Interface.Data
         Task<Users?> FetchUserByUserName(string? userName);
         Task<Users?> FetchUserByUserNameOrUserID(string? target);
         Task<Users?> FetchUserFromUpdate(Update update);
+        Task<Users?> QueryUserByUserId(long UserId);
         Task<(string, InlineKeyboardMarkup?)> QueryUserList(Users dbUser, string query, int page);
     }
 }

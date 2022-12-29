@@ -20,7 +20,7 @@ public class UpdateService : IUpdateService
     public UpdateService(
         ILogger<UpdateService> logger,
         IUserService userService,
-       IDispatcherService dispatcherService)
+        IDispatcherService dispatcherService)
     {
         _logger = logger;
         _userService = userService;
@@ -40,14 +40,13 @@ public class UpdateService : IUpdateService
 
         var handler = update.Type switch
         {
-            // UpdateType.Unknown:
             UpdateType.ChannelPost => _dispatcherService.OnMessageReceived(dbUser, update.ChannelPost!),
-            UpdateType.EditedChannelPost => _dispatcherService.OnMessageReceived(dbUser, update.EditedChannelPost!),
+            //UpdateType.EditedChannelPost => _dispatcherService.OnMessageReceived(dbUser, update.EditedChannelPost!),
             UpdateType.Message => _dispatcherService.OnMessageReceived(dbUser, update.Message!),
-            UpdateType.EditedMessage => _dispatcherService.OnMessageReceived(dbUser, update.EditedMessage!),
+            //UpdateType.EditedMessage => _dispatcherService.OnMessageReceived(dbUser, update.EditedMessage!),
             UpdateType.CallbackQuery => _dispatcherService.OnCallbackQueryReceived(dbUser, update.CallbackQuery!),
-            //UpdateType.InlineQuery => BotOnInlineQueryReceived(botClient, dbUser, update.InlineQuery!),
-            //UpdateType.ChosenInlineResult => BotOnChosenInlineResultReceived(botClient, dbUser, update.ChosenInlineResult!),
+            //UpdateType.InlineQuery
+            //UpdateType.ChosenInlineResult,
             _ => null
         };
 

@@ -1,6 +1,14 @@
 {
   "profiles": {
-    "http": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "XinjingdailyBot.WebAPI": {
       "commandName": "Project",
       "workingDirectory": "bin\\Debug\\$(TargetFramework)",
       "launchUrl": "swagger",
@@ -9,14 +17,6 @@
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5136"
-    },
-    "IIS Express": {
-      "commandName": "IISExpress",
-      "launchBrowser": true,
-      "launchUrl": "swagger",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
     }
   },
   "$schema": "https://json.schemastore.org/launchsettings.json",
