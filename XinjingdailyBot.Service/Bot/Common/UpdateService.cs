@@ -29,14 +29,14 @@ public class UpdateService : IUpdateService
 
     public async Task HandleUpdateAsync(ITelegramBotClient _, Update update, CancellationToken cancellationToken)
     {
+        _logger.LogUpdate(update);
+
         var dbUser = await _userService.FetchUserFromUpdate(update);
 
         if (dbUser == null)
         {
             return;
         }
-
-        _logger.LogUpdate(update);
 
         var handler = update.Type switch
         {
@@ -57,7 +57,7 @@ public class UpdateService : IUpdateService
         }
     }
 
-    public async Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+    public async Task HandlePollingErrorAsync(ITelegramBotClient _, Exception exception, CancellationToken cancellationToken)
     {
         var ErrorMessage = exception switch
         {

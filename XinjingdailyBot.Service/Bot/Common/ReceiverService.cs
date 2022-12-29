@@ -9,7 +9,7 @@ using XinjingdailyBot.Interface.Bot.Common;
 
 namespace XinjingdailyBot.Service.Bot.Common;
 
-[AppService(ServiceType = typeof(IReceiverService), ServiceLifetime = LifeTime.Transient)]
+[AppService(ServiceType = typeof(IReceiverService), ServiceLifetime = LifeTime.Scoped)]
 public class ReceiverService : IReceiverService
 {
     private readonly ITelegramBotClient _botClient;

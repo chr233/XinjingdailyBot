@@ -103,20 +103,20 @@ namespace XinjingdailyBot.Service.Bot.Handler
             switch (message.Type)
             {
                 case MessageType.Text when isPrivateChat:
-                    await _postService.HandleTextPosts(_botClient, dbUser, message);
+                    await _postService.HandleTextPosts(dbUser, message);
                     break;
                 case MessageType.Photo when isMediaGroup && isPrivateChat:
                 case MessageType.Audio when isMediaGroup && isPrivateChat:
                 case MessageType.Video when isMediaGroup && isPrivateChat:
                 case MessageType.Document when isMediaGroup && isPrivateChat:
-                    await _postService.HandleMediaGroupPosts(_botClient, dbUser, message);
+                    await _postService.HandleMediaGroupPosts(dbUser, message);
                     break;
 
                 case MessageType.Photo when isPrivateChat:
                 case MessageType.Audio when isPrivateChat:
                 case MessageType.Video when isPrivateChat:
                 case MessageType.Document when isPrivateChat:
-                    await _postService.HandleMediaPosts(_botClient, dbUser, message);
+                    await _postService.HandleMediaPosts(dbUser, message);
                     break;
 
                 case MessageType.Text when isConfigedGroup && !dbUser.IsBot:
@@ -151,18 +151,27 @@ namespace XinjingdailyBot.Service.Bot.Handler
             }
         }
 
-#pragma warning disable CS1998 // 此异步方法缺少 "await" 运算符，将以同步方式运行。请考虑使用 "await" 运算符等待非阻止的 API 调用，或者使用 "await Task.Run(...)" 在后台线程上执行占用大量 CPU 的工作。
         public async Task OnTextMessageReceived(Users dbUser, Message message)
-#pragma warning restore CS1998 // 此异步方法缺少 "await" 运算符，将以同步方式运行。请考虑使用 "await" 运算符等待非阻止的 API 调用，或者使用 "await Task.Run(...)" 在后台线程上执行占用大量 CPU 的工作。
         {
-            //throw new NotImplementedException();
+            var isMediaGroup = message.MediaGroupId != null;
+            var isPrivateChat = message.Chat.Type == ChatType.Private;
+            var isGroupChat = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
+            var isCommentGroup = isGroupChat && message.Chat.Id == _channelService.CommentGroup.Id;
+            var isSubGroup = isGroupChat && message.Chat.Id == _channelService.SubGroup.Id;
+            var isReviewGroup = isGroupChat && message.Chat.Id == _channelService.ReviewGroup.Id;
+            var isConfigedGroup = isCommentGroup || isSubGroup || isReviewGroup;
+
         }
 
-#pragma warning disable CS1998 // 此异步方法缺少 "await" 运算符，将以同步方式运行。请考虑使用 "await" 运算符等待非阻止的 API 调用，或者使用 "await Task.Run(...)" 在后台线程上执行占用大量 CPU 的工作。
         public async Task OnMediaMessageReceived(Users dbUser, Message message)
-#pragma warning restore CS1998 // 此异步方法缺少 "await" 运算符，将以同步方式运行。请考虑使用 "await" 运算符等待非阻止的 API 调用，或者使用 "await Task.Run(...)" 在后台线程上执行占用大量 CPU 的工作。
         {
-            //throw new NotImplementedException();
+            var isMediaGroup = message.MediaGroupId != null;
+            var isPrivateChat = message.Chat.Type == ChatType.Private;
+            var isGroupChat = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
+            var isCommentGroup = isGroupChat && message.Chat.Id == _channelService.CommentGroup.Id;
+            var isSubGroup = isGroupChat && message.Chat.Id == _channelService.SubGroup.Id;
+            var isReviewGroup = isGroupChat && message.Chat.Id == _channelService.ReviewGroup.Id;
+            var isConfigedGroup = isCommentGroup || isSubGroup || isReviewGroup;
         }
     }
 }

@@ -45,7 +45,7 @@
 
 ### 环境依赖
 
-- MySQL
+- MySQL (非必须)
 
 ### 配置说明
 
@@ -53,24 +53,46 @@
 
 ```json
 {
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+
+  // 调试模式
   "Debug": false,
-  "BotToken": "",
-  "Welcome": "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人",
-  "ThrowPendingUpdates": false,
-  "Proxy": null,
-  "DBHost": "127.0.0.1",
-  "DBPort": 3306,
-  "DBName": "xjb_db",
-  "DBUser": "root",
-  "DBPassword": "123456",
-  "DBGenerate": true,
-  "SuperAdmins": [],
-  "ReviewGroup": "",
-  "CommentGroup": "",
-  "SubGroup": "",
-  "AcceptChannel": "",
-  "RejectChannel": "",
-  "AutoLeaveOtherGroup": false
+  // 机器人设置
+  "Bot": {
+    "BotToken": "",
+    "Proxy": null,
+    "ThrowPendingUpdates": false,
+    "AutoLeaveOtherGroup": false,
+    "SuperAdmins": []
+  },
+  "Channel": {
+    "ReviewGroup": "",
+    "CommentGroup": "",
+    "SubGroup": "",
+    "AcceptChannel": "",
+    "RejectChannel": ""
+  },
+  // 消息设置
+  "Message": {
+    "Start": "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人",
+    "Help": "发送图片/视频或者文字内容即可投稿"
+  },
+  // 数据库设置
+  "Database": {
+    "Generate": true,
+    "UseMySQL": true,
+    "DbHost": "localhost",
+    "DbPort": 3306,
+    "DbName": "xjb_db",
+    "DbUser": "root",
+    "DbPassword": "123456"
+  }
 }
 ```
 
