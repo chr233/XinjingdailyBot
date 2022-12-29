@@ -15,15 +15,23 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         {
             switch (update.Type)
             {
+                case UpdateType.ChannelPost:
+                    logger.LogMessage(update.ChannelPost!);
+                    break;
+                case UpdateType.EditedChannelPost:
+                    logger.LogMessage(update.EditedChannelPost!);
+                    break;
                 case UpdateType.Message:
-                case UpdateType.EditedMessage:
                     logger.LogMessage(update.Message!);
+                    break;
+                case UpdateType.EditedMessage:
+                    logger.LogMessage(update.EditedMessage!);
                     break;
                 case UpdateType.CallbackQuery:
                     logger.LogCallbackQuery(update.CallbackQuery!);
                     break;
                 default:
-                    logger.LogDebug($"U 未知消息 {update.Type}");
+                    logger.LogDebug("U 未知消息 {Type}", update.Type);
                     break;
             }
         }
@@ -60,7 +68,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
 
             string user = message.From?.NickName() ?? "未知";
 
-            logger.LogInformation($"M {chatFrom} {user} {content}");
+            logger.LogInformation("M {chatFrom} {user} {content}", chatFrom, user, content);
         }
 
         /// <summary>
@@ -70,8 +78,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         public static void LogCallbackQuery(this ILogger logger, CallbackQuery callbackQuery)
         {
             string user = callbackQuery.From.NickName();
-
-            logger.LogDebug($"Q {callbackQuery.Id} [数据] {user} {callbackQuery.Data}");
+            logger.LogDebug("Q [数据] {Id} {user} {callbackQuery.Data}", callbackQuery.Id, user, callbackQuery.Data);
         }
     }
 }

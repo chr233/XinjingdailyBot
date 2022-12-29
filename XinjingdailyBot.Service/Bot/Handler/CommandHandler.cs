@@ -116,9 +116,9 @@ public class CommandHandler : ICommandHandler
             {
                 var command = queryAttribute.Command.ToUpperInvariant();
                 var alias = queryAttribute.Alias?.ToUpperInvariant();
-                var validUser = queryAttribute.ValidUser;
+                var description = queryAttribute.Description;
                 var rights = queryAttribute.Rights;
-                queryCommands.Add(command, new(method, validUser, rights));
+                queryCommands.Add(command, new(method, description, rights));
 
                 //添加别名
                 if (!string.IsNullOrEmpty(alias))
@@ -160,7 +160,7 @@ public class CommandHandler : ICommandHandler
 
         //切分命令参数
         string[] args = message.Text!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
-        string cmd = args.First()[1..];
+        string cmd = args.First()[1..].ToUpperInvariant();
         bool inGroup = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
 
         //判断是不是艾特机器人的命令
@@ -185,8 +185,6 @@ public class CommandHandler : ICommandHandler
         //寻找注册的命令处理器
         foreach (var type in _commandClass.Keys)
         {
-            cmd = cmd.ToUpperInvariant();
-
             var allAlias = _commandAlias[type];
             if (allAlias.TryGetValue(cmd, out var alias))
             {
@@ -288,15 +286,33 @@ public class CommandHandler : ICommandHandler
 
         //切分命令参数
         string[] args = query.Data!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
-        string cmd = args.First();
+        string cmd = args.First().ToUpperInvariant();
+
+        if (cmd == "CMD")
+        {
+            if (args.Length < 2 || !long.TryParse(args[1], out long userID))
+            {
+                await _botClient.AutoReplyAsync("Payload 非法", query);
+                await _botClient.RemoveMessageReplyMarkupAsync(message);
+                return;
+            }
+
+            //判断消息发起人是不是同一个
+            if (dbUser.UserID != userID)
+            {
+                await _botClient.AutoReplyAsync("这不是你的消息, 请不要瞎点", query);
+                return;
+            }
+
+            args = args[2..];
+            cmd = args.First().ToUpperInvariant();
+        }
 
         bool handled = false;
         string? errorMsg = null;
         //寻找注册的命令处理器
         foreach (var type in _queryCommandClass.Keys)
         {
-            cmd = cmd.ToUpperInvariant();
-
             var allAlias = _queryCommandAlias[type];
             if (allAlias.TryGetValue(cmd, out var alias))
             {
@@ -306,26 +322,9 @@ public class CommandHandler : ICommandHandler
             var allMethods = _queryCommandClass[type];
             if (allMethods.TryGetValue(cmd, out var method))
             {
-                if (method.ValidUser)
-                {
-                    if (args.Length < 2 || !long.TryParse(args[0], out long userID))
-                    {
-                        await _botClient.AutoReplyAsync("Payload 非法", query);
-                        await _botClient.RemoveMessageReplyMarkupAsync(message);
-                        break;
-                    }
-
-                    //判断消息发起人是不是同一个
-                    if (dbUser.UserID != userID)
-                    {
-                        await _botClient.AutoReplyAsync("这不是你的消息, 请不要瞎点", query);
-                        break;
-                    }
-                }
-
                 try
                 {
-                    await CallQueryCommandAsync(dbUser, query, type, method);
+                    await CallQueryCommandAsync(dbUser, query, type, method,args);
                 }
                 catch (Exception ex) //无法捕获 TODO
                 {
@@ -338,7 +337,7 @@ public class CommandHandler : ICommandHandler
             }
         }
 
-        await _cmdRecordService.AddCmdRecord(message, dbUser, handled, true, errorMsg);
+        await _cmdRecordService.AddCmdRecord(query, dbUser, handled, true, errorMsg);
 
         if (!handled)
         {
@@ -354,7 +353,7 @@ public class CommandHandler : ICommandHandler
     /// <param name="type"></param>
     /// <param name="assemblyMethod"></param>
     /// <returns></returns>
-    private async Task CallQueryCommandAsync(Users dbUser, CallbackQuery query, Type type, AssemblyMethod assemblyMethod)
+    private async Task CallQueryCommandAsync(Users dbUser, CallbackQuery query, Type type, AssemblyMethod assemblyMethod, string[] args)
     {
         //权限检查
         if (!dbUser.Right.HasFlag(assemblyMethod.Rights))
@@ -379,8 +378,7 @@ public class CommandHandler : ICommandHandler
                     methodParameters.Add(query);
                     break;
                 case "String[]":
-                    string[] args = query.Data!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
-                    methodParameters.Add(args[1..]);
+                    methodParameters.Add(args);
                     break;
 
                 default:

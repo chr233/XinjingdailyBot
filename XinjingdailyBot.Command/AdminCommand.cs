@@ -658,7 +658,7 @@ namespace XinjingdailyBot.Command
         /// <param name="callbackQuery"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [QueryCmd("SEARCHUSER", UserRights.AdminCmd, Alias = "QUERYUSER", ValidUser = true)]
+        [QueryCmd("SEARCHUSER", UserRights.AdminCmd, Alias = "QUERYUSER")]
         public async Task QResponseSearchUser(Users dbUser, CallbackQuery callbackQuery, string[] args)
         {
             async Task<(string, InlineKeyboardMarkup?)> exec()
@@ -984,7 +984,7 @@ namespace XinjingdailyBot.Command
         /// <param name="dbUser"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [QueryCmd("SETUSERGROUP", UserRights.NormalCmd, ValidUser = true)]
+        [QueryCmd("SETUSERGROUP", UserRights.NormalCmd)]
         public async Task QResponseSetUserGroup(Users dbUser, CallbackQuery callbackQuery, string[] args)
         {
             async Task<(string, InlineKeyboardMarkup?)> exec()

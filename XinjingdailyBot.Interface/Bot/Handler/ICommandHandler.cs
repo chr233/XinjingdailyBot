@@ -7,5 +7,6 @@ namespace XinjingdailyBot.Interface.Bot.Handler
     {
         void InstallCommands();
         Task OnCommandReceived(Users dbUser, Message message);
+        Task OnQueryCommandReceived(Users dbUser, CallbackQuery query);
     }
 }

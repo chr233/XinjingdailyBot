@@ -1,4 +1,4 @@
-
+ï»¿
 using NLog.Extensions.Logging;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.WebAPI.Extensions;
@@ -7,14 +7,11 @@ namespace XinjingdailyBot.WebAPI
 {
     public class Program
     {
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            logger.Info("Starting web host");
-
-            //ÅäÖÃÀàÖ§³Ö
+            //é…ç½®ç±»æ”¯æŒ
             builder.Services.AddOptions().Configure<OptionsSetting>(builder.Configuration);
 
             //NLog
@@ -28,7 +25,7 @@ namespace XinjingdailyBot.WebAPI
             //SqlSugar
             builder.Services.AddSqlSugar(builder.Configuration);
 
-            //Ìí¼Ó·şÎñ
+            //æ·»åŠ æœåŠ¡
             builder.Services.AddAppService();
 
             //Telegram

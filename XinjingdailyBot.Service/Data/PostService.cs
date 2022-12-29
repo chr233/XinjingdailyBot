@@ -19,7 +19,7 @@ namespace XinjingdailyBot.Service.Data
     public sealed class PostService : BaseService<Posts>, IPostService
     {
         private readonly ILogger<PostService> _logger;
-        private readonly AttachmentRepository _attachmentRepository;
+        private readonly IAttachmentService _attachmentService;
         private readonly IChannelService _channelService;
         private readonly IChannelOptionService _channelOptionService;
         private readonly ITextHelperService _textHelperService;
@@ -27,22 +27,20 @@ namespace XinjingdailyBot.Service.Data
         private readonly IAttachmentHelperService _attachmentHelperService;
         private readonly ITelegramBotClient _botClient;
         private readonly IUserService _userService;
-        private readonly IAttachmentService _attachmentService;
 
         public PostService(
             ILogger<PostService> logger,
-            AttachmentRepository attachmentRepository,
+            IAttachmentService attachmentService,
             IChannelService channelService,
             IChannelOptionService channelOptionService,
             ITextHelperService textHelperService,
             IMarkupHelperService markupHelperService,
             IAttachmentHelperService attachmentHelperService,
             ITelegramBotClient botClient,
-            IUserService userService,
-            IAttachmentService attachmentService)
+            IUserService userService            )
         {
             _logger = logger;
-            _attachmentRepository = attachmentRepository;
+            _attachmentService = attachmentService;
             _channelService = channelService;
             _channelOptionService = channelOptionService;
             _textHelperService = textHelperService;
@@ -50,7 +48,6 @@ namespace XinjingdailyBot.Service.Data
             _attachmentHelperService = attachmentHelperService;
             _botClient = botClient;
             _userService = userService;
-            _attachmentService = attachmentService;
         }
 
         /// <summary>
@@ -253,7 +250,7 @@ namespace XinjingdailyBot.Service.Data
 
             if (attachment != null)
             {
-                await _attachmentRepository.Insertable(attachment).ExecuteCommandAsync();
+                await _attachmentService.Insertable(attachment).ExecuteCommandAsync();
             }
         }
 
@@ -379,7 +376,7 @@ namespace XinjingdailyBot.Service.Data
 
                 if (attachment != null)
                 {
-                    await _attachmentRepository.Insertable(attachment).ExecuteCommandAsync();
+                    await _attachmentService.Insertable(attachment).ExecuteCommandAsync();
                 }
             }
         }
