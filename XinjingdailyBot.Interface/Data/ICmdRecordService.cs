@@ -6,5 +6,6 @@ namespace XinjingdailyBot.Interface.Data
     public interface ICmdRecordService : IBaseService<CmdRecords>
     {
         Task AddCmdRecord(Message message, Users dbUser, bool handled, bool isQuery, string? exception = null);
+        Task AddCmdRecord(CallbackQuery query, Users dbUser, bool handled, bool isQuery, string? exception = null);
     }
 }

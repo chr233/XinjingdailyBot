@@ -226,7 +226,7 @@ namespace XinjingdailyBot.Service.Helper
             }
             else
             {
-                var btnPage = InlineKeyboardButton.WithCallbackData($"{current} / {total}", $"cmd  {dbUser.UserID} say 当前 {current} 页, 共 {total} 页");
+                var btnPage = InlineKeyboardButton.WithCallbackData($"{current} / {total}", $"cmd {dbUser.UserID} say 当前 {current} 页, 共 {total} 页");
 
                 var btnPrev = current > 1 ?
                     InlineKeyboardButton.WithCallbackData("上一页", $"cmd {dbUser.UserID} searchuser {query} {current - 1}") :

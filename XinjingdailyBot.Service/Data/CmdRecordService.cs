@@ -36,5 +36,34 @@ namespace XinjingdailyBot.Service.Data
 
             await Insertable(record).ExecuteCommandAsync();
         }
+
+        /// <summary>
+        /// 新增命令调用记录
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="handled"></param>
+        /// <param name="isQuery"></param>
+        /// <param name="exception"></param>
+        /// <returns></returns>
+        public async Task AddCmdRecord(CallbackQuery query, Users dbUser, bool handled, bool isQuery, string? exception = null)
+        {
+            bool error = !string.IsNullOrEmpty(exception);
+            var message = query.Message!;
+            CmdRecords record = new()
+            {
+                ChatID = message.Chat.Id,
+                MessageID = message.MessageId,
+                UserID = dbUser.UserID,
+                Command = query.Data ?? "",
+                Handled = handled,
+                IsQuery = isQuery,
+                Error = error,
+                Exception = exception ?? "",
+                ExecuteAt = DateTime.Now,
+            };
+
+            await Insertable(record).ExecuteCommandAsync();
+        }
     }
 }

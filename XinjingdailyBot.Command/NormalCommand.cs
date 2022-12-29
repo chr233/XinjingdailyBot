@@ -200,7 +200,7 @@ namespace XinjingdailyBot.Command
         /// <returns></returns>
         [TextCmd("ADMIN", UserRights.NormalCmd, Description = "艾特群管理")]
         public async Task ResponseCallAdmins(Message message)
-        {           
+        {
             StringBuilder sb = new();
 
             if (message.Chat.Type != ChatType.Group && message.Chat.Type != ChatType.Supergroup)
@@ -230,68 +230,34 @@ namespace XinjingdailyBot.Command
         /// <param name="query"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [QueryCmd("CANCEL", UserRights.NormalCmd, ValidUser = true)]
+        [QueryCmd("CANCEL", UserRights.NormalCmd, Alias = "CANCELCLOSE CANCELANDCLOSE")]
         public async Task QResponseCancel(CallbackQuery query, string[] args)
         {
-            string text;
-            if (args.Length > 1)
-            {
-                text = string.Join(' ', args[1..]);
-            }
-            else
-            {
-                text = "操作已取消";
-            }
+            string text = args.Length > 1 ? string.Join(' ', args[1..]) : "操作已取消";
 
             await _botClient.AutoReplyAsync(text, query);
-
             await _botClient.EditMessageTextAsync(query.Message!, text, replyMarkup: null);
-        }
-
-        /// <summary>
-        /// 取消命令
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        [QueryCmd("CANCELANDCLOSE", UserRights.NormalCmd, Alias = "CANCELCLOSE", ValidUser = true)]
-        public async Task QResponseCancelAndClose(CallbackQuery query, string[] args)
-        {
-            string text;
-            if (args.Length > 1)
-            {
-                text = string.Join(' ', args[1..]);
-            }
-            else
-            {
-                text = "关闭菜单";
-            }
-
-            await _botClient.AutoReplyAsync(text, query);
-
-            var message = query.Message!;
-            await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
         }
 
         /// <summary>
         /// 显示命令回复
         /// </summary>
-        /// <param name="callbackQuery"></param>
+        /// <param name="query"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [QueryCmd("SAY", UserRights.NormalCmd, ValidUser = true)]
-        public async Task ResponseSay( CallbackQuery callbackQuery, string[] args)
+        [QueryCmd("SAY", UserRights.NormalCmd)]
+        public async Task ResponseSay(CallbackQuery query, string[] args)
         {
-            string exec()
+            string text;
+            if (args.Length < 1)
             {
-                if (args.Length < 2)
-                {
-                    return "参数有误";
-                }
-                return string.Join(' ', args[1..]);
+                text = "参数有误";
             }
-            string text = exec();
-            await _botClient.AutoReplyAsync(text, callbackQuery);
+            else
+            {
+                text = string.Join(' ', args[1..]);
+            }
+            await _botClient.AutoReplyAsync(text, query);
         }
     }
 }
