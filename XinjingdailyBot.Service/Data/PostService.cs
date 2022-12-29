@@ -61,28 +61,28 @@ namespace XinjingdailyBot.Service.Data
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task HandleTextPosts(ITelegramBotClient botClient, Users dbUser, Message message)
+        public async Task HandleTextPosts(Users dbUser, Message message)
         {
             if (!dbUser.Right.HasFlag(UserRights.SendPost))
             {
-                await botClient.AutoReplyAsync(Langs.NoPostRight, message);
+                await _botClient.AutoReplyAsync(Langs.NoPostRight, message);
                 return;
             }
             if (_channelService.ReviewGroup.Id == -1)
             {
-                await botClient.AutoReplyAsync(Langs.ReviewGroupNotSet, message);
+                await _botClient.AutoReplyAsync(Langs.ReviewGroupNotSet, message);
                 return;
             }
 
             if (string.IsNullOrEmpty(message.Text))
             {
-                await botClient.AutoReplyAsync(Langs.TextPostCantBeNull, message);
+                await _botClient.AutoReplyAsync(Langs.TextPostCantBeNull, message);
                 return;
             }
 
             if (message.Text!.Length > MaxPostText)
             {
-                await botClient.AutoReplyAsync($"文本长度超过上限 {MaxPostText}, 无法创建投稿", message);
+                await _botClient.AutoReplyAsync($"文本长度超过上限 {MaxPostText}, 无法创建投稿", message);
                 return;
             }
 
@@ -140,7 +140,7 @@ namespace XinjingdailyBot.Service.Data
                     return;
             }
 
-            Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+            Message msg = await _botClient.SendTextMessageAsync(message.Chat.Id, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
             //修改数据库实体
             newPost.OriginChatID = message.Chat.Id;
@@ -163,16 +163,16 @@ namespace XinjingdailyBot.Service.Data
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task HandleMediaPosts(ITelegramBotClient botClient, Users dbUser, Message message)
+        public async Task HandleMediaPosts(Users dbUser, Message message)
         {
             if (!dbUser.Right.HasFlag(UserRights.SendPost))
             {
-                await botClient.AutoReplyAsync("没有权限", message);
+                await _botClient.AutoReplyAsync("没有权限", message);
                 return;
             }
             if (_channelService.ReviewGroup.Id == -1)
             {
-                await botClient.AutoReplyAsync("尚未设置投稿群组, 无法接收投稿", message);
+                await _botClient.AutoReplyAsync("尚未设置投稿群组, 无法接收投稿", message);
                 return;
             }
 
@@ -230,7 +230,7 @@ namespace XinjingdailyBot.Service.Data
                     return;
             }
 
-            Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+            Message msg = await _botClient.SendTextMessageAsync(message.Chat.Id, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
             //修改数据库实体
             newPost.OriginChatID = message.Chat.Id;
@@ -265,16 +265,16 @@ namespace XinjingdailyBot.Service.Data
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task HandleMediaGroupPosts(ITelegramBotClient botClient, Users dbUser, Message message)
+        public async Task HandleMediaGroupPosts(Users dbUser, Message message)
         {
             if (!dbUser.Right.HasFlag(UserRights.SendPost))
             {
-                await botClient.AutoReplyAsync("没有权限", message);
+                await _botClient.AutoReplyAsync("没有权限", message);
                 return;
             }
             if (_channelService.ReviewGroup.Id == -1)
             {
-                await botClient.AutoReplyAsync("尚未设置投稿群组, 无法接收投稿", message);
+                await _botClient.AutoReplyAsync("尚未设置投稿群组, 无法接收投稿", message);
                 return;
             }
 
@@ -308,7 +308,7 @@ namespace XinjingdailyBot.Service.Data
                     var keyboard = directPost ? _markupHelperService.DirectPostKeyboard(anonymous, tags) : _markupHelperService.PostKeyboard(anonymous);
                     string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
-                    Message msg = await botClient.SendTextMessageAsync(message.Chat.Id, "处理中, 请稍后", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
+                    Message msg = await _botClient.SendTextMessageAsync(message.Chat.Id, "处理中, 请稍后", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
 
                     //生成数据库实体
                     Posts newPost = new()
@@ -363,7 +363,7 @@ namespace XinjingdailyBot.Service.Data
                         await Task.Delay(1500);
                         MediaGroupIDs.Remove(mediaGroupId, out _);
 
-                        await botClient.EditMessageTextAsync(msg, postText, replyMarkup: keyboard);
+                        await _botClient.EditMessageTextAsync(msg, postText, replyMarkup: keyboard);
                     });
                 }
             }
