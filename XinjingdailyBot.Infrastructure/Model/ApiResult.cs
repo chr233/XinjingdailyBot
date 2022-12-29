@@ -17,7 +17,11 @@ namespace XinjingdailyBot.Infrastructure.Model
         /// <summary>
         /// 初始化一个新创建的APIResult对象，使其表示一个空消息
         /// </summary>
+#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的 属性“Data”必须包含非 null 值。请考虑将 属性 声明为可以为 null。
+#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的 属性“Msg”必须包含非 null 值。请考虑将 属性 声明为可以为 null。
         public ApiResult()
+#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的 属性“Msg”必须包含非 null 值。请考虑将 属性 声明为可以为 null。
+#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的 属性“Data”必须包含非 null 值。请考虑将 属性 声明为可以为 null。
         {
         }
 
@@ -26,7 +30,9 @@ namespace XinjingdailyBot.Infrastructure.Model
         /// </summary>
         /// <param name="code"></param>
         /// <param name="msg"></param>
+#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的 属性“Data”必须包含非 null 值。请考虑将 属性 声明为可以为 null。
         public ApiResult(int code, string msg)
+#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的 属性“Data”必须包含非 null 值。请考虑将 属性 声明为可以为 null。
         {
             Code = code;
             Msg = msg;
@@ -37,7 +43,9 @@ namespace XinjingdailyBot.Infrastructure.Model
         /// </summary>
         /// <param name="code"></param>
         /// <param name="msg"></param>
+#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的 属性“Data”必须包含非 null 值。请考虑将 属性 声明为可以为 null。
         public ApiResult(int code, string msg, object data)
+#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的 属性“Data”必须包含非 null 值。请考虑将 属性 声明为可以为 null。
         {
             Code = code;
             Msg = msg;
@@ -70,7 +78,9 @@ namespace XinjingdailyBot.Infrastructure.Model
         /// </summary>
         /// <param name="msg">返回内容</param>
         /// <returns>成功消息</returns>
+#pragma warning disable CS8625 // 无法将 null 字面量转换为非 null 的引用类型。
         public static ApiResult Success(string msg) { return new ApiResult(HttpStatus.SUCCESS, msg, null); }
+#pragma warning restore CS8625 // 无法将 null 字面量转换为非 null 的引用类型。
 
         /// <summary>
         /// 返回成功消息
@@ -121,6 +131,8 @@ namespace XinjingdailyBot.Infrastructure.Model
 
     public class ApiResult<T> : ApiResult
     {
+#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的 属性“Result”必须包含非 null 值。请考虑将 属性 声明为可以为 null。
         public T Result { get; set; }
+#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的 属性“Result”必须包含非 null 值。请考虑将 属性 声明为可以为 null。
     }
 }

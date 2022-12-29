@@ -324,7 +324,7 @@ public class CommandHandler : ICommandHandler
             {
                 try
                 {
-                    await CallQueryCommandAsync(dbUser, query, type, method,args);
+                    await CallQueryCommandAsync(dbUser, query, type, method, args);
                 }
                 catch (Exception ex) //无法捕获 TODO
                 {
