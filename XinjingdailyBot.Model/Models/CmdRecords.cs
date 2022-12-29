@@ -33,7 +33,7 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 错误消息
         /// </summary>
-        [SugarColumn(Length =2000)]
+        [SugarColumn(Length = 2000)]
         public string Exception { get; set; } = "";
 
         /// <summary>

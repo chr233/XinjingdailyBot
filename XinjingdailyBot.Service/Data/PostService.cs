@@ -11,7 +11,6 @@ using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
-using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Data
 {
@@ -37,7 +36,7 @@ namespace XinjingdailyBot.Service.Data
             IMarkupHelperService markupHelperService,
             IAttachmentHelperService attachmentHelperService,
             ITelegramBotClient botClient,
-            IUserService userService            )
+            IUserService userService)
         {
             _logger = logger;
             _attachmentService = attachmentService;
