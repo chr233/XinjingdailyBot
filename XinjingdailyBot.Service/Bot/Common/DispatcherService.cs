@@ -16,16 +16,13 @@ namespace XinjingdailyBot.Service.Bot.Common
     [AppService(ServiceType = typeof(IDispatcherService), ServiceLifetime = LifeTime.Scoped)]
     internal class DispatcherService : IDispatcherService
     {
-        private readonly ILogger<DispatcherService> _logger;
         private readonly IMessageHandler _messageHandler;
         private readonly ICommandHandler _commandHandler;
 
         public DispatcherService(
-            ILogger<DispatcherService> logger,
             IMessageHandler messageHandler,
             ICommandHandler commandHandler)
         {
-            _logger = logger;
             _messageHandler = messageHandler;
             _commandHandler = commandHandler;
         }
