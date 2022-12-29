@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SqlSugar;
+using Telegram.Bot;
+using Telegram.Bot.Requests;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -16,7 +18,7 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Data
 {
-    [AppService(ServiceType = typeof(IUserService), ServiceLifetime = LifeTime.Transient)]
+    [AppService(ServiceType = typeof(IUserService), ServiceLifetime = LifeTime.Singleton)]
     public sealed class UserService : BaseService<Users>, IUserService
     {
         private readonly ILogger<UserService> _logger;
@@ -26,6 +28,7 @@ namespace XinjingdailyBot.Service.Data
         private readonly IChannelService _channelService;
         private readonly ICmdRecordService _cmdRecordService;
         private readonly PostRepository _postRepository;
+        private readonly ITelegramBotClient _botClient;
 
         /// <summary>
         /// 更新周期
@@ -39,7 +42,8 @@ namespace XinjingdailyBot.Service.Data
             IMarkupHelperService markupHelperService,
             IChannelService channelService,
             ICmdRecordService cmdRecordService,
-           PostRepository postRepository)
+           PostRepository postRepository,
+           ITelegramBotClient botClient)
         {
             _logger = logger;
             _optionsSetting = configuration.Value;
@@ -48,6 +52,7 @@ namespace XinjingdailyBot.Service.Data
             _channelService = channelService;
             _cmdRecordService = cmdRecordService;
             _postRepository = postRepository;
+            _botClient = botClient;
         }
 
         /// <summary>
@@ -57,18 +62,6 @@ namespace XinjingdailyBot.Service.Data
         /// <returns></returns>
         public async Task<Users?> FetchUserFromUpdate(Update update)
         {
-            var msgUser = update.Type switch
-            {
-                UpdateType.ChannelPost => update.ChannelPost!.From,
-                UpdateType.EditedChannelPost => update.EditedChannelPost!.From,
-                UpdateType.Message => update.Message!.From,
-                UpdateType.EditedMessage => update.EditedMessage!.From,
-                UpdateType.CallbackQuery => update.CallbackQuery!.From,
-                UpdateType.InlineQuery => update.InlineQuery!.From,
-                UpdateType.ChosenInlineResult => update.ChosenInlineResult!.From,
-                _ => null
-            };
-
             var msgChat = update.Type switch
             {
                 UpdateType.ChannelPost => update.ChannelPost!.Chat,
@@ -78,15 +71,78 @@ namespace XinjingdailyBot.Service.Data
                 _ => null
             };
 
-            return await QueryUser(msgUser, msgChat);
+            await AutoLeaveChat(msgChat);
+
+            if (update.Type == UpdateType.ChannelPost)
+            {
+                return await QueryUserFromChannelPost(update.ChannelPost!);
+            }
+            else
+            {
+                var msgUser = update.Type switch
+                {
+                    UpdateType.ChannelPost => update.ChannelPost!.From,
+                    UpdateType.EditedChannelPost => update.EditedChannelPost!.From,
+                    UpdateType.Message => update.Message!.From,
+                    UpdateType.EditedMessage => update.EditedMessage!.From,
+                    UpdateType.CallbackQuery => update.CallbackQuery!.From,
+                    UpdateType.InlineQuery => update.InlineQuery!.From,
+                    UpdateType.ChosenInlineResult => update.ChosenInlineResult!.From,
+                    _ => null
+                };
+
+                return await QueryUserFromChat(msgUser, msgChat);
+            }
+        }
+
+        /// <summary>
+        /// 自动退出无关群组
+        /// </summary>
+        /// <param name="msgChat"></param>
+        /// <returns></returns>
+        private async Task AutoLeaveChat(Chat? msgChat)
+        {
+            if (msgChat == null || !_optionsSetting.Bot.AutoLeaveOtherGroup)
+            {
+                return;
+            }
+
+            bool autoLeave = false;
+            switch (msgChat.Type)
+            {
+                case ChatType.Group:
+                case ChatType.Supergroup:
+                    if (msgChat.Id != _channelService.SubGroup.Id &&
+                        msgChat.Id != _channelService.CommentGroup.Id &&
+                        msgChat.Id != _channelService.ReviewGroup.Id)
+                    {
+                        autoLeave = true;
+                    }
+                    break;
+                case ChatType.Channel:
+                    if (msgChat.Id != _channelService.AcceptChannel.Id &&
+                        msgChat.Id != _channelService.RejectChannel.Id)
+                    {
+                        autoLeave = true;
+                    }
+                    break;
+                default:
+                    return;
+            }
+
+            if (autoLeave)
+            {
+                await _botClient.LeaveChatAsync(msgChat.Id);
+            }
         }
 
         /// <summary>
         /// 根据MessageUser获取用户
         /// </summary>
         /// <param name="msgUser"></param>
+        /// <param name="msgChat"></param>
         /// <returns></returns>
-        private async Task<Users?> QueryUser(User? msgUser, Chat? msgChat)
+        private async Task<Users?> QueryUserFromChat(User? msgUser, Chat? msgChat)
         {
             if (msgUser == null)
             {
@@ -254,6 +310,66 @@ namespace XinjingdailyBot.Service.Data
 
             return dbUser;
         }
+
+        /// <summary>
+        /// 查找用户
+        /// </summary>
+        /// <param name="UserId"></param>
+        /// <returns></returns>
+        public async Task<Users?> QueryUserByUserId(long UserId)
+        {
+            var user = await Queryable().FirstAsync(x => x.UserID == UserId);
+            return user;
+        }
+
+        /// <summary>
+        /// 频道管理员缓存
+        /// </summary>
+        private readonly Dictionary<string, long> _channelUserIdCache = new();
+
+        /// <summary>
+        /// 根据ChannelPost Author获取用户
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        private async Task<Users?> QueryUserFromChannelPost(Message message)
+        {
+            if (message.Chat.Id != _channelService.AcceptChannel.Id)
+            {
+                return null;
+            }
+
+            string? author = message.AuthorSignature;
+            if (string.IsNullOrEmpty(author))
+            {
+                return null;
+            }
+
+            if (_channelUserIdCache.TryGetValue(author, out long userId))
+            {
+                return await QueryUserByUserId(userId);
+            }
+            else //缓存中没有该用户, 更新缓存
+            {
+                var admins = await _botClient.GetChatAdministratorsAsync(message.Chat.Id);
+                if (admins == null)
+                {
+                    return null;
+                }
+                foreach (var admis in admins)
+                {
+                    string name = admis.User.FullName();
+                    _channelUserIdCache[name] = admis.User.Id;
+                }
+
+                if (_channelUserIdCache.TryGetValue(author, out userId))
+                {
+                    return await QueryUserByUserId(userId);
+                }
+            }
+            return null;
+        }
+
 
         /// <summary>
         /// 根据UserID获取用户

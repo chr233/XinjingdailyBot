@@ -66,7 +66,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
                 _ => $"未知-{chat.Title}",
             };
 
-            string user = message.From?.NickName() ?? "未知";
+            string user = message.From?.FullName() ?? "未知";
 
             logger.LogInformation("M {chatFrom} {user} {content}", chatFrom, user, content);
         }
@@ -77,7 +77,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         /// <param name="logger"></param>
         public static void LogCallbackQuery(this ILogger logger, CallbackQuery callbackQuery)
         {
-            string user = callbackQuery.From.NickName();
+            string user = callbackQuery.From.FullName();
             logger.LogDebug("Q [数据] {Id} {user} {callbackQuery.Data}", callbackQuery.Id, user, callbackQuery.Data);
         }
     }

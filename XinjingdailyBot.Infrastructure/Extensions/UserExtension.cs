@@ -4,7 +4,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
 {
     public static class UserExtension
     {
-        public static string NickName(this User user)
+        public static string FullName(this User user)
         {
             return string.IsNullOrEmpty(user.LastName) ? user.FirstName : $"{user.FirstName} {user.LastName}";
         }
@@ -26,7 +26,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         /// <returns></returns>
         public static string EscapedNickName(this User user)
         {
-            return user.NickName().EscapeHtml();
+            return user.FullName().EscapeHtml();
         }
 
         /// <summary>
