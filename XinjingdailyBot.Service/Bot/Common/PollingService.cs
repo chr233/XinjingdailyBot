@@ -66,7 +66,6 @@ public class PollingService : BackgroundService
             catch (Exception ex)
             {
                 _logger.LogError("接收服务运行出错: {Exception}", ex);
-
                 await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
             }
         }

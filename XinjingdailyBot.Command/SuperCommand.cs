@@ -25,8 +25,6 @@ namespace XinjingdailyBot.Command
         /// <summary>
         /// 重启机器人
         /// </summary>
-        /// <param name="botClient"></param>
-        /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
         [TextCmd("RESTART", UserRights.SuperCmd, Description = "重启机器人")]

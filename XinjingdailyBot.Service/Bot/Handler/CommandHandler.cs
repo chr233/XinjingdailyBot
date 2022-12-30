@@ -341,7 +341,14 @@ public class CommandHandler : ICommandHandler
 
         if (!handled)
         {
-            await _botClient.AutoReplyAsync("未知的命令", query);
+            if (_optionsSetting.Debug)
+            {
+                await _botClient.AutoReplyAsync($"未知的命令 [{query.Data}]", query);
+            }
+            else
+            {
+                await _botClient.AutoReplyAsync("未知的命令", query);
+            }
         }
     }
 

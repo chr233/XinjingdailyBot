@@ -15,6 +15,10 @@
         /// </summary>
         public ChannelOption Channel { get; set; } = new();
         /// <summary>
+        /// 消息配置
+        /// </summary>
+        public MessageOption Message { get; set; } = new();
+        /// <summary>
         /// 数据库配置
         /// </summary>
         public DatabaseOption Database { get; set; } = new();
@@ -98,6 +102,10 @@
             /// /help 命令返回的消息
             /// </summary>
             public string? Help { get; set; }
+            /// <summary>
+            /// /about 命令返回的消息
+            /// </summary>
+            public string? About { get; set; }
         }
 
         public sealed record DatabaseOption

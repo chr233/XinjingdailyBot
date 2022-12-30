@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32519.379
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XinjingdailyBot", "XinjingdailyBot\XinjingdailyBot.csproj", "{41410EC8-65B9-41A3-BAFC-987A9270B3A5}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XinjingdailyBot.WebAPI", "XinjingdailyBot.WebAPI\XinjingdailyBot.WebAPI.csproj", "{8A18A5B3-C97B-474B-A8E8-2C6CBD21BE49}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5C52EE96-9EE9-4AFA-8E3B-F4187C195B83} = {5C52EE96-9EE9-4AFA-8E3B-F4187C195B83}
@@ -57,7 +55,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0. 杂项文件", "0. 杂�
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XinjingdailyBot.Command", "XinjingdailyBot.Command\XinjingdailyBot.Command.csproj", "{617EC3CE-8307-41BC-A4A5-D437CCA261AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XinjingdailyBot.Command", "XinjingdailyBot.Command\XinjingdailyBot.Command.csproj", "{617EC3CE-8307-41BC-A4A5-D437CCA261AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,10 +63,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{41410EC8-65B9-41A3-BAFC-987A9270B3A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{41410EC8-65B9-41A3-BAFC-987A9270B3A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{41410EC8-65B9-41A3-BAFC-987A9270B3A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{41410EC8-65B9-41A3-BAFC-987A9270B3A5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8A18A5B3-C97B-474B-A8E8-2C6CBD21BE49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8A18A5B3-C97B-474B-A8E8-2C6CBD21BE49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A18A5B3-C97B-474B-A8E8-2C6CBD21BE49}.Release|Any CPU.ActiveCfg = Release|Any CPU
