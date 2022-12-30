@@ -9,7 +9,7 @@ namespace XinjingdailyBot.Model.Models
     public sealed record ChannelOptions : BaseModel
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
-        public long Id { get; set; }
+        public int Id { get; set; }
         /// <summary>
         /// 频道ID
         /// </summary>

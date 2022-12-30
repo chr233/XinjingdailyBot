@@ -1,15 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Telegram.Bot;
-using Telegram.Bot.Types;
+﻿using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
-using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Handler
@@ -17,27 +11,15 @@ namespace XinjingdailyBot.Service.Bot.Handler
     [AppService(ServiceType = typeof(IMessageHandler), ServiceLifetime = LifeTime.Scoped)]
     public class MessageHandler : IMessageHandler
     {
-        private readonly ILogger<MessageHandler> _logger;
-        private readonly ITelegramBotClient _botClient;
-        private readonly IChannelService _channelService;
-        private readonly ITextHelperService _textHelperService;
         private readonly IPostService _postService;
-        private readonly OptionsSetting _optionsSetting;
+        private readonly IChannelService _channelService;
 
         public MessageHandler(
-            ILogger<MessageHandler> logger,
-            ITelegramBotClient botClient,
-            IChannelService channelService,
-            ITextHelperService textHelperService,
             IPostService postService,
-            IOptions<OptionsSetting> optionsSetting)
+            IChannelService channelService)
         {
-            _logger = logger;
-            _botClient = botClient;
-            _channelService = channelService;
-            _textHelperService = textHelperService;
             _postService = postService;
-            _optionsSetting = optionsSetting.Value;
+            _channelService = channelService;
         }
 
         /// <summary>
@@ -56,6 +38,17 @@ namespace XinjingdailyBot.Service.Bot.Handler
             if (message.Chat.Type == ChatType.Private)
             {
                 await _postService.HandleTextPosts(dbUser, message);
+            }
+            else
+            {
+                var msg = message.ReplyToMessage;
+                if(msg != null)
+                {
+                    if(msg.From?.Id == _channelService.BotUser.Id)
+                    {
+                        if()
+                    }
+                }
             }
         }
 

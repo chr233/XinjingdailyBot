@@ -33,7 +33,6 @@
                     return 0;
                 }
             }
-            set { }
         }
         public List<T>? Result { get; set; }
         public Dictionary<string, object> Extra { get; set; } = new Dictionary<string, object>();

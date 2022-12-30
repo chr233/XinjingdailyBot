@@ -1,6 +1,6 @@
 ﻿namespace XinjingdailyBot.Infrastructure.Constant
 {
-    public class HttpStatus
+    public static class HttpStatus
     {
         /// <summary>
         /// 操作成功

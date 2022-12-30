@@ -9,7 +9,7 @@ namespace XinjingdailyBot.Model.Models
     public sealed record Attachments : BaseModel
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
-        public long Id { get; set; }
+        public int Id { get; set; }
         /// <summary>
         /// 稿件ID
         /// </summary>
