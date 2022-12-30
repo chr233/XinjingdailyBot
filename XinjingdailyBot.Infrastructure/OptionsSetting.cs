@@ -119,6 +119,10 @@
             /// </summary>
             public bool UseMySQL { get; set; }
             /// <summary>
+            /// 打印SQL日志
+            /// </summary>
+            public bool LogSQL { get; set; }
+            /// <summary>
             /// MySQL连接设定
             /// </summary>
             public string? DbHost { get; set; }

@@ -121,7 +121,7 @@
     <value>您已被{0}封禁, 理由: {1}, 您将无法继续使用投稿功能和大部分命令</value>
   </data>
   <data name="QueryBanDescribe" xml:space="preserve">
-    <value>封禁记录自助查询: /myban\n\n如果对封禁记录有异议, 请联系频道管理员</value>
+    <value>封禁记录自助查询: /myban 如果对封禁记录有异议, 请联系频道管理员</value>
   </data>
   <data name="UnbanedUserTips" xml:space="preserve">
     <value>您已被{0}解封, 理由: {1}, 已恢复您的投稿和命令权限</value>

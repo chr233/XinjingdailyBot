@@ -13,7 +13,6 @@ namespace XinjingdailyBot.WebAPI.Extensions
 
         public static void AddSqlSugar(this IServiceCollection services, IConfiguration configuration)
         {
-            var debug = configuration.GetValue("Debug", false);
             var dbConfig = configuration.GetSection("Database").Get<OptionsSetting.DatabaseOption>();
 
             if (dbConfig == null)
@@ -36,7 +35,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
 
             SugarIocServices.ConfigurationSugar(db =>
             {
-                if (debug)
+                if (dbConfig.LogSQL)
                 {
                     db.Aop.OnLogExecuting = (sql, pars) =>
                     {
@@ -52,7 +51,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
 
                 if (dbConfig.Generate && IsFirstLoad)
                 {
-                    _logger.Info("开始创建数据库");
+                    _logger.Info("开始生成数据库结构");
                     //创建数据库
                     db.DbMaintenance.CreateDatabase(dbConfig.DbName);
 
@@ -66,6 +65,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
                         _logger.Info("开始创建 {type} 表", type);
                         db.CodeFirst.InitTables(type);
                     }
+                    _logger.Info("数据库结构生成完毕, 建议禁用 Database.Generate 来加快启动速度");
                 }
 
                 IsFirstLoad = false;

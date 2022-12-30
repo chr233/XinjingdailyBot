@@ -97,7 +97,7 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
-        ///   查找类似 封禁记录自助查询: /myban\n\n如果对封禁记录有异议, 请联系频道管理员 的本地化字符串。
+        ///   查找类似 封禁记录自助查询: /myban 如果对封禁记录有异议, 请联系频道管理员 的本地化字符串。
         /// </summary>
         public static string QueryBanDescribe {
             get {

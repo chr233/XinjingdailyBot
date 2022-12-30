@@ -29,11 +29,6 @@ namespace XinjingdailyBot.Service.Data
         private readonly PostRepository _postRepository;
         private readonly ITelegramBotClient _botClient;
 
-        /// <summary>
-        /// 更新周期
-        /// </summary>
-        private static readonly TimeSpan UpdatePeriod = TimeSpan.FromDays(15);
-
         public UserService(
             ILogger<UserService> logger,
             IOptions<OptionsSetting> configuration,
@@ -53,6 +48,11 @@ namespace XinjingdailyBot.Service.Data
             _postRepository = postRepository;
             _botClient = botClient;
         }
+
+        /// <summary>
+        /// 更新周期
+        /// </summary>
+        private static readonly TimeSpan UpdatePeriod = TimeSpan.FromDays(14);
 
         /// <summary>
         /// 根据Update获取发送消息的用户
@@ -233,13 +233,6 @@ namespace XinjingdailyBot.Service.Data
                     }
                 }
 
-                //如果被封禁自动覆盖原用户组
-                if (dbUser.IsBan)
-                {
-                    dbUser.GroupID = 0;
-                    dbUser.Level = 0;
-                }
-
                 //超过设定时间也触发更新
                 if (DateTime.Now > dbUser.ModifyAt + UpdatePeriod)
                 {
@@ -294,8 +287,8 @@ namespace XinjingdailyBot.Service.Data
                 dbUser.GroupID = maxGroupID;
             }
 
-            //根据GroupID设置用户权限信息
-            var group = _groupRepository.GetGroupById(dbUser.GroupID);
+            //根据GroupID设置用户权限信息 (封禁用户区别对待)
+            var group = _groupRepository.GetGroupById(!dbUser.IsBan ? dbUser.GroupID : 0);
 
             if (group != null)
             {

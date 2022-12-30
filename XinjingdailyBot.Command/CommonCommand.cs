@@ -8,6 +8,7 @@ using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
+using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
@@ -21,18 +22,20 @@ namespace XinjingdailyBot.Command
         private readonly OptionsSetting _optionsSetting;
         private readonly IBanRecordService _banRecordService;
         private readonly ITextHelperService _textHelperService;
+        private readonly ICommandHandler _commandHandler;
 
         public CommonCommand(
             ITelegramBotClient botClient,
             IOptions<OptionsSetting> options,
             IBanRecordService banRecordService,
-            ITextHelperService textHelperService)
+            ITextHelperService textHelperService,
+            ICommandHandler commandHandler)
         {
-            //_logger = logger;
             _botClient = botClient;
             _optionsSetting = options.Value;
             _banRecordService = banRecordService;
             _textHelperService = textHelperService;
+            _commandHandler = commandHandler;
         }
 
         /// <summary>
@@ -44,11 +47,6 @@ namespace XinjingdailyBot.Command
         [TextCmd("HELP", UserRights.None, Description = "显示命令帮助")]
         public async Task ResponseHelp(Users dbUser, Message message)
         {
-            bool super = dbUser.Right.HasFlag(UserRights.SuperCmd);
-            bool admin = dbUser.Right.HasFlag(UserRights.AdminCmd) || super;
-            bool normal = dbUser.Right.HasFlag(UserRights.NormalCmd) || admin;
-            bool review = dbUser.Right.HasFlag(UserRights.ReviewPost);
-
             StringBuilder sb = new();
 
             if (!dbUser.IsBan)
@@ -57,8 +55,10 @@ namespace XinjingdailyBot.Command
             }
             else
             {
-                sb.AppendLine("您已被限制访问此Bot, 仅可使用以下命令: \n");
+                sb.AppendLine("您已被限制访问此Bot, 仅可使用以下命令: ");
             }
+            sb.AppendLine();
+            sb.AppendLine(_commandHandler.GetAvilabeCommands(dbUser));
 
             await _botClient.SendCommandReply(sb.ToString(), message);
         }
