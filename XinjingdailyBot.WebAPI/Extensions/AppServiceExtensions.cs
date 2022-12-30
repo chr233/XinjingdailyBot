@@ -14,7 +14,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
         /// <param name="services"></param>
         public static void AddAppService(this IServiceCollection services)
         {
-            string[] cls = new string[] { "XinjingdailyBot.Repository", "XinjingdailyBot.Service", "XinjingdailyBot.Command" };
+            string[] cls = new [] { "XinjingdailyBot.Repository", "XinjingdailyBot.Service", "XinjingdailyBot.Command" };
             foreach (var item in cls)
             {
                 Assembly assembly = Assembly.Load(item);

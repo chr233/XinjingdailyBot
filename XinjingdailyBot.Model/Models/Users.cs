@@ -36,7 +36,7 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 是否封禁
         /// </summary>
-        public bool IsBan { get; set; } = false;
+        public bool IsBan { get; set; }
         /// <summary>
         /// 是否为Bot
         /// </summary>

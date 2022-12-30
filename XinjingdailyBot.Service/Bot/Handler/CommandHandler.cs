@@ -237,7 +237,7 @@ public class CommandHandler : ICommandHandler
         //获取服务
         var service = _serviceScope.ServiceProvider.GetRequiredService(type);
         var method = assemblyMethod.Method;
-        var methodParameters = new List<object>() { };
+        List<object> methodParameters = new();
         //组装函数的入参
         foreach (var parameter in method.GetParameters())
         {
@@ -372,7 +372,7 @@ public class CommandHandler : ICommandHandler
         //获取服务
         var service = _serviceScope.ServiceProvider.GetRequiredService(type);
         var method = assemblyMethod.Method;
-        var methodParameters = new List<object>() { };
+        List<object> methodParameters = new();
         //组装函数的入参
         foreach (var parameter in method.GetParameters())
         {

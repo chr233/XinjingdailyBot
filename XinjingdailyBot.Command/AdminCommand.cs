@@ -202,7 +202,7 @@ namespace XinjingdailyBot.Command
                     targetUser.ModifyAt = DateTime.Now;
                     await _userService.Updateable(targetUser).UpdateColumns(x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
 
-                    var record = new BanRecords()
+                    var record = new BanRecords
                     {
                         UserID = targetUser.UserID,
                         OperatorUID = dbUser.UserID,
@@ -262,7 +262,6 @@ namespace XinjingdailyBot.Command
                     if (args.Any())
                     {
                         targetUser = await _userService.FetchUserByUserNameOrUserID(args.First());
-                        args = args[1..];
                     }
                 }
 
@@ -297,7 +296,7 @@ namespace XinjingdailyBot.Command
                     targetUser.ModifyAt = DateTime.Now;
                     await _userService.Updateable(targetUser).UpdateColumns(x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
 
-                    var record = new BanRecords()
+                    var record = new BanRecords
                     {
                         UserID = targetUser.UserID,
                         OperatorUID = dbUser.UserID,
