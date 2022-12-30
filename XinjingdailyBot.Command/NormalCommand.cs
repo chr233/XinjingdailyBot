@@ -156,7 +156,7 @@ namespace XinjingdailyBot.Command
         /// <param name="message"></param>
         /// <returns></returns>
         [TextCmd("MYRIGHT", UserRights.NormalCmd, Description = "获取自己的权限")]
-        public async Task ResponseMyRight( Users dbUser, Message message)
+        public async Task ResponseMyRight(Users dbUser, Message message)
         {
             var right = dbUser.Right;
             var superCmd = right.HasFlag(UserRights.SuperCmd);

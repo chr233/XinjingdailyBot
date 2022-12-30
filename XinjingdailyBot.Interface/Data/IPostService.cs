@@ -1,5 +1,4 @@
-﻿using Telegram.Bot;
-using Telegram.Bot.Types;
+﻿using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Model.Models;
 

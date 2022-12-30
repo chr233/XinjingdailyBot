@@ -1,9 +1,6 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
-using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Options;
-using SqlSugar.IOC;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -14,8 +11,6 @@ using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
-using XinjingdailyBot.Repository;
-using XinjingdailyBot.Service.Data;
 
 namespace XinjingdailyBot.Command
 {
@@ -23,27 +18,18 @@ namespace XinjingdailyBot.Command
     public class CommonCommand
     {
         private readonly ITelegramBotClient _botClient;
-        private readonly IUserService _userService;
-        private readonly LevelRepository _levelRepository;
-        private readonly GroupRepository _groupRepository;
         private readonly OptionsSetting _optionsSetting;
         private readonly IBanRecordService _banRecordService;
         private readonly ITextHelperService _textHelperService;
 
         public CommonCommand(
             ITelegramBotClient botClient,
-            IUserService userService,
-            LevelRepository levelRepository,
-            GroupRepository groupRepository,
             IOptions<OptionsSetting> options,
             IBanRecordService banRecordService,
             ITextHelperService textHelperService)
         {
             //_logger = logger;
             _botClient = botClient;
-            _userService = userService;
-            _levelRepository = levelRepository;
-            _groupRepository = groupRepository;
             _optionsSetting = options.Value;
             _banRecordService = banRecordService;
             _textHelperService = textHelperService;
@@ -110,11 +96,10 @@ namespace XinjingdailyBot.Command
         /// <summary>
         /// 关于机器人
         /// </summary>
-        /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
         [TextCmd("ABOUT", UserRights.None, Description = "关于机器人")]
-        public async Task ResponseAbout(Users dbUser, Message message)
+        public async Task ResponseAbout(Message message)
         {
             StringBuilder sb = new();
             string? msg = _optionsSetting.Message.About;
