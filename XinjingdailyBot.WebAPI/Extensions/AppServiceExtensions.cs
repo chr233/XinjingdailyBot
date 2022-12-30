@@ -63,7 +63,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
                             break;
                     }
 
-                    sb.AppendLine($"[{lifetime}]：{serviceType}");
+                    sb.AppendLine($" [{lifetime}]：{serviceType}");
                 }
             }
             sb.Append($"===== 注册了 {count} 个服务 =====");

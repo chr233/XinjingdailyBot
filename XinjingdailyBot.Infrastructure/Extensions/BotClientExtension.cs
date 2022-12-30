@@ -93,7 +93,6 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         /// </summary>
         /// <param name="botClient"></param>
         /// <param name="message"></param>
-        /// <param name="replyMarkup"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public static async Task RemoveMessageReplyMarkupAsync(

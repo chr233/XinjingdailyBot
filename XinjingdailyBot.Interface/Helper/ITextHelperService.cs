@@ -9,6 +9,7 @@ namespace XinjingdailyBot.Interface.Helper
         string NSFWWrning { get; }
         string EscapeHtml(string? text);
         BuildInTags FetchTags(string? text);
+        string HtmlLink(string url, string text);
         string HtmlMessageLink(long messageID, string chatName, string linkName);
         string HtmlUserLink(long userId, string userName, string userNick);
         string HtmlUserLink(Users user);

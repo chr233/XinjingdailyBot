@@ -57,7 +57,6 @@ namespace XinjingdailyBot.Service.Data
         /// <summary>
         /// 处理文字投稿
         /// </summary>
-        /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
@@ -159,7 +158,6 @@ namespace XinjingdailyBot.Service.Data
         /// <summary>
         /// 处理多媒体投稿
         /// </summary>
-        /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>

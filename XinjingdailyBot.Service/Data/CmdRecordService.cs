@@ -21,12 +21,18 @@ namespace XinjingdailyBot.Service.Data
         {
             bool error = !string.IsNullOrEmpty(exception);
 
+            string text = message.Text ?? "NULL";
+            if (text.Length > 1000)
+            {
+                text = text[..1000];
+            }
+
             CmdRecords record = new()
             {
                 ChatID = message.Chat.Id,
                 MessageID = message.MessageId,
                 UserID = dbUser.UserID,
-                Command = message.Text ?? "",
+                Command = text,
                 Handled = handled,
                 IsQuery = isQuery,
                 Error = error,
@@ -49,13 +55,20 @@ namespace XinjingdailyBot.Service.Data
         public async Task AddCmdRecord(CallbackQuery query, Users dbUser, bool handled, bool isQuery, string? exception = null)
         {
             bool error = !string.IsNullOrEmpty(exception);
+
+            string text = query.Data ?? "NULL";
+            if (text.Length > 1000)
+            {
+                text = text[..1000];
+            }
+
             var message = query.Message!;
             CmdRecords record = new()
             {
                 ChatID = message.Chat.Id,
                 MessageID = message.MessageId,
                 UserID = dbUser.UserID,
-                Command = query.Data ?? "",
+                Command = text,
                 Handled = handled,
                 IsQuery = isQuery,
                 Error = error,

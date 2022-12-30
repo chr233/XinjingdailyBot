@@ -152,12 +152,11 @@ namespace XinjingdailyBot.Command
         /// <summary>
         /// 获取自己的权限
         /// </summary>
-        /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
         [TextCmd("MYRIGHT", UserRights.NormalCmd, Description = "获取自己的权限")]
-        public async Task ResponseMyRight(ITelegramBotClient botClient, Users dbUser, Message message)
+        public async Task ResponseMyRight( Users dbUser, Message message)
         {
             var right = dbUser.Right;
             var superCmd = right.HasFlag(UserRights.SuperCmd);
@@ -188,13 +187,12 @@ namespace XinjingdailyBot.Command
             sb.AppendLine($"功能: <code>{string.Join(", ", functions)}</code>");
             sb.AppendLine($"命令: <code>{string.Join(", ", commands)}</code>");
 
-            await botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
+            await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
         }
 
         /// <summary>
         /// 艾特群管理
         /// </summary>
-        /// <param name="botClient"></param>
         /// <param name="message"></param>
         /// <returns></returns>
         [TextCmd("ADMIN", UserRights.NormalCmd, Description = "艾特群管理")]

@@ -151,27 +151,49 @@ namespace XinjingdailyBot.Service.Bot.Handler
             }
         }
 
+        /// <summary>
+        /// 处理文本消息
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public async Task OnTextMessageReceived(Users dbUser, Message message)
         {
-            var isMediaGroup = message.MediaGroupId != null;
-            var isPrivateChat = message.Chat.Type == ChatType.Private;
-            var isGroupChat = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
-            var isCommentGroup = isGroupChat && message.Chat.Id == _channelService.CommentGroup.Id;
-            var isSubGroup = isGroupChat && message.Chat.Id == _channelService.SubGroup.Id;
-            var isReviewGroup = isGroupChat && message.Chat.Id == _channelService.ReviewGroup.Id;
-            var isConfigedGroup = isCommentGroup || isSubGroup || isReviewGroup;
+            if (dbUser.IsBan)
+            {
+                return;
+            }
 
+            if(message.Chat.Type == ChatType.Private){
+                await _postService.HandleTextPosts(dbUser, message);
+            }
         }
 
+        /// <summary>
+        /// 处理非文本消息
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public async Task OnMediaMessageReceived(Users dbUser, Message message)
         {
-            var isMediaGroup = message.MediaGroupId != null;
-            var isPrivateChat = message.Chat.Type == ChatType.Private;
-            var isGroupChat = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
-            var isCommentGroup = isGroupChat && message.Chat.Id == _channelService.CommentGroup.Id;
-            var isSubGroup = isGroupChat && message.Chat.Id == _channelService.SubGroup.Id;
-            var isReviewGroup = isGroupChat && message.Chat.Id == _channelService.ReviewGroup.Id;
-            var isConfigedGroup = isCommentGroup || isSubGroup || isReviewGroup;
+            if (dbUser.IsBan)
+            {
+                return;
+            }
+
+            if (message.Chat.Type == ChatType.Private)
+            {
+                if(message.MediaGroupId != null)
+                {
+                    await _postService.HandleMediaGroupPosts(dbUser, message);
+                }
+                else
+                {
+                    await _postService.HandleMediaPosts(dbUser, message);
+                }
+
+            }
         }
     }
 }

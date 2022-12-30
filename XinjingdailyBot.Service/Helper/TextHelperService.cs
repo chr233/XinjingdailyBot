@@ -96,12 +96,23 @@ namespace XinjingdailyBot.Service.Helper
 
             if (string.IsNullOrEmpty(userName))
             {
-                return $"<a href=\"tg://user?id={userId}\">{nick}</a>";
+                return HtmlLink($"tg://user?id={userId}", nick);
             }
             else
             {
-                return $"<a href=\"https://t.me/{userName}\">{nick}</a>";
+                return HtmlLink($"https://t.me/{userName}", nick);
             }
+        }
+
+        /// <summary>
+        /// Html链接
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public string HtmlLink(string url, string text)
+        {
+            return $"<a href=\"{url}\">{text}</a>";
         }
 
         /// <summary>
