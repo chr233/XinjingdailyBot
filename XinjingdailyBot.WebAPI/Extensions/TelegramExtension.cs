@@ -23,7 +23,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
                     httpClient = new(
                         new HttpClientHandler()
                         {
-                            Proxy = new WebProxy() { Address = new Uri(proxy) },
+                            Proxy = new WebProxy { Address = new Uri(proxy) },
                             UseProxy = true,
                         }
                     );

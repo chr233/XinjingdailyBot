@@ -1,6 +1,7 @@
 ﻿using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
@@ -46,7 +47,13 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 {
                     if(msg.From?.Id == _channelService.BotUser.Id)
                     {
-                        if()
+                        if(message.Text == msg.Text)
+                        {
+                            if (dbUser.Right.HasFlag(UserRights.AdminCmd))
+                            {
+
+                            }
+                        }
                     }
                 }
             }
