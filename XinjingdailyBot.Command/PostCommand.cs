@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
@@ -10,18 +9,14 @@ using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
-using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Command
 {
     [AppService(ServiceLifetime = LifeTime.Scoped)]
     public class PostCommand
     {
-        private readonly ILogger<PostCommand> _logger;
         private readonly ITelegramBotClient _botClient;
         private readonly IUserService _userService;
-        private readonly LevelRepository _levelRepository;
-        private readonly GroupRepository _groupRepository;
         private readonly IChannelService _channelService;
         private readonly IPostService _postService;
         private readonly IMarkupHelperService _markupHelperService;
@@ -29,22 +24,16 @@ namespace XinjingdailyBot.Command
         private readonly ITextHelperService _textHelperService;
 
         public PostCommand(
-            ILogger<PostCommand> logger,
             ITelegramBotClient botClient,
             IUserService userService,
-            LevelRepository levelRepository,
-            GroupRepository groupRepository,
             IChannelService channelService,
             IPostService postService,
             IMarkupHelperService markupHelperService,
             IAttachmentService attachmentService,
             ITextHelperService textHelperService)
         {
-            _logger = logger;
             _botClient = botClient;
             _userService = userService;
-            _levelRepository = levelRepository;
-            _groupRepository = groupRepository;
             _channelService = channelService;
             _postService = postService;
             _markupHelperService = markupHelperService;

@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Npgsql.Internal.TypeHandlers.GeometricHandlers;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
@@ -11,18 +9,14 @@ using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
-using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Command
 {
     [AppService(ServiceLifetime = LifeTime.Scoped)]
     public class ReviewCommand
     {
-        private readonly ILogger<ReviewCommand> _logger;
         private readonly ITelegramBotClient _botClient;
         private readonly IUserService _userService;
-        private readonly LevelRepository _levelRepository;
-        private readonly GroupRepository _groupRepository;
         private readonly IChannelService _channelService;
         private readonly IPostService _postService;
         private readonly ITextHelperService _textHelperService;
@@ -31,22 +25,16 @@ namespace XinjingdailyBot.Command
 
 
         public ReviewCommand(
-            ILogger<ReviewCommand> logger,
             ITelegramBotClient botClient,
             IUserService userService,
-            LevelRepository levelRepository,
-            GroupRepository groupRepository,
             IChannelService channelService,
             IPostService postService,
             ITextHelperService textHelperService,
             IMarkupHelperService markupHelperService,
             IAttachmentService attachmentService)
         {
-            _logger = logger;
             _botClient = botClient;
             _userService = userService;
-            _levelRepository = levelRepository;
-            _groupRepository = groupRepository;
             _channelService = channelService;
             _postService = postService;
             _textHelperService = textHelperService;

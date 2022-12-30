@@ -164,7 +164,8 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 return;
             }
 
-            if(message.Chat.Type == ChatType.Private){
+            if (message.Chat.Type == ChatType.Private)
+            {
                 await _postService.HandleTextPosts(dbUser, message);
             }
         }
@@ -184,7 +185,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
 
             if (message.Chat.Type == ChatType.Private)
             {
-                if(message.MediaGroupId != null)
+                if (message.MediaGroupId != null)
                 {
                     await _postService.HandleMediaGroupPosts(dbUser, message);
                 }
