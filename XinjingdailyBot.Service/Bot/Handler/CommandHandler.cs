@@ -396,4 +396,40 @@ public class CommandHandler : ICommandHandler
         //调用方法
         method.Invoke(service, methodParameters.ToArray());
     }
+
+    /// <summary>
+    /// 生成可用命令信息
+    /// </summary>
+    /// <param name="dbUser"></param>
+    /// <returns></returns>
+    public string GetAvilabeCommands(Users dbUser)
+    {
+        Dictionary<string, string> cmds = new();
+
+        foreach (var type in _commandClass.Keys)
+        {
+            var allMethods = _commandClass[type];
+            foreach (var cmd in allMethods.Keys)
+            {
+                var method = allMethods[cmd];
+
+                if (dbUser.Right.HasFlag(method.Rights))
+                {
+                    if (!string.IsNullOrEmpty(method.Description))
+                    {
+                        cmds.Add(cmd.ToLowerInvariant(), method.Description);
+                    }
+                }
+            }
+        }
+
+        if (cmds.Count > 0)
+        {
+            return string.Join('\n', cmds.OrderBy(x => x.Key).Select(x => $"/{x.Key} - {x.Value}"));
+        }
+        else
+        {
+            return "没有可用命令";
+        }
+    }
 }

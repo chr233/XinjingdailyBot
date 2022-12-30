@@ -1,8 +1,6 @@
 ﻿using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Infrastructure.Enums;
-using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
@@ -13,14 +11,14 @@ namespace XinjingdailyBot.Service.Bot.Handler
     public class MessageHandler : IMessageHandler
     {
         private readonly IPostService _postService;
-        private readonly IChannelService _channelService;
+        private readonly IGroupMessageHandler _groupMessageHandler;
 
         public MessageHandler(
             IPostService postService,
-            IChannelService channelService)
+            IGroupMessageHandler groupMessageHandler)
         {
             _postService = postService;
-            _channelService = channelService;
+            _groupMessageHandler = groupMessageHandler;
         }
 
         /// <summary>
@@ -36,26 +34,20 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 return;
             }
 
-            if (message.Chat.Type == ChatType.Private)
+            switch (message.Chat.Type)
             {
-                await _postService.HandleTextPosts(dbUser, message);
-            }
-            else
-            {
-                var msg = message.ReplyToMessage;
-                if(msg != null)
-                {
-                    if(msg.From?.Id == _channelService.BotUser.Id)
-                    {
-                        if(message.Text == msg.Text)
-                        {
-                            if (dbUser.Right.HasFlag(UserRights.AdminCmd))
-                            {
-
-                            }
-                        }
-                    }
-                }
+                case ChatType.Private:
+                    await _postService.HandleTextPosts(dbUser, message);
+                    break;
+                case ChatType.Group:
+                case ChatType.Supergroup:
+                    await _groupMessageHandler.OnGroupTextMessageReceived(dbUser, message);
+                    break;
+                //case ChatType.Channel:
+                //    await _postService.HandleTextPosts(dbUser, message);
+                //    break;
+                default:
+                    break;
             }
         }
 
