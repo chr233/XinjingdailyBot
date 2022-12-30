@@ -13,7 +13,7 @@ namespace XinjingdailyBot.Model.Models
     public sealed record CmdRecords : BaseModel
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
-        public long Id { get; set; }
+        public int Id { get; set; }
         /// <summary>
         /// 原会话ID
         /// </summary>

@@ -84,7 +84,7 @@ namespace XinjingdailyBot.Repository.Base
         /// <returns></returns>
         public int Update(T entity, List<string>? list = null, bool isNull = true)
         {
-            list ??= new List<string>()
+            list ??= new List<string>
             {
                 "Create_By",
                 "Create_time"

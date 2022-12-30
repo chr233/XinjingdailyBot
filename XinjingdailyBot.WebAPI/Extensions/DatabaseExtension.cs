@@ -26,7 +26,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 $"Host={dbConfig.DbHost};Port={dbConfig.DbPort};Database={dbConfig.DbName};UserID={dbConfig.DbUser};Password={dbConfig.DbPassword};CharSet=utf8mb4;AllowZeroDateTime=true" :
                 $"DataSource={dbConfig.DbName}.db";
 
-            services.AddSqlSugar(new IocConfig()
+            services.AddSqlSugar(new IocConfig
             {
                 ConfigId = 0,
                 ConnectionString = connStr,
@@ -41,13 +41,12 @@ namespace XinjingdailyBot.WebAPI.Extensions
                     db.Aop.OnLogExecuting = (sql, pars) =>
                     {
                         var param = db.GetConnectionScope(0).Utilities.SerializeObject(pars.ToDictionary(it => it.ParameterName, it => it.Value));
-
-                        _logger.Info($"{sql}，{param}\n");
+                        _logger.Debug("{sql}，{param}", sql, param);
                     };
 
                     db.Aop.OnError = (e) =>
                     {
-                        _logger.Error(e, $"执行SQL出错：{e.Message}");
+                        _logger.Error("执行SQL出错：", e);
                     };
                     //SQL执行完
                     db.Aop.OnLogExecuted = (sql, pars) =>
@@ -69,7 +68,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
 
                     foreach (var type in types)
                     {
-                        _logger.Info($"开始创建 {type} 表");
+                        _logger.Info("开始创建 {type} 表", type);
                         db.CodeFirst.InitTables(type);
                     }
                 }

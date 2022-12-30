@@ -17,7 +17,7 @@ namespace XinjingdailyBot.Service.Data
         /// <param name="isQuery"></param>
         /// <param name="exception"></param>
         /// <returns></returns>
-        public async Task AddCmdRecord(Message message, Users dbUser, bool handled, bool isQuery, string? exception = null)
+        public async Task AddCmdRecord(Message message, Users dbUser, bool handled, bool isQuery, string? exception)
         {
             bool error = !string.IsNullOrEmpty(exception);
 
@@ -52,7 +52,7 @@ namespace XinjingdailyBot.Service.Data
         /// <param name="isQuery"></param>
         /// <param name="exception"></param>
         /// <returns></returns>
-        public async Task AddCmdRecord(CallbackQuery query, Users dbUser, bool handled, bool isQuery, string? exception = null)
+        public async Task AddCmdRecord(CallbackQuery query, Users dbUser, bool handled, bool isQuery, string? exception)
         {
             bool error = !string.IsNullOrEmpty(exception);
 
