@@ -23,7 +23,6 @@ namespace XinjingdailyBot.Command
         private readonly IMarkupHelperService _markupHelperService;
         private readonly IAttachmentService _attachmentService;
 
-
         public ReviewCommand(
             ITelegramBotClient botClient,
             IUserService userService,
@@ -93,7 +92,6 @@ namespace XinjingdailyBot.Command
         /// <summary>
         /// 修改稿件文字说明
         /// </summary>
-        /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>

@@ -14,20 +14,17 @@ namespace XinjingdailyBot.Command
     [AppService(ServiceLifetime = LifeTime.Scoped)]
     public class NormalCommand
     {
-        //private readonly ILogger<NormalCommand> _logger;
         private readonly ITelegramBotClient _botClient;
         private readonly IUserService _userService;
         private readonly LevelRepository _levelRepository;
         private readonly GroupRepository _groupRepository;
 
         public NormalCommand(
-            //ILogger<NormalCommand> logger,
             ITelegramBotClient botClient,
             IUserService userService,
             LevelRepository levelRepository,
             GroupRepository groupRepository)
         {
-            //_logger = logger;
             _botClient = botClient;
             _userService = userService;
             _levelRepository = levelRepository;
@@ -54,7 +51,7 @@ namespace XinjingdailyBot.Command
         [TextCmd("ANONYMOUS", UserRights.NormalCmd, Alias = "ANYMOUSE", Description = "设置是否匿名")]
         public async Task ResponseAnonymous(Users dbUser, Message message)
         {
-            var anymouse = !dbUser.PreferAnonymous;
+            bool anymouse = !dbUser.PreferAnonymous;
             dbUser.PreferAnonymous = anymouse;
             dbUser.ModifyAt = DateTime.Now;
             await _userService.Updateable(dbUser).UpdateColumns(x => new { x.PreferAnonymous, x.ModifyAt }).ExecuteCommandAsync();
@@ -73,7 +70,7 @@ namespace XinjingdailyBot.Command
         [TextCmd("NOTIFICATION", UserRights.NormalCmd, Description = "设置稿件审核后是否通知")]
         public async Task ResponseNotification(Users dbUser, Message message)
         {
-            var notificationg = !dbUser.Notification;
+            bool notificationg = !dbUser.Notification;
             dbUser.Notification = notificationg;
             dbUser.ModifyAt = DateTime.Now;
             await _userService.Updateable(dbUser).UpdateColumns(x => new { x.Notification, x.ModifyAt }).ExecuteCommandAsync();
@@ -96,7 +93,7 @@ namespace XinjingdailyBot.Command
             var level = _levelRepository.GetLevelName(dbUser.Level);
             var group = _groupRepository.GetGroupName(dbUser.GroupID);
 
-            var totalPost = dbUser.PostCount - dbUser.ExpiredPostCount;
+            int totalPost = dbUser.PostCount - dbUser.ExpiredPostCount;
 
             StringBuilder sb = new();
 
@@ -122,10 +119,10 @@ namespace XinjingdailyBot.Command
                 {
                     const int miniumPost = 10;
 
-                    var acceptCountRank = await _userService.Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > dbUser.AcceptCount && x.ModifyAt >= prev30Days).CountAsync() + 1;
+                    int acceptCountRank = await _userService.Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > dbUser.AcceptCount && x.ModifyAt >= prev30Days).CountAsync() + 1;
 
-                    var ratio = 1.0 * dbUser.AcceptCount / dbUser.PostCount;
-                    var acceptRatioRank = await _userService.Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
+                    double ratio = 1.0 * dbUser.AcceptCount / dbUser.PostCount;
+                    int acceptRatioRank = await _userService.Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
                     .Select(y => 100.0 * y.AcceptCount / y.PostCount).Where(x => x > ratio).CountAsync() + 1;
 
                     sb.AppendLine($"通过数排名: <code>{acceptCountRank}</code>");
@@ -138,7 +135,7 @@ namespace XinjingdailyBot.Command
             }
             else
             {
-                var activeUser = await _userService.Queryable().Where(x => !x.IsBan && !x.IsBot && x.ModifyAt >= prev30Days).CountAsync();
+                int activeUser = await _userService.Queryable().Where(x => !x.IsBan && !x.IsBot && x.ModifyAt >= prev30Days).CountAsync();
                 sb.AppendLine($"活跃用户数: <code>{activeUser}</code>");
 
                 sb.AppendLine($"管理员不参与用户排名");
@@ -159,15 +156,15 @@ namespace XinjingdailyBot.Command
         public async Task ResponseMyRight(Users dbUser, Message message)
         {
             var right = dbUser.Right;
-            var superCmd = right.HasFlag(UserRights.SuperCmd);
-            var adminCmd = right.HasFlag(UserRights.AdminCmd);
-            var normalCmd = right.HasFlag(UserRights.NormalCmd);
-            var sendPost = right.HasFlag(UserRights.SendPost);
-            var reviewPost = right.HasFlag(UserRights.ReviewPost);
-            var directPost = right.HasFlag(UserRights.DirectPost);
-            var userNick = message.From!.EscapedNickName();
+            bool superCmd = right.HasFlag(UserRights.SuperCmd);
+            bool adminCmd = right.HasFlag(UserRights.AdminCmd);
+            bool normalCmd = right.HasFlag(UserRights.NormalCmd);
+            bool sendPost = right.HasFlag(UserRights.SendPost);
+            bool reviewPost = right.HasFlag(UserRights.ReviewPost);
+            bool directPost = right.HasFlag(UserRights.DirectPost);
+            string userNick = message.From!.EscapedNickName();
 
-            var group = _groupRepository.GetGroupName(dbUser.GroupID);
+            string group = _groupRepository.GetGroupName(dbUser.GroupID);
 
             List<string> functions = new();
             if (sendPost) { functions.Add("投递稿件"); }

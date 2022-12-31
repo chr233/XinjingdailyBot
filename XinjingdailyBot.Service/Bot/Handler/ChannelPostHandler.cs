@@ -1,14 +1,11 @@
 ﻿using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
-using XinjingdailyBot.Infrastructure.Extensions;
-using XinjingdailyBot.Infrastructure.Localization;
-using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
+using XinjingdailyBot.Interface.Data;
+using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Handler
@@ -16,118 +13,141 @@ namespace XinjingdailyBot.Service.Bot.Handler
     [AppService(ServiceType = typeof(IChannelPostHandler), ServiceLifetime = LifeTime.Singleton)]
     public class ChannelPostHandler : IChannelPostHandler
     {
-        private readonly ILogger<ChannelPostHandler> _logger;
-        private readonly IChannelService _channelService;
-        private readonly ITelegramBotClient _botClient;
+        private readonly IPostService _postService;
+        private readonly ITextHelperService _textHelperService;
+        private readonly IAttachmentService _attachmentService;
+        private readonly IAttachmentHelperService _attachmentHelperService;
+        private readonly IUserService _userService;
+        private readonly IChannelOptionService _channelOptionService;
 
         public ChannelPostHandler(
-            ILogger<ChannelPostHandler> logger,
-            ITelegramBotClient botClient,
-            IChannelService channelService)
+            IPostService postService,
+            ITextHelperService textHelperService,
+            IAttachmentService attachmentService,
+            IAttachmentHelperService attachmentHelperService,
+            IUserService userService,
+            IChannelOptionService channelOptionService)
         {
-            _logger = logger;
-            _botClient = botClient;
-            _channelService = channelService;
+            _postService = postService;
+            _textHelperService = textHelperService;
+            _attachmentService = attachmentService;
+            _attachmentHelperService = attachmentHelperService;
+            _userService = userService;
+            _channelOptionService = channelOptionService;
         }
 
+        /// <summary>
+        /// 自动更新频道发布的文本消息
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public async Task OnTextChannelPostReceived(Users dbUser, Message message)
         {
-            //if (!dbUser.Right.HasFlag(UserRights.SendPost))
-            //{
-            //    await _botClient.AutoReplyAsync(Langs.NoPostRight, message);
-            //    return;
-            //}
-            //if (_channelService.ReviewGroup.Id == -1)
-            //{
-            //    await _botClient.AutoReplyAsync(Langs.ReviewGroupNotSet, message);
-            //    return;
-            //}
+            if (string.IsNullOrEmpty(message.Text))
+            {
+                return;
+            }
+            if (message.Text.Length > _postService.MaxPostText)
+            {
+                return;
+            }
 
-            //if (string.IsNullOrEmpty(message.Text))
-            //{
-            //    await _botClient.AutoReplyAsync(Langs.TextPostCantBeNull, message);
-            //    return;
-            //}
+            string? channelName = null, channelTitle = null;
+            if (message.ForwardFromChat?.Type == ChatType.Channel)
+            {
+                channelTitle = message.ForwardFromChat.Title;
+                channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
+                long channelId = message.ForwardFromChat.Id;
+                _ = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
+            }
 
-            //if (message.Text!.Length > MaxPostText)
-            //{
-            //    await _botClient.AutoReplyAsync($"文本长度超过上限 {MaxPostText}, 无法创建投稿", message);
-            //    return;
-            //}
+            BuildInTags tags = _textHelperService.FetchTags(message.Text);
+            string text = _textHelperService.ParseMessage(message);
 
-            //ChannelOption channelOption = ChannelOption.Normal;
-            //string? channelName = null, channelTitle = null;
-            //if (message.ForwardFromChat?.Type == ChatType.Channel)
-            //{
-            //    long channelId = message.ForwardFromChat.Id;
-            //    channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
-            //    channelTitle = message.ForwardFromChat.Title;
-            //    channelOption = await _channelOptionService.FetchChannelOption(channelId, channelName, channelTitle);
-            //}
+            //生成数据库实体
+            Posts newPost = new()
+            {
+                OriginChatID = message.Chat.Id,
+                OriginMsgID = message.MessageId,
+                ActionMsgID = 0,
+                ReviewMsgID = 0,
+                ManageMsgID = 0,
+                PublicMsgID = message.MessageId,
+                Anonymous = false,
+                Text = text,
+                RawText = message.Text ?? "",
+                ChannelName = channelName ?? "",
+                ChannelTitle = channelTitle ?? "",
+                Status = PostStatus.Accepted,
+                PostType = message.Type,
+                Tags = tags,
+                PosterUID = dbUser.UserID,
+                ReviewerUID = dbUser.UserID
+            };
 
-            //BuildInTags tags = _textHelperService.FetchTags(message.Text);
-            //string text = _textHelperService.ParseMessage(message);
+            await _postService.Insertable(newPost).ExecuteCommandAsync();
 
-            //bool anonymous = dbUser.PreferAnonymous;
-
-            ////直接发布模式
-            //bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
-            ////发送确认消息
-            //var keyboard = directPost ? _markupHelperService.DirectPostKeyboard(anonymous, tags) : _markupHelperService.PostKeyboard(anonymous);
-            //string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
-
-            ////生成数据库实体
-            //Posts newPost = new()
-            //{
-            //    Anonymous = anonymous,
-            //    Text = text,
-            //    RawText = message.Text ?? "",
-            //    ChannelName = channelName ?? "",
-            //    ChannelTitle = channelTitle ?? "",
-            //    Status = directPost ? PostStatus.Reviewing : PostStatus.Padding,
-            //    PostType = message.Type,
-            //    Tags = tags,
-            //    PosterUID = dbUser.UserID
-            //};
-
-            ////套用频道设定
-            //switch (channelOption)
-            //{
-            //    case ChannelOption.Normal:
-            //        break;
-            //    case ChannelOption.PurgeOrigin:
-            //        postText += "\n由于系统设定, 来自该频道的投稿将不会显示来源";
-            //        newPost.ChannelName += '~';
-            //        break;
-            //    case ChannelOption.AutoReject:
-            //        postText = "由于系统设定, 暂不接受来自此频道的投稿";
-            //        keyboard = null;
-            //        newPost.Status = PostStatus.Rejected;
-            //        break;
-            //    default:
-            //        _logger.LogError("未知的频道选项 {channelOption}", channelOption);
-            //        return;
-            //}
-
-            //Message msg = await _botClient.SendTextMessageAsync(message.Chat.Id, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
-
-            ////修改数据库实体
-            //newPost.OriginChatID = message.Chat.Id;
-            //newPost.OriginMsgID = message.MessageId;
-            //newPost.ActionMsgID = msg.MessageId;
-
-            //if (directPost)
-            //{
-            //    newPost.ReviewMsgID = msg.MessageId;
-            //    newPost.ManageMsgID = msg.MessageId;
-            //}
-
-            //await Insertable(newPost).ExecuteCommandAsync();
+            //增加通过数量
+            dbUser.AcceptCount++;
+            dbUser.ModifyAt = DateTime.Now;
+            await _userService.Updateable(dbUser).UpdateColumns(x => new { x.AcceptCount, x.ModifyAt }).ExecuteCommandAsync();
         }
 
+        /// <summary>
+        /// 自动更新频道发布的多媒体消息
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public async Task OnMediaChannelPostReceived(Users dbUser, Message message)
         {
+            string? channelName = null, channelTitle = null;
+            if (message.ForwardFromChat?.Type == ChatType.Channel)
+            {
+                channelTitle = message.ForwardFromChat.Title;
+                channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
+                long channelId = message.ForwardFromChat.Id;
+                _ = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
+            }
 
+            BuildInTags tags = _textHelperService.FetchTags(message.Caption);
+            string text = _textHelperService.ParseMessage(message);
+
+            //生成数据库实体
+            Posts newPost = new()
+            {
+                OriginChatID = message.Chat.Id,
+                OriginMsgID = message.MessageId,
+                ActionMsgID = 0,
+                ReviewMsgID = 0,
+                ManageMsgID = 0,
+                PublicMsgID = message.MessageId,
+                Anonymous = false,
+                Text = text,
+                RawText = message.Text ?? "",
+                ChannelName = channelName ?? "",
+                ChannelTitle = channelTitle ?? "",
+                Status = PostStatus.Accepted,
+                PostType = message.Type,
+                Tags = tags,
+                PosterUID = dbUser.UserID,
+                ReviewerUID = dbUser.UserID
+            };
+
+            long postID = await _postService.Insertable(newPost).ExecuteReturnBigIdentityAsync();
+
+            Attachments? attachment = _attachmentHelperService.GenerateAttachment(message, postID);
+
+            if (attachment != null)
+            {
+                await _attachmentService.Insertable(attachment).ExecuteCommandAsync();
+            }
+
+            //增加通过数量
+            dbUser.AcceptCount++;
+            dbUser.ModifyAt = DateTime.Now;
+            await _userService.Updateable(dbUser).UpdateColumns(x => new { x.AcceptCount, x.ModifyAt }).ExecuteCommandAsync();
         }
 
         /// <summary>
@@ -135,9 +155,83 @@ namespace XinjingdailyBot.Service.Bot.Handler
         /// </summary>
         private ConcurrentDictionary<string, long> MediaGroupIDs { get; } = new();
 
+        /// <summary>
+        /// 自动更新频道发布的多媒体组消息
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public async Task OnMediaGroupChannelPostReceived(Users dbUser, Message message)
         {
+            string mediaGroupId = message.MediaGroupId!;
+            if (!MediaGroupIDs.TryGetValue(mediaGroupId, out long postID)) //如果mediaGroupId不存在则创建新Post
+            {
+                MediaGroupIDs.TryAdd(mediaGroupId, -1);
 
+                bool exists = await _postService.Queryable().AnyAsync(x => x.MediaGroupID == mediaGroupId);
+                if (!exists)
+                {
+                    string? channelName = null, channelTitle = null;
+                    if (message.ForwardFromChat?.Type == ChatType.Channel)
+                    {
+                        channelTitle = message.ForwardFromChat.Title;
+                        channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
+                        long channelId = message.ForwardFromChat.Id;
+                        _ = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
+                    }
+
+                    BuildInTags tags = _textHelperService.FetchTags(message.Caption);
+                    string text = _textHelperService.ParseMessage(message);
+
+                    //生成数据库实体
+                    Posts newPost = new()
+                    {
+                        OriginChatID = message.Chat.Id,
+                        OriginMsgID = message.MessageId,
+                        ActionMsgID = 0,
+                        ReviewMsgID = 0,
+                        ManageMsgID = 0,
+                        PublicMsgID = message.MessageId,
+                        Anonymous = false,
+                        Text = text,
+                        RawText = message.Text ?? "",
+                        ChannelName = channelName ?? "",
+                        ChannelTitle = channelTitle ?? "",
+                        Status = PostStatus.Accepted,
+                        PostType = message.Type,
+                        Tags = tags,
+                        PosterUID = dbUser.UserID,
+                        ReviewerUID = dbUser.UserID
+                    };
+
+                    postID = await _postService.Insertable(newPost).ExecuteReturnBigIdentityAsync();
+
+                    MediaGroupIDs[mediaGroupId] = postID;
+
+                    //两秒后停止接收媒体组消息
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(1500);
+                        MediaGroupIDs.Remove(mediaGroupId, out _);
+
+                        //增加通过数量
+                        dbUser.AcceptCount++;
+                        dbUser.ModifyAt = DateTime.Now;
+                        await _userService.Updateable(dbUser).UpdateColumns(x => new { x.AcceptCount, x.ModifyAt }).ExecuteCommandAsync();
+                    });
+                }
+            }
+
+            //更新附件
+            if (postID > 0)
+            {
+                Attachments? attachment = _attachmentHelperService.GenerateAttachment(message, postID);
+
+                if (attachment != null)
+                {
+                    await _attachmentService.Insertable(attachment).ExecuteCommandAsync();
+                }
+            }
         }
     }
 }

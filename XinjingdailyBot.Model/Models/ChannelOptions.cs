@@ -6,6 +6,7 @@ namespace XinjingdailyBot.Model.Models
 {
     [SugarTable("channel", TableDescription = "来源频道设定")]
     [SugarIndex("index_channel_id", nameof(ChannelID), OrderByType.Asc, true)]
+    [SugarIndex("index_channel_title", nameof(ChannelTitle), OrderByType.Asc, true)]
     public sealed record ChannelOptions : BaseModel
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]

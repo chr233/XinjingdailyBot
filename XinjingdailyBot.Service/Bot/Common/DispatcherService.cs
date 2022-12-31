@@ -13,15 +13,18 @@ namespace XinjingdailyBot.Service.Bot.Common
         private readonly IMessageHandler _messageHandler;
         private readonly ICommandHandler _commandHandler;
         private readonly IChannelPostHandler _channelPostHandler;
+        private readonly IChannelService _channelService;
 
         public DispatcherService(
             IMessageHandler messageHandler,
             ICommandHandler commandHandler,
-            IChannelPostHandler channelPostHandler)
+            IChannelPostHandler channelPostHandler,
+            IChannelService channelService)
         {
             _messageHandler = messageHandler;
             _commandHandler = commandHandler;
             _channelPostHandler = channelPostHandler;
+            _channelService = channelService;
         }
 
         /// <summary>
@@ -60,21 +63,25 @@ namespace XinjingdailyBot.Service.Bot.Common
         /// <returns></returns>
         public async Task OnChannalPostReceived(Users dbUser, Message message)
         {
-            var handler = message.Type switch
+            //仅监听发布频道的消息
+            if (message.Chat.Id == _channelService.AcceptChannel.Id)
             {
-                MessageType.Text => _channelPostHandler.OnTextChannelPostReceived(dbUser, message),
-                MessageType.Photo => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
-                MessageType.Audio => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
-                MessageType.Video => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
-                MessageType.Voice => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
-                MessageType.Document => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
-                MessageType.Sticker => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
-                _ => null,
-            };
+                var handler = message.Type switch
+                {
+                    MessageType.Text => _channelPostHandler.OnTextChannelPostReceived(dbUser, message),
+                    MessageType.Photo => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
+                    MessageType.Audio => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
+                    MessageType.Video => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
+                    MessageType.Voice => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
+                    MessageType.Document => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
+                    MessageType.Sticker => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
+                    _ => null,
+                };
 
-            if (handler != null)
-            {
-                await handler;
+                if (handler != null)
+                {
+                    await handler;
+                }
             }
         }
 

@@ -1,4 +1,6 @@
-﻿using Telegram.Bot.Types.ReplyMarkups;
+﻿using System.Text.RegularExpressions;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Localization;
@@ -13,6 +15,11 @@ namespace XinjingdailyBot.Service.Helper
     {
         private readonly GroupRepository _groupRepository;
 
+        public MarkupHelperService(
+            GroupRepository groupRepository)
+        {
+            _groupRepository = groupRepository;
+        }
 
         private static readonly string AnymouseOn = Emojis.Ghost + "匿名投稿";
         private static readonly string AnymouseOff = Emojis.Thinking + "保留来源";
@@ -41,12 +48,6 @@ namespace XinjingdailyBot.Service.Helper
         private static readonly string RejectOther = "其他原因";
 
         private static readonly string RejectCancel = Emojis.Back + "返回";
-
-        public MarkupHelperService(
-            GroupRepository groupRepository)
-        {
-            _groupRepository = groupRepository;
-        }
 
         /// <summary>
         /// 投稿键盘
@@ -192,7 +193,7 @@ namespace XinjingdailyBot.Service.Helper
 
                 btns.Add(new()
                 {
-                        InlineKeyboardButton.WithCallbackData("取消操作", $"cmd {dbUser.UserID} cancel"),
+                    InlineKeyboardButton.WithCallbackData("取消操作", $"cmd {dbUser.UserID} cancel"),
                 });
 
                 InlineKeyboardMarkup keyboard = new(btns);
@@ -249,6 +250,38 @@ namespace XinjingdailyBot.Service.Helper
 
                 return keyboard;
             }
+        }
+
+        /// <summary>
+        /// 频道选项键盘
+        /// </summary>
+        /// <param name="channelOption"></param>
+        /// <returns></returns>
+        public InlineKeyboardMarkup? SetChannelOptionKeyboard(Users dbUser, long channelId)
+        {
+            List<List<InlineKeyboardButton>> btns = new()
+            {
+                new()
+                {
+                    InlineKeyboardButton.WithCallbackData( "1. 不做特殊处理", $"cmd {dbUser.UserID} channeloption {channelId} normal"),
+                },
+                new()
+                {
+                    InlineKeyboardButton.WithCallbackData( "2. 抹除频道来源", $"cmd {dbUser.UserID} channeloption {channelId} purgeorigin"),
+                },
+                new()
+                {
+                    InlineKeyboardButton.WithCallbackData( "3. 拒绝此频道的投稿", $"cmd {dbUser.UserID} channeloption {channelId} autoreject"),
+                },
+                new()
+                {
+                    InlineKeyboardButton.WithCallbackData( "取消操作", $"cmd {dbUser.UserID} cancel"),
+                }
+            };
+
+            InlineKeyboardMarkup keyboard = new(btns);
+
+            return keyboard;
         }
     }
 }
