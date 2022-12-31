@@ -9,37 +9,71 @@
         /// <summary>
         /// 无权限
         /// </summary>
-        None = 0x00,
+        None = 0,
 
         /// <summary>
         /// 投稿
         /// </summary>
-        SendPost = 0x01,
+        SendPost = 1 << 0,
+
         /// <summary>
         /// 审核
         /// </summary>
-        ReviewPost = 0x02,
+        ReviewPost = 1 << 1,
+
         /// <summary>
         /// 直接投稿
         /// </summary>
-        DirectPost = 0x04,
+        DirectPost = 1 << 2,
 
         /// <summary>
         /// 普通命令
         /// </summary>
-        NormalCmd = 0x10,
+        NormalCmd = 1 << 4,
+
         /// <summary>
         /// 管理命令
         /// </summary>
-        AdminCmd = 0x20,
+        AdminCmd = 1 << 5,
+
         /// <summary>
         /// 超管命令
         /// </summary>
-        SuperCmd = 0x40,
+        SuperCmd = 1 << 6,
 
         /// <summary>
-        /// 全部权限
+        /// 火星
         /// </summary>
-        ALL = 0xFF,
+        Mars = 1 << 7,
+
+        /// <summary>
+        /// 普通用户
+        /// </summary>
+        NormalUser = SendPost | NormalCmd,
+
+        /// <summary>
+        /// 审核员
+        /// </summary>
+        Reviewer = NormalUser | ReviewPost,
+
+        /// <summary>
+        /// 发布员
+        /// </summary>
+        Poster = NormalUser | DirectPost,
+
+        /// <summary>
+        /// 火星救员
+        /// </summary>
+        TheMartian = NormalUser | Mars,
+
+        /// <summary>
+        /// 普通管理
+        /// </summary>
+        Admin = SendPost | ReviewPost | DirectPost | NormalCmd | AdminCmd | Mars,
+
+        /// <summary>
+        /// 超级管理
+        /// </summary>
+        SuperAdmin = Admin | SuperCmd,
     }
 }
