@@ -491,7 +491,6 @@ namespace XinjingdailyBot.Command
                 if (args.Any())
                 {
                     targetUser = await _userService.FetchUserByUserNameOrUserID(args.First());
-                    args = args[1..];
                 }
             }
 
@@ -1026,122 +1025,6 @@ namespace XinjingdailyBot.Command
 
             string text = await exec();
             await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, replyMarkup: null);
-        }
-
-
-        /// <summary>
-        /// 来源频道设置
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        [TextCmd("CHANNELOPTION", UserRights.AdminCmd, Description = "来源频道设置")]
-        public async Task ResponseChannalOption(Users dbUser, Message message)
-        {
-            async Task<(string, InlineKeyboardMarkup?)> exec()
-            {
-                if (message.Chat.Id != _channelService.ReviewGroup.Id)
-                {
-                    return ("该命令仅限审核群内使用", null);
-                }
-
-                if (message.ReplyToMessage == null)
-                {
-                    return ("请回复审核消息并输入拒绝理由", null);
-                }
-
-                var messageId = message.ReplyToMessage.MessageId;
-
-                var post = await _postService.Queryable().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
-
-                if (post == null)
-                {
-                    return ("未找到稿件", null);
-                }
-
-                if (!post.IsFromChannel)
-                {
-                    return ("不是来自其他频道的投稿, 无法设置频道选项", null);
-                }
-
-                var channel = await _channelOptionService.FetchChannelByTitle(post.ChannelTitle);
-
-                if (channel == null)
-                {
-                    return ("未找到对应频道", null);
-                }
-
-                string option = channel.Option switch
-                {
-                    ChannelOption.Normal => "1. 不做特殊处理",
-                    ChannelOption.PurgeOrigin => "2. 抹除频道来源",
-                    ChannelOption.AutoReject => "3. 拒绝此频道的投稿",
-                    _ => "未知的值",
-                };
-
-                var keyboard = _markupHelperService.SetChannelOptionKeyboard(dbUser, channel.ChannelID);
-
-                return ($"请选择针对来自 {channel.ChannelTitle} 的稿件的处理方式\n当前设置: {option}", keyboard);
-            }
-
-            (var text, var kbd) = await exec();
-            await _botClient.SendCommandReply(text, message, autoDelete: false, replyMarkup: kbd);
-        }
-
-        /// <summary>
-        /// 来源频道设置
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        [QueryCmd("CHANNELOPTION", UserRights.AdminCmd, Description = "来源频道设置")]
-        public async Task QResponseChannalOption(CallbackQuery query, string[] args)
-        {
-            async Task<string> exec()
-            {
-                if (args.Length < 3)
-                {
-                    return "参数有误";
-                }
-
-                if (!long.TryParse(args[1], out long channelId))
-                {
-                    return "参数有误";
-                }
-
-                ChannelOption? option = args[2] switch
-                {
-                    "normal" => ChannelOption.Normal,
-                    "purgeorigin" => ChannelOption.PurgeOrigin,
-                    "autoreject" => ChannelOption.AutoReject,
-                    _ => null
-                };
-
-                string optionStr = option switch
-                {
-                    ChannelOption.Normal => "不做特殊处理",
-                    ChannelOption.PurgeOrigin => "抹除频道来源",
-                    ChannelOption.AutoReject => "拒绝此频道的投稿",
-                    _ => "未知的值",
-                };
-
-                if (option == null)
-                {
-                    return $"未知的频道选项 {args[2]}";
-                }
-
-                var channel = await _channelOptionService.UpdateChannelOptionById(channelId, option.Value);
-
-                if (channel == null)
-                {
-                    return $"找不到频道 {channelId}";
-                }
-
-                return $"来自 {channel.ChannelTitle} 频道的稿件今后将被 {optionStr}";
-            }
-
-            string text = await exec();
-            await _botClient.EditMessageTextAsync(query.Message!, text, replyMarkup: null);
         }
     }
 }

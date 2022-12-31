@@ -93,15 +93,6 @@ namespace XinjingdailyBot.Repository.Base
             return Context.CopyNew().Updateable(entity).IgnoreColumns(isNull).IgnoreColumns(list.ToArray()).ExecuteCommand();
         }
 
-        //public bool Update(List<T> entity)
-        //{
-        //    var result = base.Context.Ado.UseTran(() =>
-        //    {
-        //        base.Context.Updateable(entity).ExecuteCommand();
-        //    });
-        //    return result.IsSuccess;
-        //}
-
         /// <summary>
         /// 更新指定列 eg：Update(w => w.NoticeId == model.NoticeId, it => new SysNotice(){ Update_time = DateTime.Now, Title = "通知标题" });
         /// </summary>
