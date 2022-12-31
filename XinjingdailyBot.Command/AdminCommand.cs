@@ -1095,7 +1095,7 @@ namespace XinjingdailyBot.Command
         /// <param name="args"></param>
         /// <returns></returns>
         [QueryCmd("CHANNELOPTION", UserRights.AdminCmd, Description = "来源频道设置")]
-        public async Task QResponseChannalOption(Users dbUser, CallbackQuery query, string[] args)
+        public async Task QResponseChannalOption(CallbackQuery query, string[] args)
         {
             async Task<string> exec()
             {
