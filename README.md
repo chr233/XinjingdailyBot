@@ -43,9 +43,11 @@
 
 从 [Releases](https://github.com/chr233/XinjingdailyBot/releases) 下载编译好的文件以后, 直接运行 XinjingDailyBot 即可
 
-### 数据库说明
+### 升级注意
 
-自 2.0.0.0 以后, 可选 `Sqlite` 作为数据库实现, 在配置文件的 `Database` 节设置 `UseMySQL` 为 `false` 即可
+数据库主键从 `long` 改为了 `int` , 如果从 `1.x` 升级至 `2.x` 后无法正常运行, 请重新创建数据库, 待程序生成数据库结构后使用工具手动导入旧的数据
+
+自 `2.x` 后, 可选 `Sqlite` 作为数据库实现, 在配置文件的 `Database` 节设置 `UseMySQL` 为 `false` 即可
 
 ### 配置说明
 
