@@ -21,6 +21,12 @@ namespace XinjingdailyBot.Service.Bot.Common
             _commandHandler = commandHandler;
         }
 
+        /// <summary>
+        /// 收到私聊或者群组消息消息
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public async Task OnMessageReceived(Users dbUser, Message message)
         {
             var handler = message.Type switch
@@ -43,6 +49,40 @@ namespace XinjingdailyBot.Service.Bot.Common
             }
         }
 
+        /// <summary>
+        /// 收到频道消息
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public async Task OnChannalPostReceived(Users dbUser, Message message)
+        {
+            var handler = message.Type switch
+            {
+                MessageType.Text => message.Text!.StartsWith("/") ?
+                    _commandHandler.OnCommandReceived(dbUser, message) :
+                    _messageHandler.OnTextMessageReceived(dbUser, message),
+                MessageType.Photo => _messageHandler.OnMediaMessageReceived(dbUser, message),
+                MessageType.Audio => _messageHandler.OnMediaMessageReceived(dbUser, message),
+                MessageType.Video => _messageHandler.OnMediaMessageReceived(dbUser, message),
+                MessageType.Voice => _messageHandler.OnMediaMessageReceived(dbUser, message),
+                MessageType.Document => _messageHandler.OnMediaMessageReceived(dbUser, message),
+                MessageType.Sticker => _messageHandler.OnMediaMessageReceived(dbUser, message),
+                _ => null,
+            };
+
+            if (handler != null)
+            {
+                await handler;
+            }
+        }
+
+        /// <summary>
+        /// 收到CallbackQuery
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public async Task OnCallbackQueryReceived(Users dbUser, CallbackQuery query)
         {
             await _commandHandler.OnQueryCommandReceived(dbUser, query);

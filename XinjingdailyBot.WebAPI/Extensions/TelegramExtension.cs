@@ -21,7 +21,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 if (!string.IsNullOrEmpty(proxy))
                 {
                     httpClient = new(
-                        new HttpClientHandler()
+                        new HttpClientHandler
                         {
                             Proxy = new WebProxy { Address = new Uri(proxy) },
                             UseProxy = true,

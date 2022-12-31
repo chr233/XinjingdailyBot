@@ -83,6 +83,8 @@ namespace XinjingdailyBot.Command
                 case "post confirm":
                     await ConfirmPost(post, dbUser, query);
                     break;
+                default:
+                    break;
             }
         }
 
