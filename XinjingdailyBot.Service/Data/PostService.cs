@@ -259,7 +259,6 @@ namespace XinjingdailyBot.Service.Data
         /// <summary>
         /// 处理多媒体投稿(mediaGroup)
         /// </summary>
-        /// <param name="botClient"></param>
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
@@ -637,7 +636,5 @@ namespace XinjingdailyBot.Service.Data
                 await _userService.Updateable(poster).UpdateColumns(x => new { x.PostCount, x.ModifyAt }).ExecuteCommandAsync();
             }
         }
-
-
     }
 }

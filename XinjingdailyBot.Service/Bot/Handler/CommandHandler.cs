@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -64,6 +65,7 @@ public class CommandHandler : ICommandHandler
     /// <summary>
     /// 注册命令
     /// </summary>
+    //[RequiresUnreferencedCode()]
     public void InstallCommands()
     {
         //获取所有服务方法
