@@ -6,9 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <TieredPGO>true</TieredPGO>
-    <PublishAot>true</PublishAot>
-    <TrimmerDefaultAction>link</TrimmerDefaultAction>
-    <Platforms>x86;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
