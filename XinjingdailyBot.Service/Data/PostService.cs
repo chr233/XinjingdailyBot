@@ -503,7 +503,8 @@ namespace XinjingdailyBot.Service.Data
                         _ => throw new Exception(),
                     };
                 }
-                var messages = await _botClient.SendMediaGroupAsync(_channelService.RejectChannel.Id, group);
+                var _ = await _botClient.SendMediaGroupAsync(_channelService.RejectChannel.Id, group);
+                //处理媒体组消息 TODO
             }
 
             //通知投稿人
@@ -632,8 +633,6 @@ namespace XinjingdailyBot.Service.Data
             await Updateable(post).UpdateColumns(x => new { x.ReviewMsgID, x.PublicMsgID, x.ReviewerUID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
 
             //通知投稿人
-            bool directPost = post.ManageMsgID == post.ActionMsgID;
-
             string posterMsg = _textHelperService.MakeNotification(post.IsDirectPost, post.PublicMsgID);
 
             if (poster.Notification && poster.UserID != dbUser.UserID)//启用通知并且审核与投稿不是同一个人

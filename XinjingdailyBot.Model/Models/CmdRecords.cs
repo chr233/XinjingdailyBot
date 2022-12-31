@@ -39,7 +39,7 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 是否为Query命令
         /// </summary>
-        public bool IsQuery { get; set; } = false;
+        public bool IsQuery { get; set; }
         /// <summary>
         /// 命令成功执行
         /// </summary>

@@ -43,9 +43,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 case ChatType.Supergroup:
                     await _groupMessageHandler.OnGroupTextMessageReceived(dbUser, message);
                     break;
-                //case ChatType.Channel:
-                //    await _postService.HandleTextPosts(dbUser, message);
-                //    break;
                 default:
                     break;
             }
