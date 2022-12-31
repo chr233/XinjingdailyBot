@@ -5,7 +5,7 @@ on:
     tags:
       - "*"
 env:
-  PROJECT_NAME: "XinjingdailyBot"
+  PROJECT_NAME: "XinjingdailyBot.WebAPI"
 
 jobs:
   build:
