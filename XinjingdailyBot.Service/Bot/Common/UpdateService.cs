@@ -40,10 +40,8 @@ public class UpdateService : IUpdateService
 
         var handler = update.Type switch
         {
-            UpdateType.ChannelPost => _dispatcherService.OnMessageReceived(dbUser, update.ChannelPost!),
-            //UpdateType.EditedChannelPost => _dispatcherService.OnMessageReceived(dbUser, update.EditedChannelPost!),
+            UpdateType.ChannelPost => _dispatcherService.OnChannalPostReceived(dbUser, update.ChannelPost!),
             UpdateType.Message => _dispatcherService.OnMessageReceived(dbUser, update.Message!),
-            //UpdateType.EditedMessage => _dispatcherService.OnMessageReceived(dbUser, update.EditedMessage!),
             UpdateType.CallbackQuery => _dispatcherService.OnCallbackQueryReceived(dbUser, update.CallbackQuery!),
             //UpdateType.InlineQuery
             //UpdateType.ChosenInlineResult,

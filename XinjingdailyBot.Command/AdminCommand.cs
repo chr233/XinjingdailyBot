@@ -401,7 +401,7 @@ namespace XinjingdailyBot.Command
                         warnCount = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && x.Type == BanType.Warning && x.BanTime >= lastUnbaned.BanTime).CountAsync();
                     }
 
-                    var record = new BanRecords()
+                    var record = new BanRecords
                     {
                         UserID = targetUser.UserID,
                         OperatorUID = dbUser.UserID,
@@ -422,7 +422,7 @@ namespace XinjingdailyBot.Command
 
                     if (warnCount >= WarningLimit)
                     {
-                        record = new BanRecords()
+                        record = new BanRecords
                         {
                             UserID = targetUser.UserID,
                             OperatorUID = 0,
