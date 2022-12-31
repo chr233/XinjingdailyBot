@@ -985,28 +985,28 @@ namespace XinjingdailyBot.Command
         [QueryCmd("SETUSERGROUP", UserRights.NormalCmd)]
         public async Task QResponseSetUserGroup(Users dbUser, CallbackQuery callbackQuery, string[] args)
         {
-            async Task<(string, InlineKeyboardMarkup?)> exec()
+            async Task<string> exec()
             {
                 if (args.Length < 3)
                 {
-                    return ("参数有误", null);
+                    return "参数有误";
                 }
 
                 var targetUser = await _userService.FetchUserByUserName(args[1]);
 
                 if (targetUser == null)
                 {
-                    return ("找不到指定用户", null);
+                    return "找不到指定用户";
                 }
 
                 if (targetUser.Id == dbUser.Id)
                 {
-                    return ("无法对自己进行操作", null);
+                    return "无法对自己进行操作";
                 }
 
                 if (targetUser.GroupID >= dbUser.GroupID)
                 {
-                    return ("无法对同级管理员进行此操作", null);
+                    return "无法对同级管理员进行此操作";
                 }
 
                 if (int.TryParse(args[2], out int groupID))
@@ -1017,77 +1017,131 @@ namespace XinjingdailyBot.Command
                         targetUser.GroupID = groupID;
                         targetUser.ModifyAt = DateTime.Now;
                         await _userService.Updateable(targetUser).UpdateColumns(x => new { x.GroupID, x.ModifyAt }).ExecuteCommandAsync();
-                        return ($"修改用户 {targetUser} 权限组成功, 当前权限组 {group.Name}", null);
+                        return $"修改用户 {targetUser} 权限组成功, 当前权限组 {group.Name}";
                     }
                 }
 
-                return ($"修改用户 {targetUser} 权限组失败, 找不到指定的权限组", null);
+                return $"修改用户 {targetUser} 权限组失败, 找不到指定的权限组";
             }
 
-            (string text, var kbd) = await exec();
-            await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, replyMarkup: kbd);
+            string text = await exec();
+            await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, replyMarkup: null);
+        }
+
+
+        /// <summary>
+        /// 来源频道设置
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        [TextCmd("CHANNELOPTION", UserRights.AdminCmd, Description = "来源频道设置")]
+        public async Task ResponseChannalOption(Users dbUser, Message message)
+        {
+            async Task<(string, InlineKeyboardMarkup?)> exec()
+            {
+                if (message.Chat.Id != _channelService.ReviewGroup.Id)
+                {
+                    return ("该命令仅限审核群内使用", null);
+                }
+
+                if (message.ReplyToMessage == null)
+                {
+                    return ("请回复审核消息并输入拒绝理由", null);
+                }
+
+                var messageId = message.ReplyToMessage.MessageId;
+
+                var post = await _postService.Queryable().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
+
+                if (post == null)
+                {
+                    return ("未找到稿件", null);
+                }
+
+                if (!post.IsFromChannel)
+                {
+                    return ("不是来自其他频道的投稿, 无法设置频道选项", null);
+                }
+
+                var channel = await _channelOptionService.FetchChannelByTitle(post.ChannelTitle);
+
+                if (channel == null)
+                {
+                    return ("未找到对应频道", null);
+                }
+
+                string option = channel.Option switch
+                {
+                    ChannelOption.Normal => "1. 不做特殊处理",
+                    ChannelOption.PurgeOrigin => "2. 抹除频道来源",
+                    ChannelOption.AutoReject => "3. 拒绝此频道的投稿",
+                    _ => "未知的值",
+                };
+
+                var keyboard = _markupHelperService.SetChannelOptionKeyboard(dbUser, channel.ChannelID);
+
+                return ($"请选择针对来自 {channel.ChannelTitle} 的稿件的处理方式\n当前设置: {option}", keyboard);
+            }
+
+            (var text, var kbd) = await exec();
+            await _botClient.SendCommandReply(text, message, autoDelete: false, replyMarkup: kbd);
         }
 
         /// <summary>
         /// 来源频道设置
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="query"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        //public async Task ResponseChannalOption(Users dbUser, Message message, string[] args)
-        //{
-        //    bool autoDelete = true;
-        //    async Task<string> exec()
-        //    {
-        //        var targetUser = await _userService.FetchTargetUser(message);
+        [QueryCmd("CHANNELOPTION", UserRights.AdminCmd, Description = "来源频道设置")]
+        public async Task QResponseChannalOption(Users dbUser, CallbackQuery query, string[] args)
+        {
+            async Task<string> exec()
+            {
+                if (args.Length < 3)
+                {
+                    return "参数有误";
+                }
 
-        //        if (targetUser == null)
-        //        {
-        //            if (args.Any())
-        //            {
-        //                targetUser = await _userService.FetchUserByUserNameOrUserID(args.First());
-        //                args = args[1..];
-        //            }
-        //        }
+                if (!long.TryParse(args[1], out long channelId))
+                {
+                    return "参数有误";
+                }
 
-        //        if (targetUser == null)
-        //        {
-        //            return "找不到指定用户";
-        //        }
+                ChannelOption? option = args[2] switch
+                {
+                    "normal" => ChannelOption.Normal,
+                    "purgeorigin" => ChannelOption.PurgeOrigin,
+                    "autoreject" => ChannelOption.AutoReject,
+                    _ => null
+                };
 
-        //        if (targetUser.UserID == dbUser.UserID)
-        //        {
-        //            return "为什么有人想要自己回复自己?";
-        //        }
+                string optionStr = option switch
+                {
+                    ChannelOption.Normal => "不做特殊处理",
+                    ChannelOption.PurgeOrigin => "抹除频道来源",
+                    ChannelOption.AutoReject => "拒绝此频道的投稿",
+                    _ => "未知的值",
+                };
 
-        //        if (targetUser.PrivateChatID <= 0)
-        //        {
-        //            return "该用户尚未私聊过机器人, 无法发送消息";
-        //        }
+                if (option == null)
+                {
+                    return $"未知的频道选项 {args[2]}";
+                }
 
-        //        string msg = string.Join(' ', args).Trim();
+                var channel = await _channelOptionService.UpdateChannelOptionById(channelId, option.Value);
 
-        //        if (string.IsNullOrEmpty(msg))
-        //        {
-        //            return "请输入回复内容";
-        //        }
+                if (channel == null)
+                {
+                    return $"找不到频道 {channelId}";
+                }
 
-        //        autoDelete = false;
-        //        try
-        //        {
-        //            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"来自管理员的消息:\n<code>{msg.EscapeHtml()}</code>", ParseMode.Html);
-        //            return "消息发送成功";
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            return $"消息发送失败 {ex.Message}";
-        //        }
-        //    }
+                return $"来自 {channel.ChannelTitle} 频道的稿件今后将被 {optionStr}";
+            }
 
-        //    string text = await exec();
-        //    await _botClient.SendCommandReply(text, message, autoDelete);
-        //}
-
-
+            string text = await exec();
+            await _botClient.EditMessageTextAsync(query.Message!, text, replyMarkup: null);
+        }
     }
 }

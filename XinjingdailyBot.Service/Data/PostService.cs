@@ -52,7 +52,7 @@ namespace XinjingdailyBot.Service.Data
         /// <summary>
         /// 文字投稿长度上限
         /// </summary>
-        private static readonly int MaxPostText = 2000;
+        public int MaxPostText { get; } = 2000;
 
         /// <summary>
         /// 处理文字投稿
@@ -79,7 +79,7 @@ namespace XinjingdailyBot.Service.Data
                 return;
             }
 
-            if (message.Text!.Length > MaxPostText)
+            if (message.Text.Length > MaxPostText)
             {
                 await _botClient.AutoReplyAsync($"文本长度超过上限 {MaxPostText}, 无法创建投稿", message);
                 return;
@@ -90,9 +90,19 @@ namespace XinjingdailyBot.Service.Data
             if (message.ForwardFromChat?.Type == ChatType.Channel)
             {
                 long channelId = message.ForwardFromChat.Id;
-                channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
+                //非管理员禁止从自己的频道转发
+                if (!dbUser.Right.HasFlag(UserRights.ReviewPost))
+                {
+                    if (channelId == _channelService.AcceptChannel.Id || channelId == _channelService.RejectChannel.Id)
+                    {
+                        await _botClient.AutoReplyAsync("禁止从发布频道或者拒稿频道转载投稿内容", message);
+                        return;
+                    }
+                }
+
                 channelTitle = message.ForwardFromChat.Title;
-                channelOption = await _channelOptionService.FetchChannelOption(channelId, channelName, channelTitle);
+                channelOption = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
+                channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
             }
 
             BuildInTags tags = _textHelperService.FetchTags(message.Text);
@@ -179,9 +189,19 @@ namespace XinjingdailyBot.Service.Data
             if (message.ForwardFromChat?.Type == ChatType.Channel)
             {
                 long channelId = message.ForwardFromChat.Id;
-                channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
+                //非管理员禁止从自己的频道转发
+                if (!dbUser.Right.HasFlag(UserRights.ReviewPost))
+                {
+                    if (channelId == _channelService.AcceptChannel.Id || channelId == _channelService.RejectChannel.Id)
+                    {
+                        await _botClient.AutoReplyAsync("禁止从发布频道或者拒稿频道转载投稿内容", message);
+                        return;
+                    }
+                }
+
                 channelTitle = message.ForwardFromChat.Title;
-                channelOption = await _channelOptionService.FetchChannelOption(channelId, channelName, channelTitle);
+                channelOption = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
+                channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
             }
 
             BuildInTags tags = _textHelperService.FetchTags(message.Caption);
@@ -288,9 +308,19 @@ namespace XinjingdailyBot.Service.Data
                     if (message.ForwardFromChat?.Type == ChatType.Channel)
                     {
                         long channelId = message.ForwardFromChat.Id;
-                        channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
+                        //非管理员禁止从自己的频道转发
+                        if (!dbUser.Right.HasFlag(UserRights.ReviewPost))
+                        {
+                            if (channelId == _channelService.AcceptChannel.Id || channelId == _channelService.RejectChannel.Id)
+                            {
+                                await _botClient.AutoReplyAsync("禁止从发布频道或者拒稿频道转载投稿内容", message);
+                                return;
+                            }
+                        }
+
                         channelTitle = message.ForwardFromChat.Title;
-                        channelOption = await _channelOptionService.FetchChannelOption(channelId, channelName, channelTitle);
+                        channelOption = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
+                        channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
                     }
 
                     BuildInTags tags = _textHelperService.FetchTags(message.Caption);

@@ -41,5 +41,34 @@ namespace XinjingdailyBot.Service.Data
 
             return channel.Option;
         }
+
+        /// <summary>
+        /// 通过频道名称获取频道ID
+        /// </summary>
+        /// <param name="channelTitle"></param>
+        /// <returns></returns>
+        public async Task<ChannelOptions?> FetchChannelByTitle(string channelTitle)
+        {
+            var channel = await Queryable().Where(x => x.ChannelTitle == channelTitle).FirstAsync();
+            return channel;
+        }
+
+        /// <summary>
+        /// 更新频道设定
+        /// </summary>
+        /// <param name="channelId"></param>
+        /// <param name="channelOption"></param>
+        /// <returns></returns>
+        public async Task<ChannelOptions?> UpdateChannelOptionById(long channelId, ChannelOption channelOption)
+        {
+            var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync();
+            if (channel != null)
+            {
+                channel.Option = channelOption;
+                channel.ModifyAt = DateTime.Now;
+                await Updateable(channel).ExecuteCommandAsync();
+            }
+            return channel;
+        }
     }
 }

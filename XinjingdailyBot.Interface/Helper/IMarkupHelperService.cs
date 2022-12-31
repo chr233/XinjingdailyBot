@@ -10,6 +10,7 @@ namespace XinjingdailyBot.Interface.Helper
         InlineKeyboardMarkup PostKeyboard(bool anymouse);
         InlineKeyboardMarkup ReviewKeyboardA(BuildInTags tag);
         InlineKeyboardMarkup ReviewKeyboardB();
+        InlineKeyboardMarkup? SetChannelOptionKeyboard(Users dbUser, long channelId);
         Task<InlineKeyboardMarkup?> SetUserGroupKeyboard(Users dbUser, Users targetUser);
         InlineKeyboardMarkup? UserListPageKeyboard(Users dbUser, string query, int current, int total);
     }

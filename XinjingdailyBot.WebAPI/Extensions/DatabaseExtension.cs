@@ -29,7 +29,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
             {
                 ConfigId = 0,
                 ConnectionString = connStr,
-                DbType = dbConfig.UseMySQL ? IocDbType.MySql : IocDbType.Sqlite,
+                DbType = dbConfig.UseMySQL ? IocDbType.MySqlConnector : IocDbType.Sqlite,
                 IsAutoCloseConnection = true//自动释放
             });
 
@@ -65,7 +65,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
                         _logger.Info("开始创建 {type} 表", type);
                         db.CodeFirst.InitTables(type);
                     }
-                    _logger.Info("数据库结构生成完毕, 建议禁用 Database.Generate 来加快启动速度");
+                    _logger.Warn("数据库结构生成完毕, 建议禁用 Database.Generate 来加快启动速度");
                 }
 
                 IsFirstLoad = false;

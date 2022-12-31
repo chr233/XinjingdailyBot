@@ -6,6 +6,8 @@ namespace XinjingdailyBot.Interface.Data
 {
     public interface IPostService : IBaseService<Posts>
     {
+        int MaxPostText { get; }
+
         Task AcceptPost(Posts post, Users dbUser, CallbackQuery callbackQuery);
         Task HandleMediaGroupPosts(Users dbUser, Message message);
         Task HandleMediaPosts(Users dbUser, Message message);
