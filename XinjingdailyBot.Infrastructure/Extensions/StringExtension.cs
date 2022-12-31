@@ -1,7 +1,4 @@
-﻿using System.Text;
-using System.Text.RegularExpressions;
-
-namespace XinjingdailyBot.Infrastructure.Extensions
+﻿namespace XinjingdailyBot.Infrastructure.Extensions
 {
     public static class StringExtension
     {

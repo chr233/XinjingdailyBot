@@ -10,7 +10,7 @@
     },
     "XinjingdailyBot.WebAPI": {
       "commandName": "Project",
-      "workingDirectory": "bin\\Debug\\$(TargetFramework)",
+      "workingDirectory": "bin",
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

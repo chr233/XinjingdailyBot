@@ -75,5 +75,10 @@
         /// 超级管理
         /// </summary>
         SuperAdmin = Admin | SuperCmd,
+
+        /// <summary>
+        /// 全部权限
+        /// </summary>
+        ALL = SendPost | ReviewPost | DirectPost | NormalCmd | AdminCmd | SuperCmd | Mars
     }
 }

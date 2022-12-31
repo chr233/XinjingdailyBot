@@ -12,13 +12,16 @@ namespace XinjingdailyBot.Service.Bot.Common
     {
         private readonly IMessageHandler _messageHandler;
         private readonly ICommandHandler _commandHandler;
+        private readonly IChannelPostHandler _channelPostHandler;
 
         public DispatcherService(
             IMessageHandler messageHandler,
-            ICommandHandler commandHandler)
+            ICommandHandler commandHandler,
+            IChannelPostHandler channelPostHandler)
         {
             _messageHandler = messageHandler;
             _commandHandler = commandHandler;
+            _channelPostHandler = channelPostHandler;
         }
 
         /// <summary>
@@ -59,15 +62,13 @@ namespace XinjingdailyBot.Service.Bot.Common
         {
             var handler = message.Type switch
             {
-                MessageType.Text => message.Text!.StartsWith("/") ?
-                    _commandHandler.OnCommandReceived(dbUser, message) :
-                    _messageHandler.OnTextMessageReceived(dbUser, message),
-                MessageType.Photo => _messageHandler.OnMediaMessageReceived(dbUser, message),
-                MessageType.Audio => _messageHandler.OnMediaMessageReceived(dbUser, message),
-                MessageType.Video => _messageHandler.OnMediaMessageReceived(dbUser, message),
-                MessageType.Voice => _messageHandler.OnMediaMessageReceived(dbUser, message),
-                MessageType.Document => _messageHandler.OnMediaMessageReceived(dbUser, message),
-                MessageType.Sticker => _messageHandler.OnMediaMessageReceived(dbUser, message),
+                MessageType.Text => _channelPostHandler.OnTextChannelPostReceived(dbUser, message),
+                MessageType.Photo => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
+                MessageType.Audio => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
+                MessageType.Video => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
+                MessageType.Voice => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
+                MessageType.Document => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
+                MessageType.Sticker => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
                 _ => null,
             };
 
