@@ -34,7 +34,7 @@ jobs:
         run: dotnet restore ${{ env.PROJECT_NAME }} -p:ContinuousIntegrationBuild=true --nologo
 
       - name: Publish ${{ env.PROJECT_NAME }} ${{ matrix.arch }}
-        run: dotnet publish ${{ env.PROJECT_NAME }} --runtime ${{ matrix.arch }} -p:PublishSingleFile=true --self-contained true -o ./tmp/${{ env.PROJECT_NAME }} -c Release
+        run: dotnet publish ${{ env.PROJECT_NAME }} --runtime ${{ matrix.arch }} -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true --self-contained true -c Release -o ./tmp/${{ env.PROJECT_NAME }}
 
       - name: Zip files
         run: 7z a -bd -slp -tzip -mm=Deflate -mx=5 -mfb=150 -mpass=10 "./dist/${{ matrix.arch }}.zip" "./tmp/${{ env.PROJECT_NAME }}/*"

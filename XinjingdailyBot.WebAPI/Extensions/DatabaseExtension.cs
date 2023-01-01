@@ -29,7 +29,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
             {
                 ConfigId = 0,
                 ConnectionString = connStr,
-                DbType = dbConfig.UseMySQL ? IocDbType.MySqlConnector : IocDbType.Sqlite,
+                DbType = dbConfig.UseMySQL ? IocDbType.MySql : IocDbType.Sqlite,
                 IsAutoCloseConnection = true//自动释放
             });
 
