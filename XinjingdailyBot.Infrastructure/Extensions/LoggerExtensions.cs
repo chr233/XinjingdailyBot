@@ -60,13 +60,13 @@ namespace XinjingdailyBot.Infrastructure.Extensions
             string chatFrom = chat.Type switch
             {
                 ChatType.Private => $"私聊",
-                ChatType.Group => $"群组-{chat.Title}",
-                ChatType.Channel => $"频道-{chat.Title}",
-                ChatType.Supergroup => $"群组-{chat.Title}",
-                _ => $"未知-{chat.Title}",
+                ChatType.Group => $"群组 {chat.Title}",
+                ChatType.Channel => $"频道 {chat.Title}",
+                ChatType.Supergroup => $"群组 {chat.Title}",
+                _ => $"未知 {chat.Title}",
             };
 
-            string user = message.From?.FullName() ?? "未知";
+            string user = message.From?.UserToString() ?? "未知";
 
             logger.LogInformation("M {chatFrom} {user} {content}", chatFrom, user, content);
         }

@@ -19,6 +19,18 @@ namespace XinjingdailyBot.Infrastructure.Extensions
             return $"{user.EscapedNickName()} {user.UserID()}";
         }
 
+        public static string UserToString(this User user)
+        {
+            if (string.IsNullOrEmpty(user.Username))
+            {
+                return $"{user.FullName()}(#{user.Id})";
+            }
+            else
+            {
+                return $"{user.FullName()}(@{user.Username})";
+            }
+        }
+
         /// <summary>
         /// HTML转义后的用户名
         /// </summary>

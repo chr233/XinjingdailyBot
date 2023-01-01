@@ -1,8 +1,11 @@
-﻿using Telegram.Bot.Types;
+﻿using Microsoft.Extensions.Logging;
+using Telegram.Bot;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
+using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Common
@@ -10,21 +13,55 @@ namespace XinjingdailyBot.Service.Bot.Common
     [AppService(ServiceType = typeof(IDispatcherService), ServiceLifetime = LifeTime.Scoped)]
     internal class DispatcherService : IDispatcherService
     {
+        private readonly ILogger<DispatcherService> _logger;
         private readonly IMessageHandler _messageHandler;
         private readonly ICommandHandler _commandHandler;
         private readonly IChannelPostHandler _channelPostHandler;
         private readonly IChannelService _channelService;
+        private readonly ITextHelperService _textHelperService;
+        private readonly ITelegramBotClient _botClient;
 
         public DispatcherService(
+            ILogger<DispatcherService> logger,
             IMessageHandler messageHandler,
             ICommandHandler commandHandler,
             IChannelPostHandler channelPostHandler,
-            IChannelService channelService)
+            IChannelService channelService,
+            ITextHelperService textHelperService,
+            ITelegramBotClient botClient)
         {
+            _logger = logger;
             _messageHandler = messageHandler;
             _commandHandler = commandHandler;
             _channelPostHandler = channelPostHandler;
             _channelService = channelService;
+            _textHelperService = textHelperService;
+            _botClient = botClient;
+        }
+
+        /// <summary>
+        /// 删除子频道中的NSFW消息以及取消置顶其他消息
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        private async Task UnPinMessage(Message message)
+        {
+            try
+            {
+                if (message.Text == _textHelperService.NSFWWrning)
+                {
+                    await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+                }
+                else
+                {
+
+                    await _botClient.UnpinChatMessageAsync(message.Chat.Id, message.MessageId);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("取消置顶出错", ex);
+            }
         }
 
         /// <summary>
@@ -35,23 +72,39 @@ namespace XinjingdailyBot.Service.Bot.Common
         /// <returns></returns>
         public async Task OnMessageReceived(Users dbUser, Message message)
         {
-            var handler = message.Type switch
+            if (dbUser.UserID == 777000 && (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup))
             {
-                MessageType.Text => message.Text!.StartsWith("/") ?
-                    _commandHandler.OnCommandReceived(dbUser, message) :
-                    _messageHandler.OnTextMessageReceived(dbUser, message),
-                MessageType.Photo => _messageHandler.OnMediaMessageReceived(dbUser, message),
-                MessageType.Audio => _messageHandler.OnMediaMessageReceived(dbUser, message),
-                MessageType.Video => _messageHandler.OnMediaMessageReceived(dbUser, message),
-                MessageType.Voice => _messageHandler.OnMediaMessageReceived(dbUser, message),
-                MessageType.Document => _messageHandler.OnMediaMessageReceived(dbUser, message),
-                MessageType.Sticker => _messageHandler.OnMediaMessageReceived(dbUser, message),
-                _ => null,
-            };
+                if (message.Chat.Id == _channelService.SubGroup.Id || message.Chat.Id == _channelService.CommentGroup.Id)
+                {
+                    await UnPinMessage(message);
+                    return;
+                }
+            }
 
-            if (handler != null)
+            if (message.Type == MessageType.Text && message.Text!.StartsWith("/"))
             {
-                await handler;
+                //处理命令
+                await _commandHandler.OnCommandReceived(dbUser, message);
+            }
+            else
+            {
+                //处理私聊投稿以及群聊消息
+                var handler = message.Type switch
+                {
+                    MessageType.Text => _messageHandler.OnTextMessageReceived(dbUser, message),
+                    MessageType.Photo => _messageHandler.OnMediaMessageReceived(dbUser, message),
+                    MessageType.Audio => _messageHandler.OnMediaMessageReceived(dbUser, message),
+                    MessageType.Video => _messageHandler.OnMediaMessageReceived(dbUser, message),
+                    MessageType.Voice => _messageHandler.OnMediaMessageReceived(dbUser, message),
+                    MessageType.Document => _messageHandler.OnMediaMessageReceived(dbUser, message),
+                    MessageType.Sticker => _messageHandler.OnMediaMessageReceived(dbUser, message),
+                    _ => null,
+                };
+
+                if (handler != null)
+                {
+                    await handler;
+                }
             }
         }
 
