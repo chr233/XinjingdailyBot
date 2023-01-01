@@ -140,7 +140,7 @@ namespace XinjingdailyBot.Command
         /// <param name="dbUser"></param>
         /// <param name="callbackQuery"></param>
         /// <returns></returns>
-        [QueryCmd("REVIEW", UserRights.ReviewPost, Description = "审核稿件")]
+        [QueryCmd("REVIEW", UserRights.ReviewPost, Alias = "REJECT", Description = "审核稿件")]
         public async Task HandleQuery(Users dbUser, CallbackQuery callbackQuery)
         {
             Message message = callbackQuery.Message!;
