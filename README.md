@@ -1,7 +1,7 @@
 # Xinjingdaily Bot
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/67ca08867b7a4afda91db3b70bcd303c)](https://www.codacy.com/gh/chr233/XinjingdailyBot/dashboard?utm_source=github.com&utm_medium=referral&utm_content=chr233/XinjingdailyBot&utm_campaign=Badge_Grade)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/chr233/XinjingdailyBot/workflows/Publish.yml?branch=master&logo=github)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/chr233/XinjingdailyBot/publish.yml?logo=github)
 [![License](https://img.shields.io/github/license/chr233/XinjingdailyBot?logo=apache)](https://github.com/chr233/XinjingdailyBot/blob/master/license)
 ![GitHub last commit](https://img.shields.io/github/last-commit/chr233/XinjingdailyBot?logo=github)
 
