@@ -496,7 +496,7 @@ namespace XinjingdailyBot.Service.Helper
 
             foreach (var index in indexList)
             {
-                sb.Insert(index, tagMap[index]);
+                sb.Insert(index, tagMap[index].ToString());
             }
 
             return PureText(sb.ToString());
