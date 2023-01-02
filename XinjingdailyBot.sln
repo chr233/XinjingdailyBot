@@ -57,6 +57,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0. 杂项文件", "0. 杂�
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XinjingdailyBot.Command", "XinjingdailyBot.Command\XinjingdailyBot.Command.csproj", "{617EC3CE-8307-41BC-A4A5-D437CCA261AB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XinjingdailyBot.Tasks", "XinjingdailyBot.Tasks\XinjingdailyBot.Tasks.csproj", "{6880F608-F263-473C-9B04-7C9F9972C1ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +93,10 @@ Global
 		{617EC3CE-8307-41BC-A4A5-D437CCA261AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{617EC3CE-8307-41BC-A4A5-D437CCA261AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{617EC3CE-8307-41BC-A4A5-D437CCA261AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6880F608-F263-473C-9B04-7C9F9972C1ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6880F608-F263-473C-9B04-7C9F9972C1ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6880F608-F263-473C-9B04-7C9F9972C1ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6880F608-F263-473C-9B04-7C9F9972C1ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -103,6 +109,7 @@ Global
 		{A2F7CC83-7936-436A-9511-BAE2F975F79C} = {CB9524EF-39C6-4752-9620-46FCC300F6E4}
 		{5C52EE96-9EE9-4AFA-8E3B-F4187C195B83} = {CB9524EF-39C6-4752-9620-46FCC300F6E4}
 		{617EC3CE-8307-41BC-A4A5-D437CCA261AB} = {CB9524EF-39C6-4752-9620-46FCC300F6E4}
+		{6880F608-F263-473C-9B04-7C9F9972C1ED} = {CB9524EF-39C6-4752-9620-46FCC300F6E4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E88F67A6-85E8-4E55-A7BB-925F8B9CE69F}
