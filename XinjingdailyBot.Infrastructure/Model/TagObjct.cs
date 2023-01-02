@@ -8,9 +8,12 @@
         {
             Content = new();
         }
-        public TagObjct(string content) : this()
+        public TagObjct(string content)
         {
-            Content.Add(content);
+            Content = new()
+            {
+                content
+            };
         }
 
         public void AddLast(string value)
@@ -21,6 +24,11 @@
         public void AddFirst(string value)
         {
             Content.Insert(0, value);
+        }
+
+        public override string? ToString()
+        {
+            return string.Join("", Content);
         }
     }
 }
