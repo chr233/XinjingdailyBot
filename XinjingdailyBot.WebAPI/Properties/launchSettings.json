@@ -11,12 +11,22 @@
     "XinjingdailyBot.WebAPI": {
       "commandName": "Project",
       "workingDirectory": "bin",
+      "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5136"
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "launchUrl": "http://localhost:5136/swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:5136"
+      },
+      "distributionName": ""
     }
   },
   "$schema": "https://json.schemastore.org/launchsettings.json",
