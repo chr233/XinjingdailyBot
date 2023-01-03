@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -14,423 +15,441 @@ using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
 
-namespace XinjingdailyBot.Service.Bot.Handler;
-
-
-[AppService(ServiceType = typeof(ICommandHandler), ServiceLifetime = LifeTime.Singleton)]
-public class CommandHandler : ICommandHandler
+namespace XinjingdailyBot.Service.Bot.Handler
 {
-    private readonly ILogger<CommandHandler> _logger;
-    private readonly IChannelService _channelService;
-    private readonly ITelegramBotClient _botClient;
-    private readonly IServiceScope _serviceScope;
-    private readonly ICmdRecordService _cmdRecordService;
-    private readonly OptionsSetting _optionsSetting;
 
-    public CommandHandler(
-        ILogger<CommandHandler> logger,
-        IChannelService channelService,
-        IServiceProvider serviceProvider,
-        ITelegramBotClient botClient,
-        ICmdRecordService cmdRecordService,
-        IOptions<OptionsSetting> options)
+    /// <summary>
+    /// 命令处理器
+    /// </summary>
+    [AppService(ServiceType = typeof(ICommandHandler), ServiceLifetime = LifeTime.Singleton)]
+    public class CommandHandler : ICommandHandler
     {
-        _logger = logger;
-        _channelService = channelService;
-        _serviceScope = serviceProvider.CreateScope();
-        _botClient = botClient;
-        _cmdRecordService = cmdRecordService;
-        _optionsSetting = options.Value;
-    }
+        private readonly ILogger<CommandHandler> _logger;
+        private readonly IChannelService _channelService;
+        private readonly ITelegramBotClient _botClient;
+        private readonly IServiceScope _serviceScope;
+        private readonly ICmdRecordService _cmdRecordService;
+        private readonly OptionsSetting _optionsSetting;
 
-    /// <summary>
-    /// 指令方法名映射
-    /// </summary>
-    private readonly Dictionary<Type, Dictionary<string, AssemblyMethod>> _commandClass = new();
-    /// <summary>
-    /// 指令别名
-    /// </summary>
-    private readonly Dictionary<Type, Dictionary<string, string>> _commandAlias = new();
-
-    /// <summary>
-    /// Query指令方法名映射
-    /// </summary>
-    private readonly Dictionary<Type, Dictionary<string, AssemblyMethod>> _queryCommandClass = new();
-    /// <summary>
-    /// Query指令别名
-    /// </summary>
-    private readonly Dictionary<Type, Dictionary<string, string>> _queryCommandAlias = new();
-
-    /// <summary>
-    /// 注册命令
-    /// </summary>
-    //[RequiresUnreferencedCode()]
-    public void InstallCommands()
-    {
-        //获取所有服务方法
-        var assembly = Assembly.Load("XinjingdailyBot.Command");
-        foreach (var type in assembly.GetTypes())
+        public CommandHandler(
+            ILogger<CommandHandler> logger,
+            IChannelService channelService,
+            IServiceProvider serviceProvider,
+            ITelegramBotClient botClient,
+            ICmdRecordService cmdRecordService,
+            IOptions<OptionsSetting> options)
         {
-            RegisterCommands(type);
+            _logger = logger;
+            _channelService = channelService;
+            _serviceScope = serviceProvider.CreateScope();
+            _botClient = botClient;
+            _cmdRecordService = cmdRecordService;
+            _optionsSetting = options.Value;
         }
-    }
 
-    /// <summary>
-    /// 注册命令
-    /// </summary>
-    /// <param name="type"></param>
-    private void RegisterCommands(Type type)
-    {
-        Dictionary<string, AssemblyMethod> commands = new();
-        Dictionary<string, string> commandAlias = new();
-        Dictionary<string, AssemblyMethod> queryCommands = new();
-        Dictionary<string, string> queryAlias = new();
+        /// <summary>
+        /// 指令方法名映射
+        /// </summary>
+        private readonly Dictionary<Type, Dictionary<string, AssemblyMethod>> _commandClass = new();
+        /// <summary>
+        /// 指令别名
+        /// </summary>
+        private readonly Dictionary<Type, Dictionary<string, string>> _commandAlias = new();
 
-        foreach (var method in type.GetMethods())
+        /// <summary>
+        /// Query指令方法名映射
+        /// </summary>
+        private readonly Dictionary<Type, Dictionary<string, AssemblyMethod>> _queryCommandClass = new();
+        /// <summary>
+        /// Query指令别名
+        /// </summary>
+        private readonly Dictionary<Type, Dictionary<string, string>> _queryCommandAlias = new();
+
+        /// <summary>
+        /// 注册命令
+        /// </summary>
+        //[RequiresUnreferencedCode()]
+        public void InstallCommands()
         {
-            var textAttribute = method.GetCustomAttribute<TextCmdAttribute>();
-
-            //注册文字命令
-            if (textAttribute != null)
+            //获取所有服务方法
+            var assembly = Assembly.Load("XinjingdailyBot.Command");
+            foreach (var type in assembly.GetTypes())
             {
-                var command = textAttribute.Command.ToUpperInvariant();
-                var alias = textAttribute.Alias?.ToUpperInvariant();
-                var description = textAttribute.Description;
-                var rights = textAttribute.Rights;
-                commands.Add(command, new(method, description, rights));
+                RegisterCommands(type);
+            }
+        }
 
-                //添加别名
-                if (!string.IsNullOrEmpty(alias))
+        /// <summary>
+        /// 注册命令
+        /// </summary>
+        /// <param name="type"></param>
+        private void RegisterCommands(Type type)
+        {
+            Dictionary<string, AssemblyMethod> commands = new();
+            Dictionary<string, string> commandAlias = new();
+            Dictionary<string, AssemblyMethod> queryCommands = new();
+            Dictionary<string, string> queryAlias = new();
+
+            foreach (var method in type.GetMethods())
+            {
+                var textAttribute = method.GetCustomAttribute<TextCmdAttribute>();
+
+                //注册文字命令
+                if (textAttribute != null)
                 {
-                    var splitedAlias = alias.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var split in splitedAlias)
+                    var command = textAttribute.Command.ToUpperInvariant();
+                    var alias = textAttribute.Alias?.ToUpperInvariant();
+                    var description = textAttribute.Description;
+                    var rights = textAttribute.Rights;
+                    commands.Add(command, new(method, description, rights));
+
+                    //添加别名
+                    if (!string.IsNullOrEmpty(alias))
                     {
-                        commandAlias.Add(split, command);
+                        var splitedAlias = alias.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (var split in splitedAlias)
+                        {
+                            commandAlias.Add(split, command);
+                        }
+                    }
+                }
+
+                var queryAttribute = method.GetCustomAttribute<QueryCmdAttribute>();
+
+                //注册Query命令
+                if (queryAttribute != null)
+                {
+                    var command = queryAttribute.Command.ToUpperInvariant();
+                    var alias = queryAttribute.Alias?.ToUpperInvariant();
+                    var description = queryAttribute.Description;
+                    var rights = queryAttribute.Rights;
+                    queryCommands.Add(command, new(method, description, rights));
+
+                    //添加别名
+                    if (!string.IsNullOrEmpty(alias))
+                    {
+                        var splitedAlias = alias.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (var split in splitedAlias)
+                        {
+                            queryAlias.Add(split, command);
+                        }
                     }
                 }
             }
 
-            var queryAttribute = method.GetCustomAttribute<QueryCmdAttribute>();
-
-            //注册Query命令
-            if (queryAttribute != null)
+            if (commands.Count > 0)
             {
-                var command = queryAttribute.Command.ToUpperInvariant();
-                var alias = queryAttribute.Alias?.ToUpperInvariant();
-                var description = queryAttribute.Description;
-                var rights = queryAttribute.Rights;
-                queryCommands.Add(command, new(method, description, rights));
+                _commandClass.Add(type, commands);
+                _commandAlias.Add(type, commandAlias);
+            }
 
-                //添加别名
-                if (!string.IsNullOrEmpty(alias))
-                {
-                    var splitedAlias = alias.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var split in splitedAlias)
-                    {
-                        queryAlias.Add(split, command);
-                    }
-                }
+            if (queryCommands.Count > 0)
+            {
+                _queryCommandClass.Add(type, queryCommands);
+                _queryCommandAlias.Add(type, queryAlias);
             }
         }
 
-        if (commands.Count > 0)
+        /// <summary>
+        /// 执行命令
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public async Task OnCommandReceived(Users dbUser, Message message)
         {
-            _commandClass.Add(type, commands);
-            _commandAlias.Add(type, commandAlias);
-        }
-
-        if (queryCommands.Count > 0)
-        {
-            _queryCommandClass.Add(type, queryCommands);
-            _queryCommandAlias.Add(type, queryAlias);
-        }
-    }
-
-    /// <summary>
-    /// 执行命令
-    /// </summary>
-    /// <param name="dbUser"></param>
-    /// <param name="message"></param>
-    /// <returns></returns>
-    public async Task OnCommandReceived(Users dbUser, Message message)
-    {
-        if (string.IsNullOrEmpty(message.Text))
-        {
-            return;
-        }
-
-        //切分命令参数
-        string[] args = message.Text!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
-        string cmd = args.First()[1..].ToUpperInvariant();
-        bool inGroup = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
-
-        //判断是不是艾特机器人的命令
-        bool IsAtMe = false;
-        int index = cmd.IndexOf('@');
-        if (inGroup && index > -1)
-        {
-            string botName = cmd[(index + 1)..];
-            if (botName.Equals(_channelService.BotUser.Username, StringComparison.OrdinalIgnoreCase))
-            {
-                cmd = cmd[..index];
-                IsAtMe = true;
-            }
-            else
+            if (string.IsNullOrEmpty(message.Text))
             {
                 return;
             }
-        }
 
-        bool handled = false;
-        string? errorMsg = null;
-        //寻找注册的命令处理器
-        foreach (var type in _commandClass.Keys)
-        {
-            var allAlias = _commandAlias[type];
-            if (allAlias.TryGetValue(cmd, out var alias))
-            {
-                cmd = alias;
-            }
+            //切分命令参数
+            string[] args = message.Text!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
+            string cmd = args.First()[1..].ToUpperInvariant();
+            bool inGroup = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
 
-            var allMethods = _commandClass[type];
-            if (allMethods.TryGetValue(cmd, out var method))
+            //判断是不是艾特机器人的命令
+            bool IsAtMe = false;
+            int index = cmd.IndexOf('@');
+            if (inGroup && index > -1)
             {
-                try
+                string botName = cmd[(index + 1)..];
+                if (botName.Equals(_channelService.BotUser.Username, StringComparison.OrdinalIgnoreCase))
                 {
-                    await CallCommandAsync(dbUser, message, type, method);
+                    cmd = cmd[..index];
+                    IsAtMe = true;
                 }
-                catch (Exception ex) //无法捕获 TODO
+                else
                 {
-                    errorMsg = $"{ex.GetType} {ex.Message}";
-
-                    await _botClient.SendCommandReply(_optionsSetting.Debug ? errorMsg : "遇到内部错误", message);
+                    return;
                 }
-                handled = true;
-                break;
+            }
+
+            bool handled = false;
+            string? errorMsg = null;
+            //寻找注册的命令处理器
+            foreach (var type in _commandClass.Keys)
+            {
+                var allAlias = _commandAlias[type];
+                if (allAlias.TryGetValue(cmd, out var alias))
+                {
+                    cmd = alias;
+                }
+
+                var allMethods = _commandClass[type];
+                if (allMethods.TryGetValue(cmd, out var method))
+                {
+                    try
+                    {
+                        await CallCommandAsync(dbUser, message, type, method);
+
+                        //删除原消息
+                        _ = Task.Run(async () =>
+                        {
+                            await Task.Delay(TimeSpan.FromSeconds(30));
+                            try
+                            {
+                                await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+                            }
+                            catch
+                            {
+                                _logger.LogError("删除消息 {messageId} 失败", message.MessageId);
+                            }
+                        });
+                    }
+                    catch (Exception ex) //无法捕获 TODO
+                    {
+                        errorMsg = $"{ex.GetType} {ex.Message}";
+
+                        await _botClient.SendCommandReply(_optionsSetting.Debug ? errorMsg : "遇到内部错误", message);
+                    }
+                    handled = true;
+                    break;
+                }
+            }
+
+            await _cmdRecordService.AddCmdRecord(message, dbUser, handled, false, errorMsg);
+
+            if (!handled && ((inGroup && IsAtMe) || (!inGroup)))
+            {
+                await _botClient.SendCommandReply("未知的命令", message);
             }
         }
 
-        await _cmdRecordService.AddCmdRecord(message, dbUser, handled, false, errorMsg);
-
-        if (!handled && ((inGroup && IsAtMe) || (!inGroup)))
+        /// <summary>
+        /// 调用特定命令
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <param name="type"></param>
+        /// <param name="assemblyMethod"></param>
+        /// <returns></returns>
+        private async Task CallCommandAsync(Users dbUser, Message message, Type type, AssemblyMethod assemblyMethod)
         {
-            await _botClient.SendCommandReply("未知的命令", message);
-        }
-    }
-
-    /// <summary>
-    /// 调用特定命令
-    /// </summary>
-    /// <param name="dbUser"></param>
-    /// <param name="message"></param>
-    /// <param name="type"></param>
-    /// <param name="assemblyMethod"></param>
-    /// <returns></returns>
-    private async Task CallCommandAsync(Users dbUser, Message message, Type type, AssemblyMethod assemblyMethod)
-    {
-        //权限检查
-        if (!dbUser.Right.HasFlag(assemblyMethod.Rights))
-        {
-            await _botClient.SendCommandReply("没有权限这么做", message);
-            return;
-        }
-
-        //获取服务
-        var service = _serviceScope.ServiceProvider.GetRequiredService(type);
-        var method = assemblyMethod.Method;
-        List<object> methodParameters = new();
-        //组装函数的入参
-        foreach (var parameter in method.GetParameters())
-        {
-            switch (parameter.ParameterType.Name)
+            //权限检查
+            if (!dbUser.Right.HasFlag(assemblyMethod.Rights))
             {
-                case nameof(Users):
-                    methodParameters.Add(dbUser);
-                    break;
-                case nameof(Message):
-                    methodParameters.Add(message);
-                    break;
-                case "String[]":
-                    string[] args = message.Text!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
-                    methodParameters.Add(args[1..]);
-                    break;
-
-                default:
-                    _logger.LogDebug("{paramName}", parameter.ParameterType.Name);
-                    break;
+                await _botClient.SendCommandReply("没有权限这么做", message);
+                return;
             }
-        }
-        //调用方法
-        method.Invoke(service, methodParameters.ToArray());
-    }
 
-    /// <summary>
-    /// 执行命令
-    /// </summary>
-    /// <param name="dbUser"></param>
-    /// <param name="query"></param>
-    /// <returns></returns>
-    public async Task OnQueryCommandReceived(Users dbUser, CallbackQuery query)
-    {
-        Message? message = query.Message;
-        if (message == null)
-        {
-            await _botClient.AutoReplyAsync("消息不存在", query);
-            return;
-        }
-
-        if (string.IsNullOrEmpty(query.Data))
-        {
-            await _botClient.RemoveMessageReplyMarkupAsync(message);
-            return;
-        }
-
-        //切分命令参数
-        string[] args = query.Data!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
-        string cmd = args.First().ToUpperInvariant();
-
-        if (cmd == "CMD")
-        {
-            if (args.Length < 2 || !long.TryParse(args[1], out long userID))
+            //获取服务
+            var service = _serviceScope.ServiceProvider.GetRequiredService(type);
+            var method = assemblyMethod.Method;
+            List<object> methodParameters = new();
+            //组装函数的入参
+            foreach (var parameter in method.GetParameters())
             {
-                await _botClient.AutoReplyAsync("Payload 非法", query);
+                switch (parameter.ParameterType.Name)
+                {
+                    case nameof(Users):
+                        methodParameters.Add(dbUser);
+                        break;
+                    case nameof(Message):
+                        methodParameters.Add(message);
+                        break;
+                    case "String[]":
+                        string[] args = message.Text!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
+                        methodParameters.Add(args[1..]);
+                        break;
+
+                    default:
+                        _logger.LogDebug("{paramName}", parameter.ParameterType.Name);
+                        break;
+                }
+            }
+            //调用方法
+            method.Invoke(service, methodParameters.ToArray());
+        }
+
+        /// <summary>
+        /// 执行命令
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task OnQueryCommandReceived(Users dbUser, CallbackQuery query)
+        {
+            Message? message = query.Message;
+            if (message == null)
+            {
+                await _botClient.AutoReplyAsync("消息不存在", query);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(query.Data))
+            {
                 await _botClient.RemoveMessageReplyMarkupAsync(message);
                 return;
             }
 
-            //判断消息发起人是不是同一个
-            if (dbUser.UserID != userID)
+            //切分命令参数
+            string[] args = query.Data!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
+            string cmd = args.First().ToUpperInvariant();
+
+            if (cmd == "CMD")
             {
-                await _botClient.AutoReplyAsync("这不是你的消息, 请不要瞎点", query);
+                if (args.Length < 2 || !long.TryParse(args[1], out long userID))
+                {
+                    await _botClient.AutoReplyAsync("Payload 非法", query);
+                    await _botClient.RemoveMessageReplyMarkupAsync(message);
+                    return;
+                }
+
+                //判断消息发起人是不是同一个
+                if (dbUser.UserID != userID)
+                {
+                    await _botClient.AutoReplyAsync("这不是你的消息, 请不要瞎点", query);
+                    return;
+                }
+
+                args = args[2..];
+                cmd = args.First().ToUpperInvariant();
+            }
+
+            bool handled = false;
+            string? errorMsg = null;
+            //寻找注册的命令处理器
+            foreach (var type in _queryCommandClass.Keys)
+            {
+                var allAlias = _queryCommandAlias[type];
+                if (allAlias.TryGetValue(cmd, out var alias))
+                {
+                    cmd = alias;
+                }
+
+                var allMethods = _queryCommandClass[type];
+                if (allMethods.TryGetValue(cmd, out var method))
+                {
+                    try
+                    {
+                        await CallQueryCommandAsync(dbUser, query, type, method, args);
+                    }
+                    catch (Exception ex) //无法捕获 TODO
+                    {
+                        errorMsg = $"{ex.GetType} {ex.Message}";
+
+                        await _botClient.AutoReplyAsync(_optionsSetting.Debug ? errorMsg : "遇到内部错误", query);
+                    }
+                    handled = true;
+                    break;
+                }
+            }
+
+            await _cmdRecordService.AddCmdRecord(query, dbUser, handled, true, errorMsg);
+
+            if (!handled)
+            {
+                if (_optionsSetting.Debug)
+                {
+                    await _botClient.AutoReplyAsync($"未知的命令 [{query.Data}]", query);
+                }
+                else
+                {
+                    await _botClient.AutoReplyAsync("未知的命令", query);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 调用特定命令
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="query"></param>
+        /// <param name="type"></param>
+        /// <param name="assemblyMethod"></param>
+        /// <returns></returns>
+        private async Task CallQueryCommandAsync(Users dbUser, CallbackQuery query, Type type, AssemblyMethod assemblyMethod, string[] args)
+        {
+            //权限检查
+            if (!dbUser.Right.HasFlag(assemblyMethod.Rights))
+            {
+                await _botClient.AutoReplyAsync("没有权限这么做", query);
                 return;
             }
 
-            args = args[2..];
-            cmd = args.First().ToUpperInvariant();
-        }
-
-        bool handled = false;
-        string? errorMsg = null;
-        //寻找注册的命令处理器
-        foreach (var type in _queryCommandClass.Keys)
-        {
-            var allAlias = _queryCommandAlias[type];
-            if (allAlias.TryGetValue(cmd, out var alias))
+            //获取服务
+            var service = _serviceScope.ServiceProvider.GetRequiredService(type);
+            var method = assemblyMethod.Method;
+            List<object> methodParameters = new();
+            //组装函数的入参
+            foreach (var parameter in method.GetParameters())
             {
-                cmd = alias;
-            }
-
-            var allMethods = _queryCommandClass[type];
-            if (allMethods.TryGetValue(cmd, out var method))
-            {
-                try
+                switch (parameter.ParameterType.Name)
                 {
-                    await CallQueryCommandAsync(dbUser, query, type, method, args);
+                    case nameof(Users):
+                        methodParameters.Add(dbUser);
+                        break;
+                    case nameof(CallbackQuery):
+                        methodParameters.Add(query);
+                        break;
+                    case "String[]":
+                        methodParameters.Add(args);
+                        break;
+
+                    default:
+                        _logger.LogDebug("{paramName}", parameter.ParameterType.Name);
+                        break;
                 }
-                catch (Exception ex) //无法捕获 TODO
+            }
+            //调用方法
+            method.Invoke(service, methodParameters.ToArray());
+        }
+
+        /// <summary>
+        /// 生成可用命令信息
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <returns></returns>
+        public string GetAvilabeCommands(Users dbUser)
+        {
+            Dictionary<string, string> cmds = new();
+
+            foreach (var type in _commandClass.Keys)
+            {
+                var allMethods = _commandClass[type];
+                foreach (var cmd in allMethods.Keys)
                 {
-                    errorMsg = $"{ex.GetType} {ex.Message}";
+                    var method = allMethods[cmd];
 
-                    await _botClient.AutoReplyAsync(_optionsSetting.Debug ? errorMsg : "遇到内部错误", query);
-                }
-                handled = true;
-                break;
-            }
-        }
-
-        await _cmdRecordService.AddCmdRecord(query, dbUser, handled, true, errorMsg);
-
-        if (!handled)
-        {
-            if (_optionsSetting.Debug)
-            {
-                await _botClient.AutoReplyAsync($"未知的命令 [{query.Data}]", query);
-            }
-            else
-            {
-                await _botClient.AutoReplyAsync("未知的命令", query);
-            }
-        }
-    }
-
-    /// <summary>
-    /// 调用特定命令
-    /// </summary>
-    /// <param name="dbUser"></param>
-    /// <param name="query"></param>
-    /// <param name="type"></param>
-    /// <param name="assemblyMethod"></param>
-    /// <returns></returns>
-    private async Task CallQueryCommandAsync(Users dbUser, CallbackQuery query, Type type, AssemblyMethod assemblyMethod, string[] args)
-    {
-        //权限检查
-        if (!dbUser.Right.HasFlag(assemblyMethod.Rights))
-        {
-            await _botClient.AutoReplyAsync("没有权限这么做", query);
-            return;
-        }
-
-        //获取服务
-        var service = _serviceScope.ServiceProvider.GetRequiredService(type);
-        var method = assemblyMethod.Method;
-        List<object> methodParameters = new();
-        //组装函数的入参
-        foreach (var parameter in method.GetParameters())
-        {
-            switch (parameter.ParameterType.Name)
-            {
-                case nameof(Users):
-                    methodParameters.Add(dbUser);
-                    break;
-                case nameof(CallbackQuery):
-                    methodParameters.Add(query);
-                    break;
-                case "String[]":
-                    methodParameters.Add(args);
-                    break;
-
-                default:
-                    _logger.LogDebug("{paramName}", parameter.ParameterType.Name);
-                    break;
-            }
-        }
-        //调用方法
-        method.Invoke(service, methodParameters.ToArray());
-    }
-
-    /// <summary>
-    /// 生成可用命令信息
-    /// </summary>
-    /// <param name="dbUser"></param>
-    /// <returns></returns>
-    public string GetAvilabeCommands(Users dbUser)
-    {
-        Dictionary<string, string> cmds = new();
-
-        foreach (var type in _commandClass.Keys)
-        {
-            var allMethods = _commandClass[type];
-            foreach (var cmd in allMethods.Keys)
-            {
-                var method = allMethods[cmd];
-
-                if (dbUser.Right.HasFlag(method.Rights))
-                {
-                    if (!string.IsNullOrEmpty(method.Description))
+                    if (dbUser.Right.HasFlag(method.Rights))
                     {
-                        cmds.Add(cmd.ToLowerInvariant(), method.Description);
+                        if (!string.IsNullOrEmpty(method.Description))
+                        {
+                            cmds.Add(cmd.ToLowerInvariant(), method.Description);
+                        }
                     }
                 }
             }
-        }
 
-        if (cmds.Count > 0)
-        {
-            return string.Join('\n', cmds.OrderBy(x => x.Key).Select(x => $"/{x.Key} - {x.Value}"));
-        }
-        else
-        {
-            return "没有可用命令";
+            if (cmds.Count > 0)
+            {
+                return string.Join('\n', cmds.OrderBy(x => x.Key).Select(x => $"/{x.Key} - {x.Value}"));
+            }
+            else
+            {
+                return "没有可用命令";
+            }
         }
     }
 }

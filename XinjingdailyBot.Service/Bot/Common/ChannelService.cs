@@ -32,7 +32,7 @@ namespace XinjingdailyBot.Service.Bot.Common
         User IChannelService.BotUser { get => _botUser; }
 
         public ChannelService(
-           ILogger<ChannelService> logger,
+            ILogger<ChannelService> logger,
             ITelegramBotClient botClient,
             IOptions<OptionsSetting> optionsSetting)
         {
