@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Service.Bot.Common;
-using XinjingdailyBot.Service.Tasks;
 
 namespace XinjingdailyBot.WebAPI.Extensions
 {
@@ -21,6 +20,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 HttpClient? httpClient = null;
                 if (!string.IsNullOrEmpty(proxy))
                 {
+                    _logger.Info("已配置代理: {0}", proxy);
                     httpClient = new(
                         new HttpClientHandler
                         {
