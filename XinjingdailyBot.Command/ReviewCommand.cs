@@ -295,7 +295,11 @@ namespace XinjingdailyBot.Command
                 await _botClient.AutoReplyAsync("请选择拒稿原因", callbackQuery);
             }
 
-            var keyboard = rejectMode ? _markupHelperService.ReviewKeyboardB() : _markupHelperService.ReviewKeyboardA(post.Tags);
+            bool hasSpoiler = post.Tags.HasFlag(BuildInTags.Spoiler);
+
+            var keyboard = rejectMode ?
+                _markupHelperService.ReviewKeyboardB() :
+                (hasSpoiler ? _markupHelperService.ReviewKeyboardAWithSpoiler(post.Tags) : _markupHelperService.ReviewKeyboardA(post.Tags));
 
             await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, keyboard);
         }
