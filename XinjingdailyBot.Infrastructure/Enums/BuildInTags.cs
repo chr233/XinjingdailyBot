@@ -26,5 +26,9 @@
         /// AI怪图
         /// </summary>
         AIGraph = 8,
+        /// <summary>
+        /// 遮罩
+        /// </summary>
+        Spoiler = 16
     }
 }

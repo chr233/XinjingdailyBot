@@ -115,6 +115,24 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
+        ///   查找类似 🖼️ 的本地化字符串。
+        /// </summary>
+        public static string SpoilerOff {
+            get {
+                return ResourceManager.GetString("SpoilerOff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 ⚠️ 的本地化字符串。
+        /// </summary>
+        public static string SpoilerOn {
+            get {
+                return ResourceManager.GetString("SpoilerOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 🤔 的本地化字符串。
         /// </summary>
         public static string Thinking {

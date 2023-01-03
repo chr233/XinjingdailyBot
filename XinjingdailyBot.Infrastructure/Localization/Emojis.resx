@@ -135,6 +135,12 @@
   <data name="Orange" xml:space="preserve">
     <value>🔶</value>
   </data>
+  <data name="SpoilerOff" xml:space="preserve">
+    <value>🖼️</value>
+  </data>
+  <data name="SpoilerOn" xml:space="preserve">
+    <value>⚠️</value>
+  </data>
   <data name="Thinking" xml:space="preserve">
     <value>🤔</value>
   </data>

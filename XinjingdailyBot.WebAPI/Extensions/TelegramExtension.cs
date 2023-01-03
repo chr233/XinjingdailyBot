@@ -43,9 +43,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
             });
 
             services.AddHostedService<PollingService>();
-            services.AddHostedService<TaskService>();
+            //services.AddHostedService<TaskService>();
         }
-
     }
-
 }
