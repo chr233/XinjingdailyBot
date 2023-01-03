@@ -1,6 +1,7 @@
 {
   "profiles": {
     "IIS Express": {
+      "workingDirectory": "bin",
       "commandName": "IISExpress",
       "launchBrowser": true,
       "launchUrl": "swagger",
@@ -26,7 +27,9 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_URLS": "http://localhost:5136"
       },
-      "distributionName": ""
+      "distributionName": "",
+      "workingDirectory": "{ProjectDir}/bin",
+      "launchBrowser": true
     }
   },
   "$schema": "https://json.schemastore.org/launchsettings.json",

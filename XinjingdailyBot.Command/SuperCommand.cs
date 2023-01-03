@@ -47,24 +47,17 @@ namespace XinjingdailyBot.Command
         [TextCmd("RESTART", UserRights.SuperCmd, Description = "重启机器人")]
         public async Task ResponseRestart(Message message)
         {
-            _ = Task.Run(async () =>
+            try
             {
-                try
-                {
-                    Process.Start(Environment.ProcessPath!);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("遇到错误", ex);
-                }
-
-                await Task.Delay(2000);
-
+                Process.Start(Environment.ProcessPath!);
+                await _botClient.SendCommandReply("机器人即将重启", message);
                 Environment.Exit(0);
-            });
-
-            var text = "机器人即将重启";
-            await _botClient.SendCommandReply(text, message);
+            }
+            catch (Exception ex)
+            {
+                await _botClient.SendCommandReply("启动进程遇到错误", message);
+                _logger.LogError("启动进程遇到错误", ex);
+            }
         }
 
         /// <summary>

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace XinjingdailyBot.Service.Tasks
+namespace XinjingdailyBot.Service.Bot.Common
 {
     public class TaskService : IHostedService, IDisposable
     {
