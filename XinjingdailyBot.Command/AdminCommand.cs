@@ -445,7 +445,7 @@ namespace XinjingdailyBot.Command
                         if (targetUser.PrivateChatID > 0)
                         {
                             var msg = string.Format(Langs.WarnUserTips, reason, warnCount, WarningLimit);
-                            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg, ParseMode.Html);
+                            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg,parseMode: ParseMode.Html);
 
                             if (warnCount >= WarningLimit)
                             {
@@ -600,7 +600,7 @@ namespace XinjingdailyBot.Command
                 autoDelete = false;
                 try
                 {
-                    await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"来自管理员的消息:\n<code>{msg.EscapeHtml()}</code>", ParseMode.Html);
+                    await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"来自管理员的消息:\n<code>{msg.EscapeHtml()}</code>", parseMode: ParseMode.Html);
                     return "消息发送成功";
                 }
                 catch (Exception ex)

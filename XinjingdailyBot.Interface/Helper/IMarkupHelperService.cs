@@ -7,8 +7,10 @@ namespace XinjingdailyBot.Interface.Helper
     public interface IMarkupHelperService
     {
         InlineKeyboardMarkup DirectPostKeyboard(bool anymouse, BuildInTags tag);
+        InlineKeyboardMarkup DirectPostKeyboardWithSpoiler(bool anymouse, BuildInTags tag);
         InlineKeyboardMarkup PostKeyboard(bool anymouse);
         InlineKeyboardMarkup ReviewKeyboardA(BuildInTags tag);
+        InlineKeyboardMarkup ReviewKeyboardAWithSpoiler(BuildInTags tag);
         InlineKeyboardMarkup ReviewKeyboardB();
         InlineKeyboardMarkup? SetChannelOptionKeyboard(Users dbUser, long channelId);
         Task<InlineKeyboardMarkup?> SetUserGroupKeyboard(Users dbUser, Users targetUser);

@@ -151,10 +151,10 @@ namespace XinjingdailyBot.Command
 
                     group[i] = attachmentType switch
                     {
-                        MessageType.Photo => new InputMediaPhoto(attachments[i].FileID) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
-                        MessageType.Audio => new InputMediaAudio(attachments[i].FileID) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
-                        MessageType.Video => new InputMediaVideo(attachments[i].FileID) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
-                        MessageType.Document => new InputMediaDocument(attachments[i].FileID) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
+                        MessageType.Photo => new InputMediaPhoto(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
+                        MessageType.Audio => new InputMediaAudio(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
+                        MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
+                        MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
                         _ => throw new Exception(),
                     };
                 }
@@ -164,9 +164,10 @@ namespace XinjingdailyBot.Command
 
             string msg = _textHelperService.MakeReviewMessage(dbUser, post.Anonymous);
 
-            var keyboard = _markupHelperService.ReviewKeyboardA(post.Tags);
+            bool hasSpoiler = post.PostType == MessageType.Photo || post.PostType == MessageType.Video;
+            var keyboard = hasSpoiler ? _markupHelperService.ReviewKeyboardAWithSpoiler(post.Tags) : _markupHelperService.ReviewKeyboardA(post.Tags);
 
-            Message manageMsg = await _botClient.SendTextMessageAsync(_channelService.ReviewGroup.Id, msg, ParseMode.Html, disableWebPagePreview: true, replyToMessageId: reviewMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+            Message manageMsg = await _botClient.SendTextMessageAsync(_channelService.ReviewGroup.Id, msg, parseMode: ParseMode.Html, disableWebPagePreview: true, replyToMessageId: reviewMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
             post.ReviewMsgID = reviewMsg.MessageId;
             post.ManageMsgID = manageMsg.MessageId;

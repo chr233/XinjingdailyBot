@@ -114,6 +114,11 @@ namespace XinjingdailyBot.Service.Bot.Handler
             BuildInTags tags = _textHelperService.FetchTags(message.Caption);
             string text = _textHelperService.ParseMessage(message);
 
+            if (message.HasMediaSpoiler == true)
+            {
+                tags |= BuildInTags.Spoiler;
+            }
+
             //生成数据库实体
             Posts newPost = new()
             {
@@ -182,6 +187,11 @@ namespace XinjingdailyBot.Service.Bot.Handler
 
                     BuildInTags tags = _textHelperService.FetchTags(message.Caption);
                     string text = _textHelperService.ParseMessage(message);
+
+                    if (message.HasMediaSpoiler == true)
+                    {
+                        tags |= BuildInTags.Spoiler;
+                    }
 
                     //生成数据库实体
                     Posts newPost = new()

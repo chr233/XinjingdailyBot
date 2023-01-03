@@ -112,6 +112,7 @@ namespace XinjingdailyBot.Service.Data
 
             //直接发布模式
             bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
+
             //发送确认消息
             var keyboard = directPost ? _markupHelperService.DirectPostKeyboard(anonymous, tags) : _markupHelperService.PostKeyboard(anonymous);
             string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
@@ -207,12 +208,21 @@ namespace XinjingdailyBot.Service.Data
             BuildInTags tags = _textHelperService.FetchTags(message.Caption);
             string text = _textHelperService.ParseMessage(message);
 
+            if (message.HasMediaSpoiler == true)
+            {
+                tags |= BuildInTags.Spoiler;
+            }
+
             bool anonymous = dbUser.PreferAnonymous;
 
             //直接发布模式
             bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
+            bool hasSpoiler = message.Type == MessageType.Photo || message.Type == MessageType.Video;
+
             //发送确认消息
-            var keyboard = directPost ? _markupHelperService.DirectPostKeyboard(anonymous, tags) : _markupHelperService.PostKeyboard(anonymous);
+            var keyboard = directPost ?
+                (hasSpoiler ? _markupHelperService.DirectPostKeyboardWithSpoiler(anonymous, tags) : _markupHelperService.DirectPostKeyboard(anonymous, tags)) :
+               _markupHelperService.PostKeyboard(anonymous);
             string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
             //生成数据库实体
@@ -328,11 +338,18 @@ namespace XinjingdailyBot.Service.Data
 
                     bool anonymous = dbUser.PreferAnonymous;
 
+                    if (message.HasMediaSpoiler == true)
+                    {
+                        tags |= BuildInTags.Spoiler;
+                    }
+
                     //直接发布模式
                     bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
+                    bool hasSpoiler = message.Type == MessageType.Photo || message.Type == MessageType.Video;
 
                     //发送确认消息
-                    var keyboard = directPost ? _markupHelperService.DirectPostKeyboard(anonymous, tags) : _markupHelperService.PostKeyboard(anonymous);
+                    var keyboard = directPost ? (hasSpoiler ? _markupHelperService.DirectPostKeyboardWithSpoiler(anonymous, tags) :
+                        _markupHelperService.DirectPostKeyboard(anonymous, tags)) : _markupHelperService.PostKeyboard(anonymous);
                     string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
                     Message msg = await _botClient.SendTextMessageAsync(message.Chat.Id, "处理中, 请稍后", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
@@ -452,7 +469,13 @@ namespace XinjingdailyBot.Service.Data
 
             await _botClient.AutoReplyAsync(string.Join(' ', tagNames), callbackQuery);
 
-            var keyboard = post.IsDirectPost ?
+            bool hasSpoiler = post.PostType == MessageType.Photo || post.PostType == MessageType.Video;
+
+            var keyboard = hasSpoiler ?
+                post.IsDirectPost ?
+                _markupHelperService.DirectPostKeyboardWithSpoiler(post.Anonymous, post.Tags) :
+                _markupHelperService.ReviewKeyboardAWithSpoiler(post.Tags) :
+                post.IsDirectPost ?
                 _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags) :
                 _markupHelperService.ReviewKeyboardA(post.Tags);
             await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, keyboard);
@@ -496,10 +519,10 @@ namespace XinjingdailyBot.Service.Data
                     }
                     group[i] = attachmentType switch
                     {
-                        MessageType.Photo => new InputMediaPhoto(attachments[i].FileID),
-                        MessageType.Audio => new InputMediaAudio(attachments[i].FileID),
-                        MessageType.Video => new InputMediaVideo(attachments[i].FileID),
-                        MessageType.Document => new InputMediaDocument(attachments[i].FileID),
+                        MessageType.Photo => new InputMediaPhoto(new InputFileId(attachments[i].FileID)),
+                        MessageType.Audio => new InputMediaAudio(new InputFileId(attachments[i].FileID)),
+                        MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)),
+                        MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)),
                         _ => throw new Exception(),
                     };
                 }
@@ -543,6 +566,8 @@ namespace XinjingdailyBot.Service.Data
 
             string postText = _textHelperService.MakePostText(post, poster);
 
+            bool hasSpoiler = post.Tags.HasFlag(BuildInTags.Spoiler);
+
             //发布频道发布消息
             if (!post.IsMediaGroup)
             {
@@ -554,7 +579,7 @@ namespace XinjingdailyBot.Service.Data
                 Message msg;
                 if (post.PostType == MessageType.Text)
                 {
-                    msg = await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, postText, ParseMode.Html, disableWebPagePreview: true);
+                    msg = await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, postText, parseMode: ParseMode.Html, disableWebPagePreview: true);
                 }
                 else
                 {
@@ -563,16 +588,16 @@ namespace XinjingdailyBot.Service.Data
                     switch (post.PostType)
                     {
                         case MessageType.Photo:
-                            msg = await _botClient.SendPhotoAsync(_channelService.AcceptChannel.Id, attachment.FileID, postText, ParseMode.Html);
+                            msg = await _botClient.SendPhotoAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler);
                             break;
                         case MessageType.Audio:
-                            msg = await _botClient.SendAudioAsync(_channelService.AcceptChannel.Id, attachment.FileID, postText, ParseMode.Html, title: attachment.FileName);
+                            msg = await _botClient.SendAudioAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html, title: attachment.FileName);
                             break;
                         case MessageType.Video:
-                            msg = await _botClient.SendVideoAsync(_channelService.AcceptChannel.Id, attachment.FileID, caption: postText, parseMode: ParseMode.Html);
+                            msg = await _botClient.SendVideoAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler);
                             break;
                         case MessageType.Document:
-                            msg = await _botClient.SendDocumentAsync(_channelService.AcceptChannel.Id, attachment.FileID, caption: postText, parseMode: ParseMode.Html);
+                            msg = await _botClient.SendDocumentAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html);
                             break;
                         default:
                             await _botClient.AutoReplyAsync($"不支持的稿件类型: {post.PostType}", callbackQuery);
@@ -594,10 +619,10 @@ namespace XinjingdailyBot.Service.Data
                     }
                     group[i] = attachmentType switch
                     {
-                        MessageType.Photo => new InputMediaPhoto(attachments[i].FileID) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
-                        MessageType.Audio => new InputMediaAudio(attachments[i].FileID) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
-                        MessageType.Video => new InputMediaVideo(attachments[i].FileID) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
-                        MessageType.Document => new InputMediaDocument(attachments[i].FileID) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
+                        MessageType.Photo => new InputMediaPhoto(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html, HasSpoiler = hasSpoiler },
+                        MessageType.Audio => new InputMediaAudio(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
+                        MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html, HasSpoiler = hasSpoiler },
+                        MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
                         _ => throw new Exception(),
                     };
                 }
@@ -637,7 +662,7 @@ namespace XinjingdailyBot.Service.Data
 
             if (poster.Notification && poster.UserID != dbUser.UserID)//启用通知并且审核与投稿不是同一个人
             {//单独发送通知消息
-                await _botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, ParseMode.Html, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true, disableWebPagePreview: true);
+                await _botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, parseMode: ParseMode.Html, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true, disableWebPagePreview: true);
             }
             else
             {//静默模式, 不单独发送通知消息

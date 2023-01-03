@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
     <PackageReference Include="NLog" Version="5.1.1" />
-    <PackageReference Include="Telegram.Bot" Version="18.0.0" />
+    <PackageReference Include="Telegram.Bot" Version="19.0.0-preview.2" />
   </ItemGroup>
 
   <ItemGroup>

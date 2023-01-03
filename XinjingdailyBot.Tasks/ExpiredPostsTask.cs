@@ -110,7 +110,7 @@ namespace XinjingdailyBot.Tasks
 
                         try
                         {
-                            await botClient.SendTextMessageAsync(user.PrivateChatID, sb.ToString(), ParseMode.Html, disableNotification: true);
+                            await botClient.SendTextMessageAsync(user.PrivateChatID, sb.ToString(), parseMode: ParseMode.Html, disableNotification: true);
                             await Task.Delay(100);
                         }
                         catch (Exception ex)

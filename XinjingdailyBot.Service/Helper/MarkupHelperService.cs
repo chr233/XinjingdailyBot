@@ -28,11 +28,13 @@ namespace XinjingdailyBot.Service.Helper
         private static readonly string TagFriendOn = "#我有一个朋友";
         private static readonly string TagWanAnOn = "#晚安";
         private static readonly string TagAIGraphOn = "#AI怪图";
+        private static readonly string TagSpoilerOn = Emojis.SpoilerOn + "开启遮罩";
 
         private static readonly string TagNSFWOff = "#N___";
         private static readonly string TagFriendOff = "#我_____";
         private static readonly string TagWanAnOff = "#晚_";
         private static readonly string TagAIGraphOff = "#A___";
+        private static readonly string TagSpoilerOff = Emojis.SpoilerOff + "禁用遮罩";
 
         private static readonly string ReviewReject = Emojis.No + "拒绝";
         private static readonly string ReviewAccept = Emojis.Yes + "采用";
@@ -89,9 +91,42 @@ namespace XinjingdailyBot.Service.Helper
                     InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? TagFriendOn:TagFriendOff, "review tag friend"),
                     InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? TagAIGraphOn:TagAIGraphOff, "review tag ai"),
                 },
-
                 new []
                 {
+                    InlineKeyboardButton.WithCallbackData( anymouse ? AnymouseOn : AnymouseOff, "review anymouse"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData( PostCancel,  "review cancel"),
+                    InlineKeyboardButton.WithCallbackData( ReviewAccept,  "review accept"),
+                },
+            });
+            return keyboard;
+        }
+
+        /// <summary>
+        /// 直接发布投稿键盘
+        /// </summary>
+        /// <param name="anymouse"></param>
+        /// <param name="tag"></param>
+        /// <returns></returns>
+        public InlineKeyboardMarkup DirectPostKeyboardWithSpoiler(bool anymouse, BuildInTags tag)
+        {
+            InlineKeyboardMarkup keyboard = new(new[]
+            {
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData( tag.HasFlag(BuildInTags.NSFW)? TagNSFWOn:TagNSFWOff, "review tag nsfw"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.WanAn)? TagWanAnOn:TagWanAnOff, "review tag wanan"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? TagFriendOn:TagFriendOff, "review tag friend"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? TagAIGraphOn:TagAIGraphOff, "review tag ai"),
+                },
+                new[]
+                {
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Spoiler)? TagSpoilerOn:TagSpoilerOff, "review tag spoiler"),
                     InlineKeyboardButton.WithCallbackData( anymouse ? AnymouseOn : AnymouseOff, "review anymouse"),
                 },
                 new []
@@ -121,6 +156,38 @@ namespace XinjingdailyBot.Service.Helper
                 {
                     InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? TagFriendOn:TagFriendOff, "review tag friend"),
                     InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? TagAIGraphOn:TagAIGraphOff, "review tag ai"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData( ReviewReject,  "review reject"),
+                    InlineKeyboardButton.WithCallbackData( ReviewAccept,  "review accept"),
+                },
+            });
+            return keyboard;
+        }
+        
+        /// <summary>
+        /// 审核键盘A(选择稿件Tag)
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <returns></returns>
+        public InlineKeyboardMarkup ReviewKeyboardAWithSpoiler(BuildInTags tag)
+        {
+            InlineKeyboardMarkup keyboard = new(new[]
+            {
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData( tag.HasFlag(BuildInTags.NSFW)? TagNSFWOn:TagNSFWOff, "review tag nsfw"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.WanAn)? TagWanAnOn:TagWanAnOff, "review tag wanan"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? TagFriendOn:TagFriendOff, "review tag friend"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? TagAIGraphOn:TagAIGraphOff, "review tag ai"),
+                },
+                new[]
+                {
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Spoiler)? TagSpoilerOn:TagSpoilerOff, "review tag spoiler"),
                 },
                 new []
                 {

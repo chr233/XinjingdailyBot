@@ -51,7 +51,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
             ParseMode? parsemode = null,
             CancellationToken cancellationToken = default)
         {
-            return await botClient.SendTextMessageAsync(message.Chat.Id, text, parsemode, replyToMessageId: message.MessageId, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
+            return await botClient.SendTextMessageAsync(message.Chat.Id, text, parseMode: parsemode, replyToMessageId: message.MessageId, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
             //私聊始终不删除消息, 群聊中默认删除消息, 但可以指定不删除
             bool delete = (autoDelete != null ? autoDelete.Value : (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup)) && message.Chat.Type != ChatType.Private;
 
-            var msg = await botClient.SendTextMessageAsync(message.Chat.Id, text, parsemode, replyToMessageId: message.MessageId, replyMarkup: replyMarkup, disableWebPagePreview: true, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
+            var msg = await botClient.SendTextMessageAsync(message.Chat.Id, text, parseMode: parsemode, replyToMessageId: message.MessageId, replyMarkup: replyMarkup, disableWebPagePreview: true, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
 
             if (delete)
             {
