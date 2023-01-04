@@ -1,6 +1,4 @@
-﻿using XinjingdailyBot.Infrastructure.Enums;
-
-namespace XinjingdailyBot.Infrastructure.Attribute
+﻿namespace XinjingdailyBot.Infrastructure.Attribute
 {
 
     /// <summary>

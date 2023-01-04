@@ -67,6 +67,7 @@ namespace XinjingdailyBot.Service.Data
                 UpdateType.EditedChannelPost => update.EditedChannelPost!.Chat,
                 UpdateType.Message => update.Message!.Chat,
                 UpdateType.EditedMessage => update.EditedMessage!.Chat,
+                UpdateType.ChatJoinRequest => update.ChatJoinRequest!.Chat,
                 _ => null
             };
 
@@ -87,6 +88,7 @@ namespace XinjingdailyBot.Service.Data
                     UpdateType.CallbackQuery => update.CallbackQuery!.From,
                     UpdateType.InlineQuery => update.InlineQuery!.From,
                     UpdateType.ChosenInlineResult => update.ChosenInlineResult!.From,
+                    UpdateType.ChatJoinRequest => update.ChatJoinRequest!.From,
                     _ => null
                 };
 

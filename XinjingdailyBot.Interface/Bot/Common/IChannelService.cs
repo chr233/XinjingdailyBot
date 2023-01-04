@@ -12,5 +12,7 @@ namespace XinjingdailyBot.Interface.Bot.Common
         User BotUser { get; }
 
         Task InitChannelInfo();
+        bool IsChannelMessage(long chatId);
+        bool IsGroupMessage(long chatId);
     }
 }

@@ -1,9 +1,8 @@
 ﻿using System.Text;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot;
-using XinjingdailyBot.Infrastructure.Enums;
-using XinjingdailyBot.Model.Models;
 using Microsoft.Extensions.Logging;
+using Telegram.Bot;
+using Telegram.Bot.Types.Enums;
+using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Data;
 
 namespace XinjingdailyBot.Tasks
