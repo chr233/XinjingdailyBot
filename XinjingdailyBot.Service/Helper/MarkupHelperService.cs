@@ -165,7 +165,7 @@ namespace XinjingdailyBot.Service.Helper
             });
             return keyboard;
         }
-        
+
         /// <summary>
         /// 审核键盘A(选择稿件Tag)
         /// </summary>

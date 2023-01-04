@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -68,7 +67,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
         /// <summary>
         /// 注册命令
         /// </summary>
-        //[RequiresUnreferencedCode()]
         public void InstallCommands()
         {
             //获取所有服务方法
@@ -203,19 +201,22 @@ namespace XinjingdailyBot.Service.Bot.Handler
                     {
                         await CallCommandAsync(dbUser, message, type, method);
 
-                        //删除原消息
-                        _ = Task.Run(async () =>
+                        if (_channelService.IsGroupMessage(message.Chat.Id))
                         {
-                            await Task.Delay(TimeSpan.FromSeconds(30));
-                            try
+                            //删除原消息
+                            _ = Task.Run(async () =>
                             {
-                                await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
-                            }
-                            catch
-                            {
-                                _logger.LogError("删除消息 {messageId} 失败", message.MessageId);
-                            }
-                        });
+                                await Task.Delay(TimeSpan.FromSeconds(30));
+                                try
+                                {
+                                    await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+                                }
+                                catch
+                                {
+                                    _logger.LogError("删除消息 {messageId} 失败", message.MessageId);
+                                }
+                            });
+                        }
                     }
                     catch (Exception ex) //无法捕获 TODO
                     {

@@ -472,12 +472,12 @@ namespace XinjingdailyBot.Service.Data
             bool hasSpoiler = post.PostType == MessageType.Photo || post.PostType == MessageType.Video;
 
             var keyboard = hasSpoiler ?
-                post.IsDirectPost ?
-                _markupHelperService.DirectPostKeyboardWithSpoiler(post.Anonymous, post.Tags) :
-                _markupHelperService.ReviewKeyboardAWithSpoiler(post.Tags) :
-                post.IsDirectPost ?
-                _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags) :
-                _markupHelperService.ReviewKeyboardA(post.Tags);
+                (post.IsDirectPost ?
+                    _markupHelperService.DirectPostKeyboardWithSpoiler(post.Anonymous, post.Tags) :
+                    _markupHelperService.ReviewKeyboardAWithSpoiler(post.Tags)) :
+                (post.IsDirectPost ?
+                    _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags) :
+                    _markupHelperService.ReviewKeyboardA(post.Tags));
             await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, keyboard);
         }
 

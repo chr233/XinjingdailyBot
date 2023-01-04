@@ -20,6 +20,7 @@ namespace XinjingdailyBot.Service.Bot.Common
         private readonly IChannelService _channelService;
         private readonly ITextHelperService _textHelperService;
         private readonly ITelegramBotClient _botClient;
+        private readonly IJoinRequestHandler _joinRequestHandler;
 
         public DispatcherService(
             ILogger<DispatcherService> logger,
@@ -28,7 +29,8 @@ namespace XinjingdailyBot.Service.Bot.Common
             IChannelPostHandler channelPostHandler,
             IChannelService channelService,
             ITextHelperService textHelperService,
-            ITelegramBotClient botClient)
+            ITelegramBotClient botClient,
+            IJoinRequestHandler joinRequestHandler)
         {
             _logger = logger;
             _messageHandler = messageHandler;
@@ -37,6 +39,7 @@ namespace XinjingdailyBot.Service.Bot.Common
             _channelService = channelService;
             _textHelperService = textHelperService;
             _botClient = botClient;
+            _joinRequestHandler = joinRequestHandler;
         }
 
         /// <summary>
@@ -147,6 +150,20 @@ namespace XinjingdailyBot.Service.Bot.Common
         public async Task OnCallbackQueryReceived(Users dbUser, CallbackQuery query)
         {
             await _commandHandler.OnQueryCommandReceived(dbUser, query);
+        }
+
+        /// <summary>
+        /// 收到加群请求
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task OnJoinRequestReceived(Users dbUser, ChatJoinRequest request)
+        {
+            if (_channelService.IsGroupMessage(request.Chat.Id))
+            {
+                await _joinRequestHandler.OnJoinRequestReceived(dbUser, request);
+            }
         }
     }
 }
