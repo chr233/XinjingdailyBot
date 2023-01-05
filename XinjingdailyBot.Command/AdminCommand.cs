@@ -798,12 +798,25 @@ namespace XinjingdailyBot.Command
             sb.AppendLine();
             sb.AppendLine("-- 硬盘信息 --");
             var drives = DriveInfo.GetDrives();
+
+            string[] sizes = new[] { " B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB" };
+
             foreach (var drive in drives)
             {
                 if (drive.IsReady && drive.TotalSize > 0)
                 {
-                    var freeSpacePerc = (drive.TotalSize - drive.AvailableFreeSpace) / drive.TotalSize * 100.0;
-                    sb.AppendLine($"{drive.Name} {drive.DriveFormat} 已用: {freeSpacePerc:0.00}%");
+                    double usedSize = drive.TotalSize - drive.TotalFreeSpace;
+                    double totalSize = drive.TotalSize;
+                    int i = 0;
+                    while (totalSize > 1024 && i < sizes.Length - 1)
+                    {
+                        usedSize /= 1024;
+                        totalSize /= 1024;
+                        i++;
+                    }
+                    double freeSpacePerc = (drive.TotalSize - drive.TotalFreeSpace) * 100.0 / drive.TotalSize;
+
+                    sb.AppendLine($"{drive.Name} - {drive.DriveFormat} - [ <code>{usedSize:0.00}</code> / <code>{totalSize:0.00}</code> {sizes[i]} <code>{freeSpacePerc:0.0}%</code> ] ");
                 }
             }
 
