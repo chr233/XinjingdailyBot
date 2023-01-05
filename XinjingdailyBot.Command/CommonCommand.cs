@@ -51,7 +51,7 @@ namespace XinjingdailyBot.Command
 
             if (!dbUser.IsBan)
             {
-                sb.AppendLine("发送图片/视频或者文字内容即可投稿");
+                sb.AppendLine(_optionsSetting.Message.Help ?? "发送图片/视频或者文字内容即可投稿");
             }
             else
             {

@@ -1,4 +1,5 @@
 ﻿
+using System.Reflection;
 using NLog.Extensions.Logging;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.WebAPI.Extensions;
@@ -7,8 +8,15 @@ namespace XinjingdailyBot.WebAPI
 {
     public static class Program
     {
+        private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
         public static void Main(string[] args)
         {
+            {
+                var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown";
+                _logger.Info("欢迎使用 XinjingdailyBot Version: {0}", version);
+            }
+
             var builder = WebApplication.CreateBuilder(args);
 
             //配置类支持
