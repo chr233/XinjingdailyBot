@@ -7,6 +7,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Model;
 using XinjingdailyBot.Interface.Bot.Common;
@@ -451,6 +452,46 @@ namespace XinjingdailyBot.Service.Bot.Handler
             {
                 return "没有可用命令";
             }
+        }
+
+        /// <summary>
+        /// 设置菜命令单
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> GetCommandsMenu()
+        {
+            List<BotCommand> cmds = new();
+
+            void AddCommands(UserRights right)
+            {
+                foreach (var type in _commandClass.Keys)
+                {
+                    var allMethods = _commandClass[type];
+                    foreach (var cmd in allMethods.Keys)
+                    {
+                        var method = allMethods[cmd];
+                        if (method.Rights == right)
+                        {
+                            if (!string.IsNullOrEmpty(method.Description))
+                            {
+                                cmds.Add(new BotCommand() { Command = cmd.ToLowerInvariant(), Description = method.Description });
+                            }
+                        }
+                    }
+                }
+            }
+
+            AddCommands(UserRights.None);
+            AddCommands(UserRights.NormalCmd);
+            await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllPrivateChats());
+            await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllGroupChats());
+
+            AddCommands(UserRights.AdminCmd);
+            await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllChatAdministrators());
+
+            AddCommands(UserRights.ReviewPost);
+            await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeChatAdministrators() { ChatId = _channelService.ReviewGroup.Id });
+            return true;
         }
     }
 }
