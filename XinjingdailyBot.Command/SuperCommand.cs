@@ -7,9 +7,11 @@ using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Interface.Bot.Common;
+using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace XinjingdailyBot.Command
 {
@@ -22,6 +24,7 @@ namespace XinjingdailyBot.Command
         private readonly IChannelOptionService _channelOptionService;
         private readonly IChannelService _channelService;
         private readonly IMarkupHelperService _markupHelperService;
+        private readonly ICommandHandler _commandHandler;
 
         public SuperCommand(
             ILogger<SuperCommand> logger,
@@ -29,7 +32,8 @@ namespace XinjingdailyBot.Command
             IPostService postService,
             IChannelOptionService channelOptionService,
             IChannelService channelService,
-            IMarkupHelperService markupHelperService)
+            IMarkupHelperService markupHelperService,
+            ICommandHandler commandHandler)
         {
             _logger = logger;
             _botClient = botClient;
@@ -37,6 +41,7 @@ namespace XinjingdailyBot.Command
             _channelOptionService = channelOptionService;
             _channelService = channelService;
             _markupHelperService = markupHelperService;
+            _commandHandler = commandHandler;
         }
 
         /// <summary>
@@ -174,7 +179,17 @@ namespace XinjingdailyBot.Command
             string text = await exec();
             await _botClient.EditMessageTextAsync(query.Message!, text, replyMarkup: null);
         }
+
+        /// <summary>
+        /// 设置命令菜单
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        [TextCmd("COMMAND", UserRights.SuperCmd, Description = "设置命令菜单")]
+        public async Task ResponseCommand(Message message)
+        {
+            bool result = await _commandHandler.GetCommandsMenu();
+            await _botClient.SendCommandReply(result ? "设置菜单成功" : "设置菜单失败", message, autoDelete: false);
+        }
     }
-
-
 }
