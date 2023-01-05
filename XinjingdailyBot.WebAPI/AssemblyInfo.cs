@@ -3,7 +3,7 @@
 [assembly: CLSCompliant(false)]
 [assembly: AssemblyVersion("2.0.3.3")]
 
-[assembly: AssemblyCopyright("Copyright @ 2022 Chr_")]
+[assembly: AssemblyCopyright("Copyright @ 2023 Chr_")]
 [assembly: AssemblyProduct("XinjingDaily Bot")]
 [assembly: AssemblyCompany("chrxw.com")]
 [assembly: AssemblyTitle("XinjingDaily Bot")]
