@@ -504,7 +504,24 @@ namespace XinjingdailyBot.Service.Data
             //拒稿频道发布消息
             if (!post.IsMediaGroup)
             {
-                await _botClient.CopyMessageAsync(_channelService.RejectChannel.Id, _channelService.ReviewGroup.Id, (int)post.ReviewMsgID);
+                if (post.PostType != MessageType.Text)
+                {
+                    var attachment = await _attachmentService.Queryable().Where(x => x.PostID == post.Id).FirstAsync();
+
+                    var handler = post.PostType switch
+                    {
+                        MessageType.Photo => _botClient.SendPhotoAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
+                        MessageType.Audio => _botClient.SendAudioAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
+                        MessageType.Video => _botClient.SendVideoAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
+                        MessageType.Document => _botClient.SendDocumentAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
+                        _ => throw new Exception("未知的稿件类型"),
+                    };
+
+                    if (handler != null)
+                    {
+                        await handler;
+                    }
+                }
             }
             else
             {
@@ -523,7 +540,7 @@ namespace XinjingdailyBot.Service.Data
                         MessageType.Audio => new InputMediaAudio(new InputFileId(attachments[i].FileID)),
                         MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)),
                         MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)),
-                        _ => throw new Exception(),
+                        _ => throw new Exception("未知的稿件类型"),
                     };
                 }
                 var _ = await _botClient.SendMediaGroupAsync(_channelService.RejectChannel.Id, group);
