@@ -17,7 +17,7 @@ namespace XinjingdailyBot.Service.Helper
         /// <returns></returns>
         public Attachments? GenerateAttachment(Message message, long postID)
         {
-            string? fileID, fileName, FileUid, mimeType;
+            string? fileID, fileName, fileUid, mimeType;
             long size;
             int height, width;
 
@@ -28,7 +28,7 @@ namespace XinjingdailyBot.Service.Helper
                         var x = message.Photo!.Last();
                         fileID = x.FileId;
                         fileName = "";
-                        FileUid = x.FileUniqueId;
+                        fileUid = x.FileUniqueId;
                         mimeType = "";
                         size = x.FileSize ?? 0;
                         height = x.Height;
@@ -40,7 +40,7 @@ namespace XinjingdailyBot.Service.Helper
                         var x = message.Audio!;
                         fileID = x.FileId;
                         fileName = x.Title ?? x.FileName ?? "";
-                        FileUid = x.FileUniqueId;
+                        fileUid = x.FileUniqueId;
                         mimeType = x.MimeType ?? "";
                         size = x.FileSize ?? 0;
                         height = -1;
@@ -53,11 +53,23 @@ namespace XinjingdailyBot.Service.Helper
                         var x = message.Video!;
                         fileID = x.FileId;
                         fileName = x.FileName ?? "";
-                        FileUid = x.FileUniqueId;
+                        fileUid = x.FileUniqueId;
                         mimeType = x.MimeType ?? "";
                         size = x.FileSize ?? 0;
                         height = x.Height;
                         width = x.Width;
+                    }
+                    break;
+                case MessageType.Voice:
+                    {
+                        var x = message.Voice!;
+                        fileID = x.FileId;
+                        fileName = "";
+                        fileUid = x.FileUniqueId;
+                        mimeType = "";
+                        size = x.FileSize ?? 0;
+                        height = -1;
+                        width = -1;
                     }
                     break;
                 case MessageType.Document:
@@ -65,14 +77,25 @@ namespace XinjingdailyBot.Service.Helper
                         var x = message.Document!;
                         fileID = x.FileId;
                         fileName = x.FileName ?? "";
-                        FileUid = x.FileUniqueId;
+                        fileUid = x.FileUniqueId;
                         mimeType = x.MimeType ?? "";
                         size = x.FileSize ?? 0;
                         height = -1;
                         width = -1;
                     }
                     break;
-
+                case MessageType.Animation:
+                    {
+                        var x = message.Animation!;
+                        fileID = x.FileId;
+                        fileName = x.FileName ?? "";
+                        fileUid = x.FileUniqueId;
+                        mimeType = x.MimeType ?? "";
+                        size = x.FileSize ?? 0;
+                        height = x.Height;
+                        width = x.Width;
+                    }
+                    break;
                 default:
                     return null;
             }
@@ -82,7 +105,7 @@ namespace XinjingdailyBot.Service.Helper
                 PostID = postID,
                 FileID = fileID,
                 FileName = fileName,
-                FileUniqueID = FileUid,
+                FileUniqueID = fileUid,
                 MimeType = mimeType,
                 Size = size,
                 Height = height,

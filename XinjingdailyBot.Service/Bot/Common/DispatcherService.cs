@@ -92,17 +92,7 @@ namespace XinjingdailyBot.Service.Bot.Common
             else
             {
                 //处理私聊投稿以及群聊消息
-                var handler = message.Type switch
-                {
-                    MessageType.Text => _messageHandler.OnTextMessageReceived(dbUser, message),
-                    MessageType.Photo => _messageHandler.OnMediaMessageReceived(dbUser, message),
-                    MessageType.Audio => _messageHandler.OnMediaMessageReceived(dbUser, message),
-                    MessageType.Video => _messageHandler.OnMediaMessageReceived(dbUser, message),
-                    MessageType.Voice => _messageHandler.OnMediaMessageReceived(dbUser, message),
-                    MessageType.Document => _messageHandler.OnMediaMessageReceived(dbUser, message),
-                    MessageType.Sticker => _messageHandler.OnMediaMessageReceived(dbUser, message),
-                    _ => null,
-                };
+                var handler = message.Type == MessageType.Text ? _messageHandler.OnTextMessageReceived(dbUser, message) : _messageHandler.OnMediaMessageReceived(dbUser, message);
 
                 if (handler != null)
                 {
@@ -130,7 +120,8 @@ namespace XinjingdailyBot.Service.Bot.Common
                     MessageType.Video => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
                     MessageType.Voice => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
                     MessageType.Document => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
-                    MessageType.Sticker => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
+                    MessageType.Animation => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
+                    //MessageType.Sticker 不做处理
                     _ => null,
                 };
 

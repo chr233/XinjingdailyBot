@@ -1,6 +1,8 @@
-﻿using Telegram.Bot.Types;
+﻿using Telegram.Bot;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
@@ -12,13 +14,16 @@ namespace XinjingdailyBot.Service.Bot.Handler
     {
         private readonly IPostService _postService;
         private readonly IGroupMessageHandler _groupMessageHandler;
+        private readonly ITelegramBotClient _botClient;
 
         public MessageHandler(
             IPostService postService,
-            IGroupMessageHandler groupMessageHandler)
+            IGroupMessageHandler groupMessageHandler,
+            ITelegramBotClient botClient)
         {
             _postService = postService;
             _groupMessageHandler = groupMessageHandler;
+            _botClient = botClient;
         }
 
         /// <summary>
@@ -63,13 +68,26 @@ namespace XinjingdailyBot.Service.Bot.Handler
 
             if (message.Chat.Type == ChatType.Private)
             {
-                if (message.MediaGroupId != null)
+                switch (message.Type)
                 {
-                    await _postService.HandleMediaGroupPosts(dbUser, message);
-                }
-                else
-                {
-                    await _postService.HandleMediaPosts(dbUser, message);
+                    case MessageType.Photo:
+                    case MessageType.Audio:
+                    case MessageType.Video:
+                    case MessageType.Voice:
+                    case MessageType.Document:
+                    case MessageType.Animation:
+                        if (message.MediaGroupId != null)
+                        {
+                            await _postService.HandleMediaGroupPosts(dbUser, message);
+                        }
+                        else
+                        {
+                            await _postService.HandleMediaPosts(dbUser, message);
+                        }
+                        break;
+                    default:
+                        await _botClient.AutoReplyAsync($"暂不支持的投稿类型 {message.Type}", message);
+                        break;
                 }
             }
         }
