@@ -513,7 +513,9 @@ namespace XinjingdailyBot.Service.Data
                         MessageType.Photo => _botClient.SendPhotoAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
                         MessageType.Audio => _botClient.SendAudioAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
                         MessageType.Video => _botClient.SendVideoAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
+                        MessageType.Voice => _botClient.SendVoiceAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
                         MessageType.Document => _botClient.SendDocumentAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
+                        MessageType.Animation => _botClient.SendAnimationAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
                         _ => throw new Exception("未知的稿件类型"),
                     };
 
@@ -539,7 +541,9 @@ namespace XinjingdailyBot.Service.Data
                         MessageType.Photo => new InputMediaPhoto(new InputFileId(attachments[i].FileID)),
                         MessageType.Audio => new InputMediaAudio(new InputFileId(attachments[i].FileID)),
                         MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)),
+                        MessageType.Voice => new InputMediaAudio(new InputFileId(attachments[i].FileID)),
                         MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)),
+                        //MessageType.Animation 不支持媒体组
                         _ => throw new Exception("未知的稿件类型"),
                     };
                 }
@@ -593,7 +597,7 @@ namespace XinjingdailyBot.Service.Data
                     await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, _textHelperService.NSFWWrning, allowSendingWithoutReply: true);
                 }
 
-                Message msg;
+                Message? msg = null;
                 if (post.PostType == MessageType.Text)
                 {
                     msg = await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, postText, parseMode: ParseMode.Html, disableWebPagePreview: true);
@@ -602,26 +606,26 @@ namespace XinjingdailyBot.Service.Data
                 {
                     Attachments attachment = await _attachmentService.Queryable().FirstAsync(x => x.PostID == post.Id);
 
-                    switch (post.PostType)
+                    var handler = post.PostType switch
                     {
-                        case MessageType.Photo:
-                            msg = await _botClient.SendPhotoAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler);
-                            break;
-                        case MessageType.Audio:
-                            msg = await _botClient.SendAudioAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html, title: attachment.FileName);
-                            break;
-                        case MessageType.Video:
-                            msg = await _botClient.SendVideoAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler);
-                            break;
-                        case MessageType.Document:
-                            msg = await _botClient.SendDocumentAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html);
-                            break;
-                        default:
-                            await _botClient.AutoReplyAsync($"不支持的稿件类型: {post.PostType}", callbackQuery);
-                            return;
+                        MessageType.Photo => _botClient.SendPhotoAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Audio => _botClient.SendAudioAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html, title: attachment.FileName),
+                        MessageType.Video => _botClient.SendVideoAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Voice => _botClient.SendVoiceAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html),
+                        MessageType.Document => _botClient.SendDocumentAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html),
+                        MessageType.Animation => _botClient.SendDocumentAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html),
+                        _ => null,
+                    };
+
+                    if (handler == null)
+                    {
+                        await _botClient.AutoReplyAsync($"不支持的稿件类型: {post.PostType}", callbackQuery);
+                        return;
                     }
+
+                    msg = await handler;
+                    post.PublicMsgID = msg?.MessageId ?? -1;
                 }
-                post.PublicMsgID = msg.MessageId;
             }
             else
             {
@@ -639,7 +643,9 @@ namespace XinjingdailyBot.Service.Data
                         MessageType.Photo => new InputMediaPhoto(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html, HasSpoiler = hasSpoiler },
                         MessageType.Audio => new InputMediaAudio(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
                         MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html, HasSpoiler = hasSpoiler },
+                        MessageType.Voice => new InputMediaVideo(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
                         MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
+                        //MessageType.Animation 不支持媒体组
                         _ => throw new Exception(),
                     };
                 }
