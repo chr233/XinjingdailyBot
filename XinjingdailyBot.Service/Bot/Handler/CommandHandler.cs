@@ -474,7 +474,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                         {
                             if (!string.IsNullOrEmpty(method.Description))
                             {
-                                cmds.Add(new BotCommand() { Command = cmd.ToLowerInvariant(), Description = method.Description });
+                                cmds.Add(new BotCommand { Command = cmd.ToLowerInvariant(), Description = method.Description });
                             }
                         }
                     }
