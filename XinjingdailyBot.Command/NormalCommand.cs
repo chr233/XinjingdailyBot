@@ -11,7 +11,7 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Command
 {
-    [AppService(ServiceLifetime = LifeTime.Scoped)]
+    [AppService(LifeTime.Scoped)]
     public class NormalCommand
     {
         private readonly ITelegramBotClient _botClient;

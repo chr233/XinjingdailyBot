@@ -19,7 +19,7 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Command
 {
-    [AppService(ServiceLifetime = LifeTime.Scoped)]
+    [AppService(LifeTime.Scoped)]
     public class AdminCommand
     {
         private readonly ILogger<AdminCommand> _logger;
@@ -999,12 +999,12 @@ namespace XinjingdailyBot.Command
         {
             async Task<string> exec()
             {
-                if (args.Length < 3)
+                if (args.Length < 3 || !long.TryParse(args[1],out long userId))
                 {
                     return "参数有误";
                 }
 
-                var targetUser = await _userService.FetchUserByUserName(args[1]);
+                var targetUser = await _userService.FetchUserByUserID(userId);
 
                 if (targetUser == null)
                 {

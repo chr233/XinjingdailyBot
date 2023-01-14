@@ -11,11 +11,10 @@ using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace XinjingdailyBot.Command
 {
-    [AppService(ServiceLifetime = LifeTime.Scoped)]
+    [AppService(LifeTime.Scoped)]
     public class SuperCommand
     {
         private readonly ILogger<SuperCommand> _logger;

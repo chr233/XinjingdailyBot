@@ -12,7 +12,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Helper
 {
-    [AppService(ServiceType = typeof(ITextHelperService), ServiceLifetime = LifeTime.Transient)]
+    [AppService(typeof(ITextHelperService), LifeTime.Transient)]
     public sealed class TextHelperService : ITextHelperService
     {
         private readonly IChannelService _channelService;

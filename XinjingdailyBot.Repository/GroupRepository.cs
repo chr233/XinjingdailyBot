@@ -6,7 +6,7 @@ using XinjingdailyBot.Repository.Base;
 
 namespace XinjingdailyBot.Repository
 {
-    [AppService(ServiceLifetime = LifeTime.Singleton)]
+    [AppService(LifeTime.Singleton)]
     public class GroupRepository : BaseRepository<Groups>
     {
         private readonly ILogger<GroupRepository> _logger;

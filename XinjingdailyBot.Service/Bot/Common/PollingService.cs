@@ -8,7 +8,7 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Bot.Common
 {
-    [AppService(ServiceLifetime = LifeTime.Transient)]
+    [AppService(LifeTime.Transient)]
     public class PollingService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;

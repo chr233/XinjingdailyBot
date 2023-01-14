@@ -9,7 +9,7 @@ using XinjingdailyBot.Interface.Bot.Common;
 
 namespace XinjingdailyBot.Service.Bot.Common
 {
-    [AppService(ServiceType = typeof(IChannelService), ServiceLifetime = LifeTime.Singleton)]
+    [AppService(typeof(IChannelService), LifeTime.Singleton)]
 
     public class ChannelService : IChannelService
     {

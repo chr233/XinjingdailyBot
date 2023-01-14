@@ -42,6 +42,10 @@
         /// </summary>
         Confused,
         /// <summary>
+        /// 发的太多了
+        /// </summary>
+        TooMuch,
+        /// <summary>
         /// 审核超时,自动拒稿
         /// </summary>
         AutoReject = 255,

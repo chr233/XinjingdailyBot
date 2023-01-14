@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
@@ -7,32 +8,51 @@ using XinjingdailyBot.Interface.Data;
 
 namespace XinjingdailyBot.Tasks
 {
-    public class ExpiredPostsTask
+    public class ExpiredPostsTask : IHostedService, IDisposable
     {
         private readonly ILogger<ExpiredPostsTask> _logger;
         private readonly IPostService _postService;
         private readonly IUserService _userService;
+        private readonly ITelegramBotClient _botClient;
 
         public ExpiredPostsTask(
             ILogger<ExpiredPostsTask> logger,
             IPostService postService,
-            IUserService userService)
+            IUserService userService,
+            ITelegramBotClient botClient)
         {
             _logger = logger;
             _postService = postService;
             _userService = userService;
+            _botClient = botClient;
         }
 
         /// <summary>
         /// 超时时间设定
         /// </summary>
-        private readonly TimeSpan PostTimeout = TimeSpan.FromDays(3);
+        private readonly TimeSpan PostExpiredTime = TimeSpan.FromDays(3);
 
-        public async Task MarkExpiredPost(ITelegramBotClient botClient)
+        /// <summary>
+        /// 计时器
+        /// </summary>
+        private Timer? _timer = null;
+
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("T 开始定时任务, 清理过期稿件任务");
+            var now = DateTime.Now;
+            var nextDay = now.AddDays(1).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+            var tillTomorrow = nextDay - now;
 
-            DateTime expiredDate = DateTime.Now - PostTimeout;
+            _timer = new Timer(DoWork, null, tillTomorrow, TimeSpan.FromDays(1));
+
+            return Task.CompletedTask;
+        }
+
+        private async void DoWork(object? state)
+        {
+            _logger.LogInformation("开始定时任务, 清理过期稿件任务");
+
+            DateTime expiredDate = DateTime.Now - PostExpiredTime;
 
             //获取有过期稿件的用户
             var userIDList = await _postService.Queryable()
@@ -41,11 +61,11 @@ namespace XinjingdailyBot.Tasks
 
             if (!userIDList.Any())
             {
-                _logger.LogInformation("T 结束定时任务, 没有需要清理的过期稿件");
+                _logger.LogInformation("结束定时任务, 没有需要清理的过期稿件");
                 return;
             }
 
-            _logger.LogInformation($"T 成功获取 {userIDList.Count} 个有过期稿件的用户");
+            _logger.LogInformation("成功获取 {Count} 个有过期稿件的用户", userIDList.Count);
 
             foreach (var userID in userIDList)
             {
@@ -81,11 +101,11 @@ namespace XinjingdailyBot.Tasks
 
                 if (user == null)
                 {
-                    _logger.LogInformation($"T 清理了 {userID} 的 {cTmout} / {rTmout} 条确认/审核超时投稿");
+                    _logger.LogInformation("清理了 {userID} 的 {cTmout} / {rTmout} 条确认/审核超时投稿", userID, cTmout, rTmout);
                 }
                 else
                 {
-                    _logger.LogInformation($"T 清理了 {user} 的 {cTmout} / {rTmout} 条确认/审核超时投稿");
+                    _logger.LogInformation("清理了 {user} 的 {cTmout} / {rTmout} 条确认/审核超时投稿", user.ToString(), cTmout, rTmout);
 
                     //满足条件则通知投稿人
                     //1.未封禁
@@ -97,26 +117,24 @@ namespace XinjingdailyBot.Tasks
 
                         if (cTmout > 0)
                         {
-                            sb.AppendLine($"你有 <code>{cTmout}</code> 份稿件确认超时");
+                            sb.AppendLine($"你有 <code>{cTmout}</code> 份稿件因为确认超时被清理");
                         }
 
                         if (rTmout > 0)
                         {
-                            sb.AppendLine($"你有 <code>{rTmout}</code> 份稿件审核超时");
+                            sb.AppendLine($"你有 <code>{rTmout}</code> 份稿件因为审核超时被清理");
                         }
-                        sb.AppendLine();
-                        sb.AppendLine("可以使用命令 /notification 开启或关闭此提示");
-
+                        
                         try
                         {
-                            await botClient.SendTextMessageAsync(user.PrivateChatID, sb.ToString(), parseMode: ParseMode.Html, disableNotification: true);
-                            await Task.Delay(100);
+                            await _botClient.SendTextMessageAsync(user.PrivateChatID, sb.ToString(), parseMode: ParseMode.Html, disableNotification: true);
+                            await Task.Delay(500);
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError($"T 通知消息发送失败, 自动禁用更新 {ex.GetType()} {ex.Message}");
+                            _logger.LogError("通知消息发送失败, 自动禁用更新 {error}", ex);
                             user.PrivateChatID = -1;
-                            await Task.Delay(500);
+                            await Task.Delay(5000);
                         }
                     }
 
@@ -127,6 +145,18 @@ namespace XinjingdailyBot.Tasks
                     await _userService.Updateable(user).UpdateColumns(x => new { x.PrivateChatID, x.ExpiredPostCount, x.ModifyAt }).ExecuteCommandAsync();
                 }
             }
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            _timer?.Change(Timeout.Infinite, 0);
+            return Task.CompletedTask;
+        }
+
+        public void Dispose()
+        {
+            _timer?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

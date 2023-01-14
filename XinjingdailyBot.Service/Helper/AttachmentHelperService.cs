@@ -6,7 +6,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Helper
 {
-    [AppService(ServiceType = typeof(IAttachmentHelperService), ServiceLifetime = LifeTime.Transient)]
+    [AppService(typeof(IAttachmentHelperService), LifeTime.Transient)]
     public sealed class AttachmentHelperService : IAttachmentHelperService
     {
         /// <summary>

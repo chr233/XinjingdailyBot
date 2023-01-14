@@ -5,7 +5,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Data
 {
-    [AppService(ServiceType = typeof(IChannelOptionService), ServiceLifetime = LifeTime.Transient)]
+    [AppService(typeof(IChannelOptionService), LifeTime.Transient)]
     public sealed class ChannelOptionService : BaseService<ChannelOptions>, IChannelOptionService
     {
         /// <summary>

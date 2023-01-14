@@ -8,7 +8,7 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Helper
 {
-    [AppService(ServiceType = typeof(IMarkupHelperService), ServiceLifetime = LifeTime.Transient)]
+    [AppService(typeof(IMarkupHelperService), LifeTime.Transient)]
     public sealed class MarkupHelperService : IMarkupHelperService
     {
         private readonly GroupRepository _groupRepository;
