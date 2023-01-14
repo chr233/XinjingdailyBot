@@ -48,7 +48,7 @@ namespace XinjingdailyBot.Tasks
             return Task.CompletedTask;
         }
 
-        private async void DoWork(object? state)
+        private async void DoWork(object? _ = null)
         {
             _logger.LogInformation("开始定时任务, 清理过期稿件任务");
 
@@ -124,7 +124,7 @@ namespace XinjingdailyBot.Tasks
                         {
                             sb.AppendLine($"你有 <code>{rTmout}</code> 份稿件因为审核超时被清理");
                         }
-                        
+
                         try
                         {
                             await _botClient.SendTextMessageAsync(user.PrivateChatID, sb.ToString(), parseMode: ParseMode.Html, disableNotification: true);
