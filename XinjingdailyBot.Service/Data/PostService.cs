@@ -14,7 +14,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Data
 {
-    [AppService(ServiceType = typeof(IPostService), ServiceLifetime = LifeTime.Singleton)]
+    [AppService(typeof(IPostService), LifeTime.Singleton)]
     public sealed class PostService : BaseService<Posts>, IPostService
     {
         private readonly ILogger<PostService> _logger;

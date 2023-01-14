@@ -17,7 +17,7 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Data
 {
-    [AppService(ServiceType = typeof(IUserService), ServiceLifetime = LifeTime.Singleton)]
+    [AppService(typeof(IUserService), LifeTime.Singleton)]
     public sealed class UserService : BaseService<Users>, IUserService
     {
         private readonly ILogger<UserService> _logger;

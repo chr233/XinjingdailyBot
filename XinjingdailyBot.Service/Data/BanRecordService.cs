@@ -4,7 +4,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Data
 {
-    [AppService(ServiceType = typeof(IBanRecordService), ServiceLifetime = LifeTime.Transient)]
+    [AppService(typeof(IBanRecordService), LifeTime.Transient)]
     public sealed class BanRecordService : BaseService<BanRecords>, IBanRecordService
     {
     }

@@ -10,7 +10,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Common
 {
-    [AppService(ServiceType = typeof(IDispatcherService), ServiceLifetime = LifeTime.Scoped)]
+    [AppService(typeof(IDispatcherService), LifeTime.Scoped)]
     internal class DispatcherService : IDispatcherService
     {
         private readonly ILogger<DispatcherService> _logger;

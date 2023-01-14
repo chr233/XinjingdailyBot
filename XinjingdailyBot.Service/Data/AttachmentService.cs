@@ -4,7 +4,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Data
 {
-    [AppService(ServiceType = typeof(IAttachmentService), ServiceLifetime = LifeTime.Transient)]
+    [AppService(typeof(IAttachmentService), LifeTime.Transient)]
     public sealed class AttachmentService : BaseService<Attachments>, IAttachmentService
     {
     }

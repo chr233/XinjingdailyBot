@@ -9,7 +9,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Handler
 {
-    [AppService(ServiceType = typeof(IMessageHandler), ServiceLifetime = LifeTime.Scoped)]
+    [AppService(typeof(IMessageHandler), LifeTime.Singleton)]
     public class MessageHandler : IMessageHandler
     {
         private readonly IPostService _postService;

@@ -10,7 +10,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Handler
 {
-    [AppService(ServiceType = typeof(IChannelPostHandler), ServiceLifetime = LifeTime.Singleton)]
+    [AppService(typeof(IChannelPostHandler), LifeTime.Singleton)]
     public class ChannelPostHandler : IChannelPostHandler
     {
         private readonly IPostService _postService;

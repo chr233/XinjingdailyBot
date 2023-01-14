@@ -21,7 +21,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
     /// <summary>
     /// 命令处理器
     /// </summary>
-    [AppService(ServiceType = typeof(ICommandHandler), ServiceLifetime = LifeTime.Singleton)]
+    [AppService(typeof(ICommandHandler), LifeTime.Singleton)]
     public class CommandHandler : ICommandHandler
     {
         private readonly ILogger<CommandHandler> _logger;
