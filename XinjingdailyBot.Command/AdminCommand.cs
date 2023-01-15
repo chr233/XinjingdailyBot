@@ -35,6 +35,7 @@ namespace XinjingdailyBot.Command
         private readonly IChannelOptionService _channelOptionService;
         private readonly IChannelService _channelService;
         private readonly IMarkupHelperService _markupHelperService;
+        private readonly ICmdRecordService _cmdRecordService;
 
         public AdminCommand(
             ILogger<AdminCommand> logger,
@@ -47,7 +48,8 @@ namespace XinjingdailyBot.Command
             IAttachmentService attachmentService,
             IChannelOptionService channelOptionService,
             IChannelService channelService,
-            IMarkupHelperService markupHelperService)
+            IMarkupHelperService markupHelperService,
+            ICmdRecordService cmdRecordService)
         {
             _logger = logger;
             _botClient = botClient;
@@ -60,6 +62,7 @@ namespace XinjingdailyBot.Command
             _channelOptionService = channelOptionService;
             _channelService = channelService;
             _markupHelperService = markupHelperService;
+            _cmdRecordService = cmdRecordService;
         }
 
         /// <summary>
@@ -796,6 +799,15 @@ namespace XinjingdailyBot.Command
             sb.AppendLine($"当前版本: <code>{version}</code>");
             sb.AppendLine($"占用内存: <code>{mem.ToString("f2")}</code> MB");
             sb.AppendLine($"运行时间: <code>{cpu.TotalMinutes.ToString("0.00")}</code> 天");
+
+            var today = DateTime.Now.AddHours(-24);
+            var cmdCount = await _cmdRecordService.Queryable().Where(x => !x.IsQuery && x.ExecuteAt >= today).CountAsync();
+            var QueryCount = await _cmdRecordService.Queryable().Where(x => x.IsQuery && x.ExecuteAt >= today).CountAsync();
+           
+            sb.AppendLine();
+            sb.AppendLine("-- 调用统计 --");
+            sb.AppendLine($"文字命令: <code>{cmdCount}</code> 次");
+            sb.AppendLine($"查询调用: <code>{QueryCount}</code> 次");
 
             sb.AppendLine();
             sb.AppendLine("-- 硬盘信息 --");

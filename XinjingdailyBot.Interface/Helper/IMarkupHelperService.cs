@@ -9,6 +9,7 @@ namespace XinjingdailyBot.Interface.Helper
         InlineKeyboardMarkup DirectPostKeyboard(bool anymouse, BuildInTags tag);
         InlineKeyboardMarkup DirectPostKeyboardWithSpoiler(bool anymouse, BuildInTags tag);
         InlineKeyboardMarkup? LinkToOriginPostKeyboard(Posts post);
+        InlineKeyboardMarkup? LinkToOriginPostKeyboard(string link);
         InlineKeyboardMarkup PostKeyboard(bool anymouse);
         InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser);
         InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, Posts post, string tagName, string tag);

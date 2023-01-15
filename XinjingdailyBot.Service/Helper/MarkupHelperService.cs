@@ -381,6 +381,24 @@ namespace XinjingdailyBot.Service.Helper
         }
 
         /// <summary>
+        /// 跳转链接键盘
+        /// </summary>
+        /// <param name="link"></param>
+        /// <returns></returns>
+        public InlineKeyboardMarkup? LinkToOriginPostKeyboard(string link)
+        {
+            var channel = _channelService.AcceptChannel;
+            InlineKeyboardMarkup keyboard = new(new[]
+             {
+                new []
+                {
+                    InlineKeyboardButton.WithUrl($"在{channel.Title}中查看", link),
+                },
+            });
+            return keyboard;
+        }
+
+        /// <summary>
         /// 获取随机投稿键盘
         /// </summary>
         /// <returns></returns>
@@ -390,17 +408,17 @@ namespace XinjingdailyBot.Service.Helper
             {
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData("随机稿件",$"cmd {dbUser.UserID} randompost all 1"),
+                    InlineKeyboardButton.WithCallbackData("随机稿件",$"cmd {dbUser.UserID} randompost all"),
                 },
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData("随机 #NSFW",$"cmd {dbUser.UserID} randompost nsfw 1"),
-                    InlineKeyboardButton.WithCallbackData("随机 #我有一个朋友",$"cmd {dbUser.UserID} randompost friend 1"),
+                    InlineKeyboardButton.WithCallbackData("随机 #NSFW",$"cmd {dbUser.UserID} randompost nsfw"),
+                    InlineKeyboardButton.WithCallbackData("随机 #我有一个朋友",$"cmd {dbUser.UserID} randompost friend"),
                 },
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData("随机 #晚安",$"cmd {dbUser.UserID} randompost wanan 1"),
-                    InlineKeyboardButton.WithCallbackData("随机 #AI怪图",$"cmd {dbUser.UserID} randompost ai 1"),
+                    InlineKeyboardButton.WithCallbackData("随机 #晚安",$"cmd {dbUser.UserID} randompost wanan"),
+                    InlineKeyboardButton.WithCallbackData("随机 #AI怪图",$"cmd {dbUser.UserID} randompost ai"),
                 },
             });
 
@@ -421,7 +439,7 @@ namespace XinjingdailyBot.Service.Helper
                 new []
                 {
                     InlineKeyboardButton.WithUrl($"在{channel.Title}中查看", link),
-                    InlineKeyboardButton.WithCallbackData($"再来一张{tagName}",$"cmd {dbUser.UserID} randompost {tag}"),
+                    InlineKeyboardButton.WithCallbackData($"再来一张{tagName}",$"cmd {dbUser.UserID} randompost {tag} {link}"),
                 },
             });
 
