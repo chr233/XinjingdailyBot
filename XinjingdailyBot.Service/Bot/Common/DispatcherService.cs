@@ -7,6 +7,7 @@ using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
+using XinjingdailyBot.Service.Bot.Handler;
 
 namespace XinjingdailyBot.Service.Bot.Common
 {
@@ -21,6 +22,7 @@ namespace XinjingdailyBot.Service.Bot.Common
         private readonly ITextHelperService _textHelperService;
         private readonly ITelegramBotClient _botClient;
         private readonly IJoinRequestHandler _joinRequestHandler;
+        private readonly IInlineQueryHandler _inlineQueryHandler;
 
         public DispatcherService(
             ILogger<DispatcherService> logger,
@@ -30,7 +32,8 @@ namespace XinjingdailyBot.Service.Bot.Common
             IChannelService channelService,
             ITextHelperService textHelperService,
             ITelegramBotClient botClient,
-            IJoinRequestHandler joinRequestHandler)
+            IJoinRequestHandler joinRequestHandler,
+            IInlineQueryHandler inlineQueryHandler)
         {
             _logger = logger;
             _messageHandler = messageHandler;
@@ -40,6 +43,7 @@ namespace XinjingdailyBot.Service.Bot.Common
             _textHelperService = textHelperService;
             _botClient = botClient;
             _joinRequestHandler = joinRequestHandler;
+            _inlineQueryHandler = inlineQueryHandler;
         }
 
         /// <summary>
@@ -155,6 +159,11 @@ namespace XinjingdailyBot.Service.Bot.Common
             {
                 await _joinRequestHandler.OnJoinRequestReceived(dbUser, request);
             }
+        }
+
+        public async Task OnInlineQueryReceived(Users dbUser, InlineQuery query)
+        {
+            await _inlineQueryHandler.OnInlineQueryReceived(dbUser, query);
         }
     }
 }

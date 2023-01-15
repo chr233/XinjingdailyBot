@@ -34,7 +34,7 @@ namespace XinjingdailyBot.Service.Bot.Common
             ReceiverOptions receiverOptions = new()
             {
                 AllowedUpdates = Array.Empty<UpdateType>(),
-                ThrowPendingUpdates = true||_optionsSetting.Bot.ThrowPendingUpdates,
+                ThrowPendingUpdates = true || _optionsSetting.Bot.ThrowPendingUpdates,
             };
 
             _logger.LogInformation("接收服务运行中...");

@@ -43,7 +43,7 @@ namespace XinjingdailyBot.Tasks
             var nextDay = now.AddDays(1).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             var tillTomorrow = nextDay - now;
 
-            _timer = new Timer(DoWork, null, tillTomorrow, TimeSpan.FromDays(1));
+            _timer = new Timer(DoWork, null, tillTomorrow, PostExpiredTime);
 
             return Task.CompletedTask;
         }

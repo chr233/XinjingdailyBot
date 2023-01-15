@@ -51,6 +51,12 @@ namespace XinjingdailyBot.Command
         [TextCmd("ANONYMOUS", UserRights.NormalCmd, Alias = "ANYMOUSE", Description = "设置是否匿名")]
         public async Task ResponseAnonymous(Users dbUser, Message message)
         {
+            if (message.Chat.Type != ChatType.Private)
+            {
+                await _botClient.SendCommandReply("仅能在私聊中使用", message);
+                return;
+            }
+
             bool anymouse = !dbUser.PreferAnonymous;
             dbUser.PreferAnonymous = anymouse;
             dbUser.ModifyAt = DateTime.Now;
@@ -70,6 +76,12 @@ namespace XinjingdailyBot.Command
         [TextCmd("NOTIFICATION", UserRights.NormalCmd, Description = "设置稿件审核后是否通知")]
         public async Task ResponseNotification(Users dbUser, Message message)
         {
+            if (message.Chat.Type != ChatType.Private)
+            {
+                await _botClient.SendCommandReply("仅能在私聊中使用", message);
+                return;
+            }
+
             bool notificationg = !dbUser.Notification;
             dbUser.Notification = notificationg;
             dbUser.ModifyAt = DateTime.Now;

@@ -30,6 +30,9 @@ namespace XinjingdailyBot.Infrastructure.Extensions
                 case UpdateType.CallbackQuery:
                     logger.LogCallbackQuery(update.CallbackQuery!);
                     break;
+                case UpdateType.InlineQuery:
+                    logger.LogInlineQuery(update.InlineQuery!);
+                    break;
                 default:
                     logger.LogDebug("U 未知消息 {Type}", update.Type);
                     break;
@@ -75,10 +78,22 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         /// 输出query
         /// </summary>
         /// <param name="logger"></param>
+        /// <param name="callbackQuery"></param>
         public static void LogCallbackQuery(this ILogger logger, CallbackQuery callbackQuery)
         {
             string user = callbackQuery.From.FullName();
-            logger.LogDebug("Q [数据] {Id} {user} {callbackQuery.Data}", callbackQuery.Id, user, callbackQuery.Data);
+            logger.LogDebug("Q [回调数据] {Id} {user} {Data}", callbackQuery.Id, user, callbackQuery.Data);
+        }
+
+        /// <summary>
+        /// 输出query
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="inlineQuery"></param>
+        public static void LogInlineQuery(this ILogger logger, InlineQuery inlineQuery)
+        {
+            string user = inlineQuery.From.FullName();
+            logger.LogDebug("Q [查询数据] {Id} {user} {Data}", inlineQuery.Id, user, inlineQuery.Query);
         }
     }
 }
