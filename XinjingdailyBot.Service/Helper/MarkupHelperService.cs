@@ -1,7 +1,10 @@
-﻿using Telegram.Bot.Types.ReplyMarkups;
+﻿using System.Threading.Channels;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Localization;
+using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
@@ -12,11 +15,14 @@ namespace XinjingdailyBot.Service.Helper
     public sealed class MarkupHelperService : IMarkupHelperService
     {
         private readonly GroupRepository _groupRepository;
+        private readonly IChannelService _channelService;
 
         public MarkupHelperService(
-            GroupRepository groupRepository)
+            GroupRepository groupRepository,
+            IChannelService channelService)
         {
             _groupRepository = groupRepository;
+            _channelService = channelService;
         }
 
         private static readonly string AnymouseOn = Emojis.Ghost + "匿名投稿";
@@ -345,6 +351,79 @@ namespace XinjingdailyBot.Service.Helper
             };
 
             InlineKeyboardMarkup keyboard = new(btns);
+
+            return keyboard;
+        }
+
+        /// <summary>
+        /// 跳转链接键盘
+        /// </summary>
+        /// <param name="post"></param>
+        /// <returns></returns>
+        public InlineKeyboardMarkup? LinkToOriginPostKeyboard(Posts post)
+        {
+            var channel = _channelService.AcceptChannel;
+            string? username = channel.Username;
+
+            if (string.IsNullOrEmpty(username))
+            {
+                return null;
+            }
+
+            InlineKeyboardMarkup keyboard = new(new[]
+             {
+                new []
+                {
+                    InlineKeyboardButton.WithUrl($"在{channel.Title}中查看", $"https://t.me/{username}/{post.PublicMsgID}"),
+                },
+            });
+            return keyboard;
+        }
+
+        /// <summary>
+        /// 获取随机投稿键盘
+        /// </summary>
+        /// <returns></returns>
+        public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser)
+        {
+            InlineKeyboardMarkup keyboard = new(new[]
+            {
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("随机稿件",$"cmd {dbUser.UserID} randompost all"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("随机 #NSFW",$"cmd {dbUser.UserID} randompost nsfw"),
+                    InlineKeyboardButton.WithCallbackData("随机 #我有一个朋友",$"cmd {dbUser.UserID} randompost friend"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("随机 #晚安",$"cmd {dbUser.UserID} randompost wanan"),
+                    InlineKeyboardButton.WithCallbackData("随机 #AI怪图",$"cmd {dbUser.UserID} randompost ai"),
+                },
+            });
+
+            return keyboard;
+        }
+
+        /// <summary>
+        /// 获取随机投稿键盘
+        /// </summary>
+        /// <returns></returns>
+        public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, Posts post, string tag)
+        {
+            var channel = _channelService.AcceptChannel;
+            string link = !string.IsNullOrEmpty(channel.Username) ? $"https://t.me/{channel.Username}/{post.PublicMsgID}" : $"https://t.me/c/{channel.Id}/{post.PublicMsgID}";
+
+            InlineKeyboardMarkup keyboard = new(new[]
+            {
+                new []
+                {
+                    InlineKeyboardButton.WithUrl($"在{channel.Title}中查看", link),
+                    InlineKeyboardButton.WithCallbackData("再来一张",$"cmd {dbUser.UserID} randompost {tag}"),
+                },
+            });
 
             return keyboard;
         }

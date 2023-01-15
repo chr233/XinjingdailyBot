@@ -44,6 +44,7 @@ namespace XinjingdailyBot.Service.Bot.Common
                 UpdateType.Message => _dispatcherService.OnMessageReceived(dbUser, update.Message!),
                 UpdateType.CallbackQuery => _dispatcherService.OnCallbackQueryReceived(dbUser, update.CallbackQuery!),
                 UpdateType.ChatJoinRequest => _dispatcherService.OnJoinRequestReceived(dbUser, update.ChatJoinRequest!),
+                UpdateType.InlineQuery => _dispatcherService.OnInlineQueryReceived(dbUser, update.InlineQuery!),
                 _ => null
             };
 

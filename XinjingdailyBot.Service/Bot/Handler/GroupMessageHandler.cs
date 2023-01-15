@@ -86,7 +86,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 return;
             }
 
-            if (text.Contains("投稿"))
+            if (text.Contains("投稿") && dbUser.GroupID == 1)
             {
                 await _botClient.AutoReplyAsync("如果想要投稿, 直接将稿件通过私信发给我即可.", message);
             }
