@@ -1,12 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
-using SqlSugar;
+﻿using SqlSugar;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
-using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
