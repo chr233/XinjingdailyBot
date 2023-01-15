@@ -7,7 +7,6 @@ using SqlSugar;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
@@ -803,7 +802,7 @@ namespace XinjingdailyBot.Command
             var today = DateTime.Now.AddHours(-24);
             var cmdCount = await _cmdRecordService.Queryable().Where(x => !x.IsQuery && x.ExecuteAt >= today).CountAsync();
             var QueryCount = await _cmdRecordService.Queryable().Where(x => x.IsQuery && x.ExecuteAt >= today).CountAsync();
-           
+
             sb.AppendLine();
             sb.AppendLine("-- 调用统计 --");
             sb.AppendLine($"文字命令: <code>{cmdCount}</code> 次");
