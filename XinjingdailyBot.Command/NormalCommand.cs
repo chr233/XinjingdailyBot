@@ -400,8 +400,8 @@ namespace XinjingdailyBot.Command
                     var message = await handler;
                 }
 
-                //非第一条消息才显示按钮
-                var kbd = args.Length == 2 ? _markupHelperService.LinkToOriginPostKeyboard(randomPost) : null;
+                //去除第一条消息的按钮
+                var kbd = args.Length > 2 ? _markupHelperService.LinkToOriginPostKeyboard(args[2]) : null;
                 await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, kbd);
             }
             else
