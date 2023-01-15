@@ -11,7 +11,7 @@ namespace XinjingdailyBot.Interface.Helper
         InlineKeyboardMarkup? LinkToOriginPostKeyboard(Posts post);
         InlineKeyboardMarkup PostKeyboard(bool anymouse);
         InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser);
-        InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, Posts post, string tag);
+        InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, Posts post, string tagName, string tag);
         InlineKeyboardMarkup ReviewKeyboardA(BuildInTags tag);
         InlineKeyboardMarkup ReviewKeyboardAWithSpoiler(BuildInTags tag);
         InlineKeyboardMarkup ReviewKeyboardB();

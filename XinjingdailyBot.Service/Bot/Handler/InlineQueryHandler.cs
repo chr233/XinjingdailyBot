@@ -37,37 +37,29 @@ namespace XinjingdailyBot.Service.Bot.Handler
         {
             if (dbUser.Right.HasFlag(UserRights.AdminCmd))
             {
-                Dictionary<string, BuildInTags> tags = new()
-                {
-                    { "随机稿件", BuildInTags.None },
-                    { "随机 #NSFW 稿件", BuildInTags.NSFW },
-                    { "随机 #我有一个朋友 稿件", BuildInTags.Friend },
-                    { "随机 #晚安 稿件", BuildInTags.WanAn },
-                    { "随机 #AI怪图 稿件", BuildInTags.AIGraph },
-                };
-
                 List<InlineQueryResult> results = new();
 
-                foreach (var (id, tag) in tags)
+                for (int i = 0; i < 10; i++)
                 {
                     var randomPost = await _postService.Queryable()
-                        .WhereIF(tag == BuildInTags.None, x => x.Status == PostStatus.Accepted && x.PostType == MessageType.Photo)
-                        .WhereIF(tag != BuildInTags.None, x => x.Status == PostStatus.Accepted && x.PostType == MessageType.Photo && ((byte)x.Tags & (byte)tag) > 0)
+                        .Where(x => x.Status == PostStatus.Accepted && x.PostType == MessageType.Photo)
                         .OrderBy(x => SqlFunc.GetRandom()).Take(1).FirstAsync();
 
-                    if (randomPost != null)
+                    if (randomPost == null)
                     {
-                        var postAttachment = await _attachmentService.Queryable().Where(x => x.PostID == randomPost.Id).FirstAsync();
-                        var keyboard = _markupHelperService.LinkToOriginPostKeyboard(randomPost);
-                        results.Add(new InlineQueryResultCachedPhoto(id, postAttachment.FileID)
-                        {
-                            Title = id,
-                            Description = id,
-                            Caption = randomPost.Text,
-                            ParseMode = ParseMode.Html,
-                            ReplyMarkup = keyboard
-                        });
+                        break;
                     }
+
+                    var postAttachment = await _attachmentService.Queryable().Where(x => x.PostID == randomPost.Id).FirstAsync();
+                    var keyboard = _markupHelperService.LinkToOriginPostKeyboard(randomPost);
+                    results.Add(new InlineQueryResultCachedPhoto(i.ToString(), postAttachment.FileID)
+                    {
+                        Title = randomPost.Text,
+                        Description = randomPost.Text,
+                        Caption = randomPost.Text,
+                        ParseMode = ParseMode.Html,
+                        ReplyMarkup = keyboard
+                    });
                 }
 
                 if (results.Count == 0)
@@ -84,10 +76,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             else
             {
                 InlineQueryResult[] results = {
-                    new InlineQueryResultArticle(
-                        id: "1",
-                        title: "该功能暂时仅对管理员开放",
-                        inputMessageContent: new InputTextMessageContent("To be continued"))
+                    new InlineQueryResultArticle("1", "该功能暂时仅对管理员开放", new InputTextMessageContent("To be continued"))
                 };
 
                 await _botClient.AnswerInlineQueryAsync(inlineQueryId: query.Id, results: results, cacheTime: 10, isPersonal: true);

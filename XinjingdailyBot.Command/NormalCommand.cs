@@ -1,11 +1,14 @@
 ﻿using System.Text;
+using SqlSugar;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
+using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
+using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
 
@@ -18,17 +21,29 @@ namespace XinjingdailyBot.Command
         private readonly IUserService _userService;
         private readonly LevelRepository _levelRepository;
         private readonly GroupRepository _groupRepository;
+        private readonly IChannelService _channelService;
+        private readonly IMarkupHelperService _markupHelperService;
+        private readonly IAttachmentService _attachmentService;
+        private readonly IPostService _postService;
 
         public NormalCommand(
             ITelegramBotClient botClient,
             IUserService userService,
             LevelRepository levelRepository,
-            GroupRepository groupRepository)
+            GroupRepository groupRepository,
+            IChannelService channelService,
+            IMarkupHelperService markupHelperService,
+            IAttachmentService attachmentService,
+            IPostService postService)
         {
             _botClient = botClient;
             _userService = userService;
             _levelRepository = levelRepository;
             _groupRepository = groupRepository;
+            _channelService = channelService;
+            _markupHelperService = markupHelperService;
+            _attachmentService = attachmentService;
+            _postService = postService;
         }
 
         /// <summary>
@@ -264,6 +279,135 @@ namespace XinjingdailyBot.Command
                 text = string.Join(' ', args[1..]);
             }
             await _botClient.AutoReplyAsync(text, query);
+        }
+
+        /// <summary>
+        /// 获取随机稿件
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        [TextCmd("RANDOMPOST", UserRights.NormalCmd, Description = "获取随机稿件")]
+        public async Task GetRandomPost(Users dbUser, Message message)
+        {
+            if (!dbUser.Right.HasFlag(UserRights.AdminCmd))
+            {
+                if (message.Chat.Type != ChatType.Private)
+                {
+                    await _botClient.SendCommandReply("该功能仅限私聊使用", message, autoDelete: false);
+                    return;
+                }
+            }
+
+            var keyboard = _markupHelperService.RandomPostMenuKeyboard(dbUser);
+            await _botClient.SendCommandReply("手气不错, 获取随机稿件", message, autoDelete: false, replyMarkup: keyboard);
+        }
+
+        /// <summary>
+        /// 获取随机稿件
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="callbackQuery"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        [QueryCmd("RANDOMPOST", UserRights.NormalCmd)]
+        public async Task QGetRandomPostp(Users dbUser, CallbackQuery callbackQuery, string[] args)
+        {
+            if (args.Length < 2)
+            {
+                await _botClient.EditMessageTextAsync(callbackQuery.Message!, "参数有误", replyMarkup: null);
+                return;
+            }
+
+            BuildInTags tag = args[1] switch
+            {
+                "all" => BuildInTags.None,
+                "nsfw" => BuildInTags.NSFW,
+                "friend" => BuildInTags.Friend,
+                "wanan" => BuildInTags.WanAn,
+                "ai" => BuildInTags.AIGraph,
+                _ => BuildInTags.None
+            };
+
+            string tagName = tag switch
+            {
+                BuildInTags.None => "",
+                BuildInTags.NSFW => "NSFW",
+                BuildInTags.Friend => "我有一个朋友",
+                BuildInTags.WanAn => "晚安",
+                BuildInTags.AIGraph => "AI怪图",
+                _ => "",
+            };
+
+            var randomPost = await _postService.Queryable()
+                        .WhereIF(tag == BuildInTags.None, x => x.Status == PostStatus.Accepted && x.PostType == MessageType.Photo)
+                        .WhereIF(tag != BuildInTags.None, x => x.Status == PostStatus.Accepted && x.PostType == MessageType.Photo && ((byte)x.Tags & (byte)tag) > 0)
+                        .OrderBy(x => SqlFunc.GetRandom()).Take(1).FirstAsync();
+
+            if (randomPost != null)
+            {
+                var keyboard = _markupHelperService.RandomPostMenuKeyboard(dbUser, randomPost, tagName, args[1]);
+
+                bool hasSpoiler = randomPost.Tags.HasFlag(BuildInTags.Spoiler);
+
+                long chatId = callbackQuery.Message!.Chat.Id;
+
+                if (randomPost.IsMediaGroup && false)
+                {
+                    var attachments = await _attachmentService.Queryable().Where(x => x.PostID == randomPost.Id).ToListAsync();
+                    var group = new IAlbumInputMedia[attachments.Count];
+                    for (int i = 0; i < attachments.Count; i++)
+                    {
+                        MessageType attachmentType = attachments[i].Type;
+                        if (attachmentType == MessageType.Unknown)
+                        {
+                            attachmentType = randomPost.PostType;
+                        }
+                        group[i] = attachmentType switch
+                        {
+                            MessageType.Photo => new InputMediaPhoto(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? randomPost.Text : null, ParseMode = ParseMode.Html, HasSpoiler = hasSpoiler },
+                            MessageType.Audio => new InputMediaAudio(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? randomPost.Text : null, ParseMode = ParseMode.Html },
+                            MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? randomPost.Text : null, ParseMode = ParseMode.Html, HasSpoiler = hasSpoiler },
+                            MessageType.Voice => new InputMediaVideo(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? randomPost.Text : null, ParseMode = ParseMode.Html },
+                            MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? randomPost.Text : null, ParseMode = ParseMode.Html },
+                            _ => throw new Exception(),
+                        };
+                    }
+
+                    var messages = await _botClient.SendMediaGroupAsync(chatId, group);
+                }
+                else
+                {
+                    Attachments attachment = await _attachmentService.Queryable().FirstAsync(x => x.PostID == randomPost.Id);
+                    var handler = randomPost.PostType switch
+                    {
+                        MessageType.Photo => _botClient.SendPhotoAsync(chatId, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard, hasSpoiler: hasSpoiler),
+                        MessageType.Audio => _botClient.SendAudioAsync(chatId, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard, title: attachment.FileName),
+                        MessageType.Video => _botClient.SendVideoAsync(chatId, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard, hasSpoiler: hasSpoiler),
+                        MessageType.Voice => _botClient.SendVoiceAsync(chatId, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard),
+                        MessageType.Document => _botClient.SendDocumentAsync(chatId, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard),
+                        MessageType.Animation => _botClient.SendDocumentAsync(chatId, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard),
+                        _ => null,
+                    };
+
+                    if (handler == null)
+                    {
+                        await _botClient.AutoReplyAsync($"不支持的稿件类型: {randomPost.PostType}", callbackQuery);
+                        await _botClient.EditMessageTextAsync(callbackQuery.Message!, $"不支持的稿件类型: {randomPost.PostType}", null);
+                        return;
+                    }
+
+                    var message = await handler;
+                }
+
+                //非第一条消息才显示按钮
+                var kbd = args.Length == 2 ? _markupHelperService.LinkToOriginPostKeyboard(randomPost) : null;
+                await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, kbd);
+            }
+            else
+            {
+                await _botClient.EditMessageTextAsync(callbackQuery.Message!, "无可用稿件", replyMarkup: null);
+            }
         }
     }
 }
