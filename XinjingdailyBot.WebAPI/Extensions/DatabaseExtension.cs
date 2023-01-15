@@ -53,7 +53,10 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 {
                     _logger.Info("开始生成数据库结构");
                     //创建数据库
-                    //db.DbMaintenance.CreateDatabase(dbConfig.DbName);
+                    if (!dbConfig.UseMySQL)
+                    {
+                        db.DbMaintenance.CreateDatabase(dbConfig.DbName);
+                    }
 
                     //创建数据表
                     Assembly assembly = Assembly.Load("XinjingdailyBot.Model");
