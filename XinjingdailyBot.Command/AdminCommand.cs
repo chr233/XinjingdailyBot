@@ -939,7 +939,7 @@ namespace XinjingdailyBot.Command
                 var count = 1;
                 foreach (var user in adminReviewCountRank)
                 {
-                    sb.AppendLine($"{count++}. {(!user.PreferAnonymous ? user.EscapedFullName() : "匿名用户")} {user.AcceptCount}");
+                    sb.AppendLine($"{count++}. {(!user.PreferAnonymous ? user.EscapedFullName() : "匿名用户")} {user.ReviewCount}");
                 }
             }
             else
