@@ -624,8 +624,8 @@ namespace XinjingdailyBot.Service.Data
                     }
 
                     msg = await handler;
-                    post.PublicMsgID = msg?.MessageId ?? -1;
                 }
+                post.PublicMsgID = msg?.MessageId ?? -1;
             }
             else
             {
