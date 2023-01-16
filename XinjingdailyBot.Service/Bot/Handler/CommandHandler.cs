@@ -219,7 +219,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                             });
                         }
                     }
-                    catch (Exception ex) //无法捕获 TODO
+                    catch (Exception ex)
                     {
                         errorMsg = $"{ex.GetType} {ex.Message}";
 
@@ -281,7 +281,10 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 }
             }
             //调用方法
-            method.Invoke(service, methodParameters.ToArray());
+            if (method.Invoke(service, methodParameters.ToArray()) is Task task)
+            {
+                await task;
+            }
         }
 
         /// <summary>
@@ -415,7 +418,10 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 }
             }
             //调用方法
-            method.Invoke(service, methodParameters.ToArray());
+            if (method.Invoke(service, methodParameters.ToArray()) is Task task)
+            {
+                await task;
+            }
         }
 
         /// <summary>
