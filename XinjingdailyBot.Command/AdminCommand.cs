@@ -101,7 +101,7 @@ namespace XinjingdailyBot.Command
                     sb.AppendLine($"群组链接: <code>@{chat.Username ?? "无"}</code>");
                 }
             }
-            await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
+            await _botClient.SendCommandReply(sb.ToString(), message, false, parsemode: ParseMode.Html);
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace XinjingdailyBot.Command
                 sb.AppendLine($"审核数量: <code>{targetUser.ReviewCount}</code>");
             }
 
-            await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
+            await _botClient.SendCommandReply(sb.ToString(), message, false, parsemode: ParseMode.Html);
         }
 
         /// <summary>
@@ -553,7 +553,7 @@ namespace XinjingdailyBot.Command
                 }
             }
 
-            await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
+            await _botClient.SendCommandReply(sb.ToString(), message, false, parsemode: ParseMode.Html);
         }
 
         /// <summary>
@@ -838,7 +838,7 @@ namespace XinjingdailyBot.Command
             sb.AppendLine($"框架版本: <code>DotNet {Environment.Version} {RuntimeInformation.OSArchitecture}</code>");
             sb.AppendLine($"系统信息: <code>{RuntimeInformation.OSDescription}</code>");
 
-            await _botClient.SendCommandReply(sb.ToString(), message, true, ParseMode.Html);
+            await _botClient.SendCommandReply(sb.ToString(), message, fa, ParseMode.Html);
         }
 
         /// <summary>
@@ -998,7 +998,7 @@ namespace XinjingdailyBot.Command
             }
 
             (var text, var kbd) = await exec();
-            await _botClient.SendCommandReply(text, message, autoDelete: false, replyMarkup: kbd);
+            await _botClient.SendCommandReply(text, message, false, replyMarkup: kbd);
         }
 
         /// <summary>

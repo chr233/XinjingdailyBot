@@ -104,15 +104,20 @@ namespace XinjingdailyBot.Command
 
                 if (message.ReplyToMessage == null)
                 {
-                    return "请回复审核消息并输入拒绝理由";
+                    return "请回复审核消息并输入需要替换的描述";
                 }
-
+                
                 var messageId = message.ReplyToMessage.MessageId;
 
                 var post = await _postService.Queryable().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
                 if (post == null)
                 {
                     return "未找到稿件";
+                }
+                
+                if(post.Status != PostStatus.Reviewing)
+                {
+                    return "仅能编辑状态为审核中的稿件";
                 }
 
                 var postUser = await _userService.FetchUserByUserID(post.PosterUID);
@@ -124,7 +129,7 @@ namespace XinjingdailyBot.Command
                 post.Text = string.Join(' ', args).Trim();
                 await _postService.Updateable(post).UpdateColumns(x => new { x.Text }).ExecuteCommandAsync();
 
-                return $"稿件描述已更新(投稿预览不会更新)";
+                return $"稿件描述已更新";
             }
 
             var text = await exec();
