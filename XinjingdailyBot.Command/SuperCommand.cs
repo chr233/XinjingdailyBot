@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -24,6 +25,7 @@ namespace XinjingdailyBot.Command
         private readonly IChannelService _channelService;
         private readonly IMarkupHelperService _markupHelperService;
         private readonly ICommandHandler _commandHandler;
+        private readonly IUserService _userService;
 
         public SuperCommand(
             ILogger<SuperCommand> logger,
@@ -32,7 +34,8 @@ namespace XinjingdailyBot.Command
             IChannelOptionService channelOptionService,
             IChannelService channelService,
             IMarkupHelperService markupHelperService,
-            ICommandHandler commandHandler)
+            ICommandHandler commandHandler,
+            IUserService userService)
         {
             _logger = logger;
             _botClient = botClient;
@@ -41,6 +44,7 @@ namespace XinjingdailyBot.Command
             _channelService = channelService;
             _markupHelperService = markupHelperService;
             _commandHandler = commandHandler;
+            _userService = userService;
         }
 
         /// <summary>
@@ -189,6 +193,66 @@ namespace XinjingdailyBot.Command
         {
             bool result = await _commandHandler.GetCommandsMenu();
             await _botClient.SendCommandReply(result ? "设置菜单成功" : "设置菜单失败", message, autoDelete: false);
+        }
+
+        /// <summary>
+        /// 重新计算用户投稿数量
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        [TextCmd("RECALCPOST", UserRights.SuperCmd, Description = "重新计算用户投稿数量")]
+        public async Task ResponseReCalcPost(Message message)
+        {
+            const int threads = 10;
+
+            int startId = 1;
+            int effectCount = 0;
+
+            while (true)
+            {
+                var users = await _userService.Queryable().Where(x => x.Id >= startId).Take(threads).ToListAsync();
+                if (!(users?.Count > 0))
+                {
+                    break;
+                }
+
+                var tasks = users.Select(async user =>
+                {
+                    int postCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID);
+                    int acceptCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == PostStatus.Accepted);
+                    int rejectCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == PostStatus.Rejected);
+                    int expiredCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status < 0);
+                    int reviewCount = await _postService.Queryable().CountAsync(x => x.ReviewMsgID == user.UserID && x.PosterUID != user.UserID);
+
+                    if (user.PostCount != postCount || user.AcceptCount != acceptCount || user.RejectCount != rejectCount || user.ExpiredPostCount != expiredCount || user.ReviewCount != reviewCount)
+                    {
+                        user.PostCount = postCount;
+                        user.AcceptCount = acceptCount;
+                        user.RejectCount = rejectCount;
+                        user.ExpiredPostCount = expiredCount;
+                        user.ReviewCount = reviewCount;
+                        user.ModifyAt = DateTime.Now;
+                        
+                        effectCount++;
+
+                        await _userService.Updateable(user).UpdateColumns(x => new
+                        {
+                            x.PostCount,
+                            x.AcceptCount,
+                            x.RejectCount,
+                            x.ExpiredPostCount,
+                            x.ReviewCount,
+                            x.ModifyAt
+                        }).ExecuteCommandAsync();
+                    }
+                }).ToList();
+
+                await Task.WhenAll(tasks);
+
+                startId += threads;
+            }
+
+            await _botClient.SendCommandReply($"更新用户表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
         }
     }
 }

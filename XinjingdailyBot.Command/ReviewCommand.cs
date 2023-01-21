@@ -21,7 +21,6 @@ namespace XinjingdailyBot.Command
         private readonly IPostService _postService;
         private readonly ITextHelperService _textHelperService;
         private readonly IMarkupHelperService _markupHelperService;
-        private readonly IAttachmentService _attachmentService;
 
         public ReviewCommand(
             ITelegramBotClient botClient,
@@ -29,8 +28,7 @@ namespace XinjingdailyBot.Command
             IChannelService channelService,
             IPostService postService,
             ITextHelperService textHelperService,
-            IMarkupHelperService markupHelperService,
-            IAttachmentService attachmentService)
+            IMarkupHelperService markupHelperService)
         {
             _botClient = botClient;
             _userService = userService;
@@ -38,7 +36,6 @@ namespace XinjingdailyBot.Command
             _postService = postService;
             _textHelperService = textHelperService;
             _markupHelperService = markupHelperService;
-            _attachmentService = attachmentService;
         }
 
         /// <summary>

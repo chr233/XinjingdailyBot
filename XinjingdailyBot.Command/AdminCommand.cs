@@ -145,7 +145,7 @@ namespace XinjingdailyBot.Command
                 sb.AppendLine($"投稿数量: <code>{totalPost}</code>");
                 sb.AppendLine($"通过率: <code>{100.0 * targetUser.AcceptCount / totalPost}%</code>");
                 sb.AppendLine($"通过数量: <code>{targetUser.AcceptCount}</code>");
-                sb.AppendLine($"拒绝数量: <code>{targetUser.RejetCount}</code>");
+                sb.AppendLine($"拒绝数量: <code>{targetUser.RejectCount}</code>");
                 sb.AppendLine($"审核数量: <code>{targetUser.ReviewCount}</code>");
             }
 
@@ -796,8 +796,8 @@ namespace XinjingdailyBot.Command
             var mem = proc.WorkingSet64 / 1024.0 / 1024.0;
             var cpu = proc.TotalProcessorTime;
             sb.AppendLine($"当前版本: <code>{version}</code>");
-            sb.AppendLine($"占用内存: <code>{mem.ToString("f2")}</code> MB");
-            sb.AppendLine($"运行时间: <code>{cpu.TotalMinutes.ToString("0.00")}</code> 天");
+            sb.AppendLine($"占用内存: <code>{mem:F2}</code> MB");
+            sb.AppendLine($"运行时间: <code>{cpu.TotalDays:F2}</code> 天");
 
             var today = DateTime.Now.AddHours(-24);
             var cmdCount = await _cmdRecordService.Queryable().Where(x => !x.IsQuery && x.ExecuteAt >= today).CountAsync();
