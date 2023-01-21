@@ -127,7 +127,7 @@
     <value>您已被{0}解封, 理由: {1}, 已恢复您的投稿和命令权限</value>
   </data>
   <data name="WarnUserTips" xml:space="preserve">
-    <value>您受到了一次警告, 理由: {0}\n当前累计受到警告&lt;code&gt;{1}&lt;/code&gt;次, 达到&lt;code&gt;{2}&lt;/code&gt;次后将会被系统自动封禁</value>
+    <value>您受到了一次警告, 理由: {0} \r\n 当前累计受到警告&lt;code&gt;{1}&lt;/code&gt;次, 达到&lt;code&gt;{2}&lt;/code&gt;次后将会被系统自动封禁</value>
   </data>
   <data name="NoPostRight" xml:space="preserve">
     <value>没有权限</value>

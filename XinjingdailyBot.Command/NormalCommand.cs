@@ -6,7 +6,6 @@ using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
-using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
@@ -21,7 +20,6 @@ namespace XinjingdailyBot.Command
         private readonly IUserService _userService;
         private readonly LevelRepository _levelRepository;
         private readonly GroupRepository _groupRepository;
-        private readonly IChannelService _channelService;
         private readonly IMarkupHelperService _markupHelperService;
         private readonly IAttachmentService _attachmentService;
         private readonly IPostService _postService;
@@ -31,7 +29,6 @@ namespace XinjingdailyBot.Command
             IUserService userService,
             LevelRepository levelRepository,
             GroupRepository groupRepository,
-            IChannelService channelService,
             IMarkupHelperService markupHelperService,
             IAttachmentService attachmentService,
             IPostService postService)
@@ -40,7 +37,6 @@ namespace XinjingdailyBot.Command
             _userService = userService;
             _levelRepository = levelRepository;
             _groupRepository = groupRepository;
-            _channelService = channelService;
             _markupHelperService = markupHelperService;
             _attachmentService = attachmentService;
             _postService = postService;
@@ -122,6 +118,8 @@ namespace XinjingdailyBot.Command
 
             int totalPost = dbUser.PostCount - dbUser.ExpiredPostCount;
 
+            double passPercent =1.0* dbUser.AcceptCount / totalPost;
+
             StringBuilder sb = new();
 
             sb.AppendLine("-- 基础信息 --");
@@ -130,9 +128,9 @@ namespace XinjingdailyBot.Command
             sb.AppendLine($"用户组: <code>{group}</code>");
             sb.AppendLine($"等级:  <code>{level}</code>");
             sb.AppendLine($"投稿数量: <code>{totalPost}</code>");
-            sb.AppendLine($"投稿通过率: <code>{(100.0 * dbUser.AcceptCount / totalPost).ToString("0.00")}%</code>");
+            sb.AppendLine($"投稿通过率: <code>{passPercent:0.00%}</code>");
             sb.AppendLine($"通过数量: <code>{dbUser.AcceptCount}</code>");
-            sb.AppendLine($"拒绝数量: <code>{dbUser.RejetCount}</code>");
+            sb.AppendLine($"拒绝数量: <code>{dbUser.RejectCount}</code>");
             sb.AppendLine($"审核数量: <code>{dbUser.ReviewCount}</code>");
             sb.AppendLine();
             sb.AppendLine("-- 用户排名 --");

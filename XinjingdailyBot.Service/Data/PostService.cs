@@ -23,7 +23,6 @@ namespace XinjingdailyBot.Service.Data
         private readonly IChannelOptionService _channelOptionService;
         private readonly ITextHelperService _textHelperService;
         private readonly IMarkupHelperService _markupHelperService;
-        private readonly IAttachmentHelperService _attachmentHelperService;
         private readonly ITelegramBotClient _botClient;
         private readonly IUserService _userService;
 
@@ -34,7 +33,6 @@ namespace XinjingdailyBot.Service.Data
             IChannelOptionService channelOptionService,
             ITextHelperService textHelperService,
             IMarkupHelperService markupHelperService,
-            IAttachmentHelperService attachmentHelperService,
             ITelegramBotClient botClient,
             IUserService userService)
         {
@@ -44,7 +42,6 @@ namespace XinjingdailyBot.Service.Data
             _channelOptionService = channelOptionService;
             _textHelperService = textHelperService;
             _markupHelperService = markupHelperService;
-            _attachmentHelperService = attachmentHelperService;
             _botClient = botClient;
             _userService = userService;
         }
@@ -273,7 +270,7 @@ namespace XinjingdailyBot.Service.Data
 
             long postID = await Insertable(newPost).ExecuteReturnBigIdentityAsync();
 
-            Attachments? attachment = _attachmentHelperService.GenerateAttachment(message, postID);
+            Attachments? attachment = _attachmentService.GenerateAttachment(message, postID);
 
             if (attachment != null)
             {
@@ -415,7 +412,7 @@ namespace XinjingdailyBot.Service.Data
             //更新附件
             if (postID > 0)
             {
-                Attachments? attachment = _attachmentHelperService.GenerateAttachment(message, postID);
+                Attachments? attachment = _attachmentService.GenerateAttachment(message, postID);
 
                 if (attachment != null)
                 {
@@ -562,9 +559,9 @@ namespace XinjingdailyBot.Service.Data
                 await _botClient.EditMessageTextAsync(post.OriginChatID, (int)post.ActionMsgID, posterMsg);
             }
 
-            poster.RejetCount++;
+            poster.RejectCount++;
             poster.ModifyAt = DateTime.Now;
-            await _userService.Updateable(poster).UpdateColumns(x => new { x.RejetCount, x.ModifyAt }).ExecuteCommandAsync();
+            await _userService.Updateable(poster).UpdateColumns(x => new { x.RejectCount, x.ModifyAt }).ExecuteCommandAsync();
 
             if (poster.UserID != dbUser.UserID) //非同一个人才增加审核数量
             {
@@ -584,6 +581,11 @@ namespace XinjingdailyBot.Service.Data
         public async Task AcceptPost(Posts post, Users dbUser, CallbackQuery callbackQuery)
         {
             Users poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
+
+            if (post.IsDirectPost)
+            {
+                poster.PostCount++;
+            }
 
             string postText = _textHelperService.MakePostText(post, poster);
 
