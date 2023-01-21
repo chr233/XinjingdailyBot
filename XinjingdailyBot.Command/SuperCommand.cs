@@ -208,7 +208,9 @@ namespace XinjingdailyBot.Command
             int startId = 1;
             int effectCount = 0;
 
-            while (true)
+            int totalUsers = await _userService.Queryable().CountAsync();
+
+            while (startId <= totalUsers)
             {
                 var users = await _userService.Queryable().Where(x => x.Id >= startId).Take(threads).ToListAsync();
                 if (!(users?.Count > 0))
@@ -222,7 +224,7 @@ namespace XinjingdailyBot.Command
                     int acceptCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == PostStatus.Accepted);
                     int rejectCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == PostStatus.Rejected);
                     int expiredCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status < 0);
-                    int reviewCount = await _postService.Queryable().CountAsync(x => x.ReviewMsgID == user.UserID && x.PosterUID != user.UserID);
+                    int reviewCount = await _postService.Queryable().CountAsync(x => x.ReviewerUID == user.UserID && x.PosterUID != user.UserID);
 
                     if (user.PostCount != postCount || user.AcceptCount != acceptCount || user.RejectCount != rejectCount || user.ExpiredPostCount != expiredCount || user.ReviewCount != reviewCount)
                     {
@@ -232,7 +234,7 @@ namespace XinjingdailyBot.Command
                         user.ExpiredPostCount = expiredCount;
                         user.ReviewCount = reviewCount;
                         user.ModifyAt = DateTime.Now;
-                        
+
                         effectCount++;
 
                         await _userService.Updateable(user).UpdateColumns(x => new
@@ -250,6 +252,8 @@ namespace XinjingdailyBot.Command
                 await Task.WhenAll(tasks);
 
                 startId += threads;
+
+                _logger.LogInformation("更新进度 {startId} / {totalUsers}, 更新数量 {effectCount}", startId, totalUsers, effectCount);
             }
 
             await _botClient.SendCommandReply($"更新用户表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
