@@ -787,7 +787,7 @@ namespace XinjingdailyBot.Command
             var cpu = proc.TotalProcessorTime;
             sb.AppendLine($"当前版本: <code>{version}</code>");
             sb.AppendLine($"占用内存: <code>{mem:F2}</code> MB");
-            sb.AppendLine($"运行时间: <code>{cpu.TotalDays:F2}</code> 天");
+            sb.AppendLine($"运行时间: <code>{cpu.TotalDays:F8}</code> 天");
 
             var today = DateTime.Now.AddHours(-24);
             var cmdCount = await _cmdRecordService.Queryable().Where(x => !x.IsQuery && x.ExecuteAt >= today).CountAsync();
