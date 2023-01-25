@@ -28,6 +28,7 @@ namespace XinjingdailyBot.Service.Data
         private readonly ICmdRecordService _cmdRecordService;
         private readonly PostRepository _postRepository;
         private readonly ITelegramBotClient _botClient;
+        private readonly LevelRepository _levelRepository;
 
         public UserService(
             ILogger<UserService> logger,
@@ -36,8 +37,9 @@ namespace XinjingdailyBot.Service.Data
             IMarkupHelperService markupHelperService,
             IChannelService channelService,
             ICmdRecordService cmdRecordService,
-           PostRepository postRepository,
-           ITelegramBotClient botClient)
+            PostRepository postRepository,
+            ITelegramBotClient botClient,
+            LevelRepository levelRepository)
         {
             _logger = logger;
             _optionsSetting = configuration.Value;
@@ -47,6 +49,7 @@ namespace XinjingdailyBot.Service.Data
             _cmdRecordService = cmdRecordService;
             _postRepository = postRepository;
             _botClient = botClient;
+            _levelRepository = levelRepository;
         }
 
         /// <summary>
@@ -580,6 +583,30 @@ namespace XinjingdailyBot.Service.Data
             var keyboard = _markupHelperService.UserListPageKeyboard(dbUser, query, page, totalPages);
 
             return (sb.ToString(), keyboard);
+        }
+
+        public async Task<string> GetUserBasicInfo(Users dbUser)
+        {
+            var userNick = dbUser.FullName.EscapeHtml();
+            var level = _levelRepository.GetLevelName(dbUser.Level);
+            var group = _groupRepository.GetGroupName(dbUser.GroupID);
+
+            int totalPost = dbUser.PostCount - dbUser.ExpiredPostCount;
+            double passPercent = 1.0 * dbUser.AcceptCount / totalPost;
+
+            StringBuilder sb = new();
+
+            sb.AppendLine($"用户名: <code>{userNick}</code>");
+            sb.AppendLine($"用户ID: <code>{dbUser.UserID}</code>");
+            sb.AppendLine($"用户组: <code>{group}</code>");
+            sb.AppendLine($"等级:  <code>{level}</code>");
+            sb.AppendLine($"投稿数量: <code>{totalPost}</code>");
+            sb.AppendLine($"投稿通过率: <code>{passPercent:0.00%}</code>");
+            sb.AppendLine($"通过数量: <code>{dbUser.AcceptCount}</code>");
+            sb.AppendLine($"拒绝数量: <code>{dbUser.RejectCount}</code>");
+            sb.AppendLine($"审核数量: <code>{dbUser.ReviewCount}</code>");
+
+            return sb.ToString();
         }
     }
 }

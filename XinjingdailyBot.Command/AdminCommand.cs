@@ -131,22 +131,12 @@ namespace XinjingdailyBot.Command
             }
             else
             {
-                var level = _levelRepository.GetLevelName(targetUser.Level);
-                var group = _groupRepository.GetGroupName(targetUser.GroupID);
-                var status = targetUser.IsBan ? "封禁中" : "正常";
+                sb.AppendLine("-- 基础信息 --");
+                sb.AppendLine(_userService.GetUserBasicInfo(targetUser));
 
-                var totalPost = targetUser.PostCount - targetUser.ExpiredPostCount;
-
-                sb.AppendLine($"用户名: <code>{targetUser.EscapedFullName()}</code>");
-                sb.AppendLine($"用户ID: <code>{targetUser.UserID}</code>");
-                sb.AppendLine($"用户组: <code>{group}</code>");
-                sb.AppendLine($"状态: <code>{status}</code>");
-                sb.AppendLine($"等级:  <code>{level}</code>");
-                sb.AppendLine($"投稿数量: <code>{totalPost}</code>");
-                sb.AppendLine($"通过率: <code>{100.0 * targetUser.AcceptCount / totalPost}%</code>");
-                sb.AppendLine($"通过数量: <code>{targetUser.AcceptCount}</code>");
-                sb.AppendLine($"拒绝数量: <code>{targetUser.RejectCount}</code>");
-                sb.AppendLine($"审核数量: <code>{targetUser.ReviewCount}</code>");
+                sb.AppendLine();
+                sb.AppendLine("-- 用户排名 --");
+                sb.AppendLine(await _userService.GetUserRank(targetUser));
             }
 
             await _botClient.SendCommandReply(sb.ToString(), message, false, parsemode: ParseMode.Html);
@@ -838,7 +828,7 @@ namespace XinjingdailyBot.Command
             sb.AppendLine($"框架版本: <code>DotNet {Environment.Version} {RuntimeInformation.OSArchitecture}</code>");
             sb.AppendLine($"系统信息: <code>{RuntimeInformation.OSDescription}</code>");
 
-            await _botClient.SendCommandReply(sb.ToString(), message, fa, ParseMode.Html);
+            await _botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
         }
 
         /// <summary>
