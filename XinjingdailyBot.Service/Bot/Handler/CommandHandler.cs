@@ -298,7 +298,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             Message? message = query.Message;
             if (message == null)
             {
-                await _botClient.AutoReplyAsync("消息不存在", query);
+                await _botClient.AutoReplyAsync("消息不存在", query, true);
                 return;
             }
 
@@ -316,7 +316,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             {
                 if (args.Length < 2 || !long.TryParse(args[1], out long userID))
                 {
-                    await _botClient.AutoReplyAsync("Payload 非法", query);
+                    await _botClient.AutoReplyAsync("Payload 非法", query, true);
                     await _botClient.RemoveMessageReplyMarkupAsync(message);
                     return;
                 }
@@ -324,7 +324,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 //判断消息发起人是不是同一个
                 if (dbUser.UserID != userID)
                 {
-                    await _botClient.AutoReplyAsync("这不是你的消息, 请不要瞎点", query);
+                    await _botClient.AutoReplyAsync("这不是你的消息, 请不要瞎点", query, true);
                     return;
                 }
 
@@ -354,7 +354,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                     {
                         errorMsg = $"{ex.GetType} {ex.Message}";
 
-                        await _botClient.AutoReplyAsync(_optionsSetting.Debug ? errorMsg : "遇到内部错误", query);
+                        await _botClient.AutoReplyAsync(_optionsSetting.Debug ? errorMsg : "遇到内部错误", query, true);
                     }
                     handled = true;
                     break;
@@ -367,11 +367,11 @@ namespace XinjingdailyBot.Service.Bot.Handler
             {
                 if (_optionsSetting.Debug)
                 {
-                    await _botClient.AutoReplyAsync($"未知的命令 [{query.Data}]", query);
+                    await _botClient.AutoReplyAsync($"未知的命令 [{query.Data}]", query, true);
                 }
                 else
                 {
-                    await _botClient.AutoReplyAsync("未知的命令", query);
+                    await _botClient.AutoReplyAsync("未知的命令", query, true);
                 }
             }
         }
@@ -389,7 +389,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             //权限检查
             if (!dbUser.Right.HasFlag(assemblyMethod.Rights))
             {
-                await _botClient.AutoReplyAsync("没有权限这么做", query);
+                await _botClient.AutoReplyAsync("没有权限这么做", query, true);
                 return;
             }
 
