@@ -22,7 +22,11 @@
         /// 数据库配置
         /// </summary>
         public DatabaseOption Database { get; set; } = new();
-
+        /// <summary>
+        /// 投稿配置
+        /// </summary>
+        public PostOption Post { get; set; } = new();
+        
         public sealed record BotOption
         {
             /// <summary>
@@ -53,39 +57,32 @@
             /// 审核群组
             /// </summary>
             public string ReviewGroup { get; set; } = "";
-
             /// <summary>
             /// 审核日志频道
             /// </summary>
             public string ReviewLogChannel { get; set; } = "";
-
             /// <summary>
             /// 是否使用审核日志模式
             /// 启用: 审核后在审核群直接删除消息, 审核记录发送至审核日志频道
             /// 禁用: 审核后再审核群保留消息记录, 审核日志频道不使用
             /// </summary>
             public bool UseReviewLogMode { get; set; }
-
             /// <summary>
             /// 频道评论区群组
             /// </summary>
             public string CommentGroup { get; set; } = "";
-
             /// <summary>
             /// 闲聊区群组
             /// </summary>
             public string SubGroup { get; set; } = "";
-
             /// <summary>
             /// 通过频道
             /// </summary>
             public string AcceptChannel { get; set; } = "";
-
             /// <summary>
             /// 拒稿频道
             /// </summary>
             public string RejectChannel { get; set; } = "";
-
             /// <summary>
             /// 自动退出未在配置文件中定义的群组和频道, 默认 false
             /// </summary>
@@ -130,6 +127,35 @@
             public string? DbName { get; set; }
             public string? DbUser { get; set; }
             public string? DbPassword { get; set; }
+        }
+
+        public sealed record PostOption
+        {
+            /// <summary>
+            /// 启用每日投稿限制
+            /// </summary>
+            public bool EnablePostLimit { get; set; }
+            /// <summary>
+            /// 待定稿件上限, 不受 Ratio 倍率影响
+            /// </summary>
+            public int DailyPaddingLimit { get; set; } = 5;
+            /// <summary>
+            /// 审核队列上限
+            /// </summary>
+            public int DailyReviewLimit { get; set; } = 5;
+            /// <summary>
+            /// 每日投稿上限
+            /// </summary>
+            public int DailyPostLimit { get; set; } = 5;
+            /// <summary>
+            /// Ratio = 通过稿件数量 / RatioDivisor + 1
+            /// 实际上限 = Ratio * 原始上限
+            /// </summary>
+            public int RatioDivisor { get; set; } = 100;
+            /// <summary>
+            /// 最高倍数
+            /// </summary>
+            public int MaxRatio { get; set; } = 10;
         }
     }
 }
