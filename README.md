@@ -36,6 +36,8 @@
   - [x] 匿名回复
   - [x] 检索用户
 - [x] 审核超时自动拒绝
+- [x] 投稿数量限制
+- [x] 获取随机稿件
 - [ ] 稿件检索
 - [ ] 实装用户等级系统
 
@@ -95,39 +97,53 @@
     "DbName": "xjb_db",
     "DbUser": "root",
     "DbPassword": "123456"
+  },
+  // 投稿设置
+  "Post": {
+    "EnablePostLimit": true,
+    "DailyPaddingLimit": 5,
+    "DailyReviewLimit": 5,
+    "DailyPostLimit": 5,
+    "RatioDivisor": 100,
+    "MaxRatio": 10
   }
 }
 ```
 
-| 节       | 配置项              | 类型   | 默认值                                         | 说明                                    |
-| -------- | ------------------- | ------ | ---------------------------------------------- | --------------------------------------- |
-| 无       | Debug               | bool   | false                                          | 是否开启调试模式                        |
-| -        | -                   | -      | -                                              |                                         |
-| Bot      | BotToken            | string | ""                                             | 机器人 Token                            |
-| Bot      | Proxy               | string | null                                           | 代理地址, 支持 http 和 sock5            |
-| Bot      | ThrowPendingUpdates | bool   | false                                          | 启动时是否忽略机器人离线时产生的 Update |
-| Bot      | AutoLeaveOtherGroup | bool   | false                                          | 是否自动离开无关群组                    |
-| Bot      | SuperAdmins         | int[]  | []                                             | 超级管理员 数字 ID 列表                 |
-| Bot      | BotToken            | string | ""                                             | 机器人 Token                            |
-| Bot      | BotToken            | string | ""                                             | 机器人 Token                            |
-| -        | -                   | -      | -                                              |                                         |
-| Channel  | ReviewGroup         | string | ""                                             | 审核群组 ID                             |
-| Channel  | CommentGroup        | string | ""                                             | 评论群组 ID                             |
-| Channel  | SubGroup            | string | ""                                             | 闲聊群组 ID                             |
-| Channel  | AcceptChannel       | string | ""                                             | 审核通过频道 ID                         |
-| Channel  | RejectChannel       | string | ""                                             | 审核拒绝频道 ID                         |
-| -        | -                   | -      | -                                              |                                         |
-| Message  | Start               | string | "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人" | 使用 /start 命令显示的欢迎语            |
-| Message  | Help                | string | "发送图片/视频或者文字内容即可投稿"            | 使用 /help 命令显示语句                 |
-| -        | -                   | -      | -                                              |                                         |
-| Database | Generate            | bool   | true                                           | 是否自动生成数据库表                    |
-| Database | UseMySQL            | bool   | true                                           | 是否使用 MySQL 作为数据库实现           |
-| Database | LogSQL              | bool   | false                                          | 是否输出 SQL 日志                       |
-| Database | DBHost              | string | "127.0.0.1"                                    | MySQL 主机                              |
-| Database | DBPort              | int    | 3306                                           | MySQL 端口                              |
-| Database | DBName              | string | "xjb_db"                                       | 数据库名                                |
-| Database | DBUser              | string | "root"                                         | 数据库用户名                            |
-| Database | DBPassword          | string | "123456"                                       | 数据库密码                              |
+|     节     |        配置项         |   类型   |                     默认值                     | 必须 | 说明                                    |
+| :--------: | :-------------------: | :------: | :--------------------------------------------: | :--: | --------------------------------------- |
+|     无     |        `Debug`        |  `bool`  |                    `false`                     |      | 是否开启调试模式                        |
+|     -      |           -           |    -     |                       -                        |  -   |                                         |
+|   `Bot`    |      `BotToken`       | `string` |                                                |  ✔️  | 机器人 Token                            |
+|   `Bot`    |        `Proxy`        | `string` |                     `null`                     |      | 代理地址, 支持 http 和 sock5            |
+|   `Bot`    | `ThrowPendingUpdates` |  `bool`  |                    `false`                     |      | 启动时是否忽略机器人离线时产生的 Update |
+|   `Bot`    | `AutoLeaveOtherGroup` |  `bool`  |                    `false`                     |      | 是否自动离开无关群组                    |
+|   `Bot`    |     `SuperAdmins`     | `int[]`  |                       []                       |      | 超级管理员 数字 ID 列表                 |
+|     -      |           -           |    -     |                       -                        |  -   |                                         |
+| `Channel`  |     `ReviewGroup`     | `string` |                                                |      | 审核群组 ID                             |
+| `Channel`  |    `CommentGroup`     | `string` |                                                |      | 评论群组 ID                             |
+| `Channel`  |      `SubGroup`       | `string` |                                                |      | 闲聊群组 ID                             |
+| `Channel`  |    `AcceptChannel`    | `string` |                                                |  ✔️  | 审核通过频道 ID                         |
+| `Channel`  |    `RejectChannel`    | `string` |                                                |  ✔️  | 审核拒绝频道 ID                         |
+|     -      |           -           |    -     |                       -                        |  -   |                                         |
+| `Message`  |        `Start`        | `string` | "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人" |      | 使用 /start 命令显示的欢迎语            |
+| `Message`  |        `Help`         | `string` |      "发送图片/视频或者文字内容即可投稿"       |      | 使用 /help 命令显示语句                 |
+|     -      |           -           |    -     |                       -                        |  -   |                                         |
+| `Database` |      `Generate`       |  `bool`  |                     `true`                     |      | 是否自动生成数据库表                    |
+| `Database` |      `UseMySQL`       |  `bool`  |                     `true`                     |      | 是否使用 MySQL 作为数据库实现           |
+| `Database` |       `LogSQL`        |  `bool`  |                    `false`                     |      | 是否输出 SQL 日志                       |
+| `Database` |       `DBHost`        | `string` |                 `"127.0.0.1"`                  |      | MySQL 主机                              |
+| `Database` |       `DBPort`        |  `int`   |                     `3306`                     |      | MySQL 端口                              |
+| `Database` |       `DBName`        | `string` |                   `"xjb_db"`                   |      | 数据库名                                |
+| `Database` |       `DBUser`        | `string` |                    `"root"`                    |      | 数据库用户名                            |
+| `Database` |     `DBPassword`      | `string` |                   `"123456"`                   |      | 数据库密码                              |
+|     -      |           -           |    -     |                       -                        |  -   |                                         |
+|   `Post`   |   `EnablePostLimit`   |  `bool`  |                    `false`                     |      | 是否启用每日投稿数量限制                |
+|   `Post`   |  `DailyPaddingLimit`  |  `int`   |                      `5`                       |      | 每日待定稿件数量上限                    |
+|   `Post`   |  `DailyReviewLimit`   |  `int`   |                      `5`                       |      | 每日审核中稿件数量上限基数              |
+|   `Post`   |   `DailyPostLimit`    |  `int`   |                      `5`                       |      | 每日通过以及未通过稿件数量上限基数      |
+|   `Post`   |    `RatioDivisor`     |  `int`   |                     `100`                      |      | 每日投稿数量上限倍率除数                |
+|   `Post`   |      `MaxRatio`       |  `int`   |                      `10`                      |      | 每日投稿数量上限最高倍率                |
 
 > 新安装或者数据库结构变动后一定要修改 `DBGenerate` 为 `true`, 会自动生成数据表, 生成完毕后建议禁用以加快启动速度
 
@@ -144,6 +160,14 @@
 > `ReviewGroup`, `CommentGroup`, `SubGroup` 不一定需要是公开频道
 > 如果是公开群组, 群组名需要加 `@`, 例如 `@xinjingdailychatroom`
 > 如果是私有群组, 可以使用命令 /groupinfo 获取群组的信息, 然后设置为群组的 GroupID
+
+---
+
+> 每日投稿数量上限计算方法:
+> 倍数 = 用户累计通过稿件数量 / `RatioDivisor` + 1 (倍数不会超过 `MaxRatio`)
+> 每日审核中稿件数量上限 = `DailyReviewLimit` \* 倍数
+> 每日通过以及未通过稿件数量上限 = `DailyPostLimit` \* 倍数 (计算时排除拒绝理由为重复的稿件)
+> 如果 待定稿件数量达到上限, 或者审核中稿件达到上限, 或者投稿稿件达到上限, 则无法投稿
 
 ### 权限说明
 

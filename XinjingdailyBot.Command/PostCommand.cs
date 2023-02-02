@@ -132,6 +132,11 @@ namespace XinjingdailyBot.Command
         /// <returns></returns>
         private async Task ConfirmPost(Posts post, Users dbUser, CallbackQuery query)
         {
+            if(await _postService.CheckPostLimit(dbUser, null, query) == false)
+            {
+                return;
+            }
+
             Message reviewMsg;
             if (!post.IsMediaGroup)
             {

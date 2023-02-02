@@ -1,8 +1,11 @@
 ﻿using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
@@ -25,6 +28,7 @@ namespace XinjingdailyBot.Service.Data
         private readonly IMarkupHelperService _markupHelperService;
         private readonly ITelegramBotClient _botClient;
         private readonly IUserService _userService;
+        private readonly OptionsSetting.PostOption _postOption;
 
         public PostService(
             ILogger<PostService> logger,
@@ -34,7 +38,8 @@ namespace XinjingdailyBot.Service.Data
             ITextHelperService textHelperService,
             IMarkupHelperService markupHelperService,
             ITelegramBotClient botClient,
-            IUserService userService)
+            IUserService userService,
+            IOptions<OptionsSetting> options)
         {
             _logger = logger;
             _attachmentService = attachmentService;
@@ -44,6 +49,87 @@ namespace XinjingdailyBot.Service.Data
             _markupHelperService = markupHelperService;
             _botClient = botClient;
             _userService = userService;
+            _postOption = options.Value.Post;
+        }
+
+        /// <summary>
+        /// 检查用户是否达到每日投稿上限
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <returns>true: 可以继续投稿 false: 无法继续投稿</returns>
+        public async Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null)
+        {
+            // 未开启限制或者用户为管理员时不受限制
+            if (!_postOption.EnablePostLimit || dbUser.Right.HasFlag(UserRights.Admin))
+            {
+                return true;
+            }
+
+            DateTime now = DateTime.Now;
+            DateTime today = now.AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+
+            //待确认
+            var paddingCount = await Queryable()
+                .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today && x.Status == PostStatus.Padding)
+                .CountAsync();
+
+            int paddingLimit = _postOption.DailyPaddingLimit;
+            if (paddingCount >= paddingLimit)
+            {
+                if (message != null)
+                {
+                    await _botClient.AutoReplyAsync($"您的投稿队列已满 {paddingCount} / {paddingLimit}, 请先处理尚未确认的稿件", message);
+                }
+                if (query != null)
+                {
+                    await _botClient.AutoReplyAsync($"您的投稿队列已满 {paddingCount} / {paddingLimit}, 请先处理尚未确认的稿件", query, true);
+                }
+                return false;
+            }
+
+            int baseRatio = Math.Min(dbUser.AcceptCount / _postOption.RatioDivisor + 1, _postOption.MaxRatio);
+
+            //审核中
+            var reviewCount = await Queryable()
+                .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today && x.Status == PostStatus.Reviewing)
+                .CountAsync();
+
+            int reviewLimit = baseRatio * _postOption.DailyReviewLimit;
+            if (reviewCount >= reviewLimit)
+            {
+                if (message != null)
+                {
+                    await _botClient.AutoReplyAsync($"您的审核队列已满 {reviewCount} / {reviewLimit}, 请耐心等待队列中的稿件审核完毕", message);
+                    return true;
+                }
+                if (query != null)
+                {
+                    await _botClient.AutoReplyAsync($"您的审核队列已满 {reviewCount} / {reviewLimit}, 请耐心等待队列中的稿件审核完毕", query, true);
+                    return false;
+                }
+            }
+
+            //已通过 + 已拒绝(非重复原因)
+            var postCount = await Queryable()
+                .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today && (x.Status == PostStatus.Accepted || (x.Status == PostStatus.Rejected && x.Reason != RejectReason.Duplicate)))
+                .CountAsync();
+
+            int dailyLimit = baseRatio * _postOption.DailyPostLimit;
+            if (postCount >= dailyLimit)
+            {
+                if (message != null)
+                {
+                    await _botClient.AutoReplyAsync($"您已达到每日投稿上限 {postCount} / {dailyLimit}, 暂时无法继续投稿, 请明日再来", message);
+                    return true;
+                }
+                if (query != null)
+                {
+                    await _botClient.AutoReplyAsync($"您已达到每日投稿上限 {postCount} / {dailyLimit}, 暂时无法继续投稿, 请明日再来", query, true);
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>
