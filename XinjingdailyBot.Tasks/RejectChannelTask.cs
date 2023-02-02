@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Enums;
+using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 
@@ -13,8 +14,6 @@ namespace XinjingdailyBot.Tasks
     {
         private readonly ILogger<RejectChannelTask> _logger;
         private readonly IChannelService _channelService;
-        private readonly IPostService _postService;
-        private readonly IUserService _userService;
         private readonly ITelegramBotClient _botClient;
 
 
@@ -53,10 +52,13 @@ namespace XinjingdailyBot.Tasks
         {
             _logger.LogInformation("开始定时任务, 置顶拒稿频道通知");
 
-            long chatId = _channelService.RejectChannel.Id;
+            var rejectChannel = _channelService.RejectChannel;
+            var acceptChannel = _channelService.AcceptChannel;
 
-            var message = await _botClient.SendTextMessageAsync(chatId, "12345");
-            await _botClient.PinChatMessageAsync(chatId, message.MessageId);
+            string descText = string.Format("此频道为 {0} 的附属频道: {1}\r\n\r\n频道中的内容均来自用户投稿, 仅用于存档, 不代表主频道立场", acceptChannel.Title, acceptChannel.ChatID());
+
+            var message = await _botClient.SendTextMessageAsync(rejectChannel, descText);
+            await _botClient.PinChatMessageAsync(rejectChannel, message.MessageId);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
