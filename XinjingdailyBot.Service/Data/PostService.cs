@@ -100,6 +100,7 @@ namespace XinjingdailyBot.Service.Data
                 if (message != null)
                 {
                     await _botClient.AutoReplyAsync($"您的审核队列已满 {reviewCount} / {reviewLimit}, 请耐心等待队列中的稿件审核完毕", message);
+                    return true;
                 }
                 if (query != null)
                 {
@@ -119,6 +120,7 @@ namespace XinjingdailyBot.Service.Data
                 if (message != null)
                 {
                     await _botClient.AutoReplyAsync($"您已达到每日投稿上限 {postCount} / {dailyLimit}, 暂时无法继续投稿, 请明日再来", message);
+                    return true;
                 }
                 if (query != null)
                 {
