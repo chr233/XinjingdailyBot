@@ -256,6 +256,7 @@ namespace XinjingdailyBot.Command
                     if (args.Any())
                     {
                         targetUser = await _userService.FetchUserByUserNameOrUserID(args.First());
+                        args = args[1..];
                     }
                 }
 
