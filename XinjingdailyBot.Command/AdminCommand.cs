@@ -26,7 +26,7 @@ namespace XinjingdailyBot.Command
         private readonly ILogger<AdminCommand> _logger;
         private readonly ITelegramBotClient _botClient;
         private readonly IUserService _userService;
-        private readonly LevelRepository _levelRepository;
+        //private readonly LevelRepository _levelRepository;
         private readonly GroupRepository _groupRepository;
         private readonly IBanRecordService _banRecordService;
         private readonly IPostService _postService;
@@ -40,7 +40,7 @@ namespace XinjingdailyBot.Command
             ILogger<AdminCommand> logger,
             ITelegramBotClient botClient,
             IUserService userService,
-            LevelRepository levelRepository,
+            //LevelRepository levelRepository,
             GroupRepository groupRepository,
             IBanRecordService banRecordService,
             IPostService postService,
@@ -53,7 +53,7 @@ namespace XinjingdailyBot.Command
             _logger = logger;
             _botClient = botClient;
             _userService = userService;
-            _levelRepository = levelRepository;
+            //_levelRepository = levelRepository;
             _groupRepository = groupRepository;
             _banRecordService = banRecordService;
             _postService = postService;
