@@ -73,7 +73,7 @@ namespace XinjingdailyBot.Command
                 {
                     return "仅能编辑状态为审核中的稿件";
                 }
-                
+
                 var reason = string.Join(' ', args).Trim();
 
                 if (string.IsNullOrEmpty(reason))
@@ -111,7 +111,7 @@ namespace XinjingdailyBot.Command
                 {
                     return "请回复审核消息并输入需要替换的描述";
                 }
-                
+
                 var messageId = message.ReplyToMessage.MessageId;
 
                 var post = await _postService.Queryable().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
@@ -119,8 +119,8 @@ namespace XinjingdailyBot.Command
                 {
                     return "未找到稿件";
                 }
-                
-                if(post.Status != PostStatus.Reviewing)
+
+                if (post.Status != PostStatus.Reviewing)
                 {
                     return "仅能编辑状态为审核中的稿件";
                 }
