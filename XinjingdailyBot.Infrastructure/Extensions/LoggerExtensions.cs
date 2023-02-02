@@ -75,7 +75,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
                 ChatType.Group => $"【群组|{chat.Title}】",
                 ChatType.Channel => $"【频道|{chat.Title}】",
                 ChatType.Supergroup => $"【群组|{chat.Title}】",
-                _ => $"【未知| {chat.Title}】",
+                _ => $"【未知|{chat.Title}】",
             };
 
             string user = message.From?.UserToString() ?? "未知";
