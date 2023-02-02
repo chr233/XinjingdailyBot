@@ -45,6 +45,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
 
             services.AddHostedService<PollingService>();
             services.AddHostedService<ExpiredPostsTask>();
+            services.AddHostedService<RejectChannelTask>();
         }
     }
 }
