@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;

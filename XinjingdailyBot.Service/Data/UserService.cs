@@ -78,6 +78,13 @@ namespace XinjingdailyBot.Service.Data
 
             if (update.Type == UpdateType.ChannelPost)
             {
+                var message = update.ChannelPost!;
+                // 自动删除置顶通知 和 群名修改通知
+                if (message.Type == MessageType.MessagePinned || message.Type == MessageType.ChatTitleChanged)
+                {
+                    await AutoDeleteNotification(message);
+                    return null;
+                }
                 return await QueryUserFromChannelPost(update.ChannelPost!);
             }
             else
@@ -367,6 +374,25 @@ namespace XinjingdailyBot.Service.Data
             return null;
         }
 
+        /// <summary>
+        /// 自动删除置顶消息通知
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        private async Task AutoDeleteNotification(Message message)
+        {
+            if (message.Chat.Id == _channelService.AcceptChannel.Id || message.Chat.Id == _channelService.RejectChannel.Id)
+            {
+                try
+                {
+                    await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "删除置顶通知失败");
+                }
+            }
+        }
 
         /// <summary>
         /// 根据UserID获取用户

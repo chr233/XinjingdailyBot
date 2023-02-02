@@ -26,7 +26,7 @@
         /// 投稿配置
         /// </summary>
         public PostOption Post { get; set; } = new();
-        
+
         public sealed record BotOption
         {
             /// <summary>
