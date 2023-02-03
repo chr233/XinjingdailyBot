@@ -20,7 +20,10 @@ namespace XinjingdailyBot.Service.Helper
         public TextHelperService(IChannelService channelService)
         {
             _channelService = channelService;
+            PureStrings = Emojis.PureStrings.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
         }
+
+        private string[] PureStrings { get; init; }
 
         private static readonly Regex MatchTag = new(@"(^#\S+)|(\s#\S+)");
         private static readonly Regex MatchSpace = new(@"^\s*$");
@@ -154,6 +157,10 @@ namespace XinjingdailyBot.Service.Helper
                     .Replace("<", "＜")
                     .Replace(">", "＞")
                     .Replace("&", "＆");
+                foreach (var item in PureStrings)
+                {
+                    escapedText = escapedText.Replace(item, "");
+                }
                 return escapedText;
             }
         }

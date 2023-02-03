@@ -439,7 +439,10 @@ namespace XinjingdailyBot.Command
                     {
                         if (targetUser.PrivateChatID > 0)
                         {
-                            var msg = string.Format(Langs.WarnUserTips, reason, warnCount, WarningLimit);
+                            StringBuilder s = new();
+                            s.AppendLine(string.Format(Langs.WarnUserTips, reason));
+                            s.AppendLine(string.Format(Langs.WarnUserTips2, warnCount, WarningLimit));
+                            string msg = s.ToString();
                             await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg, parseMode: ParseMode.Html);
 
                             if (warnCount >= WarningLimit)

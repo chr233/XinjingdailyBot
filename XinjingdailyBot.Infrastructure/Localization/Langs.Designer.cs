@@ -142,11 +142,20 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
-        ///   查找类似 您受到了一次警告, 理由: {0} \r\n 当前累计受到警告&lt;code&gt;{1}&lt;/code&gt;次, 达到&lt;code&gt;{2}&lt;/code&gt;次后将会被系统自动封禁 的本地化字符串。
+        ///   查找类似 您受到了一次警告, 理由: {0} 的本地化字符串。
         /// </summary>
         public static string WarnUserTips {
             get {
                 return ResourceManager.GetString("WarnUserTips", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 当前累计受到警告&lt;code&gt;{0}&lt;/code&gt;次, 达到&lt;code&gt;{1}&lt;/code&gt;次后将会被系统自动封禁 的本地化字符串。
+        /// </summary>
+        public static string WarnUserTips2 {
+            get {
+                return ResourceManager.GetString("WarnUserTips2", resourceCulture);
             }
         }
     }
