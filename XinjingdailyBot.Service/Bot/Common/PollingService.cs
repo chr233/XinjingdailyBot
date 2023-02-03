@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using XinjingdailyBot.Infrastructure.Attribute;
@@ -34,6 +35,7 @@ namespace XinjingdailyBot.Service.Bot.Common
             _levelRepository = levelRepository;
         }
 
+        [RequiresUnreferencedCode("不兼容剪裁")]
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogDebug("注册可用命令");

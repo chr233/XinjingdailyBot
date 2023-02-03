@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -68,6 +69,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
         /// <summary>
         /// 注册命令
         /// </summary>
+        [RequiresUnreferencedCode("不兼容剪裁")]
         public void InstallCommands()
         {
             //获取所有服务方法
@@ -82,7 +84,8 @@ namespace XinjingdailyBot.Service.Bot.Handler
         /// 注册命令
         /// </summary>
         /// <param name="type"></param>
-        private void RegisterCommands(Type type)
+        //[RequiresUnreferencedCode("不兼容剪裁")]
+        private void RegisterCommands([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type type)
         {
             Dictionary<string, AssemblyMethod> commands = new();
             Dictionary<string, string> commandAlias = new();
