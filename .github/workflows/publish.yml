@@ -49,7 +49,7 @@ jobs:
 
       - name: Publish ${{ env.PROJECT_NAME }} ${{ matrix.arch }}
         if: ${{ matrix.arch == 'generic' ) }}
-        run: dotnet publish ${{ env.PROJECT_NAME }} -r ${{ matrix.arch }} -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=true -c Release -o ./tmp/${{ env.PROJECT_NAME }}
+        run: dotnet publish ${{ env.PROJECT_NAME }} -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=true -c Release -o ./tmp/${{ env.PROJECT_NAME }}
 
       - name: Zip files
         run: 7z a -bd -slp -tzip -mm=Deflate -mx=5 -mfb=150 -mpass=10 "./dist/${{ matrix.arch }}.zip" "./tmp/${{ env.PROJECT_NAME }}/*"
