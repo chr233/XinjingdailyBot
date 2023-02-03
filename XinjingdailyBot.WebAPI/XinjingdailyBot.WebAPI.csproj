@@ -6,7 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <TieredPGO>true</TieredPGO>
-    <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -15,6 +14,19 @@
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <DebuggerSupport>false</DebuggerSupport>
+    <UseNativeHttpHandler>true</UseNativeHttpHandler>
+    <TrimMode>partial</TrimMode>
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimmerRemoveSymbols>true</TrimmerRemoveSymbols>
+    <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+    <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
+    <EventSourceSupport>false</EventSourceSupport>
+    <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
+    <MetadataUpdaterSupport>false</MetadataUpdaterSupport>
+    <UseNativeHttpHandler>true</UseNativeHttpHandler>
+    <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,12 +51,8 @@
     <ProjectReference Include="..\XinjingdailyBot.Model\XinjingdailyBot.Model.csproj" />
     <ProjectReference Include="..\XinjingdailyBot.Service\XinjingdailyBot.Service.csproj" />
     <ProjectReference Include="..\XinjingdailyBot.Tasks\XinjingdailyBot.Tasks.csproj" />
-  </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)'=='Release'">
-    <Content Update="appsettings.Development.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Content>
+
   </ItemGroup>
 
 </Project>
