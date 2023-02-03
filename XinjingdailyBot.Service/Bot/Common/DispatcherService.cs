@@ -7,7 +7,6 @@ using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
-using XinjingdailyBot.Service.Bot.Handler;
 
 namespace XinjingdailyBot.Service.Bot.Common
 {

@@ -68,6 +68,18 @@ namespace XinjingdailyBot.Command
         }
 
         /// <summary>
+        /// 终止机器人
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        [TextCmd("EXIT", UserRights.SuperCmd, Description = "终止机器人")]
+        public async Task ResponseExit(Message message)
+        {
+            await _botClient.SendCommandReply("机器人即将退出", message);
+            Environment.Exit(0);
+        }
+
+        /// <summary>
         /// 来源频道设置
         /// </summary>
         /// <param name="dbUser"></param>
@@ -256,6 +268,70 @@ namespace XinjingdailyBot.Command
             }
 
             await _botClient.SendCommandReply($"更新用户表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
+        }
+
+        /// <summary>
+        /// 自动升级机器人
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        //[TextCmd("UPDATE", UserRights.SuperCmd, Description = "自动升级机器人")]
+        public async Task ResponseUpdate(Message message)
+        {
+            //const int threads = 10;
+
+            //int startId = 1;
+            //int effectCount = 0;
+
+            //int totalUsers = await _userService.Queryable().CountAsync();
+
+            //while (startId <= totalUsers)
+            //{
+            //    var users = await _userService.Queryable().Where(x => x.Id >= startId).Take(threads).ToListAsync();
+            //    if (!(users?.Count > 0))
+            //    {
+            //        break;
+            //    }
+
+            //    var tasks = users.Select(async user =>
+            //    {
+            //        int postCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID);
+            //        int acceptCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == PostStatus.Accepted);
+            //        int rejectCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == PostStatus.Rejected);
+            //        int expiredCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status < 0);
+            //        int reviewCount = await _postService.Queryable().CountAsync(x => x.ReviewerUID == user.UserID && x.PosterUID != user.UserID);
+
+            //        if (user.PostCount != postCount || user.AcceptCount != acceptCount || user.RejectCount != rejectCount || user.ExpiredPostCount != expiredCount || user.ReviewCount != reviewCount)
+            //        {
+            //            user.PostCount = postCount;
+            //            user.AcceptCount = acceptCount;
+            //            user.RejectCount = rejectCount;
+            //            user.ExpiredPostCount = expiredCount;
+            //            user.ReviewCount = reviewCount;
+            //            user.ModifyAt = DateTime.Now;
+
+            //            effectCount++;
+
+            //            await _userService.Updateable(user).UpdateColumns(x => new
+            //            {
+            //                x.PostCount,
+            //                x.AcceptCount,
+            //                x.RejectCount,
+            //                x.ExpiredPostCount,
+            //                x.ReviewCount,
+            //                x.ModifyAt
+            //            }).ExecuteCommandAsync();
+            //        }
+            //    }).ToList();
+
+            //    await Task.WhenAll(tasks);
+
+            //    startId += threads;
+
+            //    _logger.LogInformation("更新进度 {startId} / {totalUsers}, 更新数量 {effectCount}", startId, totalUsers, effectCount);
+            //}
+
+            //await _botClient.SendCommandReply($"更新用户表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
         }
     }
 }
