@@ -44,11 +44,11 @@ jobs:
         run: dotnet restore ${{ env.PROJECT_NAME }} -p:ContinuousIntegrationBuild=true --nologo
 
       - name: Publish ${{ env.PROJECT_NAME }} ${{ matrix.arch }}
-        if: ${{ !contains( matrix.arch , 'generic' ) }}
+        if: ${{ matrix.arch != 'generic' }}
         run: dotnet publish ${{ env.PROJECT_NAME }} -r ${{ matrix.arch }} -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=true --self-contained true -c Release -o ./tmp/${{ env.PROJECT_NAME }}
 
       - name: Publish ${{ env.PROJECT_NAME }} ${{ matrix.arch }}
-        if: ${{ contains( matrix.arch , 'generic' ) }}
+        if: ${{ matrix.arch == 'generic' ) }}
         run: dotnet publish ${{ env.PROJECT_NAME }} -r ${{ matrix.arch }} -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=true -c Release -o ./tmp/${{ env.PROJECT_NAME }}
 
       - name: Zip files
