@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.Text;
 using XinjingdailyBot.Infrastructure.Attribute;
 
@@ -12,6 +13,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
         /// 注册引用程序域中所有有AppService标记的类的服务
         /// </summary>
         /// <param name="services"></param>
+        [RequiresUnreferencedCode("不兼容剪裁")]
         public static void AddAppService(this IServiceCollection services)
         {
             string[] cls = new[] { "XinjingdailyBot.Repository", "XinjingdailyBot.Service", "XinjingdailyBot.Command" };
@@ -22,6 +24,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
             }
         }
 
+        [RequiresUnreferencedCode("不兼容剪裁")]
         private static void Register(IServiceCollection services, Assembly assembly)
         {
             StringBuilder sb = new();

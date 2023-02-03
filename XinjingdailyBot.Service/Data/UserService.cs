@@ -311,7 +311,7 @@ namespace XinjingdailyBot.Service.Data
                 _logger.LogError("读取用户 {dbUser} 权限组 {GroupID} 失败", dbUser, dbUser.GroupID);
                 return null;
             }
-
+            
             return dbUser;
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using SqlSugar;
 using SqlSugar.IOC;
 using XinjingdailyBot.Infrastructure;
@@ -11,6 +12,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
 
         private static bool IsFirstLoad = true;
 
+        [RequiresUnreferencedCode("不兼容剪裁")]
         public static void AddSqlSugar(this IServiceCollection services, IConfiguration configuration)
         {
             var dbConfig = configuration.GetSection("Database").Get<OptionsSetting.DatabaseOption>();

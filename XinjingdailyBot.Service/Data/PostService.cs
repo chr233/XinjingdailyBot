@@ -108,9 +108,10 @@ namespace XinjingdailyBot.Service.Data
                 }
             }
 
-            //已通过 + 已拒绝(非重复原因)
+            //已通过 + 已拒绝(非重复/模糊原因)
             var postCount = await Queryable()
-                .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today && (x.Status == PostStatus.Accepted || (x.Status == PostStatus.Rejected && x.Reason != RejectReason.Duplicate)))
+                .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today &&
+                    (x.Status == PostStatus.Accepted || (x.Status == PostStatus.Rejected && x.Reason != RejectReason.Duplicate && x.Reason != RejectReason.Fuzzy)))
                 .CountAsync();
 
             int dailyLimit = baseRatio * _postOption.DailyPostLimit;

@@ -47,7 +47,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. 实体", "2. 实体", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. 服务", "3. 服务", "{CB9524EF-39C6-4752-9620-46FCC300F6E4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5. 启动", "5. 启动", "{484B48CF-FB80-4DE6-A066-F08FED8C3522}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4. 启动", "4. 启动", "{484B48CF-FB80-4DE6-A066-F08FED8C3522}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0. 杂项文件", "0. 杂项文件", "{5B6F00C0-D19B-4D46-AA8A-D81845FE868B}"
 	ProjectSection(SolutionItems) = preProject
@@ -57,7 +57,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0. 杂项文件", "0. 杂�
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XinjingdailyBot.Command", "XinjingdailyBot.Command\XinjingdailyBot.Command.csproj", "{617EC3CE-8307-41BC-A4A5-D437CCA261AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XinjingdailyBot.Tasks", "XinjingdailyBot.Tasks\XinjingdailyBot.Tasks.csproj", "{6880F608-F263-473C-9B04-7C9F9972C1ED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XinjingdailyBot.Tasks", "XinjingdailyBot.Tasks\XinjingdailyBot.Tasks.csproj", "{6880F608-F263-473C-9B04-7C9F9972C1ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,4 +1,5 @@
 ﻿
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using NLog.Extensions.Logging;
 using XinjingdailyBot.Infrastructure;
@@ -10,6 +11,7 @@ namespace XinjingdailyBot.WebAPI
     {
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
+        [RequiresUnreferencedCode("不兼容剪裁")]
         public static void Main(string[] args)
         {
             {
@@ -35,6 +37,9 @@ namespace XinjingdailyBot.WebAPI
 
             //添加服务
             builder.Services.AddAppService();
+
+            //注册HttpClient
+            builder.Services.AddHttpClients();
 
             //Telegram
             builder.Services.AddTelegramBotClient();

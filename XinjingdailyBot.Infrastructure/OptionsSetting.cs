@@ -27,8 +27,14 @@
         /// </summary>
         public PostOption Post { get; set; } = new();
 
+        public GitHubOption GitHub { get; set; } = new();
+
         public sealed record BotOption
         {
+            /// <summary>
+            /// Telegram Api地址
+            /// </summary>
+            public string? BaseUrl { get; set; }
             /// <summary>
             /// 机器人Token
             /// </summary>
@@ -120,12 +126,24 @@
             /// </summary>
             public bool LogSQL { get; set; }
             /// <summary>
-            /// MySQL连接设定
+            /// MySQL主机IP
             /// </summary>
             public string? DbHost { get; set; }
+            /// <summary>
+            /// MySQL主机端口
+            /// </summary>
             public int DbPort { get; set; }
+            /// <summary>
+            /// MySQL数据库名称
+            /// </summary>
             public string? DbName { get; set; }
+            /// <summary>
+            /// MySQL用户名
+            /// </summary>
             public string? DbUser { get; set; }
+            /// <summary>
+            /// MySQL密码
+            /// </summary>
             public string? DbPassword { get; set; }
         }
 
@@ -156,6 +174,14 @@
             /// 最高倍数
             /// </summary>
             public int MaxRatio { get; set; } = 10;
+        }
+
+        public sealed record GitHubOption
+        {
+            /// <summary>
+            /// Github Api地址
+            /// </summary>
+            public string? BaseUrl { get; set; }
         }
     }
 }
