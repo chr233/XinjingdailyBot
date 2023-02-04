@@ -5,6 +5,9 @@ using XinjingdailyBot.Infrastructure.Attribute;
 
 namespace XinjingdailyBot.WebAPI.Extensions
 {
+    /// <summary>
+    /// 动态注册服务扩展
+    /// </summary>
     public static class AppServiceExtensions
     {
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();

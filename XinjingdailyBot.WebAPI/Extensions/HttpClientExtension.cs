@@ -5,9 +5,16 @@ using XinjingdailyBot.Infrastructure;
 
 namespace XinjingdailyBot.WebAPI.Extensions
 {
+    /// <summary>
+    /// HttpClient扩展
+    /// </summary>
     public static class HttpClientExtension
     {
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+        /// <summary>
+        /// 注册HttpClient
+        /// </summary>
+        /// <param name="services"></param>
         public static void AddHttpClients(this IServiceCollection services)
         {
             services.AddHttpClient("Telegram", (serviceProvider, httpClient) =>

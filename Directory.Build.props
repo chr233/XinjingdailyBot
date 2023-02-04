@@ -5,6 +5,7 @@
 
   <PropertyGroup>
     <Authors>Chr_</Authors>
+    <ApplicationIcon>../resources/icon.ico</ApplicationIcon>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <Company>chrxw.com</Company>
     <Copyright>Copyright © 2022-$([System.DateTime]::UtcNow.Year) $(Company)</Copyright>
@@ -16,7 +17,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <NeutralLanguage>zh-cn</NeutralLanguage>
     <Nullable>enable</Nullable>
-    <PackageIcon>../resources/icon.ico</PackageIcon>
+    <PackageIcon>$(ApplicationIcon)</PackageIcon>
     <PackageLicenseExpression>AGPL-3.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/chr233/XinjingdailyBot</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -36,7 +37,6 @@
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DebugType>none</DebugType>
-    <DebugSymbols>false</DebugSymbols>
     <DebuggerSupport>false</DebuggerSupport>
     <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
     <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
@@ -46,7 +46,6 @@
     <UseNativeHttpHandler>true</UseNativeHttpHandler>
     <TieredPGO>true</TieredPGO>
     <TrimMode>partial</TrimMode>
-    <PublishTrimmed>true</PublishTrimmed>
     <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
   </PropertyGroup>
 

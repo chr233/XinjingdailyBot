@@ -1,7 +1,10 @@
-using Microsoft.AspNetCore.Mvc;
+ï»¿using Microsoft.AspNetCore.Mvc;
 
 namespace XinjingdailyBot.WebAPI.Controllers
 {
+    /// <summary>
+    /// ä¸»é¡µæ§åˆ¶å™¨
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class IndexController : ControllerBase
@@ -16,7 +19,7 @@ namespace XinjingdailyBot.WebAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok("Æô¶¯Íê³É");
+            return Ok("å¯åŠ¨å®Œæˆ");
         }
     }
 }
