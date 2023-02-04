@@ -22,6 +22,8 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 if (string.IsNullOrEmpty(token))
                 {
                     _logger.Error("Telegram bot token 不能为空");
+                    _logger.Error("按任意键退出...");
+                    Console.ReadKey();
                     Environment.Exit(1);
                 }
 

@@ -20,6 +20,8 @@ namespace XinjingdailyBot.WebAPI.Extensions
             if (dbConfig == null)
             {
                 _logger.Error("数据库配置不能为空");
+                _logger.Error("按任意键退出...");
+                Console.ReadKey();
                 Environment.Exit(1);
             }
 
