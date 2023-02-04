@@ -6,9 +6,16 @@ using XinjingdailyBot.Tasks;
 
 namespace XinjingdailyBot.WebAPI.Extensions
 {
+    /// <summary>
+    /// Telegram扩展
+    /// </summary>
     public static class TelegramExtension
     {
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+        /// <summary>
+        /// 注册Telegram客户端
+        /// </summary>
+        /// <param name="services"></param>
         public static void AddTelegramBotClient(this IServiceCollection services)
         {
             services.AddSingleton<ITelegramBotClient>(serviceProvider =>

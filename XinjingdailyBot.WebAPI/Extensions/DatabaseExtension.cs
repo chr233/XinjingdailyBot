@@ -6,12 +6,21 @@ using XinjingdailyBot.Infrastructure;
 
 namespace XinjingdailyBot.WebAPI.Extensions
 {
+    
+    /// <summary>
+    /// 数据库扩展
+    /// </summary>
     public static class DatabaseExtension
     {
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         private static bool IsFirstLoad = true;
 
+        /// <summary>
+        /// 注册数据库
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
         [RequiresUnreferencedCode("不兼容剪裁")]
         public static void AddSqlSugar(this IServiceCollection services, IConfiguration configuration)
         {
