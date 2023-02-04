@@ -52,7 +52,7 @@ jobs:
         run: |
           $variant = '${{ matrix.arch }}'
 
-          $commonArgs = '-p:PublishSingleFile=true', '-p:IncludeNativeLibrariesForSelfExtract=true', '-p:PublishTrimmed=true'
+          $commonArgs = '-p:PublishSingleFile=true', '-p:IncludeNativeLibrariesForSelfExtract=true', '-p:PublishTrimmed=false'
 
           if ($variant -eq 'generic') {
             $buildArgs = '-p:TargetLatestRuntimePatch=false', '-p:UseAppHost=false'
