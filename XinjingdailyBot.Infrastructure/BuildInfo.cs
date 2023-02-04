@@ -3,7 +3,7 @@
     public static class BuildInfo
     {
 #if XJB_VARIANT_GENERIC
-		    internal static bool CanUpdate => true;
+		    internal static bool CanUpdate => false;
 		    internal static string Variant => "generic";
 #elif XJB_VARIANT_LINUX_ARM
 		    internal static bool CanUpdate => true;
