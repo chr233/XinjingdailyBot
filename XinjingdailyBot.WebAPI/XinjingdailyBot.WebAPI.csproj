@@ -38,6 +38,7 @@
     <Content Include="..\LICENSE.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Content>
   </ItemGroup>
   

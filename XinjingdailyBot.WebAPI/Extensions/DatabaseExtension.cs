@@ -6,7 +6,7 @@ using XinjingdailyBot.Infrastructure;
 
 namespace XinjingdailyBot.WebAPI.Extensions
 {
-    
+
     /// <summary>
     /// 数据库扩展
     /// </summary>

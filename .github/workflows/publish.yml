@@ -9,7 +9,6 @@ env:
   CONFIGURATION: Release
   DOTNET_SDK_VERSION: 7.0.x
 
-
 jobs:
   build:
     strategy:
@@ -24,7 +23,6 @@ jobs:
             linux-x64,
             linux-arm,
             linux-arm64,
-            generic,
           ]
 
     runs-on: windows-latest
@@ -73,6 +71,13 @@ jobs:
         with:
           name: ${{ matrix.arch }}
           path: ./dist/${{ matrix.arch }}.zip
+    
+      - name: Upload ${{ env.PROJECT_NAME }} ${{ matrix.arch }}
+        continue-on-error: true
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: ${{ matrix.arch }}
+          path: ./dist/${{ matrix.arch }}-cfe.zip
 
   release:
     needs: build
