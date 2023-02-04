@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using System.Text;
+﻿using System.Text;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -120,10 +119,11 @@ namespace XinjingdailyBot.Command
         public async Task ResponseVersion(Message message)
         {
             StringBuilder sb = new();
-            var version = Assembly.Load("XinjingdailyBot.WebAPI").GetName().Version;
-            sb.AppendLine($"当前机器人版本: <code>{version}</code>");
-            sb.Append("获取开源程序: ");
-            sb.AppendLine(_textHelperService.HtmlLink("https://github.com/chr233/XinjingdailyBot/", "Xinjingdaily"));
+            string version = Utils.Version;
+            string variant = BuildInfo.Variant;
+            sb.AppendLine($"程序版本: <code>{version}</code>");
+            sb.AppendLine($"子版本: <code>{variant}</code>");
+            sb.AppendLine(string.Format("获取开源程序: {0}", _textHelperService.HtmlLink("https://github.com/chr233/XinjingdailyBot/", "Xinjingdaily")));
             await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
         }
 

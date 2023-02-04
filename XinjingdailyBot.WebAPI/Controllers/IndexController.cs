@@ -11,11 +11,19 @@ namespace XinjingdailyBot.WebAPI.Controllers
     {
         private readonly ILogger<IndexController> _logger;
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="logger"></param>
         public IndexController(ILogger<IndexController> logger)
         {
             _logger = logger;
         }
 
+        /// <summary>
+        /// Root
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Get()
         {

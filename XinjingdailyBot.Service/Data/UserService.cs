@@ -311,7 +311,7 @@ namespace XinjingdailyBot.Service.Data
                 _logger.LogError("读取用户 {dbUser} 权限组 {GroupID} 失败", dbUser, dbUser.GroupID);
                 return null;
             }
-            
+
             return dbUser;
         }
 
@@ -637,6 +637,16 @@ namespace XinjingdailyBot.Service.Data
             return sb.ToString();
         }
 
+        /// <summary>
+        /// 进入排行榜所需的最低稿件数量
+        /// </summary>
+        private const int MiniumRankPost = 10;
+
+        /// <summary>
+        /// 获取用户排名
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <returns></returns>
         public async Task<string> GetUserRank(Users dbUser)
         {
             var now = DateTime.Now;
@@ -644,20 +654,22 @@ namespace XinjingdailyBot.Service.Data
 
             StringBuilder sb = new();
 
+
             if (dbUser.GroupID == 1)
             {
-                if (dbUser.AcceptCount >= 1)
+                if (dbUser.AcceptCount >= MiniumRankPost)
                 {
-                    const int miniumPost = 10;
-
                     int acceptCountRank = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > dbUser.AcceptCount && x.ModifyAt >= prev30Days).CountAsync() + 1;
 
                     double ratio = 1.0 * dbUser.AcceptCount / dbUser.PostCount;
-                    int acceptRatioRank = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
+                    int acceptRatioRank = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > MiniumRankPost && x.ModifyAt >= prev30Days)
                     .Select(y => 100.0 * y.AcceptCount / y.PostCount).Where(x => x > ratio).CountAsync() + 1;
 
                     sb.AppendLine($"通过数排名: <code>{acceptCountRank}</code>");
                     sb.AppendLine($"通过率排名: <code>{acceptRatioRank}</code>");
+
+                    int activeUser = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.ModifyAt >= prev30Days).CountAsync();
+                    sb.AppendLine($"活跃用户总数: <code>{activeUser}</code>");
                 }
                 else
                 {
@@ -666,11 +678,14 @@ namespace XinjingdailyBot.Service.Data
             }
             else
             {
-                int activeUser = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.ModifyAt >= prev30Days).CountAsync();
-                sb.AppendLine($"活跃用户数: <code>{activeUser}</code>");
+                int acceptCountRank = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.AcceptCount > dbUser.AcceptCount && x.ModifyAt >= prev30Days).CountAsync() + 1;
+                int reviewCountRank = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.ReviewCount > dbUser.ReviewCount && x.ModifyAt >= prev30Days).CountAsync() + 1;
 
-                sb.AppendLine($"管理员不参与用户排名");
-                sb.AppendLine($"可以使用命令 /userrank 查看总排名");
+                sb.AppendLine($"投稿数排名: <code>{acceptCountRank}</code>");
+                sb.AppendLine($"审核数排名: <code>{reviewCountRank}</code>");
+
+                int activeAdmin = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.ModifyAt >= prev30Days).CountAsync();
+                sb.AppendLine($"活跃管理员总数: <code>{activeAdmin}</code>");
             }
 
             return sb.ToString();

@@ -794,13 +794,15 @@ namespace XinjingdailyBot.Command
             sb.AppendLine($"运行时间: <code>{cpu.TotalDays:F8}</code> 天");
 
             var today = DateTime.Now.AddHours(-24);
-            var cmdCount = await _cmdRecordService.Queryable().Where(x => !x.IsQuery && x.ExecuteAt >= today).CountAsync();
-            var QueryCount = await _cmdRecordService.Queryable().Where(x => x.IsQuery && x.ExecuteAt >= today).CountAsync();
+            var cmdCount = await _cmdRecordService.Queryable().Where(x => !x.IsQuery && x.Handled && x.ExecuteAt >= today).CountAsync();
+            var QueryCount = await _cmdRecordService.Queryable().Where(x => x.IsQuery && x.Handled && x.ExecuteAt >= today).CountAsync();
+            var errorCount = await _cmdRecordService.Queryable().Where(x => x.Error && x.Handled && x.ExecuteAt >= today).CountAsync();
 
             sb.AppendLine();
             sb.AppendLine("-- 调用统计 --");
             sb.AppendLine($"文字命令: <code>{cmdCount}</code> 次");
             sb.AppendLine($"查询调用: <code>{QueryCount}</code> 次");
+            sb.AppendLine($"出错次数: <code>{errorCount}</code> 次");
 
             sb.AppendLine();
             sb.AppendLine("-- 硬盘信息 --");

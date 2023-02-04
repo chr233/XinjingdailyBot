@@ -8,7 +8,7 @@ namespace XinjingdailyBot.Interface.Bot.Handler
     {
         string GetAvilabeCommands(Users dbUser);
         Task<bool> GetCommandsMenu();
-        
+
         [RequiresUnreferencedCode("不兼容剪裁")]
         void InstallCommands();
         Task OnCommandReceived(Users dbUser, Message message);

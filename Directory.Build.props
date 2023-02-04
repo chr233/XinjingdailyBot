@@ -10,7 +10,7 @@
     <Company>chrxw.com</Company>
     <Copyright>Copyright © 2022-$([System.DateTime]::UtcNow.Year) $(Company)</Copyright>
     <Description>The submission bot of @xinjingdaily developed by Chr_.</Description>
-		<Deterministic>true</Deterministic>
+    <Deterministic>true</Deterministic>
     <ErrorReport>none</ErrorReport>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
@@ -37,6 +37,7 @@
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
     <DebuggerSupport>false</DebuggerSupport>
     <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
     <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
