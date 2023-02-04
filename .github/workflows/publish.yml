@@ -53,12 +53,12 @@ jobs:
         run: |
           $variant = '${{ matrix.arch }}'
 
-          $commonArgs = '-p:PublishSingleFile=true', '-p:IncludeNativeLibrariesForSelfExtract=true', '-p:PublishTrimmed=false'
+          $commonArgs = '-p:PublishTrimmed=false'
 
           if ($variant -eq 'generic') {
             $buildArgs = '-p:TargetLatestRuntimePatch=false', '-p:UseAppHost=false'
           } else {
-            $buildArgs = '-r', "$variant", '--self-contained'
+            $buildArgs = '-r', "$variant", '--self-contained', '-p:PublishSingleFile=true', '-p:IncludeNativeLibrariesForSelfExtract=true'
           }
 
           dotnet publish ${{ env.PROJECT_NAME }} -c "$env:CONFIGURATION" -o "./tmp/${{ env.PROJECT_NAME }}" -p:XJBVariant="$variant" -p:ContinuousIntegrationBuild=true --no-restore --nologo $commonArgs $buildArgs
@@ -89,48 +89,56 @@ jobs:
         uses: actions/checkout@v3.0.2
 
       - name: Download win-x64 artifact
+        continue-on-error: true
         uses: actions/download-artifact@v3.0.0
         with:
           name: win-x64
           path: out
 
       - name: Download win-arm64 artifact
+        continue-on-error: true
         uses: actions/download-artifact@v3.0.0
         with:
           name: win-arm64
           path: out
 
       - name: Download osx-x64 artifact
+        continue-on-error: true
         uses: actions/download-artifact@v3.0.0
         with:
           name: osx-x64
           path: out
 
       - name: Download osx-arm64 artifact
+        continue-on-error: true
         uses: actions/download-artifact@v3.0.0
         with:
           name: osx-arm64
           path: out
 
       - name: Download linux-x64 artifact
+        continue-on-error: true
         uses: actions/download-artifact@v3.0.0
         with:
           name: linux-x64
           path: out
 
       - name: Download linux-arm artifact
+        continue-on-error: true
         uses: actions/download-artifact@v3.0.0
         with:
           name: linux-arm
           path: out
 
       - name: Download linux-arm64 artifact
+        continue-on-error: true
         uses: actions/download-artifact@v3.0.0
         with:
           name: linux-arm64
           path: out
 
       - name: Download generic artifact
+        continue-on-error: true
         uses: actions/download-artifact@v3.0.0
         with:
           name: generic
@@ -148,6 +156,7 @@ jobs:
           prerelease: true
 
       - name: Upload win-x64 to GitHub release
+        continue-on-error: true
         uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -158,6 +167,7 @@ jobs:
           asset_content_type: application/zip
 
       - name: Upload win-arm64 to GitHub release
+        continue-on-error: true
         uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -168,6 +178,7 @@ jobs:
           asset_content_type: application/zip
 
       - name: Upload osx-x64 to GitHub release
+        continue-on-error: true
         uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -178,6 +189,7 @@ jobs:
           asset_content_type: application/zip
 
       - name: Upload osx-arm64 to GitHub release
+        continue-on-error: true
         uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -188,6 +200,7 @@ jobs:
           asset_content_type: application/zip
 
       - name: Upload linux-x64 to GitHub release
+        continue-on-error: true
         uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -198,6 +211,7 @@ jobs:
           asset_content_type: application/zip
 
       - name: Upload linux-arm to GitHub release
+        continue-on-error: true
         uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -208,6 +222,7 @@ jobs:
           asset_content_type: application/zip
 
       - name: Upload linux-arm64 to GitHub release
+        continue-on-error: true
         uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -218,6 +233,7 @@ jobs:
           asset_content_type: application/zip
 
       - name: Upload generic to GitHub release
+        continue-on-error: true
         uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
