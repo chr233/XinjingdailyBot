@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Model;
+using XinjingdailyBot.Interface.Helper;
 
 namespace XinjingdailyBot.Service.Helper
 {

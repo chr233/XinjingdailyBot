@@ -15,7 +15,6 @@ using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
-using XinjingdailyBot.Service.Helper;
 
 namespace XinjingdailyBot.Command
 {
