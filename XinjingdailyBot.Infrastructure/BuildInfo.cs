@@ -27,8 +27,8 @@
 		    internal static bool CanUpdate => true;
 		    internal static string Variant => "win-x64";
 #else
-        public static bool CanUpdate => true;
-        public static string Variant => "win-x64";
+        public static bool CanUpdate => false;
+        public static string Variant => "source";
 #endif
     }
 }
