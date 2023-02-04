@@ -6,6 +6,10 @@ on:
       - "*"
 env:
   PROJECT_NAME: "XinjingdailyBot.WebAPI"
+  CONFIGURATION: Release
+  DOTNET_NOLOGO: true
+  DOTNET_SDK_VERSION: 7.0.x
+
 
 jobs:
   build:
@@ -35,21 +39,31 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v2.1.0
         with:
-          dotnet-version: 7.0.x
+          dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
 
       - name: Verify .NET Core
         run: dotnet --info
 
-      - name: Restore packages in preparation for ${{ env.PROJECT_NAME }} publishing
-        run: dotnet restore ${{ env.PROJECT_NAME }} -p:ContinuousIntegrationBuild=true --nologo
+      - name: Prepare for publishing ${{ env.PROJECT_NAME }}
+        shell: pwsh
+        run: |
+          dotnet restore
+          dotnet build ${{ env.PROJECT_NAME }} -c "$env:CONFIGURATION" -p:ContinuousIntegrationBuild=true -p:TargetLatestRuntimePatch=false -p:UseAppHost=false --no-restore --nologo
 
       - name: Publish ${{ env.PROJECT_NAME }} ${{ matrix.arch }}
-        if: ${{ matrix.arch != 'generic' }}
-        run: dotnet publish ${{ env.PROJECT_NAME }} -r ${{ matrix.arch }} -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=true --self-contained true -c Release -o ./tmp/${{ env.PROJECT_NAME }}
+        shell: pwsh
+        run: |
+          $variant = '${{ matrix.arch }}'
 
-      - name: Publish ${{ env.PROJECT_NAME }} ${{ matrix.arch }}
-        if: ${{ matrix.arch == 'generic' ) }}
-        run: dotnet publish ${{ env.PROJECT_NAME }} -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=true -c Release -o ./tmp/${{ env.PROJECT_NAME }}
+          $commonArgs = '-p:PublishSingleFile=true', '-p:IncludeNativeLibrariesForSelfExtract=true', '-p:PublishTrimmed=true'
+
+          if ($variant -eq 'generic') {
+            $buildArgs = '-p:TargetLatestRuntimePatch=false', '-p:UseAppHost=false'
+          } else {
+            $buildArgs = '-r', "$variant", '--self-contained'
+          }
+
+          dotnet publish ${{ env.PROJECT_NAME }} -c "$env:CONFIGURATION" -o "./tmp/${{ env.PROJECT_NAME }}" -p:XJBVariant="$variant" -p:ContinuousIntegrationBuild=true --no-restore --nologo $commonArgs $buildArgs
 
       - name: Zip files
         run: 7z a -bd -slp -tzip -mm=Deflate -mx=5 -mfb=150 -mpass=10 "./dist/${{ matrix.arch }}.zip" "./tmp/${{ env.PROJECT_NAME }}/*"
@@ -197,7 +211,7 @@ jobs:
           asset_path: out/linux-arm64.zip
           asset_name: ${{ env.PROJECT_NAME }}-linux-arm64.zip
           asset_content_type: application/zip
-      
+
       - name: Upload generic to GitHub release
         uses: actions/upload-release-asset@v1.0.2
         env:

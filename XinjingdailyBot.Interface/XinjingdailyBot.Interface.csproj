@@ -2,17 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <TieredPGO>true</TieredPGO>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <DebugType>none</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
