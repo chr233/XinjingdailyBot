@@ -44,7 +44,7 @@
     <EventSourceSupport>false</EventSourceSupport>
     <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
     <MetadataUpdaterSupport>false</MetadataUpdaterSupport>
-    <UseNativeHttpHandler>true</UseNativeHttpHandler>
+    <UseNativeHttpHandler>false</UseNativeHttpHandler>
     <TieredPGO>true</TieredPGO>
     <TrimMode>partial</TrimMode>
     <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
