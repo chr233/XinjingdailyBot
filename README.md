@@ -43,7 +43,7 @@
 
 ## 安装与使用
 
-从 [Releases](https://github.com/chr233/XinjingdailyBot/releases) 下载编译好的文件以后, 直接运行 XinjingDailyBot 即可
+从 [Releases](https://github.com/chr233/XinjingdailyBot/releases) 下载编译好的文件以后, 直接运行 XinjingDailyBot.WebAPI 即可
 
 ### 升级注意
 
