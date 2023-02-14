@@ -174,6 +174,14 @@
             /// 最高倍数
             /// </summary>
             public int MaxRatio { get; set; } = 10;
+            /// <summary>
+            /// 过滤连续空格
+            /// </summary>
+            public bool PureRetuens { get; set; } = true;
+            /// <summary>
+            /// 过滤其他 #Tag
+            /// </summary>
+            public bool PureHashTag { get; set; } = true;
         }
 
         public sealed record GitHubOption

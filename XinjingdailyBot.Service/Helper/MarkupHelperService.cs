@@ -280,7 +280,7 @@ namespace XinjingdailyBot.Service.Helper
         /// <returns></returns>
         public InlineKeyboardMarkup? UserListPageKeyboard(Users dbUser, string query, int current, int total)
         {
-            var btnClose = InlineKeyboardButton.WithCallbackData("关闭", $"cmd {dbUser.UserID} cancelclose 已关闭");
+            var btnClose = InlineKeyboardButton.WithCallbackData("关闭", $"cmd {dbUser.UserID} cancelsearchuser 已关闭");
 
             if (total == 1)
             {
