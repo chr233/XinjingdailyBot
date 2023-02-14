@@ -64,6 +64,8 @@ namespace XinjingdailyBot.Command
             _cmdRecordService = cmdRecordService;
         }
 
+        private readonly DateTime StartAt = DateTime.Now;
+
         /// <summary>
         /// 被警告超过此值自动封禁
         /// </summary>
@@ -677,6 +679,19 @@ namespace XinjingdailyBot.Command
         }
 
         /// <summary>
+        /// 停止搜索用户
+        /// </summary>
+        /// <param name="callbackQuery"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        [QueryCmd("CANCELSEARCHUSER", UserRights.AdminCmd, Alias = "CANCELCLOSE")]
+        public async Task QResponseCancelSearchUser(Users dbUser, CallbackQuery callbackQuery, string[] args)
+        {
+            string text = args.Length >= 2 ? args[1] : "参数有误";
+            await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, ParseMode.Html, true, null);
+        }
+
+        /// <summary>
         /// 生成投稿统计信息
         /// </summary>
         /// <param name="message"></param>
@@ -788,10 +803,14 @@ namespace XinjingdailyBot.Command
             sb.AppendLine("-- 应用信息 --");
             var proc = Process.GetCurrentProcess();
             var mem = proc.WorkingSet64 / 1024.0 / 1024.0;
-            var cpu = proc.TotalProcessorTime;
             sb.AppendLine($"当前版本: <code>{version}</code>");
             sb.AppendLine($"占用内存: <code>{mem:F2}</code> MB");
-            sb.AppendLine($"运行时间: <code>{cpu.TotalDays:F8}</code> 天");
+
+            TimeSpan uptime = DateTime.Now - StartAt;
+            int day = (int)uptime.TotalDays;
+            double hours = uptime.TotalHours - day * 24;
+
+            sb.AppendLine($"运行时间: <code>{day}</code> 天 <code>{hours:F8}</code> 小时");
 
             var today = DateTime.Now.AddHours(-24);
             var cmdCount = await _cmdRecordService.Queryable().Where(x => !x.IsQuery && x.Handled && x.ExecuteAt >= today).CountAsync();
@@ -1038,6 +1057,19 @@ namespace XinjingdailyBot.Command
                         targetUser.GroupID = groupID;
                         targetUser.ModifyAt = DateTime.Now;
                         await _userService.Updateable(targetUser).UpdateColumns(x => new { x.GroupID, x.ModifyAt }).ExecuteCommandAsync();
+
+                        if (targetUser.PrivateChatID != -1)
+                        {
+                            try
+                            {
+                                await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"您的权限组已被管理员修改为 {group.Name}");
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError("向用户 {targetUser} 发送消息失败, {ex}", targetUser, ex);
+                            }
+                        }
+
                         return $"修改用户 {targetUser} 权限组成功, 当前权限组 {group.Name}";
                     }
                 }
