@@ -1,5 +1,4 @@
 ﻿using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
 
