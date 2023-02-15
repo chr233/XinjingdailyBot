@@ -34,7 +34,7 @@ namespace XinjingdailyBot.Tasks
         /// <summary>
         /// 发布频道置顶间隔
         /// </summary>
-        private readonly TimeSpan CheckInterval = TimeSpan.FromSeconds(5);
+        private readonly TimeSpan CheckInterval = TimeSpan.FromDays(1);
 
         /// <summary>
         /// 计时器
@@ -46,10 +46,6 @@ namespace XinjingdailyBot.Tasks
             var now = DateTime.Now;
             var nextDay = now.AddDays(1).AddHours(19 - now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             var tillTomorrow = nextDay - now;
-
-#if DEBUG
-            tillTomorrow = TimeSpan.FromSeconds(5);
-#endif
 
             _timer = new Timer(DoWork, null, tillTomorrow, CheckInterval);
 
