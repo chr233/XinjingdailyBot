@@ -2,14 +2,15 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Repository;
 
-namespace XinjingdailyBot.Service.Bot.Common
+namespace XinjingdailyBot.Tasks
 {
-    [AppService(LifeTime.Transient)]
+    /// <summary>
+    /// 注册消息接收器
+    /// </summary>
     public class PollingService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;

@@ -1,13 +1,18 @@
 ﻿using System.Text;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
+using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Data;
 
 namespace XinjingdailyBot.Tasks
 {
+    /// <summary>
+    /// 过期稿件处理
+    /// </summary>
     public class ExpiredPostsTask : IHostedService, IDisposable
     {
         private readonly ILogger<ExpiredPostsTask> _logger;
@@ -19,18 +24,25 @@ namespace XinjingdailyBot.Tasks
             ILogger<ExpiredPostsTask> logger,
             IPostService postService,
             IUserService userService,
-            ITelegramBotClient botClient)
+            ITelegramBotClient botClient,
+            IOptions<OptionsSetting> options)
         {
             _logger = logger;
             _postService = postService;
             _userService = userService;
             _botClient = botClient;
+            PostExpiredTime = TimeSpan.FromDays(options.Value.Post.PostExpiredTime);
         }
 
         /// <summary>
-        /// 超时时间设定
+        /// 定时器周期
         /// </summary>
-        private readonly TimeSpan PostExpiredTime = TimeSpan.FromDays(3);
+        private readonly TimeSpan CheckInterval = TimeSpan.FromDays(3);
+
+        /// <summary>
+        /// 稿件过期时间
+        /// </summary>
+        private TimeSpan PostExpiredTime { get; init; }
 
         /// <summary>
         /// 计时器
@@ -43,7 +55,7 @@ namespace XinjingdailyBot.Tasks
             var nextDay = now.AddDays(1).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             var tillTomorrow = nextDay - now;
 
-            _timer = new Timer(DoWork, null, tillTomorrow, PostExpiredTime);
+            _timer = new Timer(DoWork, null, tillTomorrow, CheckInterval);
 
             return Task.CompletedTask;
         }

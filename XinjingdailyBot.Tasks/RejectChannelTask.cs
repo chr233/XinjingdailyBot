@@ -6,12 +6,14 @@ using XinjingdailyBot.Interface.Bot.Common;
 
 namespace XinjingdailyBot.Tasks
 {
+    /// <summary>
+    /// 拒稿存档频道置顶
+    /// </summary>
     public class RejectChannelTask : IHostedService, IDisposable
     {
         private readonly ILogger<RejectChannelTask> _logger;
         private readonly IChannelService _channelService;
         private readonly ITelegramBotClient _botClient;
-
 
         public RejectChannelTask(
             ILogger<RejectChannelTask> logger,
@@ -26,7 +28,7 @@ namespace XinjingdailyBot.Tasks
         /// <summary>
         /// 发布频道置顶间隔
         /// </summary>
-        private readonly TimeSpan PostNoticePeriod = TimeSpan.FromDays(1);
+        private readonly TimeSpan PostInterval = TimeSpan.FromDays(1);
 
         /// <summary>
         /// 计时器
@@ -39,7 +41,7 @@ namespace XinjingdailyBot.Tasks
             var nextDay = now.AddDays(1).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             var tillTomorrow = nextDay - now;
 
-            _timer = new Timer(DoWork, null, tillTomorrow, PostNoticePeriod);
+            _timer = new Timer(DoWork, null, tillTomorrow, PostInterval);
 
             return Task.CompletedTask;
         }
@@ -54,7 +56,7 @@ namespace XinjingdailyBot.Tasks
 
             var rejectChannel = _channelService.RejectChannel;
             var message = await _botClient.SendTextMessageAsync(rejectChannel, descText);
-            await _botClient.PinChatMessageAsync(rejectChannel, message.MessageId);
+            await _botClient.PinChatMessageAsync(rejectChannel, message.MessageId, true);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

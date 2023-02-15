@@ -685,7 +685,7 @@ namespace XinjingdailyBot.Command
         /// <param name="args"></param>
         /// <returns></returns>
         [QueryCmd("CANCELSEARCHUSER", UserRights.AdminCmd, Alias = "CANCELCLOSE")]
-        public async Task QResponseCancelSearchUser(Users dbUser, CallbackQuery callbackQuery, string[] args)
+        public async Task QResponseCancelSearchUser(CallbackQuery callbackQuery, string[] args)
         {
             string text = args.Length >= 2 ? args[1] : "参数有误";
             await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, ParseMode.Html, true, null);
@@ -1079,6 +1079,49 @@ namespace XinjingdailyBot.Command
 
             string text = await exec();
             await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, replyMarkup: null);
+        }
+
+        /// <summary>
+        /// 查看消息详情
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        [TextCmd("MESSAGE", UserRights.AdminCmd, Alias = "MSG", Description = "查看消息详情")]
+        public async Task GetMessageDetail(Message message)
+        {
+            var msg = message.ReplyToMessage ?? message;
+
+            StringBuilder sb = new();
+
+            sb.AppendLine("消息详情");
+
+            sb.AppendLine($"Chat Type: <code>{msg.Chat.Type}</code>");
+            if (message.Chat.Type != ChatType.Private)
+            {
+                sb.AppendLine($"Chat Title: <code>{msg.Chat.ChatProfile()}</code>");
+            }
+            sb.AppendLine($"Chat Id: <code>{msg.Chat.Id}</code>");
+
+            if (msg.From != null)
+            {
+                sb.AppendLine($"From: <code>{msg.From.FullName()}</code> <code>{msg.From.UserID()}</code>");
+            }
+            if (msg.ForwardFrom != null)
+            {
+                sb.AppendLine($"ForwardFrom: <code>{msg.ForwardFrom.FullName()}</code> <code>{msg.ForwardFrom.UserID()}</code>");
+            }
+
+            sb.AppendLine($"Message Id: <code>{msg.MessageId}</code>");
+
+            if (!string.IsNullOrEmpty(msg.MediaGroupId))
+            {
+                sb.AppendLine($"Media Group Id: <code>{msg.MediaGroupId}</code>");
+            }
+
+            sb.AppendLine($"Message Type: <code>{msg.Type}</code>");
+            sb.AppendLine($"Message Date: <code>{msg.Date}</code>");
+
+            await _botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
         }
     }
 }
