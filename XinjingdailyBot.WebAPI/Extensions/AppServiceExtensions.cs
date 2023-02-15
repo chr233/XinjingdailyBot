@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Text;
 using XinjingdailyBot.Infrastructure.Attribute;
 
 namespace XinjingdailyBot.WebAPI.Extensions
@@ -27,12 +26,16 @@ namespace XinjingdailyBot.WebAPI.Extensions
             }
         }
 
+        /// <summary>
+        /// 动态注册服务
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="assembly"></param>
         [RequiresUnreferencedCode("不兼容剪裁")]
         private static void Register(IServiceCollection services, Assembly assembly)
         {
-            StringBuilder sb = new();
-            sb.AppendLine();
-            sb.AppendLine("===== 开始注册服务 =====");
+            string? name = assembly.GetName().Name;
+            _logger.Debug($"===== 注册 {name} 中的服务 =====");
             int count = 0;
             foreach (var type in assembly.GetTypes())
             {
@@ -69,12 +72,10 @@ namespace XinjingdailyBot.WebAPI.Extensions
                             break;
                     }
 
-                    sb.AppendLine($" [{lifetime}]：{serviceType}");
+                    _logger.Debug($"{lifetime} - {serviceType}");
                 }
             }
-            sb.Append($"===== 注册了 {count} 个服务 =====");
-
-            _logger.Debug(sb.ToString());
+            _logger.Debug($"===== 注册了 {count} 个服务 =====");
         }
     }
 }

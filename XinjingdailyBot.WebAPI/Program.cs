@@ -47,6 +47,9 @@ namespace XinjingdailyBot.WebAPI
             //Telegram
             builder.Services.AddTelegramBotClient();
 
+            //定时任务
+            builder.Services.AddTasks();
+
             //Web API
             builder.Services.AddControllers();
 

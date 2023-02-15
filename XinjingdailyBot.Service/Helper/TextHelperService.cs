@@ -25,8 +25,8 @@ namespace XinjingdailyBot.Service.Helper
         {
             _channelService = channelService;
             _optionsSetting = options.Value;
-            PureStrings = Emojis.PureStrings.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
 
+            PureStrings = _optionsSetting.Post.PureWords.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
         }
 
         private string[] PureStrings { get; init; }
