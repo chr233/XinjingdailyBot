@@ -35,6 +35,7 @@ namespace XinjingdailyBot.Service.Bot.Common
 
             if (dbUser == null)
             {
+                _logger.LogWarning("User not found in database");
                 return;
             }
 
@@ -45,7 +46,7 @@ namespace XinjingdailyBot.Service.Bot.Common
                 UpdateType.CallbackQuery => _dispatcherService.OnCallbackQueryReceived(dbUser, update.CallbackQuery!),
                 UpdateType.ChatJoinRequest => _dispatcherService.OnJoinRequestReceived(dbUser, update.ChatJoinRequest!),
                 UpdateType.InlineQuery => _dispatcherService.OnInlineQueryReceived(dbUser, update.InlineQuery!),
-                _ => null
+                _ => _dispatcherService.OnOtherUpdateReceived(dbUser, update)
             };
 
             if (handler != null)

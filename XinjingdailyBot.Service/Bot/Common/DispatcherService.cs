@@ -164,5 +164,10 @@ namespace XinjingdailyBot.Service.Bot.Common
         {
             await _inlineQueryHandler.OnInlineQueryReceived(dbUser, query);
         }
+
+        public async Task OnOtherUpdateReceived(Users dbUser, Update update)
+        {
+            _logger.LogInformation("收到未知消息类型的消息");
+        }
     }
 }
