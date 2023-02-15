@@ -1,12 +1,11 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
-using XinjingdailyBot.Infrastructure.Extensions;
+using Telegram.Bot.Types;
+using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
-using XinjingdailyBot.Infrastructure.Enums;
-using Telegram.Bot.Types;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace XinjingdailyBot.Tasks
 {
@@ -35,7 +34,7 @@ namespace XinjingdailyBot.Tasks
         /// <summary>
         /// 发布频道置顶间隔
         /// </summary>
-        private readonly TimeSpan CheckInterval = TimeSpan.FromDays(1);
+        private readonly TimeSpan CheckInterval = TimeSpan.FromSeconds(5);
 
         /// <summary>
         /// 计时器
@@ -47,6 +46,10 @@ namespace XinjingdailyBot.Tasks
             var now = DateTime.Now;
             var nextDay = now.AddDays(1).AddHours(19 - now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             var tillTomorrow = nextDay - now;
+
+#if DEBUG
+            tillTomorrow = TimeSpan.FromSeconds(5);
+#endif
 
             _timer = new Timer(DoWork, null, tillTomorrow, CheckInterval);
 
@@ -97,6 +100,10 @@ namespace XinjingdailyBot.Tasks
                     catch (Exception ex)
                     {
                         _logger.LogError("投放广告出错: {error}", ex.Message);
+                    }
+                    finally
+                    {
+                        await Task.Delay(500);
                     }
                 }
                 await _advertisesService.UpdateAsync(ad);
