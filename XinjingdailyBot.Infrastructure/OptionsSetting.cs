@@ -1,4 +1,6 @@
-﻿namespace XinjingdailyBot.Infrastructure
+﻿using XinjingdailyBot.Infrastructure.Localization;
+
+namespace XinjingdailyBot.Infrastructure
 {
     public sealed record OptionsSetting
     {
@@ -27,8 +29,14 @@
         /// </summary>
         public PostOption Post { get; set; } = new();
 
+        /// <summary>
+        /// GitHub配置
+        /// </summary>
         public GitHubOption GitHub { get; set; } = new();
 
+        /// <summary>
+        /// 机器人选项
+        /// </summary>
         public sealed record BotOption
         {
             /// <summary>
@@ -57,6 +65,9 @@
             public HashSet<long>? SuperAdmins { get; set; }
         }
 
+        /// <summary>
+        /// 频道选项
+        /// </summary>
         public sealed record ChannelOption
         {
             /// <summary>
@@ -95,6 +106,9 @@
             public bool AutoLeaveOtherGroup { get; set; }
         }
 
+        /// <summary>
+        /// 消息选项
+        /// </summary>
         public sealed record MessageOption
         {
             /// <summary>
@@ -111,6 +125,9 @@
             public string? About { get; set; }
         }
 
+        /// <summary>
+        /// 数据库选项
+        /// </summary>
         public sealed record DatabaseOption
         {
             /// <summary>
@@ -147,6 +164,9 @@
             public string? DbPassword { get; set; }
         }
 
+        /// <summary>
+        /// 稿件选项
+        /// </summary>
         public sealed record PostOption
         {
             /// <summary>
@@ -182,8 +202,19 @@
             /// 过滤其他 #Tag
             /// </summary>
             public bool PureHashTag { get; set; } = true;
+            /// <summary>
+            /// 过滤字符串
+            /// </summary>
+            public string PureWords { get; set; } = Emojis.PureStrings;
+            /// <summary>
+            /// 稿件自动过期时间
+            /// </summary>
+            public uint PostExpiredTime { get; set; } = 3;
         }
 
+        /// <summary>
+        /// GitHub选项
+        /// </summary>
         public sealed record GitHubOption
         {
             /// <summary>
