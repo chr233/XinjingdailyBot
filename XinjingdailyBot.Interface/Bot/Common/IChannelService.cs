@@ -5,6 +5,7 @@ namespace XinjingdailyBot.Interface.Bot.Common
     public interface IChannelService
     {
         Chat ReviewGroup { get; }
+        Chat ReviewLogChannel { get; }
         Chat CommentGroup { get; }
         Chat SubGroup { get; }
         Chat AcceptChannel { get; }

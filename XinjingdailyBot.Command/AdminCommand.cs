@@ -1098,7 +1098,7 @@ namespace XinjingdailyBot.Command
             sb.AppendLine($"Chat Type: <code>{msg.Chat.Type}</code>");
             if (message.Chat.Type != ChatType.Private)
             {
-                sb.AppendLine($"Chat Title: <code>{msg.Chat.ChatProfile()}</code>");
+                sb.AppendLine($"Chat Title: <code>{msg.Chat.FullChatProfile()}</code>");
             }
             sb.AppendLine($"Chat Id: <code>{msg.Chat.Id}</code>");
 

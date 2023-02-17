@@ -5,6 +5,7 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "launchUrl": "swagger",
+      "externalUrlConfiguration": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -14,6 +15,7 @@
       "workingDirectory": "bin",
       "launchBrowser": true,
       "launchUrl": "swagger",
+      "externalUrlConfiguration": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
@@ -23,6 +25,7 @@
     "WSL": {
       "commandName": "WSL2",
       "launchUrl": "http://localhost:5136/swagger",
+      "externalUrlConfiguration": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_URLS": "http://localhost:5136"

@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
@@ -12,7 +12,8 @@ namespace XinjingdailyBot.Tasks
     /// <summary>
     /// 发布广告
     /// </summary>
-    public class PostAdvertiseTask : IHostedService, IDisposable
+    [Job("0 0 19 * * ?")]
+    public class PostAdvertiseTask : IJob
     {
         private readonly ILogger<PostAdvertiseTask> _logger;
         private readonly IServiceProvider _serviceProvider;
@@ -31,28 +32,7 @@ namespace XinjingdailyBot.Tasks
             _advertisesService = advertisesService;
         }
 
-        /// <summary>
-        /// 发布频道置顶间隔
-        /// </summary>
-        private readonly TimeSpan CheckInterval = TimeSpan.FromDays(1);
-
-        /// <summary>
-        /// 计时器
-        /// </summary>
-        private Timer? _timer = null;
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            var now = DateTime.Now;
-            var nextDay = now.AddDays(1).AddHours(19 - now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
-            var tillTomorrow = nextDay - now;
-
-            _timer = new Timer(DoWork, null, tillTomorrow, CheckInterval);
-
-            return Task.CompletedTask;
-        }
-
-        private async void DoWork(object? _ = null)
+        public async Task Execute(IJobExecutionContext context)
         {
             _logger.LogInformation("开始定时任务, 发布广告");
 
@@ -104,18 +84,6 @@ namespace XinjingdailyBot.Tasks
                 }
                 await _advertisesService.UpdateAsync(ad);
             }
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            _timer?.Change(Timeout.Infinite, 0);
-            return Task.CompletedTask;
-        }
-
-        public void Dispose()
-        {
-            _timer?.Dispose();
-            GC.SuppressFinalize(this);
         }
     }
 }

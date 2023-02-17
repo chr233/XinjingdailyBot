@@ -29,6 +29,8 @@ namespace XinjingdailyBot.Model.Models
         /// </summary>
         public ChannelOption Option { get; set; } = ChannelOption.Normal;
 
+        public int Count { get; set; }
+
         public DateTime CreateAt { get; set; } = DateTime.Now;
 
         public DateTime ModifyAt { get; set; } = DateTime.Now;

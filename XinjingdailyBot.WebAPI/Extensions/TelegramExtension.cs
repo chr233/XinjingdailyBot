@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.Tasks;
 
 namespace XinjingdailyBot.WebAPI.Extensions
 {
@@ -37,6 +38,8 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 TelegramBotClientOptions options = new(token, baseUrl, false);
                 return new TelegramBotClient(options, httpClient);
             });
+
+            services.AddHostedService<PollingService>();
         }
     }
 }

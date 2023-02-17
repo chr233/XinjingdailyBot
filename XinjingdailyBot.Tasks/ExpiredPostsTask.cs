@@ -1,10 +1,10 @@
 ﻿using System.Text;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Data;
 
@@ -13,7 +13,8 @@ namespace XinjingdailyBot.Tasks
     /// <summary>
     /// 过期稿件处理
     /// </summary>
-    public class ExpiredPostsTask : IHostedService, IDisposable
+    [Job("0 0 0 * * ?")]
+    public class ExpiredPostsTask : IJob
     {
         private readonly ILogger<ExpiredPostsTask> _logger;
         private readonly IPostService _postService;
@@ -35,32 +36,11 @@ namespace XinjingdailyBot.Tasks
         }
 
         /// <summary>
-        /// 定时器周期
-        /// </summary>
-        private readonly TimeSpan CheckInterval = TimeSpan.FromDays(3);
-
-        /// <summary>
         /// 稿件过期时间
         /// </summary>
         private TimeSpan PostExpiredTime { get; init; }
 
-        /// <summary>
-        /// 计时器
-        /// </summary>
-        private Timer? _timer = null;
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            var now = DateTime.Now;
-            var nextDay = now.AddDays(1).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
-            var tillTomorrow = nextDay - now;
-
-            _timer = new Timer(DoWork, null, tillTomorrow, CheckInterval);
-
-            return Task.CompletedTask;
-        }
-
-        private async void DoWork(object? _ = null)
+        public async Task Execute(IJobExecutionContext context)
         {
             _logger.LogInformation("开始定时任务, 清理过期稿件任务");
 
@@ -157,18 +137,6 @@ namespace XinjingdailyBot.Tasks
                     await _userService.Updateable(user).UpdateColumns(x => new { x.PrivateChatID, x.ExpiredPostCount, x.ModifyAt }).ExecuteCommandAsync();
                 }
             }
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            _timer?.Change(Timeout.Infinite, 0);
-            return Task.CompletedTask;
-        }
-
-        public void Dispose()
-        {
-            _timer?.Dispose();
-            GC.SuppressFinalize(this);
         }
     }
 }

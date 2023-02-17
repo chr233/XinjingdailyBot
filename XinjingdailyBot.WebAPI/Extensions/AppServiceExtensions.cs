@@ -36,13 +36,13 @@ namespace XinjingdailyBot.WebAPI.Extensions
         {
             string? name = assembly.GetName().Name;
             _logger.Debug($"===== 注册 {name} 中的服务 =====");
-            int count = 0;
+            uint count = 0;
             foreach (var type in assembly.GetTypes())
             {
                 var serviceAttribute = type.GetCustomAttribute<AppServiceAttribute>();
                 if (serviceAttribute != null)
                 {
-                    count += 1;
+                    count++;
                     var serviceType = serviceAttribute.ServiceType;
                     //情况1 适用于依赖抽象编程，注意这里只获取第一个
                     if (serviceType == null && serviceAttribute.InterfaceServiceType)
