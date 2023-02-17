@@ -166,11 +166,23 @@ namespace XinjingdailyBot.Service.Bot.Common
             }
         }
 
+        /// <summary>
+        /// 收到Query消息
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public async Task OnInlineQueryReceived(Users dbUser, InlineQuery query)
         {
             await _inlineQueryHandler.OnInlineQueryReceived(dbUser, query);
         }
 
+        /// <summary>
+        /// 收到其他消息
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="update"></param>
+        /// <returns></returns>
         public Task OnOtherUpdateReceived(Users dbUser, Update update)
         {
             _logger.LogInformation("收到未知消息类型的消息");
