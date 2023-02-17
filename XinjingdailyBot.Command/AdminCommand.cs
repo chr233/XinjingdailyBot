@@ -1110,6 +1110,14 @@ namespace XinjingdailyBot.Command
             {
                 sb.AppendLine($"ForwardFrom: <code>{msg.ForwardFrom.FullName()}</code> <code>{msg.ForwardFrom.UserID()}</code>");
             }
+            if (msg.ForwardFromChat != null)
+            {
+                sb.AppendLine($"ForwardFromChat: <code>{msg.ForwardFromChat.FullChatProfile()}</code>");
+            }
+            if (msg.ForwardFromMessageId != null)
+            {
+                sb.AppendLine($"ForwardFromMessageId: <code>{msg.ForwardFromMessageId}</code>");
+            }
 
             sb.AppendLine($"Message Id: <code>{msg.MessageId}</code>");
 

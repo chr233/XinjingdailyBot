@@ -1,5 +1,4 @@
 ﻿using SqlSugar;
-using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Model.Base;
 
 namespace XinjingdailyBot.Model.Models
@@ -10,18 +9,18 @@ namespace XinjingdailyBot.Model.Models
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
         /// <summary>
-        /// 原会话ID
+        /// 会话ID
         /// </summary>
         public long ChatID { get; set; }
         /// <summary>
-        /// 原消息ID
+        /// 消息ID
         /// </summary>
         public long MessageID { get; set; }
 
         /// <summary>
         /// 用户ID
         /// </summary>
-        public long UserID { get; set; }
+        public long UserID { get; set; } = -1;
 
         /// <summary>
         /// 回复消息ID
@@ -29,37 +28,17 @@ namespace XinjingdailyBot.Model.Models
         public long ReplyMessageID { get; set; } = -1;
 
         /// <summary>
-        /// 广告发布位置
+        /// 消息内容
         /// </summary>
-        public MessageType Type { get; set; }
+        public string Content { get; set; } = "";
 
         /// <summary>
-        /// 展示权重, 数值越大概率越高, 0为不展示
+        /// 消息类型
         /// </summary>
-        public byte Weight { get; set; }
-
+        public string Type { get; set; }
         /// <summary>
-        /// 上次发布时间
+        /// 消息事件
         /// </summary>
-        public DateTime LastPostAt { get; set; } = DateTime.MinValue;
-
-        /// <summary>
-        /// 广告展示次数
-        /// </summary>
-        public uint ShowCount { get; set; }
-        /// <summary>
-        /// 最大展示次数, 当次数值不为0且展示次数大于等于该值时自动禁用
-        /// </summary>
-        public uint MaxShowCount { get; set; }
-
-        /// <summary>
-        /// 过期时间, 系统时间大于过期时间自动禁用
-        /// </summary>
-        public DateTime ExpireAt { get; set; } = DateTime.MaxValue;
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreateAt { get; set; } = DateTime.Now;
+        public DateTime Date { get; set; } = DateTime.Now;
     }
 }

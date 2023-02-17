@@ -5,6 +5,7 @@ using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
+using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 
@@ -22,6 +23,7 @@ namespace XinjingdailyBot.Service.Bot.Common
         private readonly ITelegramBotClient _botClient;
         private readonly IJoinRequestHandler _joinRequestHandler;
         private readonly IInlineQueryHandler _inlineQueryHandler;
+        private readonly IDialogueService _dialogueService;
 
         public DispatcherService(
             ILogger<DispatcherService> logger,
@@ -32,7 +34,8 @@ namespace XinjingdailyBot.Service.Bot.Common
             ITextHelperService textHelperService,
             ITelegramBotClient botClient,
             IJoinRequestHandler joinRequestHandler,
-            IInlineQueryHandler inlineQueryHandler)
+            IInlineQueryHandler inlineQueryHandler,
+            IDialogueService dialogueService)
         {
             _logger = logger;
             _messageHandler = messageHandler;
@@ -43,6 +46,7 @@ namespace XinjingdailyBot.Service.Bot.Common
             _botClient = botClient;
             _joinRequestHandler = joinRequestHandler;
             _inlineQueryHandler = inlineQueryHandler;
+            _dialogueService = dialogueService;
         }
 
         /// <summary>
@@ -78,6 +82,8 @@ namespace XinjingdailyBot.Service.Bot.Common
         /// <returns></returns>
         public async Task OnMessageReceived(Users dbUser, Message message)
         {
+            await _dialogueService.RecordUpdate(message);
+
             if (dbUser.UserID == 777000 && (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup))
             {
                 if (message.Chat.Id == _channelService.SubGroup.Id || message.Chat.Id == _channelService.CommentGroup.Id)
