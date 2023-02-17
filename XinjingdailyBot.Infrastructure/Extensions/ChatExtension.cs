@@ -9,9 +9,19 @@ namespace XinjingdailyBot.Infrastructure.Extensions
             return string.IsNullOrEmpty(chat.Username) ? $"#{chat.Id}" : $"@{chat.Username}";
         }
 
+        public static string FullChatID(this Chat chat)
+        {
+            return string.IsNullOrEmpty(chat.Username) ? $"#{chat.Id}" : $"@{chat.Username} #{chat.Id}";
+        }
+
         public static string ChatProfile(this Chat chat)
         {
             return $"{chat.Title} {chat.ChatID()}";
+        }
+
+        public static string FullChatProfile(this Chat chat)
+        {
+            return $"{chat.Title} {chat.FullChatID()}";
         }
 
         /// <summary>

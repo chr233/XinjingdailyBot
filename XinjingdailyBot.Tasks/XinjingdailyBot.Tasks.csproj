@@ -12,4 +12,13 @@
     <ProjectReference Include="..\XinjingdailyBot.Service\XinjingdailyBot.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Quartz" />
+    <PackageReference Include="Quartz.AspNetCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Quartz" />
+  </ItemGroup>
+
 </Project>

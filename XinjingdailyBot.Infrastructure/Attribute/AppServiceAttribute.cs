@@ -22,11 +22,6 @@
         /// </summary>
         public bool InterfaceServiceType { get; set; }
 
-        [Obsolete]
-        public AppServiceAttribute()
-        {
-        }
-
         public AppServiceAttribute(LifeTime serviceLifetime)
         {
             ServiceLifetime = serviceLifetime;

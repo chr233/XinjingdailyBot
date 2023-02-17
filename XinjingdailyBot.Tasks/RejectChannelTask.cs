@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Telegram.Bot;
+using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Interface.Bot.Common;
 
@@ -9,7 +9,8 @@ namespace XinjingdailyBot.Tasks
     /// <summary>
     /// 拒稿存档频道置顶
     /// </summary>
-    public class RejectChannelTask : IHostedService, IDisposable
+    [Job("0 0 0 * * ?")]
+    public class RejectChannelTask : IJob
     {
         private readonly ILogger<RejectChannelTask> _logger;
         private readonly IChannelService _channelService;
@@ -25,28 +26,7 @@ namespace XinjingdailyBot.Tasks
             _botClient = botClient;
         }
 
-        /// <summary>
-        /// 发布频道置顶间隔
-        /// </summary>
-        private readonly TimeSpan PostInterval = TimeSpan.FromDays(1);
-
-        /// <summary>
-        /// 计时器
-        /// </summary>
-        private Timer? _timer = null;
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            var now = DateTime.Now;
-            var nextDay = now.AddDays(1).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
-            var tillTomorrow = nextDay - now;
-
-            _timer = new Timer(DoWork, null, tillTomorrow, PostInterval);
-
-            return Task.CompletedTask;
-        }
-
-        private async void DoWork(object? _ = null)
+        public async Task Execute(IJobExecutionContext context)
         {
             _logger.LogInformation("开始定时任务, 置顶拒稿频道通知");
 
@@ -57,18 +37,6 @@ namespace XinjingdailyBot.Tasks
             var rejectChannel = _channelService.RejectChannel;
             var message = await _botClient.SendTextMessageAsync(rejectChannel, descText);
             await _botClient.PinChatMessageAsync(rejectChannel, message.MessageId, true);
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            _timer?.Change(Timeout.Infinite, 0);
-            return Task.CompletedTask;
-        }
-
-        public void Dispose()
-        {
-            _timer?.Dispose();
-            GC.SuppressFinalize(this);
         }
     }
 }
