@@ -35,7 +35,7 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 消息类型
         /// </summary>
-        public string Type { get; set; }
+        public string Type { get; set; } = "";
         /// <summary>
         /// 消息事件
         /// </summary>
