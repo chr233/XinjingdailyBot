@@ -11,7 +11,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Handler
 {
-    [AppService(ServiceType = typeof(IGroupMessageHandler), ServiceLifetime = LifeTime.Singleton)]
+    [AppService(typeof(IGroupMessageHandler), LifeTime.Singleton)]
     public class GroupMessageHandler : IGroupMessageHandler
     {
         private readonly IChannelService _channelService;
@@ -33,12 +33,14 @@ namespace XinjingdailyBot.Service.Bot.Handler
         /// <returns></returns>
         public async Task OnGroupTextMessageReceived(Users dbUser, Message message)
         {
-            //制裁复读机
             var replyMessage = message.ReplyToMessage;
             if (replyMessage != null)
             {
                 if (replyMessage.From?.Id == _channelService.BotUser.Id)
                 {
+                    Random rand = new();
+
+                    //制裁复读机
                     if (message.Text == replyMessage.Text)
                     {
                         if (dbUser.Right.HasFlag(UserRights.AdminCmd) || dbUser.Right.HasFlag(UserRights.SuperCmd))
@@ -47,7 +49,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
                         }
                         else
                         {
-                            Random rand = new();
                             int seconds = rand.Next(60, 300);
                             DateTime banTime = DateTime.Now + TimeSpan.FromSeconds(seconds);
 
@@ -67,6 +68,14 @@ namespace XinjingdailyBot.Service.Bot.Handler
                         }
                         return;
                     }
+
+                    if (message.Text == "爬" || message.Text == "爪巴")
+                    {
+                        if (dbUser.Right.HasFlag(UserRights.AdminCmd) || dbUser.Right.HasFlag(UserRights.SuperCmd))
+                        {
+                            await _botClient.AutoReplyAsync("嗻", message);
+                        }
+                    }
                 }
             }
 
@@ -77,7 +86,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 return;
             }
 
-            if (text.Contains("投稿"))
+            if (text.Contains("投稿") && dbUser.GroupID == 1)
             {
                 await _botClient.AutoReplyAsync("如果想要投稿, 直接将稿件通过私信发给我即可.", message);
             }

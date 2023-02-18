@@ -9,7 +9,7 @@ using XinjingdailyBot.Interface.Bot.Common;
 
 namespace XinjingdailyBot.Service.Bot.Common
 {
-    [AppService(ServiceType = typeof(IChannelService), ServiceLifetime = LifeTime.Singleton)]
+    [AppService(typeof(IChannelService), LifeTime.Singleton)]
 
     public class ChannelService : IChannelService
     {
@@ -18,6 +18,7 @@ namespace XinjingdailyBot.Service.Bot.Common
         private readonly ILogger<ChannelService> _logger;
 
         private Chat _reviewGroup = new();
+        private Chat _reviewLogChannel = new();
         private Chat _commentGroup = new();
         private Chat _subGroup = new();
         private Chat _acceptChannel = new();
@@ -25,6 +26,7 @@ namespace XinjingdailyBot.Service.Bot.Common
         private User _botUser = new();
 
         Chat IChannelService.ReviewGroup { get => _reviewGroup; }
+        Chat IChannelService.ReviewLogChannel { get => _reviewLogChannel; }
         Chat IChannelService.CommentGroup { get => _commentGroup; }
         Chat IChannelService.SubGroup { get => _subGroup; }
         Chat IChannelService.AcceptChannel { get => _acceptChannel; }
@@ -86,7 +88,11 @@ namespace XinjingdailyBot.Service.Bot.Common
             catch
             {
                 _logger.LogError("未找到指定的审核群组, 可以使用 /groupinfo 命令获取群组信息");
-                _reviewGroup = new() { Id = -1 };
+            }
+
+            if (channelOption.UseReviewLogMode)
+            {
+
             }
 
             try
@@ -104,7 +110,6 @@ namespace XinjingdailyBot.Service.Bot.Common
             catch
             {
                 _logger.LogError("未找到指定的评论区群组, 可以使用 /groupinfo 命令获取群组信息");
-                _commentGroup = new() { Id = -1 };
             }
 
             try

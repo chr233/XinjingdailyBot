@@ -21,6 +21,24 @@
         /// 是否可以从第一个接口获取服务类型
         /// </summary>
         public bool InterfaceServiceType { get; set; }
+
+        public AppServiceAttribute(LifeTime serviceLifetime)
+        {
+            ServiceLifetime = serviceLifetime;
+        }
+
+        public AppServiceAttribute(Type? serviceType, LifeTime serviceLifetime)
+        {
+            ServiceLifetime = serviceLifetime;
+            ServiceType = serviceType;
+        }
+
+        public AppServiceAttribute(Type? serviceType, LifeTime serviceLifetime, bool interfaceServiceType)
+        {
+            ServiceLifetime = serviceLifetime;
+            ServiceType = serviceType;
+            InterfaceServiceType = interfaceServiceType;
+        }
     }
 
     public enum LifeTime

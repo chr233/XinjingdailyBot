@@ -61,6 +61,24 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
+        ///   查找类似 🤔保留来源 的本地化字符串。
+        /// </summary>
+        public static string AnymouseOff {
+            get {
+                return ResourceManager.GetString("AnymouseOff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 👻匿名投稿 的本地化字符串。
+        /// </summary>
+        public static string AnymouseOn {
+            get {
+                return ResourceManager.GetString("AnymouseOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 您已被{0}封禁, 理由: {1}, 您将无法继续使用投稿功能和大部分命令 的本地化字符串。
         /// </summary>
         public static string BanedUserTips {
@@ -79,11 +97,29 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
+        ///   查找类似 ❌取消 的本地化字符串。
+        /// </summary>
+        public static string PostCancel {
+            get {
+                return ResourceManager.GetString("PostCancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 投稿已取消 的本地化字符串。
         /// </summary>
         public static string PostCanceled {
             get {
                 return ResourceManager.GetString("PostCanceled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 ✅投稿 的本地化字符串。
+        /// </summary>
+        public static string PostConfirm {
+            get {
+                return ResourceManager.GetString("PostConfirm", resourceCulture);
             }
         }
         
@@ -106,11 +142,191 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
+        ///   查找类似 无趣 的本地化字符串。
+        /// </summary>
+        public static string RejectBoring {
+            get {
+                return ResourceManager.GetString("RejectBoring", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 ↩️返回 的本地化字符串。
+        /// </summary>
+        public static string RejectCancel {
+            get {
+                return ResourceManager.GetString("RejectCancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 没懂 的本地化字符串。
+        /// </summary>
+        public static string RejectConfusing {
+            get {
+                return ResourceManager.GetString("RejectConfusing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 内容不合适 的本地化字符串。
+        /// </summary>
+        public static string RejectDeny {
+            get {
+                return ResourceManager.GetString("RejectDeny", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 重复 的本地化字符串。
+        /// </summary>
+        public static string RejectDuplicate {
+            get {
+                return ResourceManager.GetString("RejectDuplicate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 模糊 的本地化字符串。
+        /// </summary>
+        public static string RejectFuzzy {
+            get {
+                return ResourceManager.GetString("RejectFuzzy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 其他原因 的本地化字符串。
+        /// </summary>
+        public static string RejectOther {
+            get {
+                return ResourceManager.GetString("RejectOther", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 广告 的本地化字符串。
+        /// </summary>
+        public static string RejectQRCode {
+            get {
+                return ResourceManager.GetString("RejectQRCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 ✅采用 的本地化字符串。
+        /// </summary>
+        public static string ReviewAccept {
+            get {
+                return ResourceManager.GetString("ReviewAccept", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 尚未设置审核群组, 无法接收投稿 的本地化字符串。
         /// </summary>
         public static string ReviewGroupNotSet {
             get {
                 return ResourceManager.GetString("ReviewGroupNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 ❌拒绝 的本地化字符串。
+        /// </summary>
+        public static string ReviewReject {
+            get {
+                return ResourceManager.GetString("ReviewReject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 #A___ 的本地化字符串。
+        /// </summary>
+        public static string TagAIGraphOff {
+            get {
+                return ResourceManager.GetString("TagAIGraphOff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 #AI怪图 的本地化字符串。
+        /// </summary>
+        public static string TagAIGraphOn {
+            get {
+                return ResourceManager.GetString("TagAIGraphOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 #我_____ 的本地化字符串。
+        /// </summary>
+        public static string TagFriendOff {
+            get {
+                return ResourceManager.GetString("TagFriendOff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 #我有一个朋友 的本地化字符串。
+        /// </summary>
+        public static string TagFriendOn {
+            get {
+                return ResourceManager.GetString("TagFriendOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 #N___ 的本地化字符串。
+        /// </summary>
+        public static string TagNSFWOff {
+            get {
+                return ResourceManager.GetString("TagNSFWOff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 #NSFW 的本地化字符串。
+        /// </summary>
+        public static string TagNSFWOn {
+            get {
+                return ResourceManager.GetString("TagNSFWOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 🖼️禁用遮罩 的本地化字符串。
+        /// </summary>
+        public static string TagSpoilerOff {
+            get {
+                return ResourceManager.GetString("TagSpoilerOff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 ⚠️开启遮罩 的本地化字符串。
+        /// </summary>
+        public static string TagSpoilerOn {
+            get {
+                return ResourceManager.GetString("TagSpoilerOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 #晚_ 的本地化字符串。
+        /// </summary>
+        public static string TagWanAnOff {
+            get {
+                return ResourceManager.GetString("TagWanAnOff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 #晚安 的本地化字符串。
+        /// </summary>
+        public static string TagWanAnOn {
+            get {
+                return ResourceManager.GetString("TagWanAnOn", resourceCulture);
             }
         }
         
@@ -142,11 +358,20 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
-        ///   查找类似 您受到了一次警告, 理由: {0}\n当前累计受到警告&lt;code&gt;{1}&lt;/code&gt;次, 达到&lt;code&gt;{2}&lt;/code&gt;次后将会被系统自动封禁 的本地化字符串。
+        ///   查找类似 您受到了一次警告, 理由: {0} 的本地化字符串。
         /// </summary>
         public static string WarnUserTips {
             get {
                 return ResourceManager.GetString("WarnUserTips", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 当前累计受到警告&lt;code&gt;{0}&lt;/code&gt;次, 达到&lt;code&gt;{1}&lt;/code&gt;次后将会被系统自动封禁 的本地化字符串。
+        /// </summary>
+        public static string WarnUserTips2 {
+            get {
+                return ResourceManager.GetString("WarnUserTips2", resourceCulture);
             }
         }
     }

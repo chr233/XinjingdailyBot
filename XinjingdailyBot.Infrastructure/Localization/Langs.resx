@@ -127,7 +127,7 @@
     <value>您已被{0}解封, 理由: {1}, 已恢复您的投稿和命令权限</value>
   </data>
   <data name="WarnUserTips" xml:space="preserve">
-    <value>您受到了一次警告, 理由: {0}\n当前累计受到警告&lt;code&gt;{1}&lt;/code&gt;次, 达到&lt;code&gt;{2}&lt;/code&gt;次后将会被系统自动封禁</value>
+    <value>您受到了一次警告, 理由: {0}</value>
   </data>
   <data name="NoPostRight" xml:space="preserve">
     <value>没有权限</value>
@@ -146,5 +146,80 @@
   </data>
   <data name="PostCanceled" xml:space="preserve">
     <value>投稿已取消</value>
+  </data>
+  <data name="WarnUserTips2" xml:space="preserve">
+    <value>当前累计受到警告&lt;code&gt;{0}&lt;/code&gt;次, 达到&lt;code&gt;{1}&lt;/code&gt;次后将会被系统自动封禁</value>
+  </data>
+  <data name="RejectFuzzy" xml:space="preserve">
+    <value>模糊</value>
+  </data>
+  <data name="RejectDuplicate" xml:space="preserve">
+    <value>重复</value>
+  </data>
+  <data name="RejectBoring" xml:space="preserve">
+    <value>无趣</value>
+  </data>
+  <data name="RejectConfusing" xml:space="preserve">
+    <value>没懂</value>
+  </data>
+  <data name="RejectQRCode" xml:space="preserve">
+    <value>广告</value>
+  </data>
+  <data name="RejectDeny" xml:space="preserve">
+    <value>内容不合适</value>
+  </data>
+  <data name="RejectOther" xml:space="preserve">
+    <value>其他原因</value>
+  </data>
+  <data name="RejectCancel" xml:space="preserve">
+    <value>↩️返回</value>
+  </data>
+  <data name="TagNSFWOn" xml:space="preserve">
+    <value>#NSFW</value>
+  </data>
+  <data name="TagFriendOn" xml:space="preserve">
+    <value>#我有一个朋友</value>
+  </data>
+  <data name="TagWanAnOn" xml:space="preserve">
+    <value>#晚安</value>
+  </data>
+  <data name="TagAIGraphOn" xml:space="preserve">
+    <value>#AI怪图</value>
+  </data>
+  <data name="TagSpoilerOn" xml:space="preserve">
+    <value>⚠️开启遮罩</value>
+  </data>
+  <data name="TagNSFWOff" xml:space="preserve">
+    <value>#N___</value>
+  </data>
+  <data name="TagFriendOff" xml:space="preserve">
+    <value>#我_____</value>
+  </data>
+  <data name="TagWanAnOff" xml:space="preserve">
+    <value>#晚_</value>
+  </data>
+  <data name="TagAIGraphOff" xml:space="preserve">
+    <value>#A___</value>
+  </data>
+  <data name="TagSpoilerOff" xml:space="preserve">
+    <value>🖼️禁用遮罩</value>
+  </data>
+  <data name="ReviewReject" xml:space="preserve">
+    <value>❌拒绝</value>
+  </data>
+  <data name="ReviewAccept" xml:space="preserve">
+    <value>✅采用</value>
+  </data>
+  <data name="AnymouseOn" xml:space="preserve">
+    <value>👻匿名投稿</value>
+  </data>
+  <data name="AnymouseOff" xml:space="preserve">
+    <value>🤔保留来源</value>
+  </data>
+  <data name="PostCancel" xml:space="preserve">
+    <value>❌取消</value>
+  </data>
+  <data name="PostConfirm" xml:space="preserve">
+    <value>✅投稿</value>
   </data>
 </root>

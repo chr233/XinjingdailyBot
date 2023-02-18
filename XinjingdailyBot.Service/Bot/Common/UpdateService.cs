@@ -10,7 +10,7 @@ using XinjingdailyBot.Interface.Data;
 
 namespace XinjingdailyBot.Service.Bot.Common
 {
-    [AppService(ServiceType = typeof(IUpdateService), ServiceLifetime = LifeTime.Scoped)]
+    [AppService(typeof(IUpdateService), LifeTime.Scoped)]
     public class UpdateService : IUpdateService
     {
         private readonly ILogger<UpdateService> _logger;
@@ -35,6 +35,7 @@ namespace XinjingdailyBot.Service.Bot.Common
 
             if (dbUser == null)
             {
+                _logger.LogWarning("User not found in database");
                 return;
             }
 
@@ -44,7 +45,8 @@ namespace XinjingdailyBot.Service.Bot.Common
                 UpdateType.Message => _dispatcherService.OnMessageReceived(dbUser, update.Message!),
                 UpdateType.CallbackQuery => _dispatcherService.OnCallbackQueryReceived(dbUser, update.CallbackQuery!),
                 UpdateType.ChatJoinRequest => _dispatcherService.OnJoinRequestReceived(dbUser, update.ChatJoinRequest!),
-                _ => null
+                UpdateType.InlineQuery => _dispatcherService.OnInlineQueryReceived(dbUser, update.InlineQuery!),
+                _ => _dispatcherService.OnOtherUpdateReceived(dbUser, update)
             };
 
             if (handler != null)

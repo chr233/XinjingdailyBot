@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -21,7 +22,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
     /// <summary>
     /// 命令处理器
     /// </summary>
-    [AppService(ServiceType = typeof(ICommandHandler), ServiceLifetime = LifeTime.Singleton)]
+    [AppService(typeof(ICommandHandler), LifeTime.Singleton)]
     public class CommandHandler : ICommandHandler
     {
         private readonly ILogger<CommandHandler> _logger;
@@ -68,6 +69,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
         /// <summary>
         /// 注册命令
         /// </summary>
+        [RequiresUnreferencedCode("不兼容剪裁")]
         public void InstallCommands()
         {
             //获取所有服务方法
@@ -82,7 +84,8 @@ namespace XinjingdailyBot.Service.Bot.Handler
         /// 注册命令
         /// </summary>
         /// <param name="type"></param>
-        private void RegisterCommands(Type type)
+        //[RequiresUnreferencedCode("不兼容剪裁")]
+        private void RegisterCommands([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type type)
         {
             Dictionary<string, AssemblyMethod> commands = new();
             Dictionary<string, string> commandAlias = new();
@@ -219,7 +222,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                             });
                         }
                     }
-                    catch (Exception ex) //无法捕获 TODO
+                    catch (Exception ex)
                     {
                         errorMsg = $"{ex.GetType} {ex.Message}";
 
@@ -281,7 +284,10 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 }
             }
             //调用方法
-            method.Invoke(service, methodParameters.ToArray());
+            if (method.Invoke(service, methodParameters.ToArray()) is Task task)
+            {
+                await task;
+            }
         }
 
         /// <summary>
@@ -295,7 +301,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             Message? message = query.Message;
             if (message == null)
             {
-                await _botClient.AutoReplyAsync("消息不存在", query);
+                await _botClient.AutoReplyAsync("消息不存在", query, true);
                 return;
             }
 
@@ -313,7 +319,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             {
                 if (args.Length < 2 || !long.TryParse(args[1], out long userID))
                 {
-                    await _botClient.AutoReplyAsync("Payload 非法", query);
+                    await _botClient.AutoReplyAsync("Payload 非法", query, true);
                     await _botClient.RemoveMessageReplyMarkupAsync(message);
                     return;
                 }
@@ -321,7 +327,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 //判断消息发起人是不是同一个
                 if (dbUser.UserID != userID)
                 {
-                    await _botClient.AutoReplyAsync("这不是你的消息, 请不要瞎点", query);
+                    await _botClient.AutoReplyAsync("这不是你的消息, 请不要瞎点", query, true);
                     return;
                 }
 
@@ -351,7 +357,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                     {
                         errorMsg = $"{ex.GetType} {ex.Message}";
 
-                        await _botClient.AutoReplyAsync(_optionsSetting.Debug ? errorMsg : "遇到内部错误", query);
+                        await _botClient.AutoReplyAsync(_optionsSetting.Debug ? errorMsg : "遇到内部错误", query, true);
                     }
                     handled = true;
                     break;
@@ -364,11 +370,11 @@ namespace XinjingdailyBot.Service.Bot.Handler
             {
                 if (_optionsSetting.Debug)
                 {
-                    await _botClient.AutoReplyAsync($"未知的命令 [{query.Data}]", query);
+                    await _botClient.AutoReplyAsync($"未知的命令 [{query.Data}]", query, true);
                 }
                 else
                 {
-                    await _botClient.AutoReplyAsync("未知的命令", query);
+                    await _botClient.AutoReplyAsync("未知的命令", query, true);
                 }
             }
         }
@@ -386,7 +392,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             //权限检查
             if (!dbUser.Right.HasFlag(assemblyMethod.Rights))
             {
-                await _botClient.AutoReplyAsync("没有权限这么做", query);
+                await _botClient.AutoReplyAsync("没有权限这么做", query, true);
                 return;
             }
 
@@ -415,7 +421,10 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 }
             }
             //调用方法
-            method.Invoke(service, methodParameters.ToArray());
+            if (method.Invoke(service, methodParameters.ToArray()) is Task task)
+            {
+                await task;
+            }
         }
 
         /// <summary>
@@ -474,7 +483,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                         {
                             if (!string.IsNullOrEmpty(method.Description))
                             {
-                                cmds.Add(new BotCommand() { Command = cmd.ToLowerInvariant(), Description = method.Description });
+                                cmds.Add(new BotCommand { Command = cmd.ToLowerInvariant(), Description = method.Description });
                             }
                         }
                     }

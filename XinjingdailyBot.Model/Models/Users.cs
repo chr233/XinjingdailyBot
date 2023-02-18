@@ -62,7 +62,8 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 被拒绝的稿件数量
         /// </summary>
-        public int RejetCount { get; set; }
+        [SugarColumn(OldColumnName = "RejetCount")]
+        public int RejectCount { get; set; }
         /// <summary>
         /// 过期未被审核的稿件数量(统计时总投稿需要减去此字段)
         /// </summary>

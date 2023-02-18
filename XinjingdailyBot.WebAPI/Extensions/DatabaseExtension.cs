@@ -1,16 +1,27 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using SqlSugar;
 using SqlSugar.IOC;
 using XinjingdailyBot.Infrastructure;
 
 namespace XinjingdailyBot.WebAPI.Extensions
 {
+
+    /// <summary>
+    /// 数据库扩展
+    /// </summary>
     public static class DatabaseExtension
     {
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         private static bool IsFirstLoad = true;
 
+        /// <summary>
+        /// 注册数据库
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
+        [RequiresUnreferencedCode("不兼容剪裁")]
         public static void AddSqlSugar(this IServiceCollection services, IConfiguration configuration)
         {
             var dbConfig = configuration.GetSection("Database").Get<OptionsSetting.DatabaseOption>();
@@ -18,6 +29,8 @@ namespace XinjingdailyBot.WebAPI.Extensions
             if (dbConfig == null)
             {
                 _logger.Error("数据库配置不能为空");
+                _logger.Error("按任意键退出...");
+                Console.ReadKey();
                 Environment.Exit(1);
             }
 
@@ -53,7 +66,10 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 {
                     _logger.Info("开始生成数据库结构");
                     //创建数据库
-                    db.DbMaintenance.CreateDatabase(dbConfig.DbName);
+                    if (!dbConfig.UseMySQL)
+                    {
+                        db.DbMaintenance.CreateDatabase(dbConfig.DbName);
+                    }
 
                     //创建数据表
                     Assembly assembly = Assembly.Load("XinjingdailyBot.Model");

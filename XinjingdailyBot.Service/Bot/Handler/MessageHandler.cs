@@ -9,7 +9,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Handler
 {
-    [AppService(ServiceType = typeof(IMessageHandler), ServiceLifetime = LifeTime.Scoped)]
+    [AppService(typeof(IMessageHandler), LifeTime.Singleton)]
     public class MessageHandler : IMessageHandler
     {
         private readonly IPostService _postService;
@@ -39,17 +39,16 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 return;
             }
 
-            switch (message.Chat.Type)
+            if (message.Chat.Type == ChatType.Private)
             {
-                case ChatType.Private:
+                if (await _postService.CheckPostLimit(dbUser, message, null))
+                {
                     await _postService.HandleTextPosts(dbUser, message);
-                    break;
-                case ChatType.Group:
-                case ChatType.Supergroup:
-                    await _groupMessageHandler.OnGroupTextMessageReceived(dbUser, message);
-                    break;
-                default:
-                    break;
+                }
+            }
+            else if (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup)
+            {
+                await _groupMessageHandler.OnGroupTextMessageReceived(dbUser, message);
             }
         }
 
@@ -76,14 +75,18 @@ namespace XinjingdailyBot.Service.Bot.Handler
                     case MessageType.Voice:
                     case MessageType.Document:
                     case MessageType.Animation:
-                        if (message.MediaGroupId != null)
+                        if (await _postService.CheckPostLimit(dbUser, message, null))
                         {
-                            await _postService.HandleMediaGroupPosts(dbUser, message);
+                            if (message.MediaGroupId != null)
+                            {
+                                await _postService.HandleMediaGroupPosts(dbUser, message);
+                            }
+                            else
+                            {
+                                await _postService.HandleMediaPosts(dbUser, message);
+                            }
                         }
-                        else
-                        {
-                            await _postService.HandleMediaPosts(dbUser, message);
-                        }
+
                         break;
                     default:
                         await _botClient.AutoReplyAsync($"暂不支持的投稿类型 {message.Type}", message);

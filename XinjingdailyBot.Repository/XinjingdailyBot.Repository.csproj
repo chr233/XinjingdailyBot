@@ -1,14 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <TieredPGO>true</TieredPGO>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SqlSugar.IOC" Version="1.9.0" />
+    <PackageReference Include="SqlSugar.IOC" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,12 +5,13 @@ using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
+using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Common
 {
-    [AppService(ServiceType = typeof(IDispatcherService), ServiceLifetime = LifeTime.Scoped)]
+    [AppService(typeof(IDispatcherService), LifeTime.Scoped)]
     internal class DispatcherService : IDispatcherService
     {
         private readonly ILogger<DispatcherService> _logger;
@@ -21,6 +22,8 @@ namespace XinjingdailyBot.Service.Bot.Common
         private readonly ITextHelperService _textHelperService;
         private readonly ITelegramBotClient _botClient;
         private readonly IJoinRequestHandler _joinRequestHandler;
+        private readonly IInlineQueryHandler _inlineQueryHandler;
+        private readonly IDialogueService _dialogueService;
 
         public DispatcherService(
             ILogger<DispatcherService> logger,
@@ -30,7 +33,9 @@ namespace XinjingdailyBot.Service.Bot.Common
             IChannelService channelService,
             ITextHelperService textHelperService,
             ITelegramBotClient botClient,
-            IJoinRequestHandler joinRequestHandler)
+            IJoinRequestHandler joinRequestHandler,
+            IInlineQueryHandler inlineQueryHandler,
+            IDialogueService dialogueService)
         {
             _logger = logger;
             _messageHandler = messageHandler;
@@ -40,6 +45,8 @@ namespace XinjingdailyBot.Service.Bot.Common
             _textHelperService = textHelperService;
             _botClient = botClient;
             _joinRequestHandler = joinRequestHandler;
+            _inlineQueryHandler = inlineQueryHandler;
+            _dialogueService = dialogueService;
         }
 
         /// <summary>
@@ -75,6 +82,8 @@ namespace XinjingdailyBot.Service.Bot.Common
         /// <returns></returns>
         public async Task OnMessageReceived(Users dbUser, Message message)
         {
+            await _dialogueService.RecordMessage(message);
+
             if (dbUser.UserID == 777000 && (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup))
             {
                 if (message.Chat.Id == _channelService.SubGroup.Id || message.Chat.Id == _channelService.CommentGroup.Id)
@@ -155,6 +164,29 @@ namespace XinjingdailyBot.Service.Bot.Common
             {
                 await _joinRequestHandler.OnJoinRequestReceived(dbUser, request);
             }
+        }
+
+        /// <summary>
+        /// 收到Query消息
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task OnInlineQueryReceived(Users dbUser, InlineQuery query)
+        {
+            await _inlineQueryHandler.OnInlineQueryReceived(dbUser, query);
+        }
+
+        /// <summary>
+        /// 收到其他消息
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="update"></param>
+        /// <returns></returns>
+        public Task OnOtherUpdateReceived(Users dbUser, Update update)
+        {
+            _logger.LogInformation("收到未知消息类型的消息");
+            return Task.CompletedTask;
         }
     }
 }

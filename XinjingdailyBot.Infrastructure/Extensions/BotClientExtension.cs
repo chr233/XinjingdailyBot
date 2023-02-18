@@ -10,33 +10,6 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        /// 自动选择回复方式
-        /// </summary>
-        /// <param name="botClient"></param>
-        /// <param name="text"></param>
-        /// <param name="update"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public static async Task<Message?> AutoReplyAsync(
-            this ITelegramBotClient botClient,
-            string text,
-            Update update,
-            CancellationToken cancellationToken = default)
-        {
-            if (update.Type == UpdateType.Message)
-            {
-                Message msg = update.Message!;
-                return await botClient.SendTextMessageAsync(msg.Chat.Id, text, replyToMessageId: msg.MessageId, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
-            }
-            else if (update.Type == UpdateType.CallbackQuery)
-            {
-                CallbackQuery query = update.CallbackQuery!;
-                await botClient.AnswerCallbackQueryAsync(query.Id, text, cancellationToken: cancellationToken);
-            }
-            return null;
-        }
-
-        /// <summary>
         /// 发送回复
         /// </summary>
         /// <param name="botClient"></param>
@@ -66,9 +39,10 @@ namespace XinjingdailyBot.Infrastructure.Extensions
             this ITelegramBotClient botClient,
             string text,
             CallbackQuery query,
+            bool showAlert = false,
             CancellationToken cancellationToken = default)
         {
-            await botClient.AnswerCallbackQueryAsync(query.Id, text, cancellationToken: cancellationToken);
+            await botClient.AnswerCallbackQueryAsync(query.Id, text, showAlert: showAlert, cancellationToken: cancellationToken);
         }
 
         /// <summary>
