@@ -1,9 +1,12 @@
-﻿using System.Reflection;
-using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using XinjingdailyBot.Infrastructure.Attribute;
 
 namespace XinjingdailyBot.WebAPI.Extensions
 {
+    /// <summary>
+    /// 动态注册服务扩展
+    /// </summary>
     public static class AppServiceExtensions
     {
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
@@ -12,6 +15,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
         /// 注册引用程序域中所有有AppService标记的类的服务
         /// </summary>
         /// <param name="services"></param>
+        [RequiresUnreferencedCode("不兼容剪裁")]
         public static void AddAppService(this IServiceCollection services)
         {
             string[] cls = new[] { "XinjingdailyBot.Repository", "XinjingdailyBot.Service", "XinjingdailyBot.Command" };
@@ -22,18 +26,23 @@ namespace XinjingdailyBot.WebAPI.Extensions
             }
         }
 
+        /// <summary>
+        /// 动态注册服务
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="assembly"></param>
+        [RequiresUnreferencedCode("不兼容剪裁")]
         private static void Register(IServiceCollection services, Assembly assembly)
         {
-            StringBuilder sb = new();
-            sb.AppendLine();
-            sb.AppendLine("===== 开始注册服务 =====");
-            int count = 0;
+            string? name = assembly.GetName().Name;
+            _logger.Debug($"===== 注册 {name} 中的服务 =====");
+            uint count = 0;
             foreach (var type in assembly.GetTypes())
             {
                 var serviceAttribute = type.GetCustomAttribute<AppServiceAttribute>();
                 if (serviceAttribute != null)
                 {
-                    count += 1;
+                    count++;
                     var serviceType = serviceAttribute.ServiceType;
                     //情况1 适用于依赖抽象编程，注意这里只获取第一个
                     if (serviceType == null && serviceAttribute.InterfaceServiceType)
@@ -63,12 +72,10 @@ namespace XinjingdailyBot.WebAPI.Extensions
                             break;
                     }
 
-                    sb.AppendLine($" [{lifetime}]：{serviceType}");
+                    _logger.Debug($"{lifetime} - {serviceType}");
                 }
             }
-            sb.Append($"===== 注册了 {count} 个服务 =====");
-
-            _logger.Debug(sb.ToString());
+            _logger.Debug($"===== 注册了 {count} 个服务 =====");
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Options;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Localization;
@@ -12,15 +14,22 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Helper
 {
-    [AppService(ServiceType = typeof(ITextHelperService), ServiceLifetime = LifeTime.Transient)]
+    [AppService(typeof(ITextHelperService), LifeTime.Transient)]
     public sealed class TextHelperService : ITextHelperService
     {
         private readonly IChannelService _channelService;
+        private readonly OptionsSetting _optionsSetting;
 
-        public TextHelperService(IChannelService channelService)
+        public TextHelperService(IChannelService channelService,
+            IOptions<OptionsSetting> options)
         {
             _channelService = channelService;
+            _optionsSetting = options.Value;
+
+            PureStrings = _optionsSetting.Post.PureWords.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
         }
+
+        private string[] PureStrings { get; init; }
 
         private static readonly Regex MatchTag = new(@"(^#\S+)|(\s#\S+)");
         private static readonly Regex MatchSpace = new(@"^\s*$");
@@ -41,13 +50,20 @@ namespace XinjingdailyBot.Service.Helper
                 return "";
             }
 
-            //过滤HashTag
-            text = MatchTag.Replace(text, "");
+            if (_optionsSetting.Post.PureHashTag)
+            {
+                //过滤HashTag
+                text = MatchTag.Replace(text, "");
+            }
 
-            //过滤连续换行
-            var parts = text.Split('\n', StringSplitOptions.RemoveEmptyEntries).Where(x => !MatchSpace.IsMatch(x)).Select(x => x.Trim());
+            if (_optionsSetting.Post.PureRetuens)
+            {
+                //过滤连续换行
+                var parts = text.Split('\n', StringSplitOptions.RemoveEmptyEntries).Where(x => !MatchSpace.IsMatch(x)).Select(x => x.Trim());
+                text = string.Join('\n', parts);
+            }
 
-            return string.Join('\n', parts);
+            return text;
         }
 
         /// <summary>
@@ -154,6 +170,10 @@ namespace XinjingdailyBot.Service.Helper
                     .Replace("<", "＜")
                     .Replace(">", "＞")
                     .Replace("&", "＆");
+                foreach (var item in PureStrings)
+                {
+                    escapedText = escapedText.Replace(item, "");
+                }
                 return escapedText;
             }
         }

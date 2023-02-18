@@ -12,7 +12,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Command
 {
-    [AppService(ServiceLifetime = LifeTime.Scoped)]
+    [AppService(LifeTime.Scoped)]
     public class PostCommand
     {
         private readonly ITelegramBotClient _botClient;
@@ -132,6 +132,11 @@ namespace XinjingdailyBot.Command
         /// <returns></returns>
         private async Task ConfirmPost(Posts post, Users dbUser, CallbackQuery query)
         {
+            if (await _postService.CheckPostLimit(dbUser, null, query) == false)
+            {
+                return;
+            }
+
             Message reviewMsg;
             if (!post.IsMediaGroup)
             {

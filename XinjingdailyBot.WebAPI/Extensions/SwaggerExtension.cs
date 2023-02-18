@@ -2,8 +2,15 @@
 
 namespace XinjingdailyBot.WebAPI.Extensions
 {
+    /// <summary>
+    /// Swagger扩展
+    /// </summary>
     public static class SwaggerExtension
     {
+        /// <summary>
+        /// 注册Swagger
+        /// </summary>
+        /// <param name="services"></param>
         public static void AddSwagger(this IServiceCollection services)
         {
             services.AddEndpointsApiExplorer();

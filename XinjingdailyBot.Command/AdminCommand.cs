@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using SqlSugar;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -19,13 +20,13 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Command
 {
-    [AppService(ServiceLifetime = LifeTime.Scoped)]
+    [AppService(LifeTime.Scoped)]
     public class AdminCommand
     {
         private readonly ILogger<AdminCommand> _logger;
         private readonly ITelegramBotClient _botClient;
         private readonly IUserService _userService;
-        private readonly LevelRepository _levelRepository;
+        //private readonly LevelRepository _levelRepository;
         private readonly GroupRepository _groupRepository;
         private readonly IBanRecordService _banRecordService;
         private readonly IPostService _postService;
@@ -33,24 +34,26 @@ namespace XinjingdailyBot.Command
         private readonly IChannelOptionService _channelOptionService;
         private readonly IChannelService _channelService;
         private readonly IMarkupHelperService _markupHelperService;
+        private readonly ICmdRecordService _cmdRecordService;
 
         public AdminCommand(
             ILogger<AdminCommand> logger,
             ITelegramBotClient botClient,
             IUserService userService,
-            LevelRepository levelRepository,
+            //LevelRepository levelRepository,
             GroupRepository groupRepository,
             IBanRecordService banRecordService,
             IPostService postService,
             IAttachmentService attachmentService,
             IChannelOptionService channelOptionService,
             IChannelService channelService,
-            IMarkupHelperService markupHelperService)
+            IMarkupHelperService markupHelperService,
+            ICmdRecordService cmdRecordService)
         {
             _logger = logger;
             _botClient = botClient;
             _userService = userService;
-            _levelRepository = levelRepository;
+            //_levelRepository = levelRepository;
             _groupRepository = groupRepository;
             _banRecordService = banRecordService;
             _postService = postService;
@@ -58,7 +61,10 @@ namespace XinjingdailyBot.Command
             _channelOptionService = channelOptionService;
             _channelService = channelService;
             _markupHelperService = markupHelperService;
+            _cmdRecordService = cmdRecordService;
         }
+
+        private readonly DateTime StartAt = DateTime.Now;
 
         /// <summary>
         /// 被警告超过此值自动封禁
@@ -97,7 +103,7 @@ namespace XinjingdailyBot.Command
                     sb.AppendLine($"群组链接: <code>@{chat.Username ?? "无"}</code>");
                 }
             }
-            await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
+            await _botClient.SendCommandReply(sb.ToString(), message, false, parsemode: ParseMode.Html);
         }
 
         /// <summary>
@@ -127,25 +133,15 @@ namespace XinjingdailyBot.Command
             }
             else
             {
-                var level = _levelRepository.GetLevelName(targetUser.Level);
-                var group = _groupRepository.GetGroupName(targetUser.GroupID);
-                var status = targetUser.IsBan ? "封禁中" : "正常";
+                sb.AppendLine("-- 基础信息 --");
+                sb.AppendLine(_userService.GetUserBasicInfo(targetUser));
 
-                var totalPost = targetUser.PostCount - targetUser.ExpiredPostCount;
-
-                sb.AppendLine($"用户名: <code>{targetUser.EscapedFullName()}</code>");
-                sb.AppendLine($"用户ID: <code>{targetUser.UserID}</code>");
-                sb.AppendLine($"用户组: <code>{group}</code>");
-                sb.AppendLine($"状态: <code>{status}</code>");
-                sb.AppendLine($"等级:  <code>{level}</code>");
-                sb.AppendLine($"投稿数量: <code>{totalPost}</code>");
-                sb.AppendLine($"通过率: <code>{100.0 * targetUser.AcceptCount / totalPost}%</code>");
-                sb.AppendLine($"通过数量: <code>{targetUser.AcceptCount}</code>");
-                sb.AppendLine($"拒绝数量: <code>{targetUser.RejetCount}</code>");
-                sb.AppendLine($"审核数量: <code>{targetUser.ReviewCount}</code>");
+                sb.AppendLine();
+                sb.AppendLine("-- 用户排名 --");
+                sb.AppendLine(await _userService.GetUserRank(targetUser));
             }
 
-            await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
+            await _botClient.SendCommandReply(sb.ToString(), message, false, parsemode: ParseMode.Html);
         }
 
         /// <summary>
@@ -262,6 +258,7 @@ namespace XinjingdailyBot.Command
                     if (args.Any())
                     {
                         targetUser = await _userService.FetchUserByUserNameOrUserID(args.First());
+                        args = args[1..];
                     }
                 }
 
@@ -444,7 +441,10 @@ namespace XinjingdailyBot.Command
                     {
                         if (targetUser.PrivateChatID > 0)
                         {
-                            var msg = string.Format(Langs.WarnUserTips, reason, warnCount, WarningLimit);
+                            StringBuilder s = new();
+                            s.AppendLine(string.Format(Langs.WarnUserTips, reason));
+                            s.AppendLine(string.Format(Langs.WarnUserTips2, warnCount, WarningLimit));
+                            string msg = s.ToString();
                             await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg, parseMode: ParseMode.Html);
 
                             if (warnCount >= WarningLimit)
@@ -549,7 +549,7 @@ namespace XinjingdailyBot.Command
                 }
             }
 
-            await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
+            await _botClient.SendCommandReply(sb.ToString(), message, false, parsemode: ParseMode.Html);
         }
 
         /// <summary>
@@ -679,6 +679,19 @@ namespace XinjingdailyBot.Command
         }
 
         /// <summary>
+        /// 停止搜索用户
+        /// </summary>
+        /// <param name="callbackQuery"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        [QueryCmd("CANCELSEARCHUSER", UserRights.AdminCmd, Alias = "CANCELCLOSE")]
+        public async Task QResponseCancelSearchUser(CallbackQuery callbackQuery, string[] args)
+        {
+            string text = args.Length >= 2 ? args[1] : "参数有误";
+            await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, ParseMode.Html, true, null);
+        }
+
+        /// <summary>
         /// 生成投稿统计信息
         /// </summary>
         /// <param name="message"></param>
@@ -790,10 +803,25 @@ namespace XinjingdailyBot.Command
             sb.AppendLine("-- 应用信息 --");
             var proc = Process.GetCurrentProcess();
             var mem = proc.WorkingSet64 / 1024.0 / 1024.0;
-            var cpu = proc.TotalProcessorTime;
             sb.AppendLine($"当前版本: <code>{version}</code>");
-            sb.AppendLine($"占用内存: <code>{mem.ToString("f2")}</code> MB");
-            sb.AppendLine($"运行时间: <code>{cpu.TotalMinutes.ToString("0.00")}</code> 天");
+            sb.AppendLine($"占用内存: <code>{mem:F2}</code> MB");
+
+            TimeSpan uptime = DateTime.Now - StartAt;
+            int day = (int)uptime.TotalDays;
+            double hours = uptime.TotalHours - day * 24;
+
+            sb.AppendLine($"运行时间: <code>{day}</code> 天 <code>{hours:F8}</code> 小时");
+
+            var today = DateTime.Now.AddHours(-24);
+            var cmdCount = await _cmdRecordService.Queryable().Where(x => !x.IsQuery && x.Handled && x.ExecuteAt >= today).CountAsync();
+            var QueryCount = await _cmdRecordService.Queryable().Where(x => x.IsQuery && x.Handled && x.ExecuteAt >= today).CountAsync();
+            var errorCount = await _cmdRecordService.Queryable().Where(x => x.Error && x.Handled && x.ExecuteAt >= today).CountAsync();
+
+            sb.AppendLine();
+            sb.AppendLine("-- 调用统计 --");
+            sb.AppendLine($"文字命令: <code>{cmdCount}</code> 次");
+            sb.AppendLine($"查询调用: <code>{QueryCount}</code> 次");
+            sb.AppendLine($"出错次数: <code>{errorCount}</code> 次");
 
             sb.AppendLine();
             sb.AppendLine("-- 硬盘信息 --");
@@ -825,7 +853,7 @@ namespace XinjingdailyBot.Command
             sb.AppendLine($"框架版本: <code>DotNet {Environment.Version} {RuntimeInformation.OSArchitecture}</code>");
             sb.AppendLine($"系统信息: <code>{RuntimeInformation.OSDescription}</code>");
 
-            await _botClient.SendCommandReply(sb.ToString(), message, true, ParseMode.Html);
+            await _botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
         }
 
         /// <summary>
@@ -926,7 +954,7 @@ namespace XinjingdailyBot.Command
                 var count = 1;
                 foreach (var user in adminReviewCountRank)
                 {
-                    sb.AppendLine($"{count++}. {(!user.PreferAnonymous ? user.EscapedFullName() : "匿名用户")} {user.AcceptCount}");
+                    sb.AppendLine($"{count++}. {(!user.PreferAnonymous ? user.EscapedFullName() : "匿名用户")} {user.ReviewCount}");
                 }
             }
             else
@@ -985,7 +1013,7 @@ namespace XinjingdailyBot.Command
             }
 
             (var text, var kbd) = await exec();
-            await _botClient.SendCommandReply(text, message, autoDelete: false, replyMarkup: kbd);
+            await _botClient.SendCommandReply(text, message, false, replyMarkup: kbd);
         }
 
         /// <summary>
@@ -994,17 +1022,17 @@ namespace XinjingdailyBot.Command
         /// <param name="dbUser"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [QueryCmd("SETUSERGROUP", UserRights.NormalCmd)]
+        [QueryCmd("SETUSERGROUP", UserRights.AdminCmd)]
         public async Task QResponseSetUserGroup(Users dbUser, CallbackQuery callbackQuery, string[] args)
         {
             async Task<string> exec()
             {
-                if (args.Length < 3)
+                if (args.Length < 3 || !long.TryParse(args[1], out long userId))
                 {
                     return "参数有误";
                 }
 
-                var targetUser = await _userService.FetchUserByUserName(args[1]);
+                var targetUser = await _userService.FetchUserByUserID(userId);
 
                 if (targetUser == null)
                 {
@@ -1029,6 +1057,19 @@ namespace XinjingdailyBot.Command
                         targetUser.GroupID = groupID;
                         targetUser.ModifyAt = DateTime.Now;
                         await _userService.Updateable(targetUser).UpdateColumns(x => new { x.GroupID, x.ModifyAt }).ExecuteCommandAsync();
+
+                        if (targetUser.PrivateChatID != -1)
+                        {
+                            try
+                            {
+                                await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"您的权限组已被管理员修改为 {group.Name}");
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError("向用户 {targetUser} 发送消息失败, {ex}", targetUser, ex);
+                            }
+                        }
+
                         return $"修改用户 {targetUser} 权限组成功, 当前权限组 {group.Name}";
                     }
                 }
@@ -1038,6 +1079,57 @@ namespace XinjingdailyBot.Command
 
             string text = await exec();
             await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, replyMarkup: null);
+        }
+
+        /// <summary>
+        /// 查看消息详情
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        [TextCmd("MESSAGE", UserRights.AdminCmd, Alias = "MSG", Description = "查看消息详情")]
+        public async Task GetMessageDetail(Message message)
+        {
+            var msg = message.ReplyToMessage ?? message;
+
+            StringBuilder sb = new();
+
+            sb.AppendLine("消息详情");
+
+            sb.AppendLine($"Chat Type: <code>{msg.Chat.Type}</code>");
+            if (message.Chat.Type != ChatType.Private)
+            {
+                sb.AppendLine($"Chat Title: <code>{msg.Chat.FullChatProfile()}</code>");
+            }
+            sb.AppendLine($"Chat Id: <code>{msg.Chat.Id}</code>");
+
+            if (msg.From != null)
+            {
+                sb.AppendLine($"From: <code>{msg.From.FullName()}</code> <code>{msg.From.UserID()}</code>");
+            }
+            if (msg.ForwardFrom != null)
+            {
+                sb.AppendLine($"ForwardFrom: <code>{msg.ForwardFrom.FullName()}</code> <code>{msg.ForwardFrom.UserID()}</code>");
+            }
+            if (msg.ForwardFromChat != null)
+            {
+                sb.AppendLine($"ForwardFromChat: <code>{msg.ForwardFromChat.FullChatProfile()}</code>");
+            }
+            if (msg.ForwardFromMessageId != null)
+            {
+                sb.AppendLine($"ForwardFromMessageId: <code>{msg.ForwardFromMessageId}</code>");
+            }
+
+            sb.AppendLine($"Message Id: <code>{msg.MessageId}</code>");
+
+            if (!string.IsNullOrEmpty(msg.MediaGroupId))
+            {
+                sb.AppendLine($"Media Group Id: <code>{msg.MediaGroupId}</code>");
+            }
+
+            sb.AppendLine($"Message Type: <code>{msg.Type}</code>");
+            sb.AppendLine($"Message Date: <code>{msg.Date}</code>");
+
+            await _botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
         }
     }
 }

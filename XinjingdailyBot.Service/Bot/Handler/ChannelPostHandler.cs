@@ -10,13 +10,12 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Handler
 {
-    [AppService(ServiceType = typeof(IChannelPostHandler), ServiceLifetime = LifeTime.Singleton)]
+    [AppService(typeof(IChannelPostHandler), LifeTime.Singleton)]
     public class ChannelPostHandler : IChannelPostHandler
     {
         private readonly IPostService _postService;
         private readonly ITextHelperService _textHelperService;
         private readonly IAttachmentService _attachmentService;
-        private readonly IAttachmentHelperService _attachmentHelperService;
         private readonly IUserService _userService;
         private readonly IChannelOptionService _channelOptionService;
 
@@ -24,14 +23,12 @@ namespace XinjingdailyBot.Service.Bot.Handler
             IPostService postService,
             ITextHelperService textHelperService,
             IAttachmentService attachmentService,
-            IAttachmentHelperService attachmentHelperService,
             IUserService userService,
             IChannelOptionService channelOptionService)
         {
             _postService = postService;
             _textHelperService = textHelperService;
             _attachmentService = attachmentService;
-            _attachmentHelperService = attachmentHelperService;
             _userService = userService;
             _channelOptionService = channelOptionService;
         }
@@ -142,7 +139,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
 
             long postID = await _postService.Insertable(newPost).ExecuteReturnBigIdentityAsync();
 
-            Attachments? attachment = _attachmentHelperService.GenerateAttachment(message, postID);
+            Attachments? attachment = _attachmentService.GenerateAttachment(message, postID);
 
             if (attachment != null)
             {
@@ -235,7 +232,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             //更新附件
             if (postID > 0)
             {
-                Attachments? attachment = _attachmentHelperService.GenerateAttachment(message, postID);
+                Attachments? attachment = _attachmentService.GenerateAttachment(message, postID);
 
                 if (attachment != null)
                 {

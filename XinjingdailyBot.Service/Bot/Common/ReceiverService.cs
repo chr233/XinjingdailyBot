@@ -9,7 +9,7 @@ using XinjingdailyBot.Interface.Bot.Common;
 
 namespace XinjingdailyBot.Service.Bot.Common
 {
-    [AppService(ServiceType = typeof(IReceiverService), ServiceLifetime = LifeTime.Scoped)]
+    [AppService(typeof(IReceiverService), LifeTime.Scoped)]
     public class ReceiverService : IReceiverService
     {
         private readonly ITelegramBotClient _botClient;
@@ -34,7 +34,7 @@ namespace XinjingdailyBot.Service.Bot.Common
             ReceiverOptions receiverOptions = new()
             {
                 AllowedUpdates = Array.Empty<UpdateType>(),
-                ThrowPendingUpdates = _optionsSetting.Bot.ThrowPendingUpdates,
+                ThrowPendingUpdates = true || _optionsSetting.Bot.ThrowPendingUpdates,
             };
 
             _logger.LogInformation("接收服务运行中...");

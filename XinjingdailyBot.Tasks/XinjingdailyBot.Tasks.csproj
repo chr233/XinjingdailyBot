@@ -1,9 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +10,15 @@
     <ProjectReference Include="..\XinjingdailyBot.Model\XinjingdailyBot.Model.csproj" />
     <ProjectReference Include="..\XinjingdailyBot.Repository\XinjingdailyBot.Repository.csproj" />
     <ProjectReference Include="..\XinjingdailyBot.Service\XinjingdailyBot.Service.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Quartz" />
+    <PackageReference Include="Quartz.AspNetCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Quartz" />
   </ItemGroup>
 
 </Project>

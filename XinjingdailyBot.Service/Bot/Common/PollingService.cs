@@ -1,14 +1,16 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Repository;
 
-namespace XinjingdailyBot.Service.Bot.Common
+namespace XinjingdailyBot.Tasks
 {
-    [AppService(ServiceLifetime = LifeTime.Transient)]
+    /// <summary>
+    /// 注册消息接收器
+    /// </summary>
     public class PollingService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
@@ -34,6 +36,7 @@ namespace XinjingdailyBot.Service.Bot.Common
             _levelRepository = levelRepository;
         }
 
+        [RequiresUnreferencedCode("不兼容剪裁")]
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogDebug("注册可用命令");

@@ -4,16 +4,9 @@
     {
         private List<string> Content { get; }
 
-        public TagObjct()
-        {
-            Content = new();
-        }
         public TagObjct(string content)
         {
-            Content = new()
-            {
-                content
-            };
+            Content = new() { content };
         }
 
         public void AddLast(string value)

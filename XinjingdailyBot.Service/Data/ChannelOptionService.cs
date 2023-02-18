@@ -5,7 +5,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Data
 {
-    [AppService(ServiceType = typeof(IChannelOptionService), ServiceLifetime = LifeTime.Transient)]
+    [AppService(typeof(IChannelOptionService), LifeTime.Transient)]
     public sealed class ChannelOptionService : BaseService<ChannelOptions>, IChannelOptionService
     {
         /// <summary>
@@ -26,16 +26,21 @@ namespace XinjingdailyBot.Service.Data
                     ChannelName = channelName ?? "",
                     ChannelTitle = channelTitle ?? "",
                     Option = ChannelOption.Normal,
+                    Count = 1,
                     CreateAt = DateTime.Now,
                     ModifyAt = DateTime.Now,
                 };
                 await Insertable(channel).ExecuteCommandAsync();
             }
-            else if (channel.ChannelName != channelName || channel.ChannelTitle != channelTitle)
+            else
             {
-                channel.ChannelTitle = channelTitle ?? "";
-                channel.ChannelName = channelName ?? "";
-                channel.ModifyAt = DateTime.Now;
+                if (channel.ChannelName != channelName || channel.ChannelTitle != channelTitle)
+                {
+                    channel.ChannelTitle = channelTitle ?? "";
+                    channel.ChannelName = channelName ?? "";
+                    channel.ModifyAt = DateTime.Now;
+                }
+                channel.Count++;
                 await Updateable(channel).ExecuteCommandAsync();
             }
 

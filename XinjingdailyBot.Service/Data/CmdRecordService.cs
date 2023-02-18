@@ -5,7 +5,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Data
 {
-    [AppService(ServiceType = typeof(ICmdRecordService), ServiceLifetime = LifeTime.Transient)]
+    [AppService(typeof(ICmdRecordService), LifeTime.Transient)]
     public sealed class CmdRecordService : BaseService<CmdRecords>, ICmdRecordService
     {
         /// <summary>

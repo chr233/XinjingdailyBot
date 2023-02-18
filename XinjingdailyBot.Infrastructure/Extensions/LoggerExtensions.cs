@@ -30,6 +30,9 @@ namespace XinjingdailyBot.Infrastructure.Extensions
                 case UpdateType.CallbackQuery:
                     logger.LogCallbackQuery(update.CallbackQuery!);
                     break;
+                case UpdateType.InlineQuery:
+                    logger.LogInlineQuery(update.InlineQuery!);
+                    break;
                 default:
                     logger.LogDebug("U 未知消息 {Type}", update.Type);
                     break;
@@ -52,6 +55,15 @@ namespace XinjingdailyBot.Infrastructure.Extensions
                 MessageType.Voice => $"[语音] {message.Caption}",
                 MessageType.Document => $"[文件] {message.Caption}",
                 MessageType.Sticker => $"[贴纸] {message.Sticker!.SetName}",
+                MessageType.MessagePinned => $"[消息置顶] {message.PinnedMessage!.Text}",
+                MessageType.ChatMemberLeft => $"[成员退出] {message.LeftChatMember!.UserProfile()}",
+                MessageType.ChatMembersAdded => $"[成员加入] {message.NewChatMembers?.First().UserProfile()} 等 {message.NewChatMembers?.Length ?? 0} 人",
+                MessageType.ChatTitleChanged => $"[群名变更] {message.NewChatTitle}",
+                MessageType.ChatPhotoChanged => $"[群头像变更]",
+                MessageType.ChatPhotoDeleted => $"[群头像删除]",
+                MessageType.MigratedToSupergroup => $"[群升级为超级群]",
+                MessageType.MigratedFromGroup => $"[超级群降级为群]",
+                MessageType.Poll => $"[投票] {message.Poll!.Question}",
                 _ => $"[其他] {message.Type}",
             };
 
@@ -59,26 +71,38 @@ namespace XinjingdailyBot.Infrastructure.Extensions
 
             string chatFrom = chat.Type switch
             {
-                ChatType.Private => $"私聊",
-                ChatType.Group => $"群组 {chat.Title}",
-                ChatType.Channel => $"频道 {chat.Title}",
-                ChatType.Supergroup => $"群组 {chat.Title}",
-                _ => $"未知 {chat.Title}",
+                ChatType.Private => "【私聊】",
+                ChatType.Group => $"【群组|{chat.Title}】",
+                ChatType.Channel => $"【频道|{chat.Title}】",
+                ChatType.Supergroup => $"【群组|{chat.Title}】",
+                _ => $"【未知|{chat.Title}】",
             };
 
             string user = message.From?.UserToString() ?? "未知";
 
-            logger.LogInformation("M {chatFrom} {user} {content}", chatFrom, user, content);
+            logger.LogInformation("{chatFrom} {user} {content}", chatFrom, user, content);
         }
 
         /// <summary>
         /// 输出query
         /// </summary>
         /// <param name="logger"></param>
+        /// <param name="callbackQuery"></param>
         public static void LogCallbackQuery(this ILogger logger, CallbackQuery callbackQuery)
         {
-            string user = callbackQuery.From.FullName();
-            logger.LogDebug("Q [数据] {Id} {user} {callbackQuery.Data}", callbackQuery.Id, user, callbackQuery.Data);
+            string user = callbackQuery.From.UserToString();
+            logger.LogInformation("【回调|{Id}】 {user} {Data}", callbackQuery.Id, user, callbackQuery.Data);
+        }
+
+        /// <summary>
+        /// 输出query
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="inlineQuery"></param>
+        public static void LogInlineQuery(this ILogger logger, InlineQuery inlineQuery)
+        {
+            string user = inlineQuery.From.UserToString();
+            logger.LogDebug("【查询|{Id}】 {user} {Data}", inlineQuery.Id, user, inlineQuery.Query);
         }
     }
 }

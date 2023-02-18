@@ -9,6 +9,7 @@ namespace XinjingdailyBot.Interface.Data
         int MaxPostText { get; }
 
         Task AcceptPost(Posts post, Users dbUser, CallbackQuery callbackQuery);
+        Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null);
         Task HandleMediaGroupPosts(Users dbUser, Message message);
         Task HandleMediaPosts(Users dbUser, Message message);
         Task HandleTextPosts(Users dbUser, Message message);

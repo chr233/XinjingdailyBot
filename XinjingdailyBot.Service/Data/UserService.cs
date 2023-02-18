@@ -17,7 +17,7 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Data
 {
-    [AppService(ServiceType = typeof(IUserService), ServiceLifetime = LifeTime.Singleton)]
+    [AppService(typeof(IUserService), LifeTime.Singleton)]
     public sealed class UserService : BaseService<Users>, IUserService
     {
         private readonly ILogger<UserService> _logger;
@@ -28,6 +28,7 @@ namespace XinjingdailyBot.Service.Data
         private readonly ICmdRecordService _cmdRecordService;
         private readonly PostRepository _postRepository;
         private readonly ITelegramBotClient _botClient;
+        private readonly LevelRepository _levelRepository;
 
         public UserService(
             ILogger<UserService> logger,
@@ -36,8 +37,9 @@ namespace XinjingdailyBot.Service.Data
             IMarkupHelperService markupHelperService,
             IChannelService channelService,
             ICmdRecordService cmdRecordService,
-           PostRepository postRepository,
-           ITelegramBotClient botClient)
+            PostRepository postRepository,
+            ITelegramBotClient botClient,
+            LevelRepository levelRepository)
         {
             _logger = logger;
             _optionsSetting = configuration.Value;
@@ -47,6 +49,7 @@ namespace XinjingdailyBot.Service.Data
             _cmdRecordService = cmdRecordService;
             _postRepository = postRepository;
             _botClient = botClient;
+            _levelRepository = levelRepository;
         }
 
         /// <summary>
@@ -75,6 +78,13 @@ namespace XinjingdailyBot.Service.Data
 
             if (update.Type == UpdateType.ChannelPost)
             {
+                var message = update.ChannelPost!;
+                // 自动删除置顶通知 和 群名修改通知
+                if (message.Type == MessageType.MessagePinned || message.Type == MessageType.ChatTitleChanged)
+                {
+                    await AutoDeleteNotification(message);
+                    return null;
+                }
                 return await QueryUserFromChannelPost(update.ChannelPost!);
             }
             else
@@ -364,6 +374,25 @@ namespace XinjingdailyBot.Service.Data
             return null;
         }
 
+        /// <summary>
+        /// 自动删除置顶消息通知
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        private async Task AutoDeleteNotification(Message message)
+        {
+            if (message.Chat.Id == _channelService.AcceptChannel.Id || message.Chat.Id == _channelService.RejectChannel.Id)
+            {
+                try
+                {
+                    await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "删除置顶通知失败");
+                }
+            }
+        }
 
         /// <summary>
         /// 根据UserID获取用户
@@ -580,6 +609,86 @@ namespace XinjingdailyBot.Service.Data
             var keyboard = _markupHelperService.UserListPageKeyboard(dbUser, query, page, totalPages);
 
             return (sb.ToString(), keyboard);
+        }
+
+        public string GetUserBasicInfo(Users dbUser)
+        {
+            var userNick = dbUser.FullName.EscapeHtml();
+            var level = _levelRepository.GetLevelName(dbUser.Level);
+            var group = _groupRepository.GetGroupName(dbUser.GroupID);
+            var status = dbUser.IsBan ? "封禁中" : "正常";
+
+            int totalPost = dbUser.PostCount - dbUser.ExpiredPostCount;
+            double passPercent = 1.0 * dbUser.AcceptCount / totalPost;
+
+            StringBuilder sb = new();
+
+            sb.AppendLine($"用户名: <code>{userNick}</code>");
+            sb.AppendLine($"用户ID: <code>{dbUser.UserID}</code>");
+            sb.AppendLine($"用户组: <code>{group}</code>");
+            sb.AppendLine($"状态: <code>{status}</code>");
+            sb.AppendLine($"等级:  <code>{level}</code>");
+            sb.AppendLine($"投稿数量: <code>{totalPost}</code>");
+            sb.AppendLine($"投稿通过率: <code>{passPercent:0.00%}</code>");
+            sb.AppendLine($"通过数量: <code>{dbUser.AcceptCount}</code>");
+            sb.AppendLine($"拒绝数量: <code>{dbUser.RejectCount}</code>");
+            sb.AppendLine($"审核数量: <code>{dbUser.ReviewCount}</code>");
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// 进入排行榜所需的最低稿件数量
+        /// </summary>
+        private const int MiniumRankPost = 10;
+
+        /// <summary>
+        /// 获取用户排名
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <returns></returns>
+        public async Task<string> GetUserRank(Users dbUser)
+        {
+            var now = DateTime.Now;
+            var prev30Days = now.AddDays(-30).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+
+            StringBuilder sb = new();
+
+
+            if (dbUser.GroupID == 1)
+            {
+                if (dbUser.AcceptCount >= MiniumRankPost)
+                {
+                    int acceptCountRank = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > dbUser.AcceptCount && x.ModifyAt >= prev30Days).CountAsync() + 1;
+
+                    double ratio = 1.0 * dbUser.AcceptCount / dbUser.PostCount;
+                    int acceptRatioRank = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > MiniumRankPost && x.ModifyAt >= prev30Days)
+                    .Select(y => 100.0 * y.AcceptCount / y.PostCount).Where(x => x > ratio).CountAsync() + 1;
+
+                    sb.AppendLine($"通过数排名: <code>{acceptCountRank}</code>");
+                    sb.AppendLine($"通过率排名: <code>{acceptRatioRank}</code>");
+
+                    int activeUser = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.ModifyAt >= prev30Days).CountAsync();
+                    sb.AppendLine($"活跃用户总数: <code>{activeUser}</code>");
+                }
+                else
+                {
+                    sb.AppendLine("稿件数量太少, 未进入排行榜");
+                }
+            }
+            else
+            {
+                int acceptCountRank = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.AcceptCount > dbUser.AcceptCount && x.ModifyAt >= prev30Days).CountAsync() + 1;
+                int reviewCountRank = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.ReviewCount > dbUser.ReviewCount && x.ModifyAt >= prev30Days).CountAsync() + 1;
+
+                sb.AppendLine($"投稿数排名: <code>{acceptCountRank}</code>");
+                sb.AppendLine($"审核数排名: <code>{reviewCountRank}</code>");
+
+                int activeAdmin = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.ModifyAt >= prev30Days).CountAsync();
+                sb.AppendLine($"活跃管理员总数: <code>{activeAdmin}</code>");
+            }
+
+            return sb.ToString();
         }
     }
 }

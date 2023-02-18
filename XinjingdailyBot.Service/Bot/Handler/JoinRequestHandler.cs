@@ -2,14 +2,12 @@
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
-using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Handler
 {
-    [AppService(ServiceType = typeof(IJoinRequestHandler), ServiceLifetime = LifeTime.Scoped)]
+    [AppService(typeof(IJoinRequestHandler), LifeTime.Scoped)]
     public class JoinRequestHandler : IJoinRequestHandler
     {
         private readonly ILogger<JoinRequestHandler> _logger;
