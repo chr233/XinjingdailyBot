@@ -5,6 +5,6 @@ namespace XinjingdailyBot.Interface.Data
 {
     public interface IDialogueService : IBaseService<Dialogue>
     {
-        Task RecordUpdate(Message message);
+        Task RecordMessage(Message message);
     }
 }

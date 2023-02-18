@@ -30,6 +30,7 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 消息内容
         /// </summary>
+        [SugarColumn(Length = 2000)]
         public string Content { get; set; } = "";
 
         /// <summary>

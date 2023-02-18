@@ -82,7 +82,7 @@ namespace XinjingdailyBot.Service.Bot.Common
         /// <returns></returns>
         public async Task OnMessageReceived(Users dbUser, Message message)
         {
-            await _dialogueService.RecordUpdate(message);
+            await _dialogueService.RecordMessage(message);
 
             if (dbUser.UserID == 777000 && (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup))
             {

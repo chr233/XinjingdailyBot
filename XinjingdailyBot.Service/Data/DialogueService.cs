@@ -9,7 +9,7 @@ namespace XinjingdailyBot.Service.Data
     [AppService(typeof(IDialogueService), LifeTime.Transient)]
     public sealed class DialogueService : BaseService<Dialogue>, IDialogueService
     {
-        public async Task RecordUpdate(Message message)
+        public async Task RecordMessage(Message message)
         {
             string? content = message.Type switch
             {
@@ -22,6 +22,11 @@ namespace XinjingdailyBot.Service.Data
                 MessageType.Sticker => message.Sticker!.SetName,
                 _ => null,
             };
+
+            if(content?.Length > 2000)
+            {
+                content = content[..2000];
+            }
 
             var dialogue = new Dialogue
             {
