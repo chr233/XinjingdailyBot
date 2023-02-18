@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types.ReplyMarkups;
+﻿using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Localization;
@@ -23,36 +24,6 @@ namespace XinjingdailyBot.Service.Helper
             _channelService = channelService;
         }
 
-        private static readonly string AnymouseOn = Emojis.Ghost + "匿名投稿";
-        private static readonly string AnymouseOff = Emojis.Thinking + "保留来源";
-        private static readonly string PostCancel = Emojis.No + "取消";
-        private static readonly string PostConfirm = Emojis.Yes + "投稿";
-
-        private static readonly string TagNSFWOn = "#NSFW";
-        private static readonly string TagFriendOn = "#我有一个朋友";
-        private static readonly string TagWanAnOn = "#晚安";
-        private static readonly string TagAIGraphOn = "#AI怪图";
-        private static readonly string TagSpoilerOn = Emojis.SpoilerOn + "开启遮罩";
-
-        private static readonly string TagNSFWOff = "#N___";
-        private static readonly string TagFriendOff = "#我_____";
-        private static readonly string TagWanAnOff = "#晚_";
-        private static readonly string TagAIGraphOff = "#A___";
-        private static readonly string TagSpoilerOff = Emojis.SpoilerOff + "禁用遮罩";
-
-        private static readonly string ReviewReject = Emojis.No + "拒绝";
-        private static readonly string ReviewAccept = Emojis.Yes + "采用";
-
-        private static readonly string RejectFuzzy = "模糊";
-        private static readonly string RejectDuplicate = "重复";
-        private static readonly string RejectBoring = "无趣";
-        private static readonly string RejectConfusing = "没懂";
-        private static readonly string RejectQRCode = "广告";
-        private static readonly string RejectDeny = "内容不合适";
-        private static readonly string RejectOther = "其他原因";
-
-        private static readonly string RejectCancel = Emojis.Back + "返回";
-
         /// <summary>
         /// 投稿键盘
         /// </summary>
@@ -64,12 +35,12 @@ namespace XinjingdailyBot.Service.Helper
             {
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData( anymouse ? AnymouseOn : AnymouseOff, "post anymouse"),
+                    InlineKeyboardButton.WithCallbackData(anymouse? Langs.AnymouseOn: Langs.AnymouseOff, "post anymouse"),
                 },
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData( PostCancel,  "post cancel"),
-                    InlineKeyboardButton.WithCallbackData( PostConfirm,  "post confirm"),
+                    InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "post cancel"),
+                    InlineKeyboardButton.WithCallbackData(Langs.PostConfirm, "post confirm"),
                 },
             });
             return keyboard;
@@ -87,22 +58,22 @@ namespace XinjingdailyBot.Service.Helper
             {
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData( tag.HasFlag(BuildInTags.NSFW)? TagNSFWOn:TagNSFWOff, "review tag nsfw"),
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.WanAn)? TagWanAnOn:TagWanAnOff, "review tag wanan"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.NSFW)? Langs.TagNSFWOn: Langs.TagNSFWOff, "review tag nsfw"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.WanAn)? Langs.TagWanAnOn: Langs.TagWanAnOff, "review tag wanan"),
                 },
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? TagFriendOn:TagFriendOff, "review tag friend"),
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? TagAIGraphOn:TagAIGraphOff, "review tag ai"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? Langs.TagFriendOn: Langs.TagFriendOff, "review tag friend"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? Langs.TagAIGraphOn: Langs.TagAIGraphOff, "review tag ai"),
                 },
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData( anymouse ? AnymouseOn : AnymouseOff, "review anymouse"),
+                    InlineKeyboardButton.WithCallbackData(anymouse? Langs.AnymouseOn: Langs.AnymouseOff, "review anymouse"),
                 },
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData( PostCancel,  "review cancel"),
-                    InlineKeyboardButton.WithCallbackData( ReviewAccept,  "review accept"),
+                    InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "review cancel"),
+                    InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
                 },
             });
             return keyboard;
@@ -120,23 +91,23 @@ namespace XinjingdailyBot.Service.Helper
             {
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData( tag.HasFlag(BuildInTags.NSFW)? TagNSFWOn:TagNSFWOff, "review tag nsfw"),
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.WanAn)? TagWanAnOn:TagWanAnOff, "review tag wanan"),
+                    InlineKeyboardButton.WithCallbackData( tag.HasFlag(BuildInTags.NSFW)? Langs.TagNSFWOn: Langs.TagNSFWOff, "review tag nsfw"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.WanAn)? Langs.TagWanAnOn: Langs.TagWanAnOff, "review tag wanan"),
                 },
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? TagFriendOn:TagFriendOff, "review tag friend"),
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? TagAIGraphOn:TagAIGraphOff, "review tag ai"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? Langs.TagFriendOn: Langs.TagFriendOff, "review tag friend"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? Langs.TagAIGraphOn: Langs.TagAIGraphOff, "review tag ai"),
                 },
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Spoiler)? TagSpoilerOn:TagSpoilerOff, "review tag spoiler"),
-                    InlineKeyboardButton.WithCallbackData( anymouse ? AnymouseOn : AnymouseOff, "review anymouse"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Spoiler)? Langs.TagSpoilerOn: Langs.TagSpoilerOff, "review tag spoiler"),
+                    InlineKeyboardButton.WithCallbackData(anymouse? Langs.AnymouseOn: Langs.AnymouseOff, "review anymouse"),
                 },
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData( PostCancel,  "review cancel"),
-                    InlineKeyboardButton.WithCallbackData( ReviewAccept,  "review accept"),
+                    InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "review cancel"),
+                    InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
                 },
             });
             return keyboard;
@@ -153,18 +124,18 @@ namespace XinjingdailyBot.Service.Helper
             {
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData( tag.HasFlag(BuildInTags.NSFW)? TagNSFWOn:TagNSFWOff, "review tag nsfw"),
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.WanAn)? TagWanAnOn:TagWanAnOff, "review tag wanan"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.NSFW)? Langs.TagNSFWOn: Langs.TagNSFWOff, "review tag nsfw"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.WanAn)? Langs.TagWanAnOn: Langs.TagWanAnOff, "review tag wanan"),
                 },
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? TagFriendOn:TagFriendOff, "review tag friend"),
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? TagAIGraphOn:TagAIGraphOff, "review tag ai"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? Langs.TagFriendOn: Langs.TagFriendOff, "review tag friend"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? Langs.TagAIGraphOn: Langs.TagAIGraphOff, "review tag ai"),
                 },
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData( ReviewReject,  "review reject"),
-                    InlineKeyboardButton.WithCallbackData( ReviewAccept,  "review accept"),
+                    InlineKeyboardButton.WithCallbackData(Langs.ReviewReject, "review reject"),
+                    InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
                 },
             });
             return keyboard;
@@ -181,22 +152,22 @@ namespace XinjingdailyBot.Service.Helper
             {
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData( tag.HasFlag(BuildInTags.NSFW)? TagNSFWOn:TagNSFWOff, "review tag nsfw"),
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.WanAn)? TagWanAnOn:TagWanAnOff, "review tag wanan"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.NSFW)? Langs.TagNSFWOn: Langs.TagNSFWOff, "review tag nsfw"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.WanAn)? Langs.TagWanAnOn: Langs.TagWanAnOff, "review tag wanan"),
                 },
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? TagFriendOn:TagFriendOff, "review tag friend"),
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? TagAIGraphOn:TagAIGraphOff, "review tag ai"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? Langs.TagFriendOn: Langs.TagFriendOff, "review tag friend"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? Langs.TagAIGraphOn: Langs.TagAIGraphOff, "review tag ai"),
                 },
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Spoiler)? TagSpoilerOn:TagSpoilerOff, "review tag spoiler"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Spoiler)? Langs.TagSpoilerOn: Langs.TagSpoilerOff, "review tag spoiler"),
                 },
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData( ReviewReject,  "review reject"),
-                    InlineKeyboardButton.WithCallbackData( ReviewAccept,  "review accept"),
+                    InlineKeyboardButton.WithCallbackData(Langs.ReviewReject, "review reject"),
+                    InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
                 },
             });
             return keyboard;
@@ -212,20 +183,20 @@ namespace XinjingdailyBot.Service.Helper
             {
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData(RejectFuzzy, "reject fuzzy"),
-                    InlineKeyboardButton.WithCallbackData(RejectDuplicate, "reject duplicate"),
-                    InlineKeyboardButton.WithCallbackData(RejectBoring, "reject boring"),
-                    InlineKeyboardButton.WithCallbackData(RejectConfusing, "reject confusing"),
+                    InlineKeyboardButton.WithCallbackData(Langs.RejectFuzzy, "reject fuzzy"),
+                    InlineKeyboardButton.WithCallbackData(Langs.RejectDuplicate, "reject duplicate"),
+                    InlineKeyboardButton.WithCallbackData(Langs.RejectBoring, "reject boring"),
+                    InlineKeyboardButton.WithCallbackData(Langs.RejectConfusing, "reject confusing"),
                 },
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData(RejectDeny, "reject deny"),
-                    InlineKeyboardButton.WithCallbackData(RejectQRCode, "reject qrcode"),
-                    InlineKeyboardButton.WithCallbackData(RejectOther, "reject other"),
+                    InlineKeyboardButton.WithCallbackData(Langs.RejectDeny, "reject deny"),
+                    InlineKeyboardButton.WithCallbackData(Langs.RejectQRCode, "reject qrcode"),
+                    InlineKeyboardButton.WithCallbackData(Langs.RejectOther, "reject other"),
                 },
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData( RejectCancel,  "reject back"),
+                    InlineKeyboardButton.WithCallbackData(Langs.RejectCancel, "reject back"),
                 },
             });
             return keyboard;
@@ -438,6 +409,37 @@ namespace XinjingdailyBot.Service.Helper
                 {
                     InlineKeyboardButton.WithUrl($"在{channel.Title}中查看", link),
                     InlineKeyboardButton.WithCallbackData($"再来一张{tagName}",$"cmd {dbUser.UserID} randompost {tag} {link}"),
+                },
+            });
+
+            return keyboard;
+        }
+
+        /// <summary>
+        /// 查询稿件信息
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="post"></param>
+        /// <returns></returns>
+        public InlineKeyboardMarkup QueryPostMenuKeyboard(Users dbUser, Posts post)
+        {
+            bool accept = post.Status == PostStatus.Accepted;
+            
+            InlineKeyboardMarkup keyboard = new(new[]
+            {
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("补发稿件",$"cmd {dbUser.UserID} randompost all"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("随机 #NSFW",$"cmd {dbUser.UserID} randompost nsfw"),
+                    InlineKeyboardButton.WithCallbackData("随机 #我有一个朋友",$"cmd {dbUser.UserID} randompost friend"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("随机 #晚安",$"cmd {dbUser.UserID} randompost wanan"),
+                    InlineKeyboardButton.WithCallbackData("随机 #AI怪图",$"cmd {dbUser.UserID} randompost ai"),
                 },
             });
 
