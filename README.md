@@ -106,6 +106,10 @@
     "DailyPostLimit": 5,
     "RatioDivisor": 100,
     "MaxRatio": 10
+    "PureRetuens": true,
+    "PureHashTag": true,
+    "PureWords": true,
+    "PostExpiredTime": 3
   }
 }
 ```
@@ -144,6 +148,10 @@
 |   `Post`   |   `DailyPostLimit`    |  `int`   |                      `5`                       |      | 每日通过以及未通过稿件数量上限基数      |
 |   `Post`   |    `RatioDivisor`     |  `int`   |                     `100`                      |      | 每日投稿数量上限倍率除数                |
 |   `Post`   |      `MaxRatio`       |  `int`   |                      `10`                      |      | 每日投稿数量上限最高倍率                |
+|   `Post`   |    `PureRetuens`      |  `bool`  |                      `true`                    |      | 是否启用回车过滤开关                     |
+|   `Post`   |    `PureHashTag`      |  `bool`  |                      `true`                    |      | 是否启用标签过滤开关                    |
+|   `Post`   |    `PureWords`        |  `bool`  |                      `true`                    |      | 是否启用ID中的特定字符过滤开关              |
+|   `Post`   |    `PostExpiredTime`  |  `int`   |                      `3`                       |      | 稿件过期时间                |
 
 > 新安装或者数据库结构变动后一定要修改 `DBGenerate` 为 `true`, 会自动生成数据表, 生成完毕后建议禁用以加快启动速度
 
