@@ -88,11 +88,11 @@ namespace XinjingdailyBot.Repository
                     TagSeg = 1,
                     OnText = "#NSFW",
                     OffText = "#N____",
-                    HashTag = "#NSFW",
+                    HashTag = "#NSFW", 
                     KeyWords = "NSFW",
                     AutoSpoiler = true,
                 },
-
+               
             };
 
             await Storageable(tags).ExecuteCommandAsync();
