@@ -1,7 +1,7 @@
 ﻿using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Repository.Base;
 
-namespace XinjingdailyBot.Interface.Data
+namespace XinjingdailyBot.Interface.Data.Base
 {
     /// <summary>
     /// 基础服务定义

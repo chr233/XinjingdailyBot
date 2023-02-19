@@ -109,6 +109,14 @@ namespace XinjingdailyBot.Model.Models
         /// </summary>
         public BuildInTags Tags { get; set; }
         /// <summary>
+        /// 稿件标签
+        /// </summary>
+        public int NewTag { get; set;  }
+        /// <summary>
+        /// 是否启用遮罩
+        /// </summary>
+        public bool HasSpoiler { get; set; }
+        /// <summary>
         /// 拒绝原因(如果拒绝)
         /// </summary>
         public RejectReason Reason { get; set; } = RejectReason.NotReject;
