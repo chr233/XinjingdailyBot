@@ -4,7 +4,7 @@
     /// 投稿Tag
     /// </summary>
     [Flags]
-    public enum BuildInTags : byte
+    public enum BuildInTags : int
     {
         /// <summary>
         /// 无
