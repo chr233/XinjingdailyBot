@@ -84,8 +84,8 @@ namespace XinjingdailyBot.Repository
                     AutoSpoiler = true,
                 },
                 new() {
-                    Id = 0,
-                    TagSeg = 1,
+                    Id = 4,
+                    TagSeg = 8,
                     OnText = "#NSFW",
                     OffText = "#N____",
                     HashTag = "#NSFW", 
