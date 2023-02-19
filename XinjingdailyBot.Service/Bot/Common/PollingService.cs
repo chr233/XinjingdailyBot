@@ -19,6 +19,7 @@ namespace XinjingdailyBot.Tasks
         private readonly ICommandHandler _commandHandler;
         private readonly GroupRepository _groupRepository;
         private readonly LevelRepository _levelRepository;
+        private readonly TagRepository _tagRepository;
 
         public PollingService(
             IServiceProvider serviceProvider,
@@ -26,7 +27,8 @@ namespace XinjingdailyBot.Tasks
             IChannelService channelService,
             ICommandHandler commandHandler,
             GroupRepository groupRepository,
-            LevelRepository levelRepository)
+            LevelRepository levelRepository,
+            TagRepository  tagRepository)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
@@ -34,6 +36,7 @@ namespace XinjingdailyBot.Tasks
             _commandHandler = commandHandler;
             _groupRepository = groupRepository;
             _levelRepository = levelRepository;
+            _tagRepository = tagRepository;
         }
 
         [RequiresUnreferencedCode("不兼容剪裁")]
@@ -48,6 +51,7 @@ namespace XinjingdailyBot.Tasks
             _logger.LogInformation("读取群组和等级设定");
             await _groupRepository.InitGroupCache();
             await _levelRepository.InitLevelCache();
+            await _tagRepository.InitPostTagCache();
 
             _logger.LogInformation("开始运行 Bot");
             await DoWork(stoppingToken);

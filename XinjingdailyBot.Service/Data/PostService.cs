@@ -13,6 +13,7 @@ using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
+using XinjingdailyBot.Service.Data.Base;
 
 namespace XinjingdailyBot.Service.Data
 {
