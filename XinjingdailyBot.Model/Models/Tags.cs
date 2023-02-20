@@ -4,17 +4,23 @@ using XinjingdailyBot.Model.Base;
 namespace XinjingdailyBot.Model.Models
 {
     [SugarTable("tag", TableDescription = "投稿标签")]
+    [SugarIndex("index_name",nameof(Name),OrderByType.Asc,true)]
     public sealed record Tags : BaseModel
     {
         [SugarColumn(IsPrimaryKey = true)]
         public int Id { get; set; }
+        /// <summary>
+        /// 位
+        /// </summary>
+        [SugarColumn(IsIgnore = true)]
+        public int Seg { get; set; }
         /// <summary>
         /// 标签名
         /// </summary>
         public string Name { get; set; } = "";
         /// <summary>
         /// 启用文本
-        /// </summary>
+        /// </summary> 
         public string OnText { get; set; } = "";
         /// <summary>
         /// 禁用文本

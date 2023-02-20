@@ -55,15 +55,15 @@ namespace XinjingdailyBot.Repository
                         tag.HashTag = "#" + tag.Name;
                     }
 
-                    int seg = 1 << tag.Id;
-                    _tagCache.Add(seg, tag);
+                    tag.Seg = 1 << tag.Id;
+                    _tagCache.Add(tag.Id, tag);
 
                     if (!string.IsNullOrEmpty(tag.KeyWords))
                     {
                         var keyWords = tag.KeyWords.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
                         if (keyWords?.Length > 0)
                         {
-                            _tagKeywords.Add(seg, keyWords);
+                            _tagKeywords.Add(tag.Seg, keyWords);
                         }
                     }
                 }
@@ -123,6 +123,7 @@ namespace XinjingdailyBot.Repository
                 {
                     if (text.Contains(word, StringComparison.InvariantCultureIgnoreCase))
                     {
+                        //TODO
                         tags += seg;
                         break;
                     }
