@@ -3,6 +3,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
@@ -58,7 +59,7 @@ namespace XinjingdailyBot.Service.Bot.Common
         {
             try
             {
-                if (message.Text == _textHelperService.NSFWWrning)
+                if (message.Text == Langs.NSFWWarning)
                 {
                     await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
                 }

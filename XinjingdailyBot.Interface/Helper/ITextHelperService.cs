@@ -6,8 +6,8 @@ namespace XinjingdailyBot.Interface.Helper
 {
     public interface ITextHelperService
     {
-        string NSFWWrning { get; }
         string EscapeHtml(string? text);
+        [Obsolete]
         BuildInTags FetchTags(string? text);
         string HtmlLink(string url, string text);
         string HtmlMessageLink(long messageID, string chatName, string linkName);
@@ -24,6 +24,5 @@ namespace XinjingdailyBot.Interface.Helper
         string ParseMessage(Message message);
         string PureText(string? text);
         string RejectReasonToString(RejectReason rejectReason);
-        string TagsToString(BuildInTags tags);
     }
 }

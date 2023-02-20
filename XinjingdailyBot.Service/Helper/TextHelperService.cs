@@ -42,10 +42,6 @@ namespace XinjingdailyBot.Service.Helper
         private static readonly Regex MatchTag = new(@"(^#\S+)|(\s#\S+)");
         private static readonly Regex MatchSpace = new(@"^\s*$");
 
-        private static readonly string NSFWWrning = $"{Emojis.Warning} NSFW 提前预警 {Emojis.Warning}";
-
-        string ITextHelperService.NSFWWrning { get => NSFWWrning; }
-
         /// <summary>
         /// 去除所有HashTag和连续换行
         /// </summary>
@@ -79,6 +75,7 @@ namespace XinjingdailyBot.Service.Helper
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
+        [Obsolete]
         public BuildInTags FetchTags(string? text)
         {
             if (string.IsNullOrEmpty(text))
@@ -303,38 +300,6 @@ namespace XinjingdailyBot.Service.Helper
         }
 
         /// <summary>
-        /// 格式化BuildInTags
-        /// </summary>
-        /// <param name="tags"></param>
-        /// <returns></returns>
-        public string TagsToString(BuildInTags tags)
-        {
-            if (tags == BuildInTags.None)
-            {
-                return "";
-            }
-
-            List<string> tag = new();
-            if (tags.HasFlag(BuildInTags.NSFW))
-            {
-                tag.Add("#NSFW");
-            }
-            if (tags.HasFlag(BuildInTags.Friend))
-            {
-                tag.Add("#我有一个朋友");
-            }
-            if (tags.HasFlag(BuildInTags.WanAn))
-            {
-                tag.Add("#晚安");
-            }
-            if (tags.HasFlag(BuildInTags.AIGraph))
-            {
-                tag.Add("#AI怪图");
-            }
-            return string.Join(' ', tag);
-        }
-
-        /// <summary>
         /// 生成投稿人信息
         /// </summary>
         /// <param name="post"></param>
@@ -377,7 +342,7 @@ namespace XinjingdailyBot.Service.Helper
         /// <returns></returns>
         public string MakePostText(Posts post, Users poster)
         {
-            var tag = TagsToString(post.Tags);
+            var tag = _tagRepository.GetActiviedHashTags(post.NewTags);
 
             StringBuilder sb = new();
 

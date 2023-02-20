@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository.Base;
 
@@ -15,7 +16,13 @@ namespace XinjingdailyBot.Repository
             _logger = logger;
         }
 
+        /// <summary>
+        /// 标签缓存, Key=Id
+        /// </summary>
         private readonly Dictionary<int, Tags> _tagCache = new();
+        /// <summary>
+        /// 标签缓存, Key=Id
+        /// </summary>
         private readonly Dictionary<int, string[]> _tagKeywords = new();
 
         /// <summary>
@@ -37,11 +44,15 @@ namespace XinjingdailyBot.Repository
                 _tagCache.Clear();
                 foreach (var tag in tags)
                 {
-                    if (string.IsNullOrEmpty(tag.Name))
+                    if (string.IsNullOrEmpty(tag.Name) || tag.Id <= 0)
                     {
                         continue;
                     }
 
+                    if (string.IsNullOrEmpty(tag.Payload))
+                    {
+                        tag.Payload = tag.Name;
+                    }
                     if (string.IsNullOrEmpty(tag.OnText))
                     {
                         tag.OnText = "#" + tag.Name;
@@ -55,7 +66,8 @@ namespace XinjingdailyBot.Repository
                         tag.HashTag = "#" + tag.Name;
                     }
 
-                    tag.Seg = 1 << tag.Id;
+                    tag.Payload = tag.Payload.ToLowerInvariant();
+                    tag.Seg = 1 << tag.Id - 1;
                     _tagCache.Add(tag.Id, tag);
 
                     if (!string.IsNullOrEmpty(tag.KeyWords))
@@ -87,22 +99,53 @@ namespace XinjingdailyBot.Repository
         {
             List<Tags> tags = new()
             {
-                new() { Id = 1,Name = "NSFW", KeyWords = "NSFW", AutoSpoiler = true },
-                new() { Id = 2,Name = "我有一个朋友", KeyWords = "朋友|英雄", AutoSpoiler = false },
-                new() { Id = 3,Name = "晚安", KeyWords = "晚安", AutoSpoiler = false },
-                new() { Id = 4,Name = "AI怪图", KeyWords = "#AI", AutoSpoiler = false },
+                new() { Id = 1,Name = "NSFW", Payload = "nsfw", KeyWords = "NSFW", AutoSpoiler = true, WarnText = Langs.NSFWWarning },
+                new() { Id = 2,Name = "我有一个朋友", Payload = "friend", KeyWords = "朋友|英雄", AutoSpoiler = false },
+                new() { Id = 3,Name = "晚安", Payload = "wanan", KeyWords = "晚安", AutoSpoiler = false },
+                new() { Id = 4,Name = "AI怪图", Payload = "ai", KeyWords = "#AI", AutoSpoiler = false },
             };
 
             await Storageable(tags).ExecuteCommandAsync();
         }
 
-        public Tags? GetTagById(int levelId)
+        /// <summary>
+        /// 根据ID获取标签
+        /// </summary>
+        /// <param name="tagId"></param>
+        /// <returns></returns>
+        public Tags? GetTagById(int tagId)
         {
-            if (_tagCache.TryGetValue(levelId, out var tag))
+            if (_tagCache.TryGetValue(tagId, out var tag))
             {
                 return tag;
             }
             return null;
+        }
+
+        /// <summary>
+        /// 根据Payload获取标签
+        /// </summary>
+        /// <param name="payload"></param>
+        /// <returns></returns>
+        public Tags? GetTagByPayload(string payload)
+        {
+            foreach (var tag in _tagCache.Values)
+            {
+                if (tag.Payload == payload)
+                {
+                    return tag;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 获取所有标签
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<Tags> GetAllTags()
+        {
+            return _tagCache.Values;
         }
 
         /// <summary>
@@ -116,40 +159,104 @@ namespace XinjingdailyBot.Repository
             {
                 return 0;
             }
-            int tags = 0;
+            int tagNum = 0;
             foreach (var (seg, words) in _tagKeywords)
             {
                 foreach (var word in words)
                 {
                     if (text.Contains(word, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        //TODO
-                        tags += seg;
+                        tagNum += seg;
                         break;
                     }
                 }
             }
-            return tags;
+            return tagNum;
         }
 
-        public string GetTagsName(int tagNum)
-        {
-            var tagNames = GetTags(tagNum).Select(x=>x.Name);
-            return string.Join(' ', tagNames);
-        }
-
-        public IEnumerable<Tags> GetTags(int tagNum)
+        /// <summary>
+        /// 获取激活的标签
+        /// </summary>
+        /// <param name="tagNum"></param>
+        /// <returns></returns>
+        public IEnumerable<Tags> GetActiviedTags(int tagNum)
         {
             List<Tags> tags = new();
-            foreach (var (seg, tag) in _tagCache)
+            foreach (var tag in _tagCache.Values)
             {
-                if ((seg & tagNum) > 0)
+                if ((tag.Seg & tagNum) > 0)
                 {
                     tags.Add(tag);
                 }
             }
 
             return tags;
+        }
+
+        /// <summary>
+        /// 获取激活标签的 HashTag
+        /// </summary>
+        /// <param name="tagNum"></param>
+        /// <returns></returns>
+        public string GetActiviedHashTags(int tagNum)
+        {
+            var tagHashs = GetActiviedTags(tagNum).Select(x => x.HashTag);
+            return string.Join(' ', tagHashs);
+        }
+
+        /// <summary>
+        /// 获取激活标签的名称
+        /// </summary>
+        /// <param name="tagNum"></param>
+        /// <returns></returns>
+        public string GetActiviedTagsName(int tagNum)
+        {
+            var tagNames = GetActiviedTags(tagNum).Select(x => x.Name);
+            return tagNames.Any() ? string.Join(' ', tagNames) : "无";
+        }
+
+        /// <summary>
+        /// 获取激活标签的警告
+        /// </summary>
+        /// <param name="tagNum"></param>
+        /// <returns></returns>
+        public string? GetActivedTagWarnings(int tagNum)
+        {
+            var tagWarnings = GetActiviedTags(tagNum).Select(x => x.WarnText).Where(x => !string.IsNullOrEmpty(x));
+            return tagWarnings.Any() ? string.Join("\r\n", tagWarnings) : null;
+        }
+
+        /// <summary>
+        /// 获取标签的Payload
+        /// </summary>
+        /// <param name="tagNum"></param>
+        /// <returns></returns>
+        public IEnumerable<TagPayload> GetTagsPayload(int tagNum)
+        {
+            List<TagPayload> tags = new();
+            foreach (var (seg, tag) in _tagCache)
+            {
+                bool status = (seg & tagNum) > 0;
+
+                tags.Add(new TagPayload(status ? tag.OnText : tag.OffText, tag.Payload));
+            }
+
+            return tags;
+        }
+    }
+
+    /// <summary>
+    /// Tag结构体
+    /// </summary>
+    public sealed record TagPayload
+    {
+        public string DisplayName { get; set; } = "";
+        public string Payload { get; set; } = "";
+
+        public TagPayload(string name, string payload)
+        {
+            DisplayName = name;
+            Payload = payload;
         }
     }
 }

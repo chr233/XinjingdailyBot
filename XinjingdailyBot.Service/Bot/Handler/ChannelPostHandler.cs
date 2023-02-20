@@ -84,7 +84,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 Status = PostStatus.Accepted,
                 PostType = message.Type,
                 //Tags = tags,
-                NewTag = newTag,
+                NewTags = newTag,
                 PosterUID = dbUser.UserID,
                 ReviewerUID = dbUser.UserID
             };
@@ -114,14 +114,8 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 _ = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
             }
 
-            //BuildInTags tags = _textHelperService.FetchTags(message.Caption);
             var newTags = _tagRepository.FetchTags(message.Caption);
             string text = _textHelperService.ParseMessage(message);
-
-            //if (message.HasMediaSpoiler == true)
-            //{
-            //    tags |= BuildInTags.Spoiler;
-            //}
 
             //生成数据库实体
             Posts newPost = new()
@@ -139,8 +133,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 ChannelTitle = channelTitle ?? "",
                 Status = PostStatus.Accepted,
                 PostType = message.Type,
-                //Tags = tags,
-                NewTag = newTags,
+                NewTags = newTags,
                 HasSpoiler = message.HasMediaSpoiler ?? false,
                 PosterUID = dbUser.UserID,
                 ReviewerUID = dbUser.UserID
@@ -191,14 +184,8 @@ namespace XinjingdailyBot.Service.Bot.Handler
                         _ = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
                     }
 
-                    //BuildInTags tags = _textHelperService.FetchTags(message.Caption);
                     int newTags = _tagRepository.FetchTags(message.Caption);
                     string text = _textHelperService.ParseMessage(message);
-
-                    //if (message.HasMediaSpoiler == true)
-                    //{
-                    //    tags |= BuildInTags.Spoiler;
-                    //}
 
                     //生成数据库实体
                     Posts newPost = new()
@@ -216,8 +203,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                         ChannelTitle = channelTitle ?? "",
                         Status = PostStatus.Accepted,
                         PostType = message.Type,
-                        //Tags = tags,
-                        NewTag=newTags,
+                        NewTags=newTags,
                         HasSpoiler = message.HasMediaSpoiler ?? false,
                         PosterUID = dbUser.UserID,
                         ReviewerUID = dbUser.UserID

@@ -23,6 +23,7 @@ namespace XinjingdailyBot.Command
         private readonly IMarkupHelperService _markupHelperService;
         private readonly IAttachmentService _attachmentService;
         private readonly IPostService _postService;
+        private readonly TagRepository _tagRepository;
 
         public NormalCommand(
             ITelegramBotClient botClient,
@@ -31,7 +32,8 @@ namespace XinjingdailyBot.Command
             GroupRepository groupRepository,
             IMarkupHelperService markupHelperService,
             IAttachmentService attachmentService,
-            IPostService postService)
+            IPostService postService,
+            TagRepository tagRepository)
         {
             _botClient = botClient;
             _userService = userService;
@@ -40,6 +42,7 @@ namespace XinjingdailyBot.Command
             _markupHelperService = markupHelperService;
             _attachmentService = attachmentService;
             _postService = postService;
+            _tagRepository = tagRepository;
         }
 
         /// <summary>
@@ -263,6 +266,7 @@ namespace XinjingdailyBot.Command
         /// <param name="args"></param>
         /// <returns></returns>
         [QueryCmd("RANDOMPOST", UserRights.NormalCmd)]
+        [Obsolete]
         public async Task QGetRandomPostp(Users dbUser, CallbackQuery callbackQuery, string[] args)
         {
             if (args.Length < 2)
@@ -270,6 +274,17 @@ namespace XinjingdailyBot.Command
                 await _botClient.EditMessageTextAsync(callbackQuery.Message!, "参数有误", replyMarkup: null);
                 return;
             }
+
+            //string payload = args[1].ToLowerInvariant();
+            //Tags? tag;
+            //if (payload == "all")
+            //{
+            //    tag=null
+            //}
+            //else
+            //{
+            //     tag = _tagRepository.GetTagByPayload(args[1]);
+            //}
 
             BuildInTags tag = args[1] switch
             {
@@ -291,9 +306,10 @@ namespace XinjingdailyBot.Command
                 _ => "",
             };
 
+
             var randomPost = await _postService.Queryable()
-                        .WhereIF(tag == BuildInTags.None, x => x.Status == PostStatus.Accepted && x.PostType == MessageType.Photo)
-                        .WhereIF(tag != BuildInTags.None, x => x.Status == PostStatus.Accepted && x.PostType == MessageType.Photo && ((byte)x.Tags & (byte)tag) > 0)
+                        .WhereIF(tag == null, x => x.Status == PostStatus.Accepted && x.PostType == MessageType.Photo)
+                        .WhereIF(tag != null, x => x.Status == PostStatus.Accepted && x.PostType == MessageType.Photo && ((byte)x.Tags & (byte)tag) > 0)
                         .OrderBy(x => SqlFunc.GetRandom()).Take(1).FirstAsync();
 
             if (randomPost != null)

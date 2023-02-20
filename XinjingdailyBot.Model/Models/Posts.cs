@@ -1,4 +1,5 @@
-﻿using SqlSugar;
+﻿using System.Runtime.CompilerServices;
+using SqlSugar;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Model.Base;
@@ -107,15 +108,21 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 标签
         /// </summary>
+        [Obsolete]
         public BuildInTags Tags { get; set; }
         /// <summary>
         /// 稿件标签
         /// </summary>
-        public int NewTag { get; set;  }
+        public int NewTags { get; set;  }
         /// <summary>
         /// 是否启用遮罩
         /// </summary>
         public bool HasSpoiler { get; set; }
+        /// <summary>
+        /// 是否允许遮罩
+        /// </summary>
+        [SugarColumn(IsIgnore = true)]
+        public bool CanSpoiler => PostType == MessageType.Photo || PostType == MessageType.Video;
         /// <summary>
         /// 拒绝原因(如果拒绝)
         /// </summary>

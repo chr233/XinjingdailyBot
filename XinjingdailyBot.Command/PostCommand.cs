@@ -169,8 +169,8 @@ namespace XinjingdailyBot.Command
 
             string msg = _textHelperService.MakeReviewMessage(dbUser, post.Anonymous);
 
-            bool hasSpoiler = post.PostType == MessageType.Photo || post.PostType == MessageType.Video;
-            var keyboard = hasSpoiler ? _markupHelperService.ReviewKeyboardAWithSpoiler(post.Tags) : _markupHelperService.ReviewKeyboardA(post.Tags);
+            bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
+            var keyboard = _markupHelperService.ReviewKeyboardA(post.NewTags, hasSpoiler);
 
             Message manageMsg = await _botClient.SendTextMessageAsync(_channelService.ReviewGroup.Id, msg, parseMode: ParseMode.Html, disableWebPagePreview: true, replyToMessageId: reviewMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 

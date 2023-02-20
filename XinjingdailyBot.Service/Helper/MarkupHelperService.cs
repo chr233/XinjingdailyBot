@@ -1,7 +1,5 @@
-﻿using Telegram.Bot.Types;
-using Telegram.Bot.Types.ReplyMarkups;
+﻿using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Helper;
@@ -20,7 +18,7 @@ namespace XinjingdailyBot.Service.Helper
         public MarkupHelperService(
             GroupRepository groupRepository,
             IChannelService channelService,
-            TagRepository  tagRepository)
+            TagRepository tagRepository)
         {
             _groupRepository = groupRepository;
             _channelService = channelService;
@@ -53,158 +51,98 @@ namespace XinjingdailyBot.Service.Helper
         /// 直接发布投稿键盘
         /// </summary>
         /// <param name="anymouse"></param>
-        /// <param name="tag"></param>
+        /// <param name="tagNum"></param>
+        /// <param name="hasSpoiler"></param>
         /// <returns></returns>
-        public InlineKeyboardMarkup DirectPostKeyboard(bool anymouse, BuildInTags tag)
+        public InlineKeyboardMarkup DirectPostKeyboard(bool anymouse, int tagNum, bool? hasSpoiler)
         {
-            InlineKeyboardMarkup keyboard = new(new[]
+            var tags = _tagRepository.GetTagsPayload(tagNum);
+
+            List<IEnumerable<InlineKeyboardButton>> btns = new();
+            List<InlineKeyboardButton> line = new();
+
+            foreach (var tag in tags)
             {
-                new []
+                line.Add(InlineKeyboardButton.WithCallbackData(tag.DisplayName, $"review tag {tag.Payload}"));
+                if (line.Count >= 2)
                 {
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.NSFW)? Langs.TagNSFWOn: Langs.TagNSFWOff, "review tag nsfw"),
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.WanAn)? Langs.TagWanAnOn: Langs.TagWanAnOff, "review tag wanan"),
-                },
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? Langs.TagFriendOn: Langs.TagFriendOff, "review tag friend"),
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? Langs.TagAIGraphOn: Langs.TagAIGraphOff, "review tag ai"),
-                },
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData(anymouse? Langs.AnymouseOn: Langs.AnymouseOff, "review anymouse"),
-                },
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "review cancel"),
-                    InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
-                },
-            });
-            return keyboard;
-        }
+                    btns.Add(line);
+                    line = new();
+                }
+            }
 
-        //public InlineKeyboardMarkup DirectPostKeyboard(bool anymouse, int tagNum, bool hasSpoiler)
-        //{
-        //    var tags = _tagRepository.GetTags(tagNum);
-
-        //    List<List<InlineKeyboardButton>> btns = new();
-
-        //    InlineKeyboardMarkup keyboard = new(new[]
-        //    {
-        //        new []
-        //        {
-        //            InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.NSFW)? Langs.TagNSFWOn: Langs.TagNSFWOff, "review tag nsfw"),
-        //            InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.WanAn)? Langs.TagWanAnOn: Langs.TagWanAnOff, "review tag wanan"),
-        //        },
-        //        new []
-        //        {
-        //            InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? Langs.TagFriendOn: Langs.TagFriendOff, "review tag friend"),
-        //            InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? Langs.TagAIGraphOn: Langs.TagAIGraphOff, "review tag ai"),
-        //        },
-        //        new []
-        //        {
-        //            InlineKeyboardButton.WithCallbackData(anymouse? Langs.AnymouseOn: Langs.AnymouseOff, "review anymouse"),
-        //        },
-        //        new []
-        //        {
-        //            InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "review cancel"),
-        //            InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
-        //        },
-        //    });
-        //    return keyboard;
-        //}
-
-        /// <summary>
-        /// 直接发布投稿键盘
-        /// </summary>
-        /// <param name="anymouse"></param>
-        /// <param name="tag"></param>
-        /// <returns></returns>
-        public InlineKeyboardMarkup DirectPostKeyboardWithSpoiler(bool anymouse, BuildInTags tag)
-        {
-            InlineKeyboardMarkup keyboard = new(new[]
+            if (line.Any())
             {
-                new []
+                btns.Add(line);
+            }
+
+            if (hasSpoiler .HasValue)
+            {
+                btns.Add(new[]
                 {
-                    InlineKeyboardButton.WithCallbackData( tag.HasFlag(BuildInTags.NSFW)? Langs.TagNSFWOn: Langs.TagNSFWOff, "review tag nsfw"),
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.WanAn)? Langs.TagWanAnOn: Langs.TagWanAnOff, "review tag wanan"),
-                },
-                new []
+                     InlineKeyboardButton.WithCallbackData(hasSpoiler.Value? Langs.TagSpoilerOn: Langs.TagSpoilerOff, "review spoiler"),
+                     InlineKeyboardButton.WithCallbackData(anymouse? Langs.AnymouseOn: Langs.AnymouseOff, "review anymouse"),
+                });
+            }
+            else
+            {
+                btns.Add(new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? Langs.TagFriendOn: Langs.TagFriendOff, "review tag friend"),
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? Langs.TagAIGraphOn: Langs.TagAIGraphOff, "review tag ai"),
-                },
-                new[]
-                {
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Spoiler)? Langs.TagSpoilerOn: Langs.TagSpoilerOff, "review tag spoiler"),
-                    InlineKeyboardButton.WithCallbackData(anymouse? Langs.AnymouseOn: Langs.AnymouseOff, "review anymouse"),
-                },
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "review cancel"),
-                    InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
-                },
+                     InlineKeyboardButton.WithCallbackData(anymouse? Langs.AnymouseOn: Langs.AnymouseOff, "review anymouse"),
+                });
+            }
+            btns.Add(new[]
+            {
+                InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "review cancel"),
+                InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
             });
-            return keyboard;
+
+            return new(btns);
         }
 
         /// <summary>
         /// 审核键盘A(选择稿件Tag)
         /// </summary>
-        /// <param name="tag"></param>
+        /// <param name="tagNum"></param>
+        /// <param name="hasSpoiler"></param>
         /// <returns></returns>
-        public InlineKeyboardMarkup ReviewKeyboardA(BuildInTags tag)
+        public InlineKeyboardMarkup ReviewKeyboardA(int tagNum,bool? hasSpoiler)
         {
-            InlineKeyboardMarkup keyboard = new(new[]
-            {
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.NSFW)? Langs.TagNSFWOn: Langs.TagNSFWOff, "review tag nsfw"),
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.WanAn)? Langs.TagWanAnOn: Langs.TagWanAnOff, "review tag wanan"),
-                },
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? Langs.TagFriendOn: Langs.TagFriendOff, "review tag friend"),
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? Langs.TagAIGraphOn: Langs.TagAIGraphOff, "review tag ai"),
-                },
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData(Langs.ReviewReject, "review reject"),
-                    InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
-                },
-            });
-            return keyboard;
-        }
+            var tags = _tagRepository.GetTagsPayload(tagNum);
 
-        /// <summary>
-        /// 审核键盘A(选择稿件Tag)
-        /// </summary>
-        /// <param name="tag"></param>
-        /// <returns></returns>
-        public InlineKeyboardMarkup ReviewKeyboardAWithSpoiler(BuildInTags tag)
-        {
-            InlineKeyboardMarkup keyboard = new(new[]
+            List<IEnumerable<InlineKeyboardButton>> btns = new();
+            List<InlineKeyboardButton> line = new();
+
+            foreach (var tag in tags)
             {
-                new []
+                line.Add(InlineKeyboardButton.WithCallbackData(tag.DisplayName, $"review tag {tag.Payload}"));
+                if (line.Count >= 2)
                 {
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.NSFW)? Langs.TagNSFWOn: Langs.TagNSFWOff, "review tag nsfw"),
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.WanAn)? Langs.TagWanAnOn: Langs.TagWanAnOff, "review tag wanan"),
-                },
-                new []
+                    btns.Add(line);
+                    line = new();
+                }
+            }
+
+            if (line.Any())
+            {
+                btns.Add(line);
+            }
+
+            if (hasSpoiler.HasValue)
+            {
+                btns.Add(new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? Langs.TagFriendOn: Langs.TagFriendOff, "review tag friend"),
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? Langs.TagAIGraphOn: Langs.TagAIGraphOff, "review tag ai"),
-                },
-                new[]
-                {
-                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Spoiler)? Langs.TagSpoilerOn: Langs.TagSpoilerOff, "review tag spoiler"),
-                },
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData(Langs.ReviewReject, "review reject"),
-                    InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
-                },
+                     InlineKeyboardButton.WithCallbackData(hasSpoiler.Value? Langs.TagSpoilerOn: Langs.TagSpoilerOff, "review spoiler"),
+                });
+            }
+
+            btns.Add(new[]
+            {
+                InlineKeyboardButton.WithCallbackData(Langs.ReviewReject, "review reject"),
+                InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
             });
-            return keyboard;
+
+            return new(btns);
         }
 
         /// <summary>
@@ -252,20 +190,20 @@ namespace XinjingdailyBot.Service.Helper
             }
             else
             {
-                List<List<InlineKeyboardButton>> btns = new();
+                List<IEnumerable<InlineKeyboardButton>> btns = new();
 
                 foreach (var group in groups)
                 {
                     var name = targetUser.GroupID == group.Id ? $"当前用户组: [ {group.Id}. {group.Name} ]" : $"{group.Id}. {group.Name}";
                     var data = $"cmd {dbUser.UserID} setusergroup {targetUser.UserID} {group.Id}";
 
-                    btns.Add(new()
+                    btns.Add(new[]
                     {
                         InlineKeyboardButton.WithCallbackData(name, data),
                     });
                 }
 
-                btns.Add(new()
+                btns.Add(new[]
                 {
                     InlineKeyboardButton.WithCallbackData("取消操作", $"cmd {dbUser.UserID} cancel"),
                 });
@@ -333,21 +271,21 @@ namespace XinjingdailyBot.Service.Helper
         /// <returns></returns>
         public InlineKeyboardMarkup? SetChannelOptionKeyboard(Users dbUser, long channelId)
         {
-            List<List<InlineKeyboardButton>> btns = new()
+            List<IEnumerable<InlineKeyboardButton>> btns = new()
             {
-                new()
+                new []
                 {
                     InlineKeyboardButton.WithCallbackData( "1. 不做特殊处理", $"cmd {dbUser.UserID} channeloption {channelId} normal"),
                 },
-                new()
+                new []
                 {
                     InlineKeyboardButton.WithCallbackData( "2. 抹除频道来源", $"cmd {dbUser.UserID} channeloption {channelId} purgeorigin"),
                 },
-                new()
+                new []
                 {
                     InlineKeyboardButton.WithCallbackData( "3. 拒绝此频道的投稿", $"cmd {dbUser.UserID} channeloption {channelId} autoreject"),
                 },
-                new()
+                new []
                 {
                     InlineKeyboardButton.WithCallbackData( "取消操作", $"cmd {dbUser.UserID} cancel"),
                 }
@@ -407,25 +345,33 @@ namespace XinjingdailyBot.Service.Helper
         /// <returns></returns>
         public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser)
         {
-            InlineKeyboardMarkup keyboard = new(new[]
+            var tags = _tagRepository.GetAllTags();
+
+            List<IEnumerable<InlineKeyboardButton>> btns = new()
             {
-                new []
+                new[]
                 {
                     InlineKeyboardButton.WithCallbackData("随机稿件",$"cmd {dbUser.UserID} randompost all"),
-                },
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData("随机 #NSFW",$"cmd {dbUser.UserID} randompost nsfw"),
-                    InlineKeyboardButton.WithCallbackData("随机 #我有一个朋友",$"cmd {dbUser.UserID} randompost friend"),
-                },
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData("随机 #晚安",$"cmd {dbUser.UserID} randompost wanan"),
-                    InlineKeyboardButton.WithCallbackData("随机 #AI怪图",$"cmd {dbUser.UserID} randompost ai"),
-                },
-            });
+                }
+            };
 
-            return keyboard;
+            List<InlineKeyboardButton> line = new();
+            foreach (var tag in tags)
+            {
+                line.Add(InlineKeyboardButton.WithCallbackData( $"随机 {tag.HashTag}", $"cmd {dbUser.UserID} randompost {tag.Payload}"));
+                if (line.Count >= 2)
+                {
+                    btns.Add(line);
+                    line = new();
+                }
+            }
+
+            if (line.Any())
+            {
+                btns.Add(line);
+            }
+
+            return new(btns);
         }
 
         /// <summary>
@@ -451,14 +397,17 @@ namespace XinjingdailyBot.Service.Helper
 
         /// <summary>
         /// 查询稿件信息
+        /// TODO
         /// </summary>
         /// <param name="dbUser"></param>
         /// <param name="post"></param>
         /// <returns></returns>
         public InlineKeyboardMarkup QueryPostMenuKeyboard(Users dbUser, Posts post)
         {
-            bool accept = post.Status == PostStatus.Accepted;
-            
+            //bool accept = post.Status == PostStatus.Accepted;
+
+            //todo
+
             InlineKeyboardMarkup keyboard = new(new[]
             {
                 new []
