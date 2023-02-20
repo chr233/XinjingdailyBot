@@ -203,7 +203,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                         ChannelTitle = channelTitle ?? "",
                         Status = PostStatus.Accepted,
                         PostType = message.Type,
-                        NewTags=newTags,
+                        NewTags = newTags,
                         HasSpoiler = message.HasMediaSpoiler ?? false,
                         PosterUID = dbUser.UserID,
                         ReviewerUID = dbUser.UserID

@@ -6,7 +6,6 @@ using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
-using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Infrastructure.Model;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Helper;

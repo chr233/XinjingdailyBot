@@ -28,7 +28,7 @@ namespace XinjingdailyBot.Tasks
             ICommandHandler commandHandler,
             GroupRepository groupRepository,
             LevelRepository levelRepository,
-            TagRepository  tagRepository)
+            TagRepository tagRepository)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;

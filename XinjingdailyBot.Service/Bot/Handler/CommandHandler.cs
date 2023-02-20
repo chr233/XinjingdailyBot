@@ -499,7 +499,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllChatAdministrators());
 
             AddCommands(UserRights.ReviewPost);
-            await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeChatAdministrators() { ChatId = _channelService.ReviewGroup.Id });
+            await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeChatAdministrators { ChatId = _channelService.ReviewGroup.Id });
             return true;
         }
     }
