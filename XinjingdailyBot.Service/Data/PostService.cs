@@ -188,7 +188,6 @@ namespace XinjingdailyBot.Service.Data
                 channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
             }
 
-            BuildInTags tags = _textHelperService.FetchTags(message.Text);
             int newTags = _tagRepository.FetchTags(message.Text);
             string text = _textHelperService.ParseMessage(message);
 
@@ -198,7 +197,7 @@ namespace XinjingdailyBot.Service.Data
             bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
 
             //发送确认消息
-            var keyboard = directPost ? _markupHelperService.DirectPostKeyboard(anonymous, tags) : _markupHelperService.PostKeyboard(anonymous);
+            var keyboard = directPost ? _markupHelperService.DirectPostKeyboard(anonymous, newTags, null) : _markupHelperService.PostKeyboard(anonymous);
             string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
             //生成数据库实体
@@ -211,7 +210,8 @@ namespace XinjingdailyBot.Service.Data
                 ChannelTitle = channelTitle ?? "",
                 Status = directPost ? PostStatus.Reviewing : PostStatus.Padding,
                 PostType = message.Type,
-                Tags = tags,
+                NewTags = newTags,
+                HasSpoiler = message.HasMediaSpoiler ?? false,
                 PosterUID = dbUser.UserID
             };
 
@@ -289,24 +289,21 @@ namespace XinjingdailyBot.Service.Data
                 channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
             }
 
-            BuildInTags tags = _textHelperService.FetchTags(message.Caption);
+            //BuildInTags tags = _textHelperService.FetchTags(message.Caption);
+            int newTags = _tagRepository.FetchTags(message.Caption);
             string text = _textHelperService.ParseMessage(message);
-
-            if (message.HasMediaSpoiler == true)
-            {
-                tags |= BuildInTags.Spoiler;
-            }
 
             bool anonymous = dbUser.PreferAnonymous;
 
             //直接发布模式
             bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
-            bool hasSpoiler = message.Type == MessageType.Photo || message.Type == MessageType.Video;
+
+            bool? hasSpoiler = message.CanSpoiler() ? message.HasMediaSpoiler ?? false : null;
 
             //发送确认消息
             var keyboard = directPost ?
-                (hasSpoiler ? _markupHelperService.DirectPostKeyboardWithSpoiler(anonymous, tags) : _markupHelperService.DirectPostKeyboard(anonymous, tags)) :
-               _markupHelperService.PostKeyboard(anonymous);
+                _markupHelperService.DirectPostKeyboard(anonymous, newTags, hasSpoiler) :
+                _markupHelperService.PostKeyboard(anonymous);
             string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
             //生成数据库实体
@@ -319,7 +316,8 @@ namespace XinjingdailyBot.Service.Data
                 ChannelTitle = channelTitle ?? "",
                 Status = directPost ? PostStatus.Reviewing : PostStatus.Padding,
                 PostType = message.Type,
-                Tags = tags,
+                NewTags = newTags,
+                HasSpoiler = hasSpoiler ?? false,
                 PosterUID = dbUser.UserID
             };
 
@@ -417,23 +415,19 @@ namespace XinjingdailyBot.Service.Data
                         channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
                     }
 
-                    BuildInTags tags = _textHelperService.FetchTags(message.Caption);
+                    int newTags = _tagRepository.FetchTags(message.Caption);
                     string text = _textHelperService.ParseMessage(message);
 
                     bool anonymous = dbUser.PreferAnonymous;
 
-                    if (message.HasMediaSpoiler == true)
-                    {
-                        tags |= BuildInTags.Spoiler;
-                    }
-
                     //直接发布模式
                     bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
-                    bool hasSpoiler = message.Type == MessageType.Photo || message.Type == MessageType.Video;
+                    bool? hasSpoiler = message.CanSpoiler() ? message.HasMediaSpoiler ?? false : null;
 
                     //发送确认消息
-                    var keyboard = directPost ? (hasSpoiler ? _markupHelperService.DirectPostKeyboardWithSpoiler(anonymous, tags) :
-                        _markupHelperService.DirectPostKeyboard(anonymous, tags)) : _markupHelperService.PostKeyboard(anonymous);
+                    var keyboard = directPost ?
+                        _markupHelperService.DirectPostKeyboard(anonymous, newTags, hasSpoiler) :
+                        _markupHelperService.PostKeyboard(anonymous);
                     string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
                     Message msg = await _botClient.SendTextMessageAsync(message.Chat.Id, "处理中, 请稍后", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
@@ -452,7 +446,8 @@ namespace XinjingdailyBot.Service.Data
                         Status = directPost ? PostStatus.Reviewing : PostStatus.Padding,
                         PostType = message.Type,
                         MediaGroupID = mediaGroupId,
-                        Tags = tags,
+                        NewTags = newTags,
+                        HasSpoiler = hasSpoiler ?? false,
                         PosterUID = dbUser.UserID,
                     };
 
@@ -512,57 +507,56 @@ namespace XinjingdailyBot.Service.Data
         /// 设置稿件Tag
         /// </summary>
         /// <param name="post"></param>
-        /// <param name="tag"></param>
+        /// <param name="tagId"></param>
         /// <param name="callbackQuery"></param>
         /// <returns></returns>
-        public async Task SetPostTag(Posts post, BuildInTags tag, CallbackQuery callbackQuery)
+        public async Task SetPostTag(Posts post, int tagId, CallbackQuery callbackQuery)
         {
-            if (post.Tags.HasFlag(tag))
+            var tag = _tagRepository.GetTagById(tagId);
+            if (tag == null)
             {
-                post.Tags &= ~tag;
+                return;
+            }
+
+            if ((post.NewTags & tag.Seg) > 0)
+            {
+                post.NewTags &= ~tag.Seg;
             }
             else
             {
-                post.Tags |= tag;
+                post.NewTags |= tag.Seg;
             }
 
-            List<string> tagNames = new() { "当前标签:" };
-            if (post.Tags.HasFlag(BuildInTags.NSFW))
-            {
-                tagNames.Add("NSFW");
-            }
-            if (post.Tags.HasFlag(BuildInTags.WanAn))
-            {
-                tagNames.Add("晚安");
-            }
-            if (post.Tags.HasFlag(BuildInTags.Friend))
-            {
-                tagNames.Add("我有一个朋友");
-            }
-            if (post.Tags.HasFlag(BuildInTags.AIGraph))
-            {
-                tagNames.Add("AI怪图");
-            }
-            if (post.Tags == BuildInTags.None)
-            {
-                tagNames.Add("无");
-            }
+            string tagName = _tagRepository.GetActiviedTagsName(post.NewTags);
 
             post.ModifyAt = DateTime.Now;
-            await Updateable(post).UpdateColumns(x => new { x.Tags, x.ModifyAt }).ExecuteCommandAsync();
+            await Updateable(post).UpdateColumns(x => new { x.NewTags, x.ModifyAt }).ExecuteCommandAsync();
 
-            await _botClient.AutoReplyAsync(string.Join(' ', tagNames), callbackQuery);
+            await _botClient.AutoReplyAsync($"当前标签: {tagName}", callbackQuery);
 
-            bool hasSpoiler = post.PostType == MessageType.Photo || post.PostType == MessageType.Video;
+            bool? hasSpoiler = (post.PostType == MessageType.Photo || post.PostType == MessageType.Video) ? post.HasSpoiler : null;
 
-            var keyboard = hasSpoiler ?
-                (post.IsDirectPost ?
-                    _markupHelperService.DirectPostKeyboardWithSpoiler(post.Anonymous, post.Tags) :
-                    _markupHelperService.ReviewKeyboardAWithSpoiler(post.Tags)) :
-                (post.IsDirectPost ?
-                    _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags) :
-                    _markupHelperService.ReviewKeyboardA(post.Tags));
+            var keyboard = post.IsDirectPost ?
+                _markupHelperService.DirectPostKeyboard(post.Anonymous, post.NewTags, hasSpoiler) :
+                _markupHelperService.ReviewKeyboardA(post.NewTags, hasSpoiler);
             await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, keyboard);
+        }
+
+        /// <summary>
+        /// 设置稿件Tag
+        /// </summary>
+        /// <param name="post"></param>
+        /// <param name="payload"></param>
+        /// <param name="callbackQuery"></param>
+        /// <returns></returns>
+        public async Task SetPostTag(Posts post, string payload, CallbackQuery callbackQuery)
+        {
+            payload = payload.ToLowerInvariant();
+            var tag = _tagRepository.GetTagByPayload(payload);
+            if (tag != null)
+            {
+                await SetPostTag(post, tag.Id, callbackQuery);
+            }
         }
 
         /// <summary>
@@ -676,14 +670,15 @@ namespace XinjingdailyBot.Service.Data
 
             string postText = _textHelperService.MakePostText(post, poster);
 
-            bool hasSpoiler = post.Tags.HasFlag(BuildInTags.Spoiler);
+            bool hasSpoiler = post.HasSpoiler;
 
             //发布频道发布消息
             if (!post.IsMediaGroup)
             {
-                if (post.Tags.HasFlag(BuildInTags.NSFW))
+                string? warnText = _tagRepository.GetActivedTagWarnings(post.NewTags);
+                if (!string.IsNullOrEmpty(warnText))
                 {
-                    await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, _textHelperService.NSFWWrning, allowSendingWithoutReply: true);
+                    await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, warnText, allowSendingWithoutReply: true);
                 }
 
                 Message? msg = null;
@@ -739,9 +734,10 @@ namespace XinjingdailyBot.Service.Data
                     };
                 }
 
-                if (post.Tags.HasFlag(BuildInTags.NSFW))
+                string? warnText = _tagRepository.GetActivedTagWarnings(post.NewTags);
+                if (!string.IsNullOrEmpty(warnText))
                 {
-                    await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, _textHelperService.NSFWWrning, allowSendingWithoutReply: true);
+                    await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, warnText, allowSendingWithoutReply: true);
                 }
 
                 var messages = await _botClient.SendMediaGroupAsync(_channelService.AcceptChannel.Id, group);

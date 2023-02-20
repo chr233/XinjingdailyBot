@@ -155,25 +155,32 @@ namespace XinjingdailyBot.Command
 
             if (post == null)
             {
-                await _botClient.AutoReplyAsync("未找到稿件", callbackQuery);
+                await _botClient.AutoReplyAsync("未找到稿件", callbackQuery, true);
                 await _botClient.EditMessageReplyMarkupAsync(message, null);
                 return;
             }
 
             if (post.Status != PostStatus.Reviewing)
             {
-                await _botClient.AutoReplyAsync("请不要重复操作", callbackQuery);
+                await _botClient.AutoReplyAsync("请不要重复操作", callbackQuery, true);
                 await _botClient.EditMessageReplyMarkupAsync(message, null);
                 return;
             }
 
             if (!dbUser.Right.HasFlag(UserRights.ReviewPost))
             {
-                await _botClient.AutoReplyAsync("无权操作", callbackQuery);
+                await _botClient.AutoReplyAsync("无权操作", callbackQuery, true);
                 return;
             }
 
-            switch (callbackQuery.Data)
+            var data = callbackQuery.Data;
+            if (string.IsNullOrEmpty(data))
+            {
+                await _botClient.AutoReplyAsync("内部错误", callbackQuery, true);
+                return;
+            }
+
+            switch (data)
             {
                 case "review reject":
                     await SwitchKeyboard(true, post, callbackQuery);
@@ -182,20 +189,8 @@ namespace XinjingdailyBot.Command
                     await SwitchKeyboard(false, post, callbackQuery);
                     break;
 
-                case "review tag nsfw":
-                    await SetPostTag(post, BuildInTags.NSFW, callbackQuery);
-                    break;
-                case "review tag wanan":
-                    await SetPostTag(post, BuildInTags.WanAn, callbackQuery);
-                    break;
-                case "review tag friend":
-                    await SetPostTag(post, BuildInTags.Friend, callbackQuery);
-                    break;
-                case "review tag ai":
-                    await SetPostTag(post, BuildInTags.AIGraph, callbackQuery);
-                    break;
-                case "review tag spoiler":
-                    await SetPostTag(post, BuildInTags.Spoiler, callbackQuery);
+                case "review spoiler":
+                    await SetSpoiler(post, callbackQuery);
                     break;
 
                 case "reject fuzzy":
@@ -233,8 +228,21 @@ namespace XinjingdailyBot.Command
                     break;
 
                 default:
+                    if (data.StartsWith("review tag"))
+                    {
+                        var payload = data[11..];
+                        if (payload != "spoiler")
+                        {
+                            await _postService.SetPostTag(post, payload, callbackQuery);
+                        }
+                        else
+                        {
+                            await SetSpoiler(post, callbackQuery);
+                        }
+                    }
                     break;
             }
+
         }
 
         /// <summary>
@@ -243,7 +251,7 @@ namespace XinjingdailyBot.Command
         /// <param name="post"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        private async Task SetAnymouse(Posts post, CallbackQuery query)
+        private async Task SetAnymouse (Posts post, CallbackQuery query)
         {
             await _botClient.AutoReplyAsync("可以使用命令 /anymouse 切换默认匿名投稿", query);
 
@@ -252,9 +260,35 @@ namespace XinjingdailyBot.Command
             post.ModifyAt = DateTime.Now;
             await _postService.Updateable(post).UpdateColumns(x => new { x.Anonymous, x.ModifyAt }).ExecuteCommandAsync();
 
-            bool hasSpoiler = post.PostType == MessageType.Photo || post.PostType == MessageType.Video;
+            bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
 
-            var keyboard = hasSpoiler ? _markupHelperService.DirectPostKeyboardWithSpoiler(anonymous, post.Tags) : _markupHelperService.DirectPostKeyboard(anonymous, post.Tags);
+            var keyboard = _markupHelperService.DirectPostKeyboard(anonymous, post.NewTags, hasSpoiler);
+            await _botClient.EditMessageReplyMarkupAsync(query.Message!, keyboard);
+        }
+
+        /// <summary>
+        /// 设置或者取消遮罩
+        /// </summary>
+        /// <param name="post"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        private async Task SetSpoiler(Posts post, CallbackQuery query)
+        {
+            if (!post.CanSpoiler)
+            {
+                await _botClient.AutoReplyAsync("当前稿件类型无法设置遮罩", query, true);
+                return;
+            }
+
+            post.HasSpoiler = !post.HasSpoiler;
+            post.ModifyAt = DateTime.Now;
+            await _postService.Updateable(post).UpdateColumns(x => new { x.HasSpoiler, x.ModifyAt }).ExecuteCommandAsync();
+
+            await _botClient.AutoReplyAsync(post.HasSpoiler ? "启用遮罩" : "禁用遮罩", query);
+
+            var keyboard = post.IsDirectPost ?
+                _markupHelperService.DirectPostKeyboard(post.Anonymous, post.NewTags, post.HasSpoiler) :
+                _markupHelperService.ReviewKeyboardA(post.NewTags, post.HasSpoiler);
             await _botClient.EditMessageReplyMarkupAsync(query.Message!, keyboard);
         }
 
@@ -302,70 +336,12 @@ namespace XinjingdailyBot.Command
                 await _botClient.AutoReplyAsync("请选择拒稿原因", callbackQuery);
             }
 
-            bool hasSpoiler = post.Tags.HasFlag(BuildInTags.Spoiler);
+            bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
 
             var keyboard = rejectMode ?
                 _markupHelperService.ReviewKeyboardB() :
-                (hasSpoiler ? _markupHelperService.ReviewKeyboardAWithSpoiler(post.Tags) : _markupHelperService.ReviewKeyboardA(post.Tags));
+                _markupHelperService.ReviewKeyboardA(post.NewTags, hasSpoiler);
 
-            await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, keyboard);
-        }
-
-        /// <summary>
-        /// 修改Tag
-        /// </summary>
-        /// <param name="post"></param>
-        /// <param name="tag"></param>
-        /// <param name="callbackQuery"></param>
-        /// <returns></returns>
-        private async Task SetPostTag(Posts post, BuildInTags tag, CallbackQuery callbackQuery)
-        {
-            if (post.Tags.HasFlag(tag))
-            {
-                post.Tags &= ~tag;
-            }
-            else
-            {
-                post.Tags |= tag;
-            }
-
-            List<string> tagNames = new() { "当前标签:" };
-            if (post.Tags.HasFlag(BuildInTags.NSFW))
-            {
-                tagNames.Add("NSFW");
-            }
-            if (post.Tags.HasFlag(BuildInTags.WanAn))
-            {
-                tagNames.Add("晚安");
-            }
-            if (post.Tags.HasFlag(BuildInTags.Friend))
-            {
-                tagNames.Add("我有一个朋友");
-            }
-            if (post.Tags.HasFlag(BuildInTags.AIGraph))
-            {
-                tagNames.Add("AI怪图");
-            }
-            if (post.Tags == BuildInTags.None)
-            {
-                tagNames.Add("无");
-            }
-
-            if (post.Tags.HasFlag(BuildInTags.Spoiler))
-            {
-                tagNames.Insert(0, "[启用遮罩]");
-            }
-
-            post.ModifyAt = DateTime.Now;
-            await _postService.Updateable(post).UpdateColumns(x => new { x.Tags, x.ModifyAt }).ExecuteCommandAsync();
-
-            await _botClient.AutoReplyAsync(string.Join(' ', tagNames), callbackQuery);
-
-            bool hasSpoiler = post.PostType == MessageType.Photo || post.PostType == MessageType.Video;
-            var keyboard =
-                post.IsDirectPost ?
-                (hasSpoiler ? _markupHelperService.DirectPostKeyboardWithSpoiler(post.Anonymous, post.Tags) : _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags)) :
-                (hasSpoiler ? _markupHelperService.ReviewKeyboardAWithSpoiler(post.Tags) : _markupHelperService.ReviewKeyboardA(post.Tags));
             await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, keyboard);
         }
     }

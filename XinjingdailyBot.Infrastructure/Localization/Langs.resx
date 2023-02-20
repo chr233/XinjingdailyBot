@@ -222,4 +222,7 @@
   <data name="PostConfirm" xml:space="preserve">
     <value>✅投稿</value>
   </data>
+  <data name="NSFWWarning" xml:space="preserve">
+    <value>⚠️ NSFW 提前预警 ⚠️</value>
+  </data>
 </root>

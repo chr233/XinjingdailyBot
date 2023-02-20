@@ -18,6 +18,7 @@ namespace XinjingdailyBot.Interface.Data
         Task HandleMediaPosts(Users dbUser, Message message);
         Task HandleTextPosts(Users dbUser, Message message);
         Task RejetPost(Posts post, Users dbUser, string rejectReason);
-        Task SetPostTag(Posts post, BuildInTags tag, CallbackQuery callbackQuery);
+        Task SetPostTag(Posts post, int tagId, CallbackQuery callbackQuery);
+        Task SetPostTag(Posts post, string payload, CallbackQuery callbackQuery);
     }
 }

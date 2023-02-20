@@ -4,7 +4,7 @@ using XinjingdailyBot.Model.Base;
 namespace XinjingdailyBot.Model.Models
 {
     [SugarTable("tag", TableDescription = "投稿标签")]
-    [SugarIndex("index_name",nameof(Name),OrderByType.Asc,true)]
+    [SugarIndex("index_name", nameof(Name), OrderByType.Asc, true)]
     public sealed record Tags : BaseModel
     {
         [SugarColumn(IsPrimaryKey = true)]
@@ -18,6 +18,10 @@ namespace XinjingdailyBot.Model.Models
         /// 标签名
         /// </summary>
         public string Name { get; set; } = "";
+        /// <summary>
+        /// CallbackData
+        /// </summary>
+        public string Payload { get; set; } = "";
         /// <summary>
         /// 启用文本
         /// </summary> 
@@ -38,6 +42,10 @@ namespace XinjingdailyBot.Model.Models
         /// 投稿时识别到此Tag是否自动添加遮罩, 手动添加Tag时不生效
         /// </summary>
         public bool AutoSpoiler { get; set; }
+        /// <summary>
+        /// 警告文本, 带有此Tag的投稿会在发布时提前发送警告
+        /// </summary>
+        public string WarnText { get; set; } = "";
         /// <summary>
         /// 创建时间
         /// </summary>

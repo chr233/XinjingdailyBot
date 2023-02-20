@@ -97,6 +97,15 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
+        ///   查找类似 ⚠️ NSFW 提前预警 ⚠️ 的本地化字符串。
+        /// </summary>
+        public static string NSFWWarning {
+            get {
+                return ResourceManager.GetString("NSFWWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 ❌取消 的本地化字符串。
         /// </summary>
         public static string PostCancel {
