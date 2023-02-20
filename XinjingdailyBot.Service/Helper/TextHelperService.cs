@@ -11,6 +11,7 @@ using XinjingdailyBot.Infrastructure.Model;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
+using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Helper
 {
@@ -18,18 +19,25 @@ namespace XinjingdailyBot.Service.Helper
     public sealed class TextHelperService : ITextHelperService
     {
         private readonly IChannelService _channelService;
-        private readonly OptionsSetting _optionsSetting;
+        private readonly TagRepository _tagRepository;
 
-        public TextHelperService(IChannelService channelService,
-            IOptions<OptionsSetting> options)
+        public TextHelperService(
+            IChannelService channelService,
+            IOptions<OptionsSetting> options,
+            TagRepository tagRepository)
         {
             _channelService = channelService;
-            _optionsSetting = options.Value;
+            _tagRepository = tagRepository;
 
-            PureStrings = _optionsSetting.Post.PureWords.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+            var postOption = options.Value.Post;
+            PureWords = postOption.PureWords.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+            PureReturns = postOption.PureReturns;
+            PureHashTag = postOption.PureHashTag;
         }
 
-        private string[] PureStrings { get; init; }
+        private string[] PureWords { get; init; }
+        private bool PureReturns { get; init; }
+        private bool PureHashTag { get; init; }
 
         private static readonly Regex MatchTag = new(@"(^#\S+)|(\s#\S+)");
         private static readonly Regex MatchSpace = new(@"^\s*$");
@@ -50,13 +58,13 @@ namespace XinjingdailyBot.Service.Helper
                 return "";
             }
 
-            if (_optionsSetting.Post.PureHashTag)
+            if (PureHashTag)
             {
                 //过滤HashTag
                 text = MatchTag.Replace(text, "");
             }
 
-            if (_optionsSetting.Post.PureRetuens)
+            if (PureReturns)
             {
                 //过滤连续换行
                 var parts = text.Split('\n', StringSplitOptions.RemoveEmptyEntries).Where(x => !MatchSpace.IsMatch(x)).Select(x => x.Trim());
@@ -96,6 +104,7 @@ namespace XinjingdailyBot.Service.Helper
             {
                 tags |= BuildInTags.AIGraph;
             }
+
             return tags;
         }
 
@@ -170,7 +179,7 @@ namespace XinjingdailyBot.Service.Helper
                     .Replace("<", "＜")
                     .Replace(">", "＞")
                     .Replace("&", "＆");
-                foreach (var item in PureStrings)
+                foreach (var item in PureWords)
                 {
                     escapedText = escapedText.Replace(item, "");
                 }

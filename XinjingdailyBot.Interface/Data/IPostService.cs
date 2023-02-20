@@ -7,7 +7,10 @@ namespace XinjingdailyBot.Interface.Data
 {
     public interface IPostService : IBaseService<Posts>
     {
-        int MaxPostText { get; }
+        /// <summary>
+        /// 文字投稿长度上限
+        /// </summary>
+        public const int MaxPostText = 2000;
 
         Task AcceptPost(Posts post, Users dbUser, CallbackQuery callbackQuery);
         Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null);

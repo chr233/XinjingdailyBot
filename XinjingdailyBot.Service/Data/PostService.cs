@@ -13,6 +13,7 @@ using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
+using XinjingdailyBot.Repository;
 using XinjingdailyBot.Service.Data.Base;
 
 namespace XinjingdailyBot.Service.Data
@@ -29,6 +30,7 @@ namespace XinjingdailyBot.Service.Data
         private readonly ITelegramBotClient _botClient;
         private readonly IUserService _userService;
         private readonly OptionsSetting.PostOption _postOption;
+        private readonly TagRepository _tagRepository;
 
         public PostService(
             ILogger<PostService> logger,
@@ -39,7 +41,8 @@ namespace XinjingdailyBot.Service.Data
             IMarkupHelperService markupHelperService,
             ITelegramBotClient botClient,
             IUserService userService,
-            IOptions<OptionsSetting> options)
+            IOptions<OptionsSetting> options,
+            TagRepository tagRepository)
         {
             _logger = logger;
             _attachmentService = attachmentService;
@@ -50,6 +53,7 @@ namespace XinjingdailyBot.Service.Data
             _botClient = botClient;
             _userService = userService;
             _postOption = options.Value.Post;
+            _tagRepository = tagRepository;
         }
 
         /// <summary>
@@ -134,11 +138,6 @@ namespace XinjingdailyBot.Service.Data
         }
 
         /// <summary>
-        /// 文字投稿长度上限
-        /// </summary>
-        public int MaxPostText { get; } = 2000;
-
-        /// <summary>
         /// 处理文字投稿
         /// </summary>
         /// <param name="dbUser"></param>
@@ -163,9 +162,9 @@ namespace XinjingdailyBot.Service.Data
                 return;
             }
 
-            if (message.Text.Length > MaxPostText)
+            if (message.Text.Length > IPostService.MaxPostText)
             {
-                await _botClient.AutoReplyAsync($"文本长度超过上限 {MaxPostText}, 无法创建投稿", message);
+                await _botClient.AutoReplyAsync($"文本长度超过上限 {IPostService.MaxPostText}, 无法创建投稿", message);
                 return;
             }
 
@@ -190,6 +189,7 @@ namespace XinjingdailyBot.Service.Data
             }
 
             BuildInTags tags = _textHelperService.FetchTags(message.Text);
+            int newTags = _tagRepository.FetchTags(message.Text);
             string text = _textHelperService.ParseMessage(message);
 
             bool anonymous = dbUser.PreferAnonymous;

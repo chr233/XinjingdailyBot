@@ -4,6 +4,7 @@
     /// 投稿Tag
     /// </summary>
     [Flags]
+    [Obsolete("过时的方法")]
     public enum BuildInTags : int
     {
         /// <summary>
