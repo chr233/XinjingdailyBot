@@ -4,15 +4,14 @@ using XinjingdailyBot.Model.Base;
 namespace XinjingdailyBot.Model.Models
 {
     [SugarTable("tag", TableDescription = "投稿标签")]
-    [SugarIndex("index_tagid", nameof(TagSeg), OrderByType.Asc, true)]
     public sealed record Tags : BaseModel
     {
-        [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
+        [SugarColumn(IsPrimaryKey = true)]
         public int Id { get; set; }
         /// <summary>
-        /// 标签位, 0~16
+        /// 标签名
         /// </summary>
-        public byte TagSeg { get; set; }
+        public string Name { get; set; } = "";
         /// <summary>
         /// 启用文本
         /// </summary>

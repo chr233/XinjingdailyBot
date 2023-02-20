@@ -15,13 +15,16 @@ namespace XinjingdailyBot.Service.Helper
     {
         private readonly GroupRepository _groupRepository;
         private readonly IChannelService _channelService;
+        private readonly TagRepository _tagRepository;
 
         public MarkupHelperService(
             GroupRepository groupRepository,
-            IChannelService channelService)
+            IChannelService channelService,
+            TagRepository  tagRepository)
         {
             _groupRepository = groupRepository;
             _channelService = channelService;
+            _tagRepository = tagRepository;
         }
 
         /// <summary>
@@ -54,6 +57,37 @@ namespace XinjingdailyBot.Service.Helper
         /// <returns></returns>
         public InlineKeyboardMarkup DirectPostKeyboard(bool anymouse, BuildInTags tag)
         {
+            InlineKeyboardMarkup keyboard = new(new[]
+            {
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.NSFW)? Langs.TagNSFWOn: Langs.TagNSFWOff, "review tag nsfw"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.WanAn)? Langs.TagWanAnOn: Langs.TagWanAnOff, "review tag wanan"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.Friend)? Langs.TagFriendOn: Langs.TagFriendOff, "review tag friend"),
+                    InlineKeyboardButton.WithCallbackData(tag.HasFlag(BuildInTags.AIGraph)? Langs.TagAIGraphOn: Langs.TagAIGraphOff, "review tag ai"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData(anymouse? Langs.AnymouseOn: Langs.AnymouseOff, "review anymouse"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "review cancel"),
+                    InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
+                },
+            });
+            return keyboard;
+        }
+
+        public InlineKeyboardMarkup DirectPostKeyboard(bool anymouse, int tagNum, bool hasSpoiler)
+        {
+            var tags = _tagRepository.GetTags(tagNum);
+
+            List<List<InlineKeyboardButton>> btns = new();
+
             InlineKeyboardMarkup keyboard = new(new[]
             {
                 new []

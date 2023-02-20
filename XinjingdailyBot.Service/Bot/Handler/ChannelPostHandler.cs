@@ -7,6 +7,7 @@ using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
+using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Bot.Handler
 {
@@ -18,19 +19,22 @@ namespace XinjingdailyBot.Service.Bot.Handler
         private readonly IAttachmentService _attachmentService;
         private readonly IUserService _userService;
         private readonly IChannelOptionService _channelOptionService;
+        private readonly TagRepository _tagRepository;
 
         public ChannelPostHandler(
             IPostService postService,
             ITextHelperService textHelperService,
             IAttachmentService attachmentService,
             IUserService userService,
-            IChannelOptionService channelOptionService)
+            IChannelOptionService channelOptionService,
+            TagRepository tagRepository)
         {
             _postService = postService;
             _textHelperService = textHelperService;
             _attachmentService = attachmentService;
             _userService = userService;
             _channelOptionService = channelOptionService;
+            _tagRepository = tagRepository;
         }
 
         /// <summary>
@@ -45,7 +49,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             {
                 return;
             }
-            if (message.Text.Length > _postService.MaxPostText)
+            if (message.Text.Length > IPostService.MaxPostText)
             {
                 return;
             }
@@ -59,7 +63,8 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 _ = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
             }
 
-            BuildInTags tags = _textHelperService.FetchTags(message.Text);
+            //BuildInTags tags = _textHelperService.FetchTags(message.Text);
+            int newTag = _tagRepository.FetchTags(message.Text);
             string text = _textHelperService.ParseMessage(message);
 
             //生成数据库实体
@@ -78,7 +83,8 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 ChannelTitle = channelTitle ?? "",
                 Status = PostStatus.Accepted,
                 PostType = message.Type,
-                Tags = tags,
+                //Tags = tags,
+                NewTag = newTag,
                 PosterUID = dbUser.UserID,
                 ReviewerUID = dbUser.UserID
             };
@@ -108,13 +114,14 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 _ = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
             }
 
-            BuildInTags tags = _textHelperService.FetchTags(message.Caption);
+            //BuildInTags tags = _textHelperService.FetchTags(message.Caption);
+            var newTags = _tagRepository.FetchTags(message.Caption);
             string text = _textHelperService.ParseMessage(message);
 
-            if (message.HasMediaSpoiler == true)
-            {
-                tags |= BuildInTags.Spoiler;
-            }
+            //if (message.HasMediaSpoiler == true)
+            //{
+            //    tags |= BuildInTags.Spoiler;
+            //}
 
             //生成数据库实体
             Posts newPost = new()
@@ -132,7 +139,9 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 ChannelTitle = channelTitle ?? "",
                 Status = PostStatus.Accepted,
                 PostType = message.Type,
-                Tags = tags,
+                //Tags = tags,
+                NewTag = newTags,
+                HasSpoiler = message.HasMediaSpoiler ?? false,
                 PosterUID = dbUser.UserID,
                 ReviewerUID = dbUser.UserID
             };
@@ -182,13 +191,14 @@ namespace XinjingdailyBot.Service.Bot.Handler
                         _ = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
                     }
 
-                    BuildInTags tags = _textHelperService.FetchTags(message.Caption);
+                    //BuildInTags tags = _textHelperService.FetchTags(message.Caption);
+                    int newTags = _tagRepository.FetchTags(message.Caption);
                     string text = _textHelperService.ParseMessage(message);
 
-                    if (message.HasMediaSpoiler == true)
-                    {
-                        tags |= BuildInTags.Spoiler;
-                    }
+                    //if (message.HasMediaSpoiler == true)
+                    //{
+                    //    tags |= BuildInTags.Spoiler;
+                    //}
 
                     //生成数据库实体
                     Posts newPost = new()
@@ -206,7 +216,9 @@ namespace XinjingdailyBot.Service.Bot.Handler
                         ChannelTitle = channelTitle ?? "",
                         Status = PostStatus.Accepted,
                         PostType = message.Type,
-                        Tags = tags,
+                        //Tags = tags,
+                        NewTag=newTags,
+                        HasSpoiler = message.HasMediaSpoiler ?? false,
                         PosterUID = dbUser.UserID,
                         ReviewerUID = dbUser.UserID
                     };

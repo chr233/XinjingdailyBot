@@ -16,6 +16,7 @@ namespace XinjingdailyBot.Repository
         }
 
         private readonly Dictionary<int, Tags> _tagCache = new();
+        private readonly Dictionary<int, string[]> _tagKeywords = new();
 
         /// <summary>
         /// 初始化缓存
@@ -23,113 +24,131 @@ namespace XinjingdailyBot.Repository
         /// <returns></returns>
         public async Task InitPostTagCache()
         {
-            var defaultLevel = await GetFirstAsync(x => x.Id == 1);
-            if (defaultLevel == null)
+            var tagCount = await CountAsync(x => x.Id > 0 && x.Id < 32);
+            if (tagCount == 0)
             {
-                _logger.LogInformation("缺少默认等级，正在创建内置等级");
+                _logger.LogInformation("未设置标签，正在创建内置标签");
                 await InsertBuildInTags();
             }
 
-            var levels = await GetListAsync();
-            if (levels?.Count > 0)
+            var tags = await GetListAsync(x => x.Id > 0 && x.Id < 32);
+            if (tags?.Count > 0)
             {
-                _levelCache.Clear();
-                foreach (var level in levels)
+                _tagCache.Clear();
+                foreach (var tag in tags)
                 {
-                    _levelCache.Add(level.Id, level);
+                    if (string.IsNullOrEmpty(tag.Name))
+                    {
+                        continue;
+                    }
+
+                    if (string.IsNullOrEmpty(tag.OnText))
+                    {
+                        tag.OnText = "#" + tag.Name;
+                    }
+                    if (string.IsNullOrEmpty(tag.OffText))
+                    {
+                        tag.OffText = "#" + tag.Name.First() + new string('_', tag.Name.Length - 1);
+                    }
+                    if (string.IsNullOrEmpty(tag.HashTag))
+                    {
+                        tag.HashTag = "#" + tag.Name;
+                    }
+
+                    int seg = 1 << tag.Id;
+                    _tagCache.Add(seg, tag);
+
+                    if (!string.IsNullOrEmpty(tag.KeyWords))
+                    {
+                        var keyWords = tag.KeyWords.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+                        if (keyWords?.Length > 0)
+                        {
+                            _tagKeywords.Add(seg, keyWords);
+                        }
+                    }
                 }
-                _logger.LogInformation("已加载 {Count} 个等级", levels.Count);
+
+                await Storageable(tags).ExecuteCommandAsync();
+
+                _logger.LogInformation("已加载 {Count} 个标签", tags.Count);
             }
             else
             {
-                _logger.LogError("意外错误, 等级数据为空");
+                _logger.LogError("意外错误, 标签数据为空");
                 Environment.Exit(1);
             }
         }
 
         /// <summary>
-        /// 创建内置群组
+        /// 创建内置标签
         /// </summary>
         /// <returns></returns>
         private async Task InsertBuildInTags()
         {
-            //请不要修改ID为0和1的字段
             List<Tags> tags = new()
             {
-                new() {
-                    Id = 1,
-                    TagSeg = 1,
-                    OnText = "#NSFW",
-                    OffText = "#N____",
-                    HashTag = "#NSFW",
-                    KeyWords = "NSFW",
-                    AutoSpoiler = true,
-                },
-                new() {
-                    Id = 2,
-                    TagSeg = 2,
-                    OnText = "#我有一个碰",
-                    OffText = "#N____",
-                    HashTag = "#NSFW",
-                    KeyWords = "NSFW",
-                    AutoSpoiler = true,
-                },
-                new() {
-                    Id = 3,
-                    TagSeg = 4,
-                    OnText = "#NSFW",
-                    OffText = "#N____",
-                    HashTag = "#NSFW",
-                    KeyWords = "NSFW",
-                    AutoSpoiler = true,
-                },
-                new() {
-                    Id = 4,
-                    TagSeg = 8,
-                    OnText = "#NSFW",
-                    OffText = "#N____",
-                    HashTag = "#NSFW", 
-                    KeyWords = "NSFW",
-                    AutoSpoiler = true,
-                },
-               
+                new() { Id = 1,Name = "NSFW", KeyWords = "NSFW", AutoSpoiler = true },
+                new() { Id = 2,Name = "我有一个朋友", KeyWords = "朋友|英雄", AutoSpoiler = false },
+                new() { Id = 3,Name = "晚安", KeyWords = "晚安", AutoSpoiler = false },
+                new() { Id = 4,Name = "AI怪图", KeyWords = "#AI", AutoSpoiler = false },
             };
 
             await Storageable(tags).ExecuteCommandAsync();
         }
 
-        //public Levels? GetLevelById(int levelId)
-        //{
-        //    if (_levelCache.TryGetValue(levelId, out var level))
-        //    {
-        //        return level;
-        //    }
-        //    return null;
-        //}
-        //public int GetMaxGroupId()
-        //{
-        //    if (_levelCache.Count > 0)
-        //    {
-        //        return _levelCache.Keys.Max();
-        //    }
-        //    return 0;
-        //}
+        public Tags? GetTagById(int levelId)
+        {
+            if (_tagCache.TryGetValue(levelId, out var tag))
+            {
+                return tag;
+            }
+            return null;
+        }
 
-        //public bool HasGroupId(int groupId)
-        //{
-        //    var group = GetLevelById(groupId);
-        //    return group != null;
-        //}
+        /// <summary>
+        /// 根据文本关键词设置稿件标签
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public int FetchTags(string? text)
+        {
+            if (string.IsNullOrEmpty(text) || _tagCache.Count == 0)
+            {
+                return 0;
+            }
+            int tags = 0;
+            foreach (var (seg, words) in _tagKeywords)
+            {
+                foreach (var word in words)
+                {
+                    if (text.Contains(word, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        tags += seg;
+                        break;
+                    }
+                }
+            }
+            return tags;
+        }
 
-        //public Levels? GetDefaultLevel()
-        //{
-        //    return GetLevelById(1);
-        //}
+        public string GetTagsName(int tagNum)
+        {
+            var tagNames = GetTags(tagNum).Select(x=>x.Name);
+            return string.Join(' ', tagNames);
+        }
 
-        //public string GetLevelName(int levelId)
-        //{
-        //    var level = GetLevelById(levelId);
-        //    return level?.Name ?? "Lv-";
-        //}
+        public IEnumerable<Tags> GetTags(int tagNum)
+        {
+            List<Tags> tags = new();
+            foreach (var (seg, tag) in _tagCache)
+            {
+                if ((seg & tagNum) > 0)
+                {
+                    tags.Add(tag);
+                }
+            }
+
+            return tags;
+        }
     }
 }

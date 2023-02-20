@@ -197,7 +197,7 @@ namespace XinjingdailyBot.Infrastructure
             /// <summary>
             /// 过滤连续空格
             /// </summary>
-            public bool PureRetuens { get; set; } = true;
+            public bool PureReturns { get; set; } = true;
             /// <summary>
             /// 过滤其他 #Tag
             /// </summary>

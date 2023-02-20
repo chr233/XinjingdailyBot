@@ -78,7 +78,7 @@ namespace XinjingdailyBot.Repository
             }
             return null;
         }
-        public int GetMaxGroupId()
+        public int GetMaxLevelId()
         {
             if (_levelCache.Count > 0)
             {
@@ -87,7 +87,7 @@ namespace XinjingdailyBot.Repository
             return 0;
         }
 
-        public bool HasGroupId(int groupId)
+        public bool HasLevelId(int groupId)
         {
             var group = GetLevelById(groupId);
             return group != null;
