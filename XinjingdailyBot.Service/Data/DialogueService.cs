@@ -24,7 +24,7 @@ namespace XinjingdailyBot.Service.Data
                 _ => null,
             };
 
-            if(content?.Length > 2000)
+            if (content?.Length > 2000)
             {
                 content = content[..2000];
             }

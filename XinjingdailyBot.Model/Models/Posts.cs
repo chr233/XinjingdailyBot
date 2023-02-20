@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using SqlSugar;
+﻿using SqlSugar;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Model.Base;
@@ -113,7 +112,7 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 稿件标签
         /// </summary>
-        public int NewTags { get; set;  }
+        public int NewTags { get; set; }
         /// <summary>
         /// 是否启用遮罩
         /// </summary>

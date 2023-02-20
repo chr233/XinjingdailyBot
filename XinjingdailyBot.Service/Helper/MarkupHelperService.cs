@@ -76,7 +76,7 @@ namespace XinjingdailyBot.Service.Helper
                 btns.Add(line);
             }
 
-            if (hasSpoiler .HasValue)
+            if (hasSpoiler.HasValue)
             {
                 btns.Add(new[]
                 {
@@ -106,7 +106,7 @@ namespace XinjingdailyBot.Service.Helper
         /// <param name="tagNum"></param>
         /// <param name="hasSpoiler"></param>
         /// <returns></returns>
-        public InlineKeyboardMarkup ReviewKeyboardA(int tagNum,bool? hasSpoiler)
+        public InlineKeyboardMarkup ReviewKeyboardA(int tagNum, bool? hasSpoiler)
         {
             var tags = _tagRepository.GetTagsPayload(tagNum);
 
@@ -358,7 +358,7 @@ namespace XinjingdailyBot.Service.Helper
             List<InlineKeyboardButton> line = new();
             foreach (var tag in tags)
             {
-                line.Add(InlineKeyboardButton.WithCallbackData( $"随机 {tag.HashTag}", $"cmd {dbUser.UserID} randompost {tag.Payload}"));
+                line.Add(InlineKeyboardButton.WithCallbackData($"随机 {tag.HashTag}", $"cmd {dbUser.UserID} randompost {tag.Payload}"));
                 if (line.Count >= 2)
                 {
                     btns.Add(line);

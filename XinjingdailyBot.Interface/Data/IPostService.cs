@@ -1,5 +1,4 @@
 ﻿using Telegram.Bot.Types;
-using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Data.Base;
 using XinjingdailyBot.Model.Models;
 
@@ -10,7 +9,7 @@ namespace XinjingdailyBot.Interface.Data
         /// <summary>
         /// 文字投稿长度上限
         /// </summary>
-        public const int MaxPostText = 2000;
+        public static int MaxPostText { get; } = 2000;
 
         Task AcceptPost(Posts post, Users dbUser, CallbackQuery callbackQuery);
         Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null);
