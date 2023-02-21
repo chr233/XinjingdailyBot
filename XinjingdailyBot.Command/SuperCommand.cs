@@ -311,7 +311,7 @@ namespace XinjingdailyBot.Command
 
             while (startId <= totalPosts)
             {
-                var posts = await _postService.Queryable().Where(x => x.Id >= startId).Take(threads).ToListAsync();
+                var posts = await _postService.Queryable().Where(x => x.Id >= startId && x.Tags != BuildInTags.None).Take(threads).ToListAsync();
                 if (!posts.Any())
                 {
                     break;
@@ -360,7 +360,7 @@ namespace XinjingdailyBot.Command
 
                 await Task.WhenAll(tasks);
 
-                startId += threads;
+                startId = posts.Last().Id + 1;
 
                 _logger.LogInformation("更新进度 {startId} / {totalUsers}, 更新数量 {effectCount}", startId, totalPosts, effectCount);
             }
