@@ -70,41 +70,6 @@ namespace XinjingdailyBot.Service.Helper
         }
 
         /// <summary>
-        /// 提取Tag
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        [Obsolete]
-        public BuildInTags FetchTags(string? text)
-        {
-            if (string.IsNullOrEmpty(text))
-            {
-                return BuildInTags.None;
-            }
-
-            var tags = BuildInTags.None;
-
-            if (text.Contains("NSFW", StringComparison.InvariantCultureIgnoreCase))
-            {
-                tags |= BuildInTags.NSFW;
-            }
-            if (text.Contains("朋友", StringComparison.InvariantCultureIgnoreCase) || text.Contains("英雄", StringComparison.InvariantCultureIgnoreCase))
-            {
-                tags |= BuildInTags.Friend;
-            }
-            if (text.Contains("晚安", StringComparison.InvariantCultureIgnoreCase))
-            {
-                tags |= BuildInTags.WanAn | BuildInTags.NSFW;
-            }
-            if (text.Contains("#ai", StringComparison.InvariantCultureIgnoreCase))
-            {
-                tags |= BuildInTags.AIGraph;
-            }
-
-            return tags;
-        }
-
-        /// <summary>
         /// Html格式的用户链接
         /// </summary>
         /// <param name="userId"></param>

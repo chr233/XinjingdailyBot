@@ -71,7 +71,7 @@ namespace XinjingdailyBot.Tasks
 
                 catch (Exception ex)
                 {
-                    _logger.LogError("接收服务运行出错: {Exception}", ex);
+                    _logger.LogError(ex,"接收服务运行出错");
                     await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
                 }
             }

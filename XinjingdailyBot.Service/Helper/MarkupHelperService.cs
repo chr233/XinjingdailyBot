@@ -1,5 +1,6 @@
 ﻿using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Helper;
@@ -61,10 +62,12 @@ namespace XinjingdailyBot.Service.Helper
             List<IEnumerable<InlineKeyboardButton>> btns = new();
             List<InlineKeyboardButton> line = new();
 
+            int lineCount = tags.Count() <= 6 ? 2 : 3;
+
             foreach (var tag in tags)
             {
                 line.Add(InlineKeyboardButton.WithCallbackData(tag.DisplayName, $"review tag {tag.Payload}"));
-                if (line.Count >= 2)
+                if (line.Count >= lineCount)
                 {
                     btns.Add(line);
                     line = new();
@@ -113,10 +116,12 @@ namespace XinjingdailyBot.Service.Helper
             List<IEnumerable<InlineKeyboardButton>> btns = new();
             List<InlineKeyboardButton> line = new();
 
+            int lineCount = tags.Count() <= 6 ? 2 : 3;
+
             foreach (var tag in tags)
             {
                 line.Add(InlineKeyboardButton.WithCallbackData(tag.DisplayName, $"review tag {tag.Payload}"));
-                if (line.Count >= 2)
+                if (line.Count >= lineCount)
                 {
                     btns.Add(line);
                     line = new();
@@ -191,16 +196,26 @@ namespace XinjingdailyBot.Service.Helper
             else
             {
                 List<IEnumerable<InlineKeyboardButton>> btns = new();
+                List<InlineKeyboardButton> line = new();
+
+                int lineCount = groups.Count <= 6 ? 2 : 3;
 
                 foreach (var group in groups)
                 {
                     var name = targetUser.GroupID == group.Id ? $"当前用户组: [ {group.Id}. {group.Name} ]" : $"{group.Id}. {group.Name}";
                     var data = $"cmd {dbUser.UserID} setusergroup {targetUser.UserID} {group.Id}";
 
-                    btns.Add(new[]
+                    line.Add(InlineKeyboardButton.WithCallbackData(name, data));
+                    if (line.Count >= lineCount)
                     {
-                        InlineKeyboardButton.WithCallbackData(name, data),
-                    });
+                        btns.Add(line);
+                        line = new();
+                    }
+                }
+
+                if (line.Any())
+                {
+                    btns.Add(line);
                 }
 
                 btns.Add(new[]
@@ -271,7 +286,7 @@ namespace XinjingdailyBot.Service.Helper
         /// <returns></returns>
         public InlineKeyboardMarkup? SetChannelOptionKeyboard(Users dbUser, long channelId)
         {
-            List<IEnumerable<InlineKeyboardButton>> btns = new()
+            InlineKeyboardMarkup keyboard = new(new[]
             {
                 new []
                 {
@@ -289,9 +304,7 @@ namespace XinjingdailyBot.Service.Helper
                 {
                     InlineKeyboardButton.WithCallbackData( "取消操作", $"cmd {dbUser.UserID} cancel"),
                 }
-            };
-
-            InlineKeyboardMarkup keyboard = new(btns);
+            });
 
             return keyboard;
         }
@@ -304,18 +317,13 @@ namespace XinjingdailyBot.Service.Helper
         public InlineKeyboardMarkup? LinkToOriginPostKeyboard(Posts post)
         {
             var channel = _channelService.AcceptChannel;
-            string? username = channel.Username;
-
-            if (string.IsNullOrEmpty(username))
-            {
-                return null;
-            }
+            string link = channel.GetMessageLink(post.PublicMsgID);
 
             InlineKeyboardMarkup keyboard = new(new[]
              {
                 new []
                 {
-                    InlineKeyboardButton.WithUrl($"在{channel.Title}中查看", $"https://t.me/{username}/{post.PublicMsgID}"),
+                    InlineKeyboardButton.WithUrl($"在{channel.Title}中查看", link),
                 },
             });
             return keyboard;
@@ -326,9 +334,11 @@ namespace XinjingdailyBot.Service.Helper
         /// </summary>
         /// <param name="link"></param>
         /// <returns></returns>
-        public InlineKeyboardMarkup? LinkToOriginPostKeyboard(string link)
+        public InlineKeyboardMarkup? LinkToOriginPostKeyboard(long messageId)
         {
             var channel = _channelService.AcceptChannel;
+            string link = channel.GetMessageLink(messageId);
+
             InlineKeyboardMarkup keyboard = new(new[]
              {
                 new []
@@ -351,15 +361,17 @@ namespace XinjingdailyBot.Service.Helper
             {
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData("随机稿件",$"cmd {dbUser.UserID} randompost all"),
+                    InlineKeyboardButton.WithCallbackData("不限制稿件标签", $"cmd {dbUser.UserID} setrandompost")
                 }
             };
-
             List<InlineKeyboardButton> line = new();
+
+            int lineCount = tags.Count() <= 6 ? 2 : 3;
+
             foreach (var tag in tags)
             {
-                line.Add(InlineKeyboardButton.WithCallbackData($"随机 {tag.HashTag}", $"cmd {dbUser.UserID} randompost {tag.Payload}"));
-                if (line.Count >= 2)
+                line.Add(InlineKeyboardButton.WithCallbackData($"{tag.OnText}", $"cmd {dbUser.UserID} setrandompost {tag.Payload}"));
+                if (line.Count >= lineCount)
                 {
                     btns.Add(line);
                     line = new();
@@ -371,6 +383,11 @@ namespace XinjingdailyBot.Service.Helper
                 btns.Add(line);
             }
 
+            btns.Add(new[]
+            {
+                InlineKeyboardButton.WithCallbackData("取消", $"cmd {dbUser.UserID} cancel"),
+            });
+
             return new(btns);
         }
 
@@ -378,17 +395,51 @@ namespace XinjingdailyBot.Service.Helper
         /// 获取随机投稿键盘
         /// </summary>
         /// <returns></returns>
-        public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, Posts post, string tagName, string tag)
+        public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, int tagNum)
+        {
+            InlineKeyboardMarkup keyboard = new(new[]
+            {
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData( "不限类型的随机稿件", $"cmd {dbUser.UserID} randompost {tagNum} all"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData( "随机图片", $"cmd {dbUser.UserID} randompost {tagNum} photo"),
+                    InlineKeyboardButton.WithCallbackData( "随机视频", $"cmd {dbUser.UserID} randompost {tagNum} video"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData( "随机音频", $"cmd {dbUser.UserID} randompost {tagNum} audio"),
+                    InlineKeyboardButton.WithCallbackData( "随机GIF", $"cmd {dbUser.UserID} randompost {tagNum} animation"),
+                    InlineKeyboardButton.WithCallbackData( "随机文件", $"cmd {dbUser.UserID} randompost {tagNum} document"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData( "返回", $"cmd {dbUser.UserID} backrandompost"),
+                    InlineKeyboardButton.WithCallbackData( "取消", $"cmd {dbUser.UserID} cancel"),
+                }
+            });
+
+            return keyboard;
+        }
+
+
+        /// <summary>
+        /// 获取随机投稿键盘
+        /// </summary>
+        /// <returns></returns>
+        public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, Posts post, int tagId, string postType)
         {
             var channel = _channelService.AcceptChannel;
-            string link = !string.IsNullOrEmpty(channel.Username) ? $"https://t.me/{channel.Username}/{post.PublicMsgID}" : $"https://t.me/c/{channel.Id}/{post.PublicMsgID}";
+            string link = channel.GetMessageLink(post.PublicMsgID);
 
             InlineKeyboardMarkup keyboard = new(new[]
             {
                 new []
                 {
                     InlineKeyboardButton.WithUrl($"在{channel.Title}中查看", link),
-                    InlineKeyboardButton.WithCallbackData($"再来一张{tagName}",$"cmd {dbUser.UserID} randompost {tag} {link}"),
+                    InlineKeyboardButton.WithCallbackData("再来一张",$"cmd {dbUser.UserID} randompost {tagId} {postType} {post.PublicMsgID}"),
                 },
             });
 

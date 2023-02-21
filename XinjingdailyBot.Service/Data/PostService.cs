@@ -317,7 +317,7 @@ namespace XinjingdailyBot.Service.Data
                 Status = directPost ? PostStatus.Reviewing : PostStatus.Padding,
                 PostType = message.Type,
                 NewTags = newTags,
-                HasSpoiler = hasSpoiler ?? false,
+                HasSpoiler = message.HasMediaSpoiler ?? false,
                 PosterUID = dbUser.UserID
             };
 
@@ -534,7 +534,7 @@ namespace XinjingdailyBot.Service.Data
 
             await _botClient.AutoReplyAsync($"当前标签: {tagName}", callbackQuery);
 
-            bool? hasSpoiler = (post.PostType == MessageType.Photo || post.PostType == MessageType.Video) ? post.HasSpoiler : null;
+            bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
 
             var keyboard = post.IsDirectPost ?
                 _markupHelperService.DirectPostKeyboard(post.Anonymous, post.NewTags, hasSpoiler) :
@@ -728,8 +728,7 @@ namespace XinjingdailyBot.Service.Data
                         MessageType.Audio => new InputMediaAudio(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
                         MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html, HasSpoiler = hasSpoiler },
                         MessageType.Voice => new InputMediaVideo(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
-                        MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
-                        //MessageType.Animation 不支持媒体组
+                        MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)) { Caption = i == attachments.Count - 1 ? postText : null, ParseMode = ParseMode.Html },
                         _ => throw new Exception(),
                     };
                 }

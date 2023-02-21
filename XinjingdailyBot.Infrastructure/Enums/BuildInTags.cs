@@ -30,6 +30,6 @@
         /// <summary>
         /// 遮罩
         /// </summary>
-        Spoiler = 16
+        Spoiler = 16,
     }
 }

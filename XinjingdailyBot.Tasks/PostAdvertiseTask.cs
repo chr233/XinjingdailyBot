@@ -75,7 +75,7 @@ namespace XinjingdailyBot.Tasks
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError("投放广告出错: {error}", ex.Message);
+                        _logger.LogError(ex, "投放广告出错");
                     }
                     finally
                     {

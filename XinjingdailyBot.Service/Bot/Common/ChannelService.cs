@@ -92,7 +92,7 @@ namespace XinjingdailyBot.Service.Bot.Common
 
             if (channelOption.UseReviewLogMode)
             {
-
+                //todo
             }
 
             try
