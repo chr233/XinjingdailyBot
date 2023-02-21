@@ -99,10 +99,10 @@ namespace XinjingdailyBot.Repository
         {
             List<Tags> tags = new()
             {
-                new() { Id = 1,Name = "NSFW", Payload = "nsfw", KeyWords = "NSFW", AutoSpoiler = true, WarnText = Langs.NSFWWarning },
-                new() { Id = 2,Name = "我有一个朋友", Payload = "friend", KeyWords = "朋友|英雄", AutoSpoiler = false },
-                new() { Id = 3,Name = "晚安", Payload = "wanan", KeyWords = "晚安", AutoSpoiler = false },
-                new() { Id = 4,Name = "AI怪图", Payload = "ai", KeyWords = "#AI", AutoSpoiler = false },
+                new() { Id = 1,Name = "NSFW", Payload = "nsfw", KeyWords = "NSFW", WarnText = Langs.NSFWWarning },
+                new() { Id = 2,Name = "我有一个朋友", Payload = "friend", KeyWords = "朋友|英雄" },
+                new() { Id = 3,Name = "晚安", Payload = "wanan", KeyWords = "晚安" },
+                new() { Id = 4,Name = "AI怪图", Payload = "ai", KeyWords = "#AI" },
             };
 
             await Storageable(tags).ExecuteCommandAsync();
