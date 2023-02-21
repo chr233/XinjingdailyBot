@@ -225,7 +225,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                     catch (Exception ex)
                     {
                         errorMsg = $"{ex.GetType} {ex.Message}";
-
+                        _logger.LogError(ex, "命令 {cmd} 执行出错", cmd);
                         await _botClient.SendCommandReply(_optionsSetting.Debug ? errorMsg : "遇到内部错误", message);
                     }
                     handled = true;
@@ -356,7 +356,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                     catch (Exception ex) //无法捕获 TODO
                     {
                         errorMsg = $"{ex.GetType} {ex.Message}";
-
+                        _logger.LogError(ex, "回调命令 {cmd} 执行出错", cmd);
                         await _botClient.AutoReplyAsync(_optionsSetting.Debug ? errorMsg : "遇到内部错误", query, true);
                     }
                     handled = true;

@@ -71,7 +71,7 @@ namespace XinjingdailyBot.Service.Bot.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError("取消置顶出错", ex);
+                _logger.LogError(ex, "取消置顶出错");
             }
         }
 

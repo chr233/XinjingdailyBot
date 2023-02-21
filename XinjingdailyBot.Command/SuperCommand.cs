@@ -75,7 +75,7 @@ namespace XinjingdailyBot.Command
             catch (Exception ex)
             {
                 await _botClient.SendCommandReply("启动进程遇到错误", message);
-                _logger.LogError("启动进程遇到错误", ex);
+                _logger.LogError(ex, "启动进程遇到错误");
             }
         }
 

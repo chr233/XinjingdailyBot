@@ -124,7 +124,7 @@ namespace XinjingdailyBot.Tasks
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError("通知消息发送失败, 自动禁用更新 {error}", ex);
+                            _logger.LogError(ex, "通知消息发送失败, 自动禁用更新");
                             user.PrivateChatID = -1;
                             await Task.Delay(5000);
                         }
