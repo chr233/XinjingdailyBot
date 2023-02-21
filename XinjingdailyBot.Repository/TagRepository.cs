@@ -24,6 +24,10 @@ namespace XinjingdailyBot.Repository
         /// 标签缓存, Key=Id
         /// </summary>
         private readonly Dictionary<int, string[]> _tagKeywords = new();
+        /// <summary>
+        /// 警告文本缓存
+        /// </summary>
+        private readonly List<string> _warnTexts = new();
 
         /// <summary>
         /// 初始化缓存
@@ -42,6 +46,8 @@ namespace XinjingdailyBot.Repository
             if (tags?.Count > 0)
             {
                 _tagCache.Clear();
+                _tagKeywords.Clear();
+                _warnTexts.Clear();
                 foreach (var tag in tags)
                 {
                     if (string.IsNullOrEmpty(tag.Name) || tag.Id <= 0)
@@ -77,6 +83,11 @@ namespace XinjingdailyBot.Repository
                         {
                             _tagKeywords.Add(tag.Seg, keyWords);
                         }
+                    }
+
+                    if (!string.IsNullOrEmpty(tag.WarnText))
+                    {
+                        _warnTexts.Add(tag.WarnText);
                     }
                 }
 
@@ -242,6 +253,21 @@ namespace XinjingdailyBot.Repository
             }
 
             return tags;
+        }
+
+        /// <summary>
+        /// 判断是否为警告文本
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public bool IsWarnText(string? text)
+        {
+            if (!string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+            bool result = _warnTexts.Any(x => x == text);
+            return result;
         }
     }
 
