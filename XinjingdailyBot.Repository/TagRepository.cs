@@ -245,9 +245,9 @@ namespace XinjingdailyBot.Repository
         public IEnumerable<TagPayload> GetTagsPayload(int tagNum)
         {
             List<TagPayload> tags = new();
-            foreach (var (seg, tag) in _tagCache)
+            foreach (var tag in _tagCache.Values)
             {
-                bool status = (seg & tagNum) > 0;
+                bool status = (tag.Seg & tagNum) > 0;
 
                 tags.Add(new TagPayload(status ? tag.OnText : tag.OffText, tag.Payload));
             }
