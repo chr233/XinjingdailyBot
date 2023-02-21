@@ -9,6 +9,7 @@ using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
+using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Bot.Common
 {
@@ -25,6 +26,7 @@ namespace XinjingdailyBot.Service.Bot.Common
         private readonly IJoinRequestHandler _joinRequestHandler;
         private readonly IInlineQueryHandler _inlineQueryHandler;
         private readonly IDialogueService _dialogueService;
+        private readonly TagRepository _tagRepository;
 
         public DispatcherService(
             ILogger<DispatcherService> logger,
@@ -36,7 +38,8 @@ namespace XinjingdailyBot.Service.Bot.Common
             ITelegramBotClient botClient,
             IJoinRequestHandler joinRequestHandler,
             IInlineQueryHandler inlineQueryHandler,
-            IDialogueService dialogueService)
+            IDialogueService dialogueService,
+            TagRepository tagRepository)
         {
             _logger = logger;
             _messageHandler = messageHandler;
@@ -48,6 +51,7 @@ namespace XinjingdailyBot.Service.Bot.Common
             _joinRequestHandler = joinRequestHandler;
             _inlineQueryHandler = inlineQueryHandler;
             _dialogueService = dialogueService;
+            _tagRepository = tagRepository;
         }
 
         /// <summary>
@@ -59,7 +63,7 @@ namespace XinjingdailyBot.Service.Bot.Common
         {
             try
             {
-                if (message.Text == Langs.NSFWWarning)
+                if (_tagRepository.IsWarnText(message.Text))
                 {
                     await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
                 }
