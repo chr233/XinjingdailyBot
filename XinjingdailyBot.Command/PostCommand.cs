@@ -159,7 +159,7 @@ namespace XinjingdailyBot.Command
                         MessageType.Photo => new InputMediaPhoto(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
                         MessageType.Audio => new InputMediaAudio(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
                         MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
-                        MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
+                        MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)) { Caption = i == attachments.Count - 1 ? post.Text : null, ParseMode = ParseMode.Html },
                         _ => throw new Exception(),
                     };
                 }

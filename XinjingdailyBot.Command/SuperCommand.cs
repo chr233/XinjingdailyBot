@@ -67,7 +67,7 @@ namespace XinjingdailyBot.Command
             try
             {
                 string path = Path.Exists(Environment.ProcessPath) ? Environment.ProcessPath : Utils.ExeFullPath;
-                _logger.LogInformation(path);
+                _logger.LogInformation("机器人运行路径: {path}", path);
                 Process.Start(path);
                 await _botClient.SendCommandReply("机器人即将重启", message);
                 Environment.Exit(0);
@@ -75,7 +75,7 @@ namespace XinjingdailyBot.Command
             catch (Exception ex)
             {
                 await _botClient.SendCommandReply("启动进程遇到错误", message);
-                _logger.LogError("启动进程遇到错误", ex);
+                _logger.LogError(ex, "启动进程遇到错误");
             }
         }
 
@@ -233,10 +233,12 @@ namespace XinjingdailyBot.Command
 
             int totalUsers = await _userService.Queryable().CountAsync();
 
+            var msg = await _botClient.SendCommandReply($"开始更新用户表, 共计 {totalUsers} 条记录", message, autoDelete: false);
+
             while (startId <= totalUsers)
             {
                 var users = await _userService.Queryable().Where(x => x.Id >= startId).Take(threads).ToListAsync();
-                if (!(users?.Count > 0))
+                if (!users.Any())
                 {
                     break;
                 }
@@ -279,7 +281,98 @@ namespace XinjingdailyBot.Command
                 _logger.LogInformation("更新进度 {startId} / {totalUsers}, 更新数量 {effectCount}", startId, totalUsers, effectCount);
             }
 
-            await _botClient.SendCommandReply($"更新用户表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
+            try
+            {
+                await _botClient.EditMessageTextAsync(msg, $"更新用户表完成, 更新了 {effectCount} 条记录");
+            }
+            catch
+            {
+                await _botClient.SendCommandReply($"更新用户表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
+            }
+        }
+
+        /// <summary>
+        /// 迁移旧的稿件数据
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        [TextCmd("MERGEPOST", UserRights.SuperCmd, Description = "迁移旧的稿件数据")]
+        [Obsolete("迁移旧数据用")]
+        public async Task ResponseMergePost(Message message)
+        {
+            const int threads = 10;
+
+            int startId = 1;
+            int effectCount = 0;
+
+            int totalPosts = await _postService.Queryable().CountAsync();
+
+            var msg = await _botClient.SendCommandReply($"开始更新稿件表, 共计 {totalPosts} 条记录", message, autoDelete: false);
+
+            while (startId <= totalPosts)
+            {
+                var posts = await _postService.Queryable().Where(x => x.Id >= startId && x.Tags != BuildInTags.None).Take(threads).ToListAsync();
+                if (!posts.Any())
+                {
+                    break;
+                }
+
+                var tasks = posts.Select(async post =>
+                {
+                    if (post.Tags != BuildInTags.None)
+                    {
+                        var oldTag = post.Tags;
+                        if (oldTag.HasFlag(BuildInTags.Spoiler))
+                        {
+                            post.HasSpoiler = true;
+                        }
+                        int newTag = 0;
+                        if (oldTag.HasFlag(BuildInTags.NSFW))
+                        {
+                            newTag += 1;
+                        }
+                        if (oldTag.HasFlag(BuildInTags.Friend))
+                        {
+                            newTag += 2;
+                        }
+                        if (oldTag.HasFlag(BuildInTags.WanAn))
+                        {
+                            newTag += 4;
+                        }
+                        if (oldTag.HasFlag(BuildInTags.AIGraph))
+                        {
+                            newTag += 8;
+                        }
+                        post.Tags = BuildInTags.None;
+                        post.NewTags = newTag;
+                        post.ModifyAt = DateTime.Now;
+
+                        effectCount++;
+
+                        await _postService.Updateable(post).UpdateColumns(x => new
+                        {
+                            x.Tags,
+                            x.NewTags,
+                            x.ModifyAt
+                        }).ExecuteCommandAsync();
+                    }
+                }).ToList();
+
+                await Task.WhenAll(tasks);
+
+                startId = posts.Last().Id + 1;
+
+                _logger.LogInformation("更新进度 {startId} / {totalUsers}, 更新数量 {effectCount}", startId, totalPosts, effectCount);
+            }
+
+            try
+            {
+                await _botClient.EditMessageTextAsync(msg, $"更新稿件表完成, 更新了 {effectCount} 条记录");
+            }
+            catch
+            {
+                await _botClient.SendCommandReply($"更新稿件表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
+            }
         }
 
         /// <summary>

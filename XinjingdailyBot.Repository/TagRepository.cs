@@ -110,10 +110,10 @@ namespace XinjingdailyBot.Repository
         {
             List<Tags> tags = new()
             {
-                new() { Id = 1,Name = "NSFW", Payload = "nsfw", KeyWords = "NSFW", AutoSpoiler = true, WarnText = Langs.NSFWWarning },
-                new() { Id = 2,Name = "我有一个朋友", Payload = "friend", KeyWords = "朋友|英雄", AutoSpoiler = false },
-                new() { Id = 3,Name = "晚安", Payload = "wanan", KeyWords = "晚安", AutoSpoiler = false },
-                new() { Id = 4,Name = "AI怪图", Payload = "ai", KeyWords = "#AI", AutoSpoiler = false },
+                new() { Id = 1,Name = "NSFW", Payload = "nsfw", KeyWords = "NSFW", WarnText = Langs.NSFWWarning },
+                new() { Id = 2,Name = "我有一个朋友", Payload = "friend", KeyWords = "朋友|英雄" },
+                new() { Id = 3,Name = "晚安", Payload = "wanan", KeyWords = "晚安" },
+                new() { Id = 4,Name = "AI怪图", Payload = "ai", KeyWords = "#AI" },
             };
 
             await Storageable(tags).ExecuteCommandAsync();
@@ -227,6 +227,17 @@ namespace XinjingdailyBot.Repository
         }
 
         /// <summary>
+        /// 获取激活标签的数量
+        /// </summary>
+        /// <param name="tagNum"></param>
+        /// <returns></returns>
+        public int GetActiviedTagsCounte(int tagNum)
+        {
+            var tagNames = GetActiviedTags(tagNum).Select(x => x.Name);
+            return tagNames.Count();
+        }
+
+        /// <summary>
         /// 获取激活标签的警告
         /// </summary>
         /// <param name="tagNum"></param>
@@ -245,9 +256,9 @@ namespace XinjingdailyBot.Repository
         public IEnumerable<TagPayload> GetTagsPayload(int tagNum)
         {
             List<TagPayload> tags = new();
-            foreach (var (seg, tag) in _tagCache)
+            foreach (var tag in _tagCache.Values)
             {
-                bool status = (seg & tagNum) > 0;
+                bool status = (tag.Seg & tagNum) > 0;
 
                 tags.Add(new TagPayload(status ? tag.OnText : tag.OffText, tag.Payload));
             }
