@@ -728,7 +728,7 @@ namespace XinjingdailyBot.Service.Data
                         MessageType.Audio => new InputMediaAudio(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
                         MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html, HasSpoiler = hasSpoiler },
                         MessageType.Voice => new InputMediaVideo(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
-                        MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
+                        MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)) { Caption = i == attachments.Count - 1 ? postText : null, ParseMode = ParseMode.Html },
                         _ => throw new Exception(),
                     };
                 }

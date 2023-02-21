@@ -10,7 +10,8 @@ namespace XinjingdailyBot.Interface.Helper
         InlineKeyboardMarkup? LinkToOriginPostKeyboard(string link);
         InlineKeyboardMarkup PostKeyboard(bool anymouse);
         InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser);
-        InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, Posts post, string tagName, string tag);
+        InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, int tagNum);
+        InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, Posts post, int tagId, string postType);
         InlineKeyboardMarkup ReviewKeyboardA(int tagNum, bool? hasSpoiler);
         InlineKeyboardMarkup ReviewKeyboardB();
         InlineKeyboardMarkup? SetChannelOptionKeyboard(Users dbUser, long channelId);

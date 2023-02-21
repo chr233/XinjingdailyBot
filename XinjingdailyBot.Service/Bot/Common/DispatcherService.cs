@@ -131,7 +131,6 @@ namespace XinjingdailyBot.Service.Bot.Common
                     MessageType.Voice => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
                     MessageType.Document => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
                     MessageType.Animation => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
-                    //MessageType.Sticker 不做处理
                     _ => null,
                 };
 
@@ -186,7 +185,7 @@ namespace XinjingdailyBot.Service.Bot.Common
         /// <returns></returns>
         public Task OnOtherUpdateReceived(Users dbUser, Update update)
         {
-            _logger.LogInformation("收到未知消息类型的消息");
+            _logger.LogInformation("收到未知消息类型的消息, [{type}]", update.Type);
             return Task.CompletedTask;
         }
     }
