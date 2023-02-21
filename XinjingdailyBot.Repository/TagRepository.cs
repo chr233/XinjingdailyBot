@@ -216,6 +216,17 @@ namespace XinjingdailyBot.Repository
         }
 
         /// <summary>
+        /// 获取激活标签的数量
+        /// </summary>
+        /// <param name="tagNum"></param>
+        /// <returns></returns>
+        public int GetActiviedTagsCounte(int tagNum)
+        {
+            var tagNames = GetActiviedTags(tagNum).Select(x => x.Name);
+            return tagNames.Count();
+        }
+
+        /// <summary>
         /// 获取激活标签的警告
         /// </summary>
         /// <param name="tagNum"></param>

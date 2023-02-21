@@ -67,7 +67,7 @@ namespace XinjingdailyBot.Command
             try
             {
                 string path = Path.Exists(Environment.ProcessPath) ? Environment.ProcessPath : Utils.ExeFullPath;
-                _logger.LogInformation(path);
+                _logger.LogInformation("机器人运行路径: {path}", path);
                 Process.Start(path);
                 await _botClient.SendCommandReply("机器人即将重启", message);
                 Environment.Exit(0);
@@ -297,7 +297,7 @@ namespace XinjingdailyBot.Command
         /// <param name="message"></param>
         /// <returns></returns>
         [TextCmd("MERGEPOST", UserRights.SuperCmd, Description = "迁移旧的稿件数据")]
-        [Obsolete]
+        [Obsolete("迁移旧数据用")]
         public async Task ResponseMergePost(Message message)
         {
             const int threads = 10;
@@ -344,6 +344,7 @@ namespace XinjingdailyBot.Command
                             newTag += 8;
                         }
                         post.Tags = BuildInTags.None;
+                        post.NewTags = newTag;
                         post.ModifyAt = DateTime.Now;
 
                         effectCount++;

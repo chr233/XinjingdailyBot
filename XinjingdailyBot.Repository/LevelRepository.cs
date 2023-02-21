@@ -78,7 +78,7 @@ namespace XinjingdailyBot.Repository
             }
             return null;
         }
-        
+
         public int GetMaxLevelId()
         {
             if (_levelCache.Count > 0)

@@ -107,7 +107,7 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 标签
         /// </summary>
-        [Obsolete]
+        [Obsolete("过时的属性")]
         public BuildInTags Tags { get; set; }
         /// <summary>
         /// 稿件标签

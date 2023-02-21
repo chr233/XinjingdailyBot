@@ -7,8 +7,6 @@ namespace XinjingdailyBot.Interface.Helper
     public interface ITextHelperService
     {
         string EscapeHtml(string? text);
-        [Obsolete]
-        BuildInTags FetchTags(string? text);
         string HtmlLink(string url, string text);
         string HtmlMessageLink(long messageID, string chatName, string linkName);
         string HtmlUserLink(long userId, string userName, string userNick);
