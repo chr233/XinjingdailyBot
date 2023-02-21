@@ -39,7 +39,7 @@
             PageSize = 20;
         }
 
-        public PagerInfo(int page = 1, int pageSize = 20)
+        public PagerInfo(int page, int pageSize)
         {
             PageNum = page;
             PageSize = pageSize;

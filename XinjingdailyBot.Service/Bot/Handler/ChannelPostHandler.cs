@@ -63,7 +63,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 _ = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
             }
 
-            //BuildInTags tags = _textHelperService.FetchTags(message.Text);
             int newTag = _tagRepository.FetchTags(message.Text);
             string text = _textHelperService.ParseMessage(message);
 
@@ -83,7 +82,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 ChannelTitle = channelTitle ?? "",
                 Status = PostStatus.Accepted,
                 PostType = message.Type,
-                //Tags = tags,
                 NewTags = newTag,
                 PosterUID = dbUser.UserID,
                 ReviewerUID = dbUser.UserID

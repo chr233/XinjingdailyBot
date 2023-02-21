@@ -69,6 +69,11 @@ namespace XinjingdailyBot.Repository
             await Storageable(groups).ExecuteCommandAsync();
         }
 
+        /// <summary>
+        /// 获取群组
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
         public Groups? GetGroupById(int groupId)
         {
             if (_groupCache.TryGetValue(groupId, out var group))
@@ -77,6 +82,11 @@ namespace XinjingdailyBot.Repository
             }
             return null;
         }
+
+        /// <summary>
+        /// 获取最大群组ID
+        /// </summary>
+        /// <returns></returns>
         public int GetMaxGroupId()
         {
             if (_groupCache.Count > 0)
@@ -86,17 +96,31 @@ namespace XinjingdailyBot.Repository
             return 0;
         }
 
+        /// <summary>
+        /// 判断群组是否存在
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
         public bool HasGroupId(int groupId)
         {
             var group = GetGroupById(groupId);
             return group != null;
         }
 
+        /// <summary>
+        /// 获取默认群组
+        /// </summary>
+        /// <returns></returns>
         public Groups? GetDefaultGroup()
         {
             return GetGroupById(1);
         }
 
+        /// <summary>
+        /// 获取群组名称
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
         public string GetGroupName(int groupId)
         {
             var group = GetGroupById(groupId);
