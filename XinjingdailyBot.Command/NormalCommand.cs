@@ -343,7 +343,7 @@ namespace XinjingdailyBot.Command
                 bool hasSpoiler = randomPost.HasSpoiler;
                 Chat? chat = callbackQuery.Message!.Chat;
 
-                if (randomPost.IsMediaGroup && false)
+                if (randomPost.IsMediaGroup)
                 {
                     var attachments = await _attachmentService.Queryable().Where(x => x.PostID == randomPost.Id).ToListAsync();
                     var group = new IAlbumInputMedia[attachments.Count];
@@ -366,7 +366,6 @@ namespace XinjingdailyBot.Command
                     }
 
                     var messages = await _botClient.SendMediaGroupAsync(chat, group);
-
                     await _botClient.SendTextMessageAsync(chat, "随机稿件操作", replyMarkup: keyboard);
                 }
                 else
@@ -374,7 +373,7 @@ namespace XinjingdailyBot.Command
                     Attachments attachment = await _attachmentService.Queryable().FirstAsync(x => x.PostID == randomPost.Id);
                     var handler = randomPost.PostType switch
                     {
-                        MessageType.Text => _botClient.SendTextMessageAsync(chat, randomPost.Text, replyMarkup: keyboard),
+                        MessageType.Text => _botClient.SendTextMessageAsync(chat, randomPost.Text),
                         MessageType.Photo => _botClient.SendPhotoAsync(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard, hasSpoiler: hasSpoiler),
                         MessageType.Audio => _botClient.SendAudioAsync(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard, title: attachment.FileName),
                         MessageType.Video => _botClient.SendVideoAsync(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard, hasSpoiler: hasSpoiler),
@@ -386,17 +385,31 @@ namespace XinjingdailyBot.Command
 
                     if (handler == null)
                     {
-                        await _botClient.AutoReplyAsync($"不支持的稿件类型: {randomPost.PostType}", callbackQuery);
+                        await _botClient.AutoReplyAsync($"不支持的稿件类型: {randomPost.PostType}", callbackQuery, true);
                         await _botClient.EditMessageTextAsync(callbackQuery.Message!, $"不支持的稿件类型: {randomPost.PostType}", null);
                         return;
                     }
 
-                    var message = await handler;
+                    try
+                    {
+                        var message = await handler;
+                    }
+                    catch (Exception ex)
+                    {
+                        int i = 0;
+                    }
                 }
 
                 //去除第一条消息的按钮
-                var kbd = args.Length > 3 ? _markupHelperService.LinkToOriginPostKeyboard(args[3]) : null;
-                await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, kbd);
+                if (args.Length > 3 && long.TryParse(args[3], out long msgId))
+                {
+                    var kbd = _markupHelperService.LinkToOriginPostKeyboard(msgId);
+                    await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, kbd);
+                }
+                else
+                {
+                    await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, null);
+                }
             }
             else
             {

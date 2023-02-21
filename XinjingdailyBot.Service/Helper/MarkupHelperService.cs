@@ -1,5 +1,6 @@
 ﻿using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Helper;
@@ -316,18 +317,13 @@ namespace XinjingdailyBot.Service.Helper
         public InlineKeyboardMarkup? LinkToOriginPostKeyboard(Posts post)
         {
             var channel = _channelService.AcceptChannel;
-            string? username = channel.Username;
-
-            if (string.IsNullOrEmpty(username))
-            {
-                return null;
-            }
+            string link = channel.GetMessageLink(post.PublicMsgID);
 
             InlineKeyboardMarkup keyboard = new(new[]
              {
                 new []
                 {
-                    InlineKeyboardButton.WithUrl($"在{channel.Title}中查看", $"https://t.me/{username}/{post.PublicMsgID}"),
+                    InlineKeyboardButton.WithUrl($"在{channel.Title}中查看", link),
                 },
             });
             return keyboard;
@@ -338,9 +334,11 @@ namespace XinjingdailyBot.Service.Helper
         /// </summary>
         /// <param name="link"></param>
         /// <returns></returns>
-        public InlineKeyboardMarkup? LinkToOriginPostKeyboard(string link)
+        public InlineKeyboardMarkup? LinkToOriginPostKeyboard(long messageId)
         {
             var channel = _channelService.AcceptChannel;
+            string link = channel.GetMessageLink(messageId);
+
             InlineKeyboardMarkup keyboard = new(new[]
              {
                 new []
@@ -434,14 +432,14 @@ namespace XinjingdailyBot.Service.Helper
         public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, Posts post, int tagId, string postType)
         {
             var channel = _channelService.AcceptChannel;
-            string link = !string.IsNullOrEmpty(channel.Username) ? $"https://t.me/{channel.Username}/{post.PublicMsgID}" : $"https://t.me/c/{channel.Id}/{post.PublicMsgID}";
+            string link = channel.GetMessageLink(post.PublicMsgID);
 
             InlineKeyboardMarkup keyboard = new(new[]
             {
                 new []
                 {
                     InlineKeyboardButton.WithUrl($"在{channel.Title}中查看", link),
-                    InlineKeyboardButton.WithCallbackData("再来一张",$"cmd {dbUser.UserID} randompost {tagId} {postType} {link}"),
+                    InlineKeyboardButton.WithCallbackData("再来一张",$"cmd {dbUser.UserID} randompost {tagId} {postType} {post.PublicMsgID}"),
                 },
             });
 

@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types;
+﻿using System.Threading.Channels;
+using Telegram.Bot.Types;
 
 namespace XinjingdailyBot.Infrastructure.Extensions
 {
@@ -32,6 +33,13 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         public static string EscapedChatName(this Chat chat)
         {
             return chat.Title?.EscapeHtml() ?? "";
+        }
+
+        public static string GetMessageLink (this Chat chat,long messageId)
+        {
+            string link = !string.IsNullOrEmpty(chat.Username) ? $"https://t.me/{chat.Username}/{messageId}" : $"https://t.me/c/{chat.Id}/{messageId}";
+            return link;
+
         }
     }
 }

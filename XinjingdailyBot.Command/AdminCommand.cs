@@ -224,7 +224,7 @@ namespace XinjingdailyBot.Command
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError("发送私聊消息失败 {Message}", ex.Message);
+                        _logger.LogError(ex, "发送私聊消息失败");
                     }
 
                     StringBuilder sb = new();
@@ -319,7 +319,7 @@ namespace XinjingdailyBot.Command
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError("发送私聊消息失败 {Message}", ex.Message);
+                        _logger.LogError(ex, "发送私聊消息失败");
                     }
 
                     StringBuilder sb = new();
@@ -462,7 +462,7 @@ namespace XinjingdailyBot.Command
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError("发送私聊消息失败 {Message}", ex.Message);
+                        _logger.LogError(ex, "发送私聊消息失败");
                     }
 
                     return sb.ToString();
@@ -1066,7 +1066,7 @@ namespace XinjingdailyBot.Command
                             }
                             catch (Exception ex)
                             {
-                                _logger.LogError("向用户 {targetUser} 发送消息失败, {ex}", targetUser, ex);
+                                _logger.LogError(ex, "向用户 {targetUser} 发送消息失败", targetUser);
                             }
                         }
 
