@@ -233,10 +233,12 @@ namespace XinjingdailyBot.Command
 
             int totalUsers = await _userService.Queryable().CountAsync();
 
+            var msg = await _botClient.SendCommandReply($"开始更新用户表, 共计 {totalUsers} 条记录", message, autoDelete: false);
+
             while (startId <= totalUsers)
             {
                 var users = await _userService.Queryable().Where(x => x.Id >= startId).Take(threads).ToListAsync();
-                if (!(users?.Count > 0))
+                if (!users.Any())
                 {
                     break;
                 }
@@ -279,7 +281,97 @@ namespace XinjingdailyBot.Command
                 _logger.LogInformation("更新进度 {startId} / {totalUsers}, 更新数量 {effectCount}", startId, totalUsers, effectCount);
             }
 
-            await _botClient.SendCommandReply($"更新用户表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
+            try
+            {
+                await _botClient.EditMessageTextAsync(msg, $"更新用户表完成, 更新了 {effectCount} 条记录");
+            }
+            catch
+            {
+                await _botClient.SendCommandReply($"更新用户表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
+            }
+        }
+
+        /// <summary>
+        /// 迁移旧的稿件数据
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        [TextCmd("MERGEPOST", UserRights.SuperCmd, Description = "迁移旧的稿件数据")]
+        [Obsolete]
+        public async Task ResponseMergePost(Message message)
+        {
+            const int threads = 10;
+
+            int startId = 1;
+            int effectCount = 0;
+
+            int totalPosts = await _postService.Queryable().CountAsync();
+
+            var msg = await _botClient.SendCommandReply($"开始更新稿件表, 共计 {totalPosts} 条记录", message, autoDelete: false);
+
+            while (startId <= totalPosts)
+            {
+                var posts = await _postService.Queryable().Where(x => x.Id >= startId).Take(threads).ToListAsync();
+                if (!posts.Any())
+                {
+                    break;
+                }
+
+                var tasks = posts.Select(async post =>
+                {
+                    if (post.Tags != BuildInTags.None)
+                    {
+                        var oldTag = post.Tags;
+                        if (oldTag.HasFlag(BuildInTags.Spoiler))
+                        {
+                            post.HasSpoiler = true;
+                        }
+                        int newTag = 0;
+                        if (oldTag.HasFlag(BuildInTags.NSFW))
+                        {
+                            newTag += 1;
+                        }
+                        if (oldTag.HasFlag(BuildInTags.Friend))
+                        {
+                            newTag += 2;
+                        }
+                        if (oldTag.HasFlag(BuildInTags.WanAn))
+                        {
+                            newTag += 4;
+                        }
+                        if (oldTag.HasFlag(BuildInTags.AIGraph))
+                        {
+                            newTag += 8;
+                        }
+                        post.Tags = BuildInTags.None;
+                        post.ModifyAt = DateTime.Now;
+
+                        effectCount++;
+
+                        await _postService.Updateable(post).UpdateColumns(x => new
+                        {
+                            x.Tags,
+                            x.NewTags,
+                            x.ModifyAt
+                        }).ExecuteCommandAsync();
+                    }
+                }).ToList();
+
+                await Task.WhenAll(tasks);
+
+                startId += threads;
+
+                _logger.LogInformation("更新进度 {startId} / {totalUsers}, 更新数量 {effectCount}", startId, totalPosts, effectCount);
+            }
+
+            try
+            {
+                await _botClient.EditMessageTextAsync(msg, $"更新稿件表完成, 更新了 {effectCount} 条记录");
+            }
+            catch
+            {
+                await _botClient.SendCommandReply($"更新稿件表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
+            }
         }
 
         /// <summary>
