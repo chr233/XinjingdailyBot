@@ -353,7 +353,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                     {
                         await CallQueryCommandAsync(dbUser, query, type, method, args);
                     }
-                    catch (Exception ex) //无法捕获 TODO
+                    catch (Exception ex)
                     {
                         errorMsg = $"{ex.GetType} {ex.Message}";
                         _logger.LogError(ex, "回调命令 {cmd} 执行出错", cmd);
