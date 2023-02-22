@@ -390,14 +390,7 @@ namespace XinjingdailyBot.Command
                         return;
                     }
 
-                    try
-                    {
-                        var message = await handler;
-                    }
-                    catch (Exception ex)
-                    {
-                        int i = 0;
-                    }
+                    var message = await handler;
                 }
 
                 //去除第一条消息的按钮
