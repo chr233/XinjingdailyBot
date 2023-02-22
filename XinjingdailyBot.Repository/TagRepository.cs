@@ -273,9 +273,13 @@ namespace XinjingdailyBot.Repository
         /// <returns></returns>
         public bool IsWarnText(string? text)
         {
-            if (!string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty(text))
             {
                 return false;
+            }
+            if (text.Contains('\n'))
+            {
+                text = text.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).First();
             }
             bool result = _warnTexts.Any(x => x == text);
             return result;
