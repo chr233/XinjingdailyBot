@@ -62,7 +62,7 @@ namespace XinjingdailyBot.Service.Helper
             List<IEnumerable<InlineKeyboardButton>> btns = new();
             List<InlineKeyboardButton> line = new();
 
-            int lineCount = tags.Count() <= 6 ? 2 : 3;
+            int lineCount = tags.Count() <= 4 ? 2 : 3;
 
             foreach (var tag in tags)
             {
@@ -116,7 +116,7 @@ namespace XinjingdailyBot.Service.Helper
             List<IEnumerable<InlineKeyboardButton>> btns = new();
             List<InlineKeyboardButton> line = new();
 
-            int lineCount = tags.Count() <= 6 ? 2 : 3;
+            int lineCount = tags.Count() <= 4 ? 2 : 3;
 
             foreach (var tag in tags)
             {
@@ -366,7 +366,7 @@ namespace XinjingdailyBot.Service.Helper
             };
             List<InlineKeyboardButton> line = new();
 
-            int lineCount = tags.Count() <= 6 ? 2 : 3;
+            int lineCount = tags.Count() <= 4 ? 2 : 3;
 
             foreach (var tag in tags)
             {
