@@ -1,4 +1,7 @@
 ﻿using System.Collections.Concurrent;
+using System.ComponentModel;
+using Microsoft.Extensions.Logging;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
@@ -20,6 +23,8 @@ namespace XinjingdailyBot.Service.Bot.Handler
         private readonly IUserService _userService;
         private readonly IChannelOptionService _channelOptionService;
         private readonly TagRepository _tagRepository;
+        private readonly ITelegramBotClient _botClient;
+        private readonly ILogger<ChannelPostHandler> _logger;
 
         public ChannelPostHandler(
             IPostService postService,
@@ -27,7 +32,9 @@ namespace XinjingdailyBot.Service.Bot.Handler
             IAttachmentService attachmentService,
             IUserService userService,
             IChannelOptionService channelOptionService,
-            TagRepository tagRepository)
+            TagRepository tagRepository,
+            ITelegramBotClient botClient,
+            ILogger<ChannelPostHandler> logger)
         {
             _postService = postService;
             _textHelperService = textHelperService;
@@ -35,6 +42,8 @@ namespace XinjingdailyBot.Service.Bot.Handler
             _userService = userService;
             _channelOptionService = channelOptionService;
             _tagRepository = tagRepository;
+            _botClient = botClient;
+            _logger = logger;
         }
 
         /// <summary>
@@ -60,7 +69,14 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 channelTitle = message.ForwardFromChat.Title;
                 channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
                 long channelId = message.ForwardFromChat.Id;
-                _ = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
+                var option = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
+
+                if (option == ChannelOption.AutoReject)
+                {
+                    await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
+                    _logger.LogInformation("删除消息 {msgid}", message.MessageId);
+                    return;
+                }
             }
 
             int newTag = _tagRepository.FetchTags(message.Text);
@@ -109,7 +125,14 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 channelTitle = message.ForwardFromChat.Title;
                 channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
                 long channelId = message.ForwardFromChat.Id;
-                _ = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
+                var option = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
+
+                if (option == ChannelOption.AutoReject)
+                {
+                    await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
+                    _logger.LogInformation("删除消息 {msgid}", message.MessageId);
+                    return;
+                }
             }
 
             var newTags = _tagRepository.FetchTags(message.Caption);
@@ -179,7 +202,14 @@ namespace XinjingdailyBot.Service.Bot.Handler
                         channelTitle = message.ForwardFromChat.Title;
                         channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
                         long channelId = message.ForwardFromChat.Id;
-                        _ = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
+                        var option = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
+
+                        if (option == ChannelOption.AutoReject)
+                        {
+                            await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
+                            _logger.LogInformation("删除消息 {msgid}", message.MessageId);
+                            return;
+                        }
                     }
 
                     int newTags = _tagRepository.FetchTags(message.Caption);
