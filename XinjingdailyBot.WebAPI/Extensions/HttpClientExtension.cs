@@ -50,6 +50,14 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
                 httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(XinjingdailyBot));
             });
+
+            services.AddHttpClient("IpInfo", (serviceProvider, httpClient) =>
+            {
+                var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
+                httpClient.BaseAddress = new Uri("https://ipinfo.io/");
+                httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+                httpClient.DefaultRequestHeaders.Add(HeaderNames.Authorization, string.Format("Bearer {0}", config.IpInfo.Token));
+            });
         }
     }
 }
