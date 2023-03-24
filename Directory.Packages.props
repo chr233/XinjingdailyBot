@@ -5,13 +5,13 @@
     <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="7.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="7.0.0" />
-    <PackageVersion Include="MySql.Data" Version="8.0.32" />
-    <PackageVersion Include="NLog" Version="5.1.1" />
-    <PackageVersion Include="NLog.Extensions.Logging" Version="5.2.1" />
-    <PackageVersion Include="Quartz" Version="3.6.0" />
-    <PackageVersion Include="Quartz.AspNetCore" Version="3.6.0" />
+    <PackageVersion Include="MySql.Data" Version="8.0.32.1" />
+    <PackageVersion Include="NLog" Version="5.1.2" />
+    <PackageVersion Include="NLog.Extensions.Logging" Version="5.2.2" />
+    <PackageVersion Include="Quartz" Version="3.6.2" />
+    <PackageVersion Include="Quartz.AspNetCore" Version="3.6.2" />
     <PackageVersion Include="SqlSugar.IOC" Version="2.0.0" />
-    <PackageVersion Include="SqlSugarCore" Version="5.1.3.50" />
+    <PackageVersion Include="SqlSugarCore" Version="5.1.4.58" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageVersion Include="Telegram.Bot" Version="19.0.0-preview.2" />
   </ItemGroup>
