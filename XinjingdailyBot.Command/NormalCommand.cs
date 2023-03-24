@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Text;
 using SqlSugar;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -23,6 +24,7 @@ namespace XinjingdailyBot.Command
         private readonly IAttachmentService _attachmentService;
         private readonly IPostService _postService;
         private readonly TagRepository _tagRepository;
+        private readonly IHttpHelperService _httpHelperService;
 
         public NormalCommand(
             ITelegramBotClient botClient,
@@ -31,7 +33,8 @@ namespace XinjingdailyBot.Command
             IMarkupHelperService markupHelperService,
             IAttachmentService attachmentService,
             IPostService postService,
-            TagRepository tagRepository)
+            TagRepository tagRepository,
+            IHttpHelperService httpHelperService)
         {
             _botClient = botClient;
             _userService = userService;
@@ -40,6 +43,7 @@ namespace XinjingdailyBot.Command
             _attachmentService = attachmentService;
             _postService = postService;
             _tagRepository = tagRepository;
+            _httpHelperService = httpHelperService;
         }
 
         /// <summary>
@@ -408,6 +412,44 @@ namespace XinjingdailyBot.Command
             {
                 await _botClient.EditMessageTextAsync(callbackQuery.Message!, "无可用稿件", replyMarkup: null);
             }
+        }
+
+        [TextCmd("IP", UserRights.NormalCmd, Alias = "IPINFO", Description = "查询IP信息")]
+        public async Task GetIpInfo(Users dbUser, Message message, string[] args)
+        {
+            StringBuilder sb = new();
+            if (args.Length < 1)
+            {
+                sb.AppendLine("参数错误, 请指定要查询的IP");
+            }
+            else
+            {
+                if (IPAddress.TryParse(args[0], out var ip))
+                {
+                    var response = await _httpHelperService.GetIpInformation(ip);
+                    if (response == null)
+                    {
+                        sb.AppendLine("读取出错");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"IP: <code>{response.Ip}</code>");
+                        sb.AppendLine($"主机: <code>{response.Ip}</code>");
+                        sb.AppendLine($"城市: <code>{response.City}</code>");
+                        sb.AppendLine($"地区: <code>{response.Region}</code>");
+                        sb.AppendLine($"国家: <code>{response.Country}</code>");
+                        sb.AppendLine($"坐标: <code>{response.Loc}</code>");
+                        sb.AppendLine($"ASN: <code>{response.Org}</code>");
+                        sb.AppendLine($"邮编: <code>{response.Postal}</code>");
+                        sb.AppendLine($"时区: <code>{response.Timezone}</code>");
+                    }
+                }
+                else
+                {
+                    sb.AppendLine("参数错误, 输入的IP无效");
+                }
+            }
+            await _botClient.AutoReplyAsync(sb.ToString(), message, ParseMode.Html);
         }
     }
 }

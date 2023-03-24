@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Net;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Model;
@@ -87,8 +88,25 @@ namespace XinjingdailyBot.Service.Helper
         public async Task<Stream?> DownloadRelease(string? downloadUrl)
         {
             HttpRequestMessage request = new(HttpMethod.Get, downloadUrl);
-            var rawResponse = await SendRequestToStream("GitHub", request);
+            using var rawResponse = await SendRequestToStream("GitHub", request);
             return rawResponse;
+        }
+
+        /// <summary>
+        /// 获取IP信息
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <returns></returns>
+        public async Task<IpInfoResponse?> GetIpInformation(IPAddress ip)
+        {
+            HttpRequestMessage request = new(HttpMethod.Get, $"/{ip}");
+            using var rawResponse = await SendRequestToStream("IpInfo", request);
+            if(rawResponse==null)
+            {
+                return null;
+            }
+            var response = await StreamToObject<IpInfoResponse>(rawResponse);
+            return response;
         }
     }
 }

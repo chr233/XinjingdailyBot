@@ -8,31 +8,20 @@ namespace XinjingdailyBot.Infrastructure
         /// 调试模式
         /// </summary>
         public bool Debug { get; set; }
-        /// <summary>
-        /// 机器人配置
-        /// </summary>
+        /// <inheritdoc cref="BotOption"/>
         public BotOption Bot { get; set; } = new();
-        /// <summary>
-        /// 频道配置
-        /// </summary>
+        /// <inheritdoc cref="ChannelOption"/>
         public ChannelOption Channel { get; set; } = new();
-        /// <summary>
-        /// 消息配置
-        /// </summary>
+        /// <inheritdoc cref="MessageOption"/>
         public MessageOption Message { get; set; } = new();
-        /// <summary>
-        /// 数据库配置
-        /// </summary>
+        /// <inheritdoc cref="DatabaseOption"/>
         public DatabaseOption Database { get; set; } = new();
-        /// <summary>
-        /// 投稿配置
-        /// </summary>
+        /// <inheritdoc cref="PostOption"/>
         public PostOption Post { get; set; } = new();
-
-        /// <summary>
-        /// GitHub配置
-        /// </summary>
+        /// <inheritdoc cref="GitHubOption"/>
         public GitHubOption GitHub { get; set; } = new();
+        /// <inheritdoc cref="IpInfoOption"/>
+        public IpInfoOption IpInfo { get; set; } = new();
 
         /// <summary>
         /// 机器人选项
@@ -221,6 +210,17 @@ namespace XinjingdailyBot.Infrastructure
             /// Github Api地址
             /// </summary>
             public string? BaseUrl { get; set; }
+        }
+
+        /// <summary>
+        /// IpInfo选项
+        /// </summary>
+        public sealed record IpInfoOption
+        {
+            /// <summary>
+            /// Token
+            /// </summary>
+            public string? Token { get; set; }
         }
     }
 }
