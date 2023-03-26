@@ -160,7 +160,7 @@ namespace XinjingdailyBot.Service.Helper
             var strAny = anymouse ? "匿名投稿" : "保留来源";
             var status = "待审核";
 
-            var msg = string.Join('\n', $"投稿人: {pUser}", "", $"模式: {strAny}", $"状态: {status}");
+            var msg = string.Join('\n', $"#待审核 ", $"投稿人: {pUser}", "", $"模式: {strAny}", $"状态: {status}");
             return msg;
         }
 
