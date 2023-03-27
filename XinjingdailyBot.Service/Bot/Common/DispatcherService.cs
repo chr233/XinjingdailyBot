@@ -3,11 +3,9 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
-using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
 
@@ -21,7 +19,6 @@ namespace XinjingdailyBot.Service.Bot.Common
         private readonly ICommandHandler _commandHandler;
         private readonly IChannelPostHandler _channelPostHandler;
         private readonly IChannelService _channelService;
-        private readonly ITextHelperService _textHelperService;
         private readonly ITelegramBotClient _botClient;
         private readonly IJoinRequestHandler _joinRequestHandler;
         private readonly IInlineQueryHandler _inlineQueryHandler;
@@ -34,7 +31,6 @@ namespace XinjingdailyBot.Service.Bot.Common
             ICommandHandler commandHandler,
             IChannelPostHandler channelPostHandler,
             IChannelService channelService,
-            ITextHelperService textHelperService,
             ITelegramBotClient botClient,
             IJoinRequestHandler joinRequestHandler,
             IInlineQueryHandler inlineQueryHandler,
@@ -46,7 +42,6 @@ namespace XinjingdailyBot.Service.Bot.Common
             _commandHandler = commandHandler;
             _channelPostHandler = channelPostHandler;
             _channelService = channelService;
-            _textHelperService = textHelperService;
             _botClient = botClient;
             _joinRequestHandler = joinRequestHandler;
             _inlineQueryHandler = inlineQueryHandler;
