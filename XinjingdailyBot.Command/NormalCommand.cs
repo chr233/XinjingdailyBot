@@ -415,7 +415,7 @@ namespace XinjingdailyBot.Command
         }
 
         [TextCmd("IP", UserRights.NormalCmd, Alias = "IPINFO", Description = "查询IP信息")]
-        public async Task GetIpInfo(Users dbUser, Message message, string[] args)
+        public async Task GetIpInfo(Message message, string[] args)
         {
             StringBuilder sb = new();
             if (args.Length < 1)
