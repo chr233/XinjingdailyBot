@@ -15,15 +15,18 @@ namespace XinjingdailyBot.Service.Bot.Handler
         private readonly IPostService _postService;
         private readonly IGroupMessageHandler _groupMessageHandler;
         private readonly ITelegramBotClient _botClient;
+        private readonly IForwardMessageHandler _forwardMessageHandler;
 
         public MessageHandler(
             IPostService postService,
             IGroupMessageHandler groupMessageHandler,
-            ITelegramBotClient botClient)
+            ITelegramBotClient botClient,
+            IForwardMessageHandler forwardMessageHandler)
         {
             _postService = postService;
             _groupMessageHandler = groupMessageHandler;
             _botClient = botClient;
+            _forwardMessageHandler = forwardMessageHandler;
         }
 
         /// <summary>
@@ -34,16 +37,25 @@ namespace XinjingdailyBot.Service.Bot.Handler
         /// <returns></returns>
         public async Task OnTextMessageReceived(Users dbUser, Message message)
         {
-            if (dbUser.IsBan)
-            {
-                return;
-            }
+
 
             if (message.Chat.Type == ChatType.Private)
             {
-                if (await _postService.CheckPostLimit(dbUser, message, null))
+                if (dbUser.IsBan)
                 {
-                    await _postService.HandleTextPosts(dbUser, message);
+                    return;
+                }
+
+                if (message.ForwardFromChat != null)
+                {
+                    var handled = await _forwardMessageHandler.OnForwardMessageReceived(dbUser, message);
+                    if (!handled)
+                    {
+                        if (await _postService.CheckPostLimit(dbUser, message, null))
+                        {
+                            await _postService.HandleTextPosts(dbUser, message);
+                        }
+                    }
                 }
             }
             else if (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup)
