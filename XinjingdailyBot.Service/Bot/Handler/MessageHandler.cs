@@ -37,15 +37,13 @@ namespace XinjingdailyBot.Service.Bot.Handler
         /// <returns></returns>
         public async Task OnTextMessageReceived(Users dbUser, Message message)
         {
-
+            if (dbUser.IsBan)
+            {
+                return;
+            }
 
             if (message.Chat.Type == ChatType.Private)
             {
-                if (dbUser.IsBan)
-                {
-                    return;
-                }
-
                 if (message.ForwardFromChat != null)
                 {
                     var handled = await _forwardMessageHandler.OnForwardMessageReceived(dbUser, message);
@@ -79,30 +77,37 @@ namespace XinjingdailyBot.Service.Bot.Handler
 
             if (message.Chat.Type == ChatType.Private)
             {
-                switch (message.Type)
+                if (message.ForwardFromChat != null)
                 {
-                    case MessageType.Photo:
-                    case MessageType.Audio:
-                    case MessageType.Video:
-                    case MessageType.Voice:
-                    case MessageType.Document:
-                    case MessageType.Animation:
-                        if (await _postService.CheckPostLimit(dbUser, message, null))
+                    var handled = await _forwardMessageHandler.OnForwardMessageReceived(dbUser, message);
+                    if (!handled)
+                    {
+                        switch (message.Type)
                         {
-                            if (message.MediaGroupId != null)
-                            {
-                                await _postService.HandleMediaGroupPosts(dbUser, message);
-                            }
-                            else
-                            {
-                                await _postService.HandleMediaPosts(dbUser, message);
-                            }
-                        }
+                            case MessageType.Photo:
+                            case MessageType.Audio:
+                            case MessageType.Video:
+                            case MessageType.Voice:
+                            case MessageType.Document:
+                            case MessageType.Animation:
+                                if (await _postService.CheckPostLimit(dbUser, message, null))
+                                {
+                                    if (message.MediaGroupId != null)
+                                    {
+                                        await _postService.HandleMediaGroupPosts(dbUser, message);
+                                    }
+                                    else
+                                    {
+                                        await _postService.HandleMediaPosts(dbUser, message);
+                                    }
+                                }
 
-                        break;
-                    default:
-                        await _botClient.AutoReplyAsync($"暂不支持的投稿类型 {message.Type}", message);
-                        break;
+                                break;
+                            default:
+                                await _botClient.AutoReplyAsync($"暂不支持的投稿类型 {message.Type}", message);
+                                break;
+                        }
+                    }
                 }
             }
         }
