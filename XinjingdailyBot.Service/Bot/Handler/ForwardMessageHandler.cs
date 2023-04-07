@@ -8,6 +8,7 @@ using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
+using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Handler
@@ -18,15 +19,18 @@ namespace XinjingdailyBot.Service.Bot.Handler
         private readonly ILogger<ForwardMessageHandler> _logger;
         private readonly IChannelService _channelService;
         private readonly ITelegramBotClient _botClient;
+        private readonly IPostService _postService;
 
         public ForwardMessageHandler(
             ILogger<ForwardMessageHandler> logger,
             ITelegramBotClient botClient,
-            IChannelService channelService)
+            IChannelService channelService,
+            IPostService postService)
         {
             _logger = logger;
             _botClient = botClient;
             _channelService = channelService;
+            _postService = postService;
         }
 
         /// <summary>
@@ -38,9 +42,19 @@ namespace XinjingdailyBot.Service.Bot.Handler
         public async Task<bool> OnForwardMessageReceived(Users dbUser, Message message)
         {
             var forwardFrom = message.ForwardFrom!;
+            var forwardFromChat = message.ForwardFromChat;
 
-            _logger.LogMessage(message);
+            if (forwardFromChat != null && (forwardFromChat.Id == _channelService.AcceptChannel.Id || forwardFromChat.Id == _channelService.RejectChannel.Id))
+            {
+                var post = await _postService.Queryable().FirstAsync(x => x.PublicMsgID == message.ForwardFromMessageId);
+                if (post != null)
+                {
+                    _logger.LogInformation(post.ToString());
 
+
+                    return true;
+                }
+            }
             return false;
         }
     }
