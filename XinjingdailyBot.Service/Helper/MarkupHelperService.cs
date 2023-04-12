@@ -1,5 +1,6 @@
 ﻿using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Interface.Bot.Common;
@@ -455,27 +456,36 @@ namespace XinjingdailyBot.Service.Helper
         /// <returns></returns>
         public InlineKeyboardMarkup QueryPostMenuKeyboard(Users dbUser, Posts post)
         {
-            //bool accept = post.Status == PostStatus.Accepted;
+            InlineKeyboardMarkup keyboard;
 
-            //todo
-
-            InlineKeyboardMarkup keyboard = new(new[]
+            if (post.Status == PostStatus.Accepted)
             {
-                new []
+                keyboard = new(new[]
                 {
-                    InlineKeyboardButton.WithCallbackData("补发稿件",$"cmd {dbUser.UserID} randompost all"),
-                },
-                new []
+                    new []
+                    {
+                        InlineKeyboardButton.WithCallbackData("撤回稿件",$"cmd {dbUser.UserID} deletepost {post.Id}"),
+                    },
+                    new []
+                    {
+                        InlineKeyboardButton.WithCallbackData("查询投稿人成分",$"cmd {dbUser.UserID} queryposter {post.PosterUID}"),
+                    },
+                });
+            }
+            else
+            {
+                keyboard = new(new[]
                 {
-                    InlineKeyboardButton.WithCallbackData("随机 #NSFW",$"cmd {dbUser.UserID} randompost nsfw"),
-                    InlineKeyboardButton.WithCallbackData("随机 #我有一个朋友",$"cmd {dbUser.UserID} randompost friend"),
-                },
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData("随机 #晚安",$"cmd {dbUser.UserID} randompost wanan"),
-                    InlineKeyboardButton.WithCallbackData("随机 #AI怪图",$"cmd {dbUser.UserID} randompost ai"),
-                },
-            });
+                    new []
+                    {
+                        InlineKeyboardButton.WithCallbackData("补发稿件",$"cmd {dbUser.UserID} repost {post.Id}"),
+                    },
+                    new []
+                    {
+                        InlineKeyboardButton.WithCallbackData("查询投稿人成分",$"cmd {dbUser.UserID} queryposter {post.PosterUID}"),
+                    },
+                });
+            }
 
             return keyboard;
         }

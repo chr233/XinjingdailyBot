@@ -5,6 +5,12 @@ namespace XinjingdailyBot.Interface.Bot.Handler
 {
     public interface IForwardMessageHandler
     {
+        /// <summary>
+        /// 处理转发的消息
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         Task<bool> OnForwardMessageReceived(Users dbUser, Message message);
     }
 }
