@@ -66,9 +66,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
         /// </summary>
         private readonly Dictionary<Type, Dictionary<string, string>> _queryCommandAlias = new();
 
-        /// <summary>
-        /// 注册命令
-        /// </summary>
         [RequiresUnreferencedCode("不兼容剪裁")]
         public void InstallCommands()
         {
@@ -152,12 +149,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
             }
         }
 
-        /// <summary>
-        /// 执行命令
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
         public async Task OnCommandReceived(Users dbUser, Message message)
         {
             if (string.IsNullOrEmpty(message.Text))
@@ -290,12 +281,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
             }
         }
 
-        /// <summary>
-        /// 执行命令
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="query"></param>
-        /// <returns></returns>
         public async Task OnQueryCommandReceived(Users dbUser, CallbackQuery query)
         {
             Message? message = query.Message;
@@ -427,11 +412,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
             }
         }
 
-        /// <summary>
-        /// 生成可用命令信息
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <returns></returns>
         public string GetAvilabeCommands(Users dbUser)
         {
             Dictionary<string, string> cmds = new();
@@ -463,10 +443,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
             }
         }
 
-        /// <summary>
-        /// 设置菜命令单
-        /// </summary>
-        /// <returns></returns>
         public async Task<bool> GetCommandsMenu()
         {
             List<BotCommand> cmds = new();

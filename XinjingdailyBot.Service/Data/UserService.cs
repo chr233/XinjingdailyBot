@@ -30,6 +30,7 @@ namespace XinjingdailyBot.Service.Data
         private readonly PostRepository _postRepository;
         private readonly ITelegramBotClient _botClient;
         private readonly LevelRepository _levelRepository;
+        private readonly INameHistoryService _nameHistoryService;
 
         public UserService(
             ILogger<UserService> logger,
@@ -40,7 +41,8 @@ namespace XinjingdailyBot.Service.Data
             ICmdRecordService cmdRecordService,
             PostRepository postRepository,
             ITelegramBotClient botClient,
-            LevelRepository levelRepository)
+            LevelRepository levelRepository,
+            INameHistoryService nameHistoryService)
         {
             _logger = logger;
             _optionsSetting = configuration.Value;
@@ -51,6 +53,7 @@ namespace XinjingdailyBot.Service.Data
             _postRepository = postRepository;
             _botClient = botClient;
             _levelRepository = levelRepository;
+            _nameHistoryService = nameHistoryService;
         }
 
         /// <summary>
@@ -225,6 +228,8 @@ namespace XinjingdailyBot.Service.Data
                 //用户名不一致时更新
                 if (!(dbUser.UserName.Equals(msgUser.Username ?? "") && dbUser.FirstName.Equals(msgUser.FirstName) && dbUser.LastName.Equals(msgUser.LastName ?? "")))
                 {
+                    await _nameHistoryService.CreateNameHistory(dbUser);
+
                     dbUser.UserName = msgUser.Username ?? "";
                     dbUser.FirstName = msgUser.FirstName;
                     dbUser.LastName = msgUser.LastName ?? "";
