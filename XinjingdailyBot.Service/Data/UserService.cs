@@ -226,7 +226,8 @@ namespace XinjingdailyBot.Service.Data
                 var needUpdate = false;
 
                 //用户名不一致时更新
-                if (!(dbUser.UserName.Equals(msgUser.Username ?? "") && dbUser.FirstName.Equals(msgUser.FirstName) && dbUser.LastName.Equals(msgUser.LastName ?? "")))
+                if (dbUser.UserName != (msgUser.Username ?? "")
+                    || dbUser.FirstName != msgUser.FirstName || dbUser.LastName != (msgUser.LastName ?? ""))
                 {
                     await _nameHistoryService.CreateNameHistory(dbUser);
 
