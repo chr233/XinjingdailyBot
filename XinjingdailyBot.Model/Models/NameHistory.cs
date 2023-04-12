@@ -9,7 +9,7 @@ namespace XinjingdailyBot.Model.Models
     [SugarTable("name_history", TableDescription = "等级组")]
     public sealed record NameHistory : BaseModel
     {
-        [SugarColumn(IsPrimaryKey = true)]
+        [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
         /// <summary>
         /// 用户UID
