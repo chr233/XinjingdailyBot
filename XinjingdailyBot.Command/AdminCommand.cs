@@ -1131,5 +1131,17 @@ namespace XinjingdailyBot.Command
 
             await _botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
         }
+
+        /// <summary>
+        /// 补发稿件
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        [QueryCmd("REPOST", UserRights.AdminCmd)]
+        public async Task QResponseRepost(Users dbUser, CallbackQuery callbackQuery, string[] args)
+        {
+            //TODO
+        }
     }
 }

@@ -59,6 +59,5 @@ namespace XinjingdailyBot.Infrastructure.Extensions
                 return $"<a href=\"https://t.me/{user.Username}\">{nick}</a>";
             }
         }
-
     }
 }
