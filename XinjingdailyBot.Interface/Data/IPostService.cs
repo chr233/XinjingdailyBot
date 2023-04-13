@@ -13,6 +13,8 @@ namespace XinjingdailyBot.Interface.Data
 
         Task AcceptPost(Posts post, Users dbUser, CallbackQuery callbackQuery);
         Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null);
+        Task<Posts?> FetchPostFromCallbackQuery(Users dbUser, CallbackQuery message);
+        Task<Posts?> FetchPostFromReplyToMessage(Users dbUser, Message message);
         Task HandleMediaGroupPosts(Users dbUser, Message message);
         Task HandleMediaPosts(Users dbUser, Message message);
         Task HandleTextPosts(Users dbUser, Message message);
