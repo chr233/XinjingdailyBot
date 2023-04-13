@@ -6,7 +6,7 @@ using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Repository;
 
-namespace XinjingdailyBot.Tasks
+namespace XinjingdailyBot.Service.Bot.Common
 {
     /// <summary>
     /// 注册消息接收器

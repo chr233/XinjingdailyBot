@@ -4,20 +4,24 @@ using XinjingdailyBot.Model.Base;
 namespace XinjingdailyBot.Model.Models
 {
     [SugarTable("post_group", TableDescription = "媒体组稿件记录")]
-    [SugarIndex("index_postid", nameof(PostID), OrderByType.Asc)]
-    [SugarIndex("index_reviewerid", nameof(PublicMsgID), OrderByType.Asc)]
-    public sealed record PostGroups : BaseModel
+    [SugarIndex("index_msgid", nameof(ChatID), OrderByType.Asc, nameof(PublicMsgID), OrderByType.Asc)]
+    [SugarIndex("index_groupid", nameof(MediaGroupID), OrderByType.Asc)]
+    public sealed record MediaGroups : BaseModel
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
         /// <summary>
-        /// 稿件ID
+        /// 聊天ID
         /// </summary>
-        public int PostID { get; set; } = -1;
+        public long ChatID { get; set; } = -1;
         /// <summary>
         /// 发布的消息Id
         /// </summary>
         public long PublicMsgID { get; set; } = -1;
+        /// <summary>
+        /// 稿件ID
+        /// </summary>
+        public string MediaGroupID { get; set; } = "";
         /// <summary>
         /// 创建时间
         /// </summary>

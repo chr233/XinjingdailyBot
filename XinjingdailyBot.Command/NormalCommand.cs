@@ -25,6 +25,7 @@ namespace XinjingdailyBot.Command
         private readonly IPostService _postService;
         private readonly TagRepository _tagRepository;
         private readonly IHttpHelperService _httpHelperService;
+        private readonly IMediaGroupService _mediaGroupService;
 
         public NormalCommand(
             ITelegramBotClient botClient,
@@ -34,7 +35,8 @@ namespace XinjingdailyBot.Command
             IAttachmentService attachmentService,
             IPostService postService,
             TagRepository tagRepository,
-            IHttpHelperService httpHelperService)
+            IHttpHelperService httpHelperService,
+            IMediaGroupService mediaGroupService)
         {
             _botClient = botClient;
             _userService = userService;
@@ -44,6 +46,7 @@ namespace XinjingdailyBot.Command
             _postService = postService;
             _tagRepository = tagRepository;
             _httpHelperService = httpHelperService;
+            _mediaGroupService = mediaGroupService;
         }
 
         /// <summary>
@@ -371,6 +374,9 @@ namespace XinjingdailyBot.Command
 
                     var messages = await _botClient.SendMediaGroupAsync(chat, group);
                     await _botClient.SendTextMessageAsync(chat, "随机稿件操作", replyMarkup: keyboard);
+
+                    //记录媒体组消息
+                    await _mediaGroupService.AddPostMediaGroup(messages);
                 }
                 else
                 {

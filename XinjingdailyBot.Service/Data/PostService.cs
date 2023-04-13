@@ -31,6 +31,7 @@ namespace XinjingdailyBot.Service.Data
         private readonly IUserService _userService;
         private readonly OptionsSetting.PostOption _postOption;
         private readonly TagRepository _tagRepository;
+        private readonly IMediaGroupService _mediaGroupService;
 
         public PostService(
             ILogger<PostService> logger,
@@ -42,7 +43,8 @@ namespace XinjingdailyBot.Service.Data
             ITelegramBotClient botClient,
             IUserService userService,
             IOptions<OptionsSetting> options,
-            TagRepository tagRepository)
+            TagRepository tagRepository,
+            IMediaGroupService mediaGroupService)
         {
             _logger = logger;
             _attachmentService = attachmentService;
@@ -54,6 +56,7 @@ namespace XinjingdailyBot.Service.Data
             _userService = userService;
             _postOption = options.Value.Post;
             _tagRepository = tagRepository;
+            _mediaGroupService = mediaGroupService;
         }
 
         /// <summary>
@@ -625,8 +628,10 @@ namespace XinjingdailyBot.Service.Data
                         _ => throw new Exception("未知的稿件类型"),
                     };
                 }
-                var _ = await _botClient.SendMediaGroupAsync(_channelService.RejectChannel.Id, group);
-                //处理媒体组消息 TODO
+                var messages = await _botClient.SendMediaGroupAsync(_channelService.RejectChannel.Id, group);
+
+                //处理媒体组消息
+                await _mediaGroupService.AddPostMediaGroup(messages);
             }
 
             //通知投稿人
@@ -741,6 +746,9 @@ namespace XinjingdailyBot.Service.Data
 
                 var messages = await _botClient.SendMediaGroupAsync(_channelService.AcceptChannel.Id, group);
                 post.PublicMsgID = messages.First().MessageId;
+
+                //记录媒体组消息
+                await _mediaGroupService.AddPostMediaGroup(messages);
             }
 
             await _botClient.AutoReplyAsync("稿件已发布", callbackQuery);
