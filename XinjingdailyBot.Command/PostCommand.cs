@@ -52,8 +52,8 @@ namespace XinjingdailyBot.Command
         [QueryCmd("POST", UserRights.SendPost, Description = "投稿消息处理")]
         public async Task HandlePostQuery(Users dbUser, CallbackQuery query)
         {
-            Message message = query.Message!;
-            Posts? post = await _postService.Queryable().FirstAsync(x => x.ActionMsgID == message.MessageId);
+            var message = query.Message!;
+            var post = await _postService.Queryable().FirstAsync(x => x.ActionMsgID == message.MessageId);
 
             if (post == null)
             {

@@ -60,10 +60,7 @@ namespace XinjingdailyBot.Command
                     return "请回复审核消息并输入拒绝理由";
                 }
 
-                var messageId = message.ReplyToMessage.MessageId;
-
-                var post = await _postService.Queryable().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
-
+                var post = await _postService.FetchPostFromReplyToMessage(dbUser, message);
                 if (post == null)
                 {
                     return "未找到稿件";
@@ -94,11 +91,12 @@ namespace XinjingdailyBot.Command
         /// <summary>
         /// 修改稿件文字说明
         /// </summary>
+        /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
         [TextCmd("EDIT", UserRights.ReviewPost, Description = "修改稿件文字说明")]
-        public async Task ResponseEditPost(Message message, string[] args)
+        public async Task ResponseEditPost(Users dbUser, Message message, string[] args)
         {
             async Task<string> exec()
             {
@@ -112,9 +110,7 @@ namespace XinjingdailyBot.Command
                     return "请回复审核消息并输入需要替换的描述";
                 }
 
-                var messageId = message.ReplyToMessage.MessageId;
-
-                var post = await _postService.Queryable().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
+                var post = await _postService.FetchPostFromReplyToMessage(dbUser, message);
                 if (post == null)
                 {
                     return "未找到稿件";
@@ -150,8 +146,8 @@ namespace XinjingdailyBot.Command
         [QueryCmd("REVIEW", UserRights.ReviewPost, Alias = "REJECT", Description = "审核稿件")]
         public async Task HandleQuery(Users dbUser, CallbackQuery callbackQuery)
         {
-            Message message = callbackQuery.Message!;
-            Posts? post = await _postService.Queryable().FirstAsync(x => x.ManageMsgID == message.MessageId);
+            var message = callbackQuery.Message!;
+            var post = await _postService.Queryable().FirstAsync(x => x.ManageMsgID == message.MessageId);
 
             if (post == null)
             {

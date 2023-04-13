@@ -805,5 +805,32 @@ namespace XinjingdailyBot.Service.Data
                 await _userService.Updateable(poster).UpdateColumns(x => new { x.PostCount, x.ModifyAt }).ExecuteCommandAsync();
             }
         }
+
+        public async Task<Posts?> FetchPostFromReplyToMessage(Users dbUser, Message message)
+        {
+            if (message.ReplyToMessage == null)
+            {
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(message.MediaGroupId))
+            {
+                var messageId = message.ReplyToMessage.MessageId;
+                var post = await Queryable().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
+                return post;
+            }
+            else
+            {
+                //var 
+            }
+
+            return null;
+        }
+
+        public async Task<Posts?> FetchPostFromCallbackQuery(Users dbUser, CallbackQuery message)
+        {
+            //if (message.forwa)
+            return null;
+        }
     }
 }
