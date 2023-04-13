@@ -71,10 +71,11 @@ namespace XinjingdailyBot.Infrastructure.Extensions
 
             string chatFrom = chat.Type switch
             {
-                ChatType.Private => "【私聊】",
+                ChatType.Private => $"【私聊|{chat.FirstName}{chat.LastName}】",
                 ChatType.Group => $"【群组|{chat.Title}】",
                 ChatType.Channel => $"【频道|{chat.Title}】",
                 ChatType.Supergroup => $"【群组|{chat.Title}】",
+                ChatType.Sender => $"【发送者|{chat.Title}】",
                 _ => $"【未知|{chat.Title}】",
             };
 

@@ -1142,6 +1142,7 @@ namespace XinjingdailyBot.Command
         public async Task QResponseRepost(Users dbUser, CallbackQuery callbackQuery, string[] args)
         {
             //TODO
+            _logger.LogInformation(args.ToString());
         }
     }
 }
