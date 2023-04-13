@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using XinjingdailyBot.Infrastructure;
-using XinjingdailyBot.Tasks;
+using XinjingdailyBot.Service.Bot.Common;
 
 namespace XinjingdailyBot.WebAPI.Extensions
 {
