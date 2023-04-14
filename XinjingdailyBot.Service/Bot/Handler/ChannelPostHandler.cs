@@ -49,12 +49,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
             _mediaGroupService = mediaGroupService;
         }
 
-        /// <summary>
-        /// 自动更新频道发布的文本消息
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
         public async Task OnTextChannelPostReceived(Users dbUser, Message message)
         {
             if (string.IsNullOrEmpty(message.Text))
@@ -114,12 +108,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
             await _userService.Updateable(dbUser).UpdateColumns(x => new { x.AcceptCount, x.ModifyAt }).ExecuteCommandAsync();
         }
 
-        /// <summary>
-        /// 自动更新频道发布的多媒体消息
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
         public async Task OnMediaChannelPostReceived(Users dbUser, Message message)
         {
             string? channelName = null, channelTitle = null;
@@ -183,12 +171,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
         /// </summary>
         private ConcurrentDictionary<string, long> MediaGroupIDs { get; } = new();
 
-        /// <summary>
-        /// 自动更新频道发布的多媒体组消息
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
         public async Task OnMediaGroupChannelPostReceived(Users dbUser, Message message)
         {
             string mediaGroupId = message.MediaGroupId!;

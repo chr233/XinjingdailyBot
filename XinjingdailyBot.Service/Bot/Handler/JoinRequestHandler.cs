@@ -21,14 +21,9 @@ namespace XinjingdailyBot.Service.Bot.Handler
             _botClient = botClient;
         }
 
-        /// <summary>
-        /// 投稿超过设定自动同意加群请求
-        /// </summary>
-        private const int AutoApproveLimit = 5;
-
         public async Task OnJoinRequestReceived(Users dbUser, ChatJoinRequest request)
         {
-            if (dbUser.AcceptCount >= AutoApproveLimit)
+            if (dbUser.AcceptCount >= IJoinRequestHandler.AutoApproveLimit)
             {
                 try
                 {

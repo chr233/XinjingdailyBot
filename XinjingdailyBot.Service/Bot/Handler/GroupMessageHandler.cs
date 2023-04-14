@@ -25,12 +25,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
             _channelService = channelService;
         }
 
-        /// <summary>
-        /// 处理群组消息
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
         public async Task OnGroupTextMessageReceived(Users dbUser, Message message)
         {
             var replyMessage = message.ReplyToMessage;

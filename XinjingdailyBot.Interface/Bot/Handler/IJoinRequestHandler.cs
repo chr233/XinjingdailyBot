@@ -5,6 +5,16 @@ namespace XinjingdailyBot.Interface.Bot.Handler
 {
     public interface IJoinRequestHandler
     {
+        /// <summary>
+        /// 投稿超过设定自动同意加群请求
+        /// </summary>
+        public const int AutoApproveLimit = 5;
+        /// <summary>
+        /// 收到加群请求处理器
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         Task OnJoinRequestReceived(Users dbUser, ChatJoinRequest request);
     }
 }

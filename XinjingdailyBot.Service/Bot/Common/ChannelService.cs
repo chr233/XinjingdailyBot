@@ -25,13 +25,13 @@ namespace XinjingdailyBot.Service.Bot.Common
         private Chat _rejectChannel = new();
         private User _botUser = new();
 
-        Chat IChannelService.ReviewGroup { get => _reviewGroup; }
-        Chat IChannelService.ReviewLogChannel { get => _reviewLogChannel; }
-        Chat IChannelService.CommentGroup { get => _commentGroup; }
-        Chat IChannelService.SubGroup { get => _subGroup; }
-        Chat IChannelService.AcceptChannel { get => _acceptChannel; }
-        Chat IChannelService.RejectChannel { get => _rejectChannel; }
-        User IChannelService.BotUser { get => _botUser; }
+        public Chat ReviewGroup { get => _reviewGroup; }
+        public Chat ReviewLogChannel { get => _reviewLogChannel; }
+        public Chat CommentGroup { get => _commentGroup; }
+        public Chat SubGroup { get => _subGroup; }
+        public Chat AcceptChannel { get => _acceptChannel; }
+        public Chat RejectChannel { get => _rejectChannel; }
+        public User BotUser { get => _botUser; }
 
         public ChannelService(
             ILogger<ChannelService> logger,
@@ -138,9 +138,6 @@ namespace XinjingdailyBot.Service.Bot.Common
             {
                 _commentGroup = _subGroup;
             }
-
-
-
         }
 
         public bool IsChannelMessage(long chatId)

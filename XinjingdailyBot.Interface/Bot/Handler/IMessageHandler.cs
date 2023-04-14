@@ -5,7 +5,19 @@ namespace XinjingdailyBot.Interface.Bot.Handler
 {
     public interface IMessageHandler
     {
+        /// <summary>
+        /// 处理文本消息
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         Task OnTextMessageReceived(Users dbUser, Message message);
+        /// <summary>
+        /// 处理非文本消息
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         Task OnMediaMessageReceived(Users dbUser, Message message);
     }
 }

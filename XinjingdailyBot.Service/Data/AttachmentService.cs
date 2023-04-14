@@ -10,14 +10,6 @@ namespace XinjingdailyBot.Service.Data
     [AppService(typeof(IAttachmentService), LifeTime.Transient)]
     public sealed class AttachmentService : BaseService<Attachments>, IAttachmentService
     {
-
-
-        /// <summary>
-        /// 附件包装器
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="postID"></param>
-        /// <returns></returns>
         public Attachments? GenerateAttachment(Message message, long postID)
         {
             string? fileID, fileName, fileUid, mimeType;

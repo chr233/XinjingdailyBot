@@ -64,10 +64,6 @@ namespace XinjingdailyBot.Service.Helper
             }
         }
 
-        /// <summary>
-        /// 获取最新的发行版
-        /// </summary>
-        /// <returns></returns>
         public async Task<GitHubReleaseResponse?> GetLatestRelease()
         {
             HttpRequestMessage request = new(HttpMethod.Get, "/XinjingdailyBot/releases/latest");
@@ -80,11 +76,6 @@ namespace XinjingdailyBot.Service.Helper
             return response;
         }
 
-        /// <summary>
-        /// 下载发行版
-        /// </summary>
-        /// <param name="downloadUrl"></param>
-        /// <returns></returns>
         public async Task<Stream?> DownloadRelease(string? downloadUrl)
         {
             HttpRequestMessage request = new(HttpMethod.Get, downloadUrl);
@@ -92,11 +83,6 @@ namespace XinjingdailyBot.Service.Helper
             return rawResponse;
         }
 
-        /// <summary>
-        /// 获取IP信息
-        /// </summary>
-        /// <param name="ip"></param>
-        /// <returns></returns>
         public async Task<IpInfoResponse?> GetIpInformation(IPAddress ip)
         {
             HttpRequestMessage request = new(HttpMethod.Get, $"/{ip}");

@@ -27,11 +27,6 @@ namespace XinjingdailyBot.Service.Helper
             _tagRepository = tagRepository;
         }
 
-        /// <summary>
-        /// 投稿键盘
-        /// </summary>
-        /// <param name="anymouse"></param>
-        /// <returns></returns>
         public InlineKeyboardMarkup PostKeyboard(bool anymouse)
         {
             InlineKeyboardMarkup keyboard = new(new[]
@@ -49,13 +44,6 @@ namespace XinjingdailyBot.Service.Helper
             return keyboard;
         }
 
-        /// <summary>
-        /// 直接发布投稿键盘
-        /// </summary>
-        /// <param name="anymouse"></param>
-        /// <param name="tagNum"></param>
-        /// <param name="hasSpoiler"></param>
-        /// <returns></returns>
         public InlineKeyboardMarkup DirectPostKeyboard(bool anymouse, int tagNum, bool? hasSpoiler)
         {
             var tags = _tagRepository.GetTagsPayload(tagNum);
@@ -104,12 +92,6 @@ namespace XinjingdailyBot.Service.Helper
             return new(btns);
         }
 
-        /// <summary>
-        /// 审核键盘A(选择稿件Tag)
-        /// </summary>
-        /// <param name="tagNum"></param>
-        /// <param name="hasSpoiler"></param>
-        /// <returns></returns>
         public InlineKeyboardMarkup ReviewKeyboardA(int tagNum, bool? hasSpoiler)
         {
             var tags = _tagRepository.GetTagsPayload(tagNum);
@@ -151,10 +133,6 @@ namespace XinjingdailyBot.Service.Helper
             return new(btns);
         }
 
-        /// <summary>
-        /// 审核键盘B(选择拒绝理由)
-        /// </summary>
-        /// <returns></returns>
         public InlineKeyboardMarkup ReviewKeyboardB()
         {
             InlineKeyboardMarkup keyboard = new(new[]
@@ -180,12 +158,6 @@ namespace XinjingdailyBot.Service.Helper
             return keyboard;
         }
 
-        /// <summary>
-        /// 设置用户群组键盘
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="targetUser"></param>
-        /// <returns></returns>
         public async Task<InlineKeyboardMarkup?> SetUserGroupKeyboard(Users dbUser, Users targetUser)
         {
             var groups = await _groupRepository.Queryable().Where(x => x.Id > 0 && x.Id < dbUser.GroupID).ToListAsync();
@@ -230,13 +202,6 @@ namespace XinjingdailyBot.Service.Helper
             }
         }
 
-        /// <summary>
-        /// 生成用户列表键盘
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="current">当前页码</param>
-        /// <param name="total">总页码</param>
-        /// <returns></returns>
         public InlineKeyboardMarkup? UserListPageKeyboard(Users dbUser, string query, int current, int total)
         {
             var btnClose = InlineKeyboardButton.WithCallbackData("关闭", $"cmd {dbUser.UserID} cancelsearchuser 已关闭");
@@ -280,11 +245,6 @@ namespace XinjingdailyBot.Service.Helper
             }
         }
 
-        /// <summary>
-        /// 频道选项键盘
-        /// </summary>
-        /// <param name="channelOption"></param>
-        /// <returns></returns>
         public InlineKeyboardMarkup? SetChannelOptionKeyboard(Users dbUser, long channelId)
         {
             InlineKeyboardMarkup keyboard = new(new[]
@@ -310,11 +270,6 @@ namespace XinjingdailyBot.Service.Helper
             return keyboard;
         }
 
-        /// <summary>
-        /// 跳转链接键盘
-        /// </summary>
-        /// <param name="post"></param>
-        /// <returns></returns>
         public InlineKeyboardMarkup? LinkToOriginPostKeyboard(Posts post)
         {
             var channel = _channelService.AcceptChannel;
@@ -330,11 +285,6 @@ namespace XinjingdailyBot.Service.Helper
             return keyboard;
         }
 
-        /// <summary>
-        /// 跳转链接键盘
-        /// </summary>
-        /// <param name="link"></param>
-        /// <returns></returns>
         public InlineKeyboardMarkup? LinkToOriginPostKeyboard(long messageId)
         {
             var channel = _channelService.AcceptChannel;
@@ -350,10 +300,6 @@ namespace XinjingdailyBot.Service.Helper
             return keyboard;
         }
 
-        /// <summary>
-        /// 获取随机投稿键盘
-        /// </summary>
-        /// <returns></returns>
         public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser)
         {
             var tags = _tagRepository.GetAllTags();
@@ -392,10 +338,6 @@ namespace XinjingdailyBot.Service.Helper
             return new(btns);
         }
 
-        /// <summary>
-        /// 获取随机投稿键盘
-        /// </summary>
-        /// <returns></returns>
         public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, int tagNum)
         {
             InlineKeyboardMarkup keyboard = new(new[]
@@ -425,11 +367,6 @@ namespace XinjingdailyBot.Service.Helper
             return keyboard;
         }
 
-
-        /// <summary>
-        /// 获取随机投稿键盘
-        /// </summary>
-        /// <returns></returns>
         public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, Posts post, int tagId, string postType)
         {
             var channel = _channelService.AcceptChannel;
@@ -447,13 +384,6 @@ namespace XinjingdailyBot.Service.Helper
             return keyboard;
         }
 
-        /// <summary>
-        /// 查询稿件信息
-        /// TODO
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="post"></param>
-        /// <returns></returns>
         public InlineKeyboardMarkup QueryPostMenuKeyboard(Users dbUser, Posts post)
         {
             InlineKeyboardMarkup keyboard;
