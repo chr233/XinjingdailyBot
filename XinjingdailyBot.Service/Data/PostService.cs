@@ -61,10 +61,27 @@ namespace XinjingdailyBot.Service.Data
 
         public async Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null)
         {
-            // 未开启限制或者用户为管理员时不受限制
-            if (!_postOption.EnablePostLimit || dbUser.Right.HasFlag(UserRights.Admin))
+            //未开启限制或者用户为管理员时不受限制
+            if ((dbUser.AcceptCount > 0 && !_postOption.EnablePostLimit) || dbUser.Right.HasFlag(UserRights.Admin))
             {
                 return true;
+            }
+
+            //待定确认稿件上限
+            int paddingLimit = _postOption.DailyPaddingLimit;
+            //上限基数
+            int baseRatio = Math.Min(dbUser.AcceptCount / _postOption.RatioDivisor + 1, _postOption.MaxRatio);
+            //审核中稿件上限
+            int reviewLimit = baseRatio * _postOption.DailyReviewLimit;
+            //每日投稿上限
+            int dailyLimit = baseRatio * _postOption.DailyPostLimit;
+
+            //没有通过稿件的用户收到更严格的限制
+            if (dbUser.AcceptCount == 0)
+            {
+                paddingLimit = 2;
+                reviewLimit = 1;
+                dailyLimit = 1;
             }
 
             DateTime now = DateTime.Now;
@@ -75,7 +92,6 @@ namespace XinjingdailyBot.Service.Data
                 .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today && x.Status == PostStatus.Padding)
                 .CountAsync();
 
-            int paddingLimit = _postOption.DailyPaddingLimit;
             if (paddingCount >= paddingLimit)
             {
                 if (message != null)
@@ -89,14 +105,11 @@ namespace XinjingdailyBot.Service.Data
                 return false;
             }
 
-            int baseRatio = Math.Min(dbUser.AcceptCount / _postOption.RatioDivisor + 1, _postOption.MaxRatio);
-
             //审核中
             var reviewCount = await Queryable()
                 .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today && x.Status == PostStatus.Reviewing)
                 .CountAsync();
 
-            int reviewLimit = baseRatio * _postOption.DailyReviewLimit;
             if (reviewCount >= reviewLimit)
             {
                 if (message != null)
@@ -117,7 +130,6 @@ namespace XinjingdailyBot.Service.Data
                     (x.Status == PostStatus.Accepted || (x.Status == PostStatus.Rejected && x.Reason != RejectReason.Duplicate && x.Reason != RejectReason.Fuzzy)))
                 .CountAsync();
 
-            int dailyLimit = baseRatio * _postOption.DailyPostLimit;
             if (postCount >= dailyLimit)
             {
                 if (message != null)
@@ -135,7 +147,7 @@ namespace XinjingdailyBot.Service.Data
             return true;
         }
 
- 
+
         public async Task HandleTextPosts(Users dbUser, Message message)
         {
             if (!dbUser.Right.HasFlag(UserRights.SendPost))
