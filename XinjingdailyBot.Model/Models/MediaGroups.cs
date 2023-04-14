@@ -4,7 +4,7 @@ using XinjingdailyBot.Model.Base;
 namespace XinjingdailyBot.Model.Models
 {
     [SugarTable("post_group", TableDescription = "媒体组稿件记录")]
-    [SugarIndex("index_msgid", nameof(ChatID), OrderByType.Asc, nameof(PublicMsgID), OrderByType.Asc)]
+    [SugarIndex("index_msgid", nameof(ChatID), OrderByType.Asc, nameof(MessageID), OrderByType.Asc)]
     [SugarIndex("index_groupid", nameof(MediaGroupID), OrderByType.Asc)]
     public sealed record MediaGroups : BaseModel
     {
@@ -17,7 +17,7 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 发布的消息Id
         /// </summary>
-        public long PublicMsgID { get; set; } = -1;
+        public long MessageID { get; set; } = -1;
         /// <summary>
         /// 稿件ID
         /// </summary>

@@ -59,11 +59,6 @@ namespace XinjingdailyBot.Service.Data
             _mediaGroupService = mediaGroupService;
         }
 
-        /// <summary>
-        /// 检查用户是否达到每日投稿上限
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <returns>true: 可以继续投稿 false: 无法继续投稿</returns>
         public async Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null)
         {
             // 未开启限制或者用户为管理员时不受限制
@@ -140,12 +135,7 @@ namespace XinjingdailyBot.Service.Data
             return true;
         }
 
-        /// <summary>
-        /// 处理文字投稿
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
+ 
         public async Task HandleTextPosts(Users dbUser, Message message)
         {
             if (!dbUser.Right.HasFlag(UserRights.SendPost))
@@ -253,12 +243,6 @@ namespace XinjingdailyBot.Service.Data
             await Insertable(newPost).ExecuteCommandAsync();
         }
 
-        /// <summary>
-        /// 处理多媒体投稿
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
         public async Task HandleMediaPosts(Users dbUser, Message message)
         {
             if (!dbUser.Right.HasFlag(UserRights.SendPost))
@@ -371,12 +355,6 @@ namespace XinjingdailyBot.Service.Data
         /// </summary>
         private ConcurrentDictionary<string, long> MediaGroupIDs { get; } = new();
 
-        /// <summary>
-        /// 处理多媒体投稿(mediaGroup)
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
         public async Task HandleMediaGroupPosts(Users dbUser, Message message)
         {
             if (!dbUser.Right.HasFlag(UserRights.SendPost))
@@ -506,13 +484,6 @@ namespace XinjingdailyBot.Service.Data
             }
         }
 
-        /// <summary>
-        /// 设置稿件Tag
-        /// </summary>
-        /// <param name="post"></param>
-        /// <param name="tagId"></param>
-        /// <param name="callbackQuery"></param>
-        /// <returns></returns>
         public async Task SetPostTag(Posts post, int tagId, CallbackQuery callbackQuery)
         {
             var tag = _tagRepository.GetTagById(tagId);
@@ -545,13 +516,6 @@ namespace XinjingdailyBot.Service.Data
             await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, keyboard);
         }
 
-        /// <summary>
-        /// 设置稿件Tag
-        /// </summary>
-        /// <param name="post"></param>
-        /// <param name="payload"></param>
-        /// <param name="callbackQuery"></param>
-        /// <returns></returns>
         public async Task SetPostTag(Posts post, string payload, CallbackQuery callbackQuery)
         {
             payload = payload.ToLowerInvariant();
@@ -562,13 +526,6 @@ namespace XinjingdailyBot.Service.Data
             }
         }
 
-        /// <summary>
-        /// 拒绝投稿
-        /// </summary>
-        /// <param name="post"></param>
-        /// <param name="dbUser"></param>
-        /// <param name="rejectReason"></param>
-        /// <returns></returns>
         public async Task RejetPost(Posts post, Users dbUser, string rejectReason)
         {
             post.ReviewerUID = dbUser.UserID;
@@ -657,13 +614,6 @@ namespace XinjingdailyBot.Service.Data
             }
         }
 
-        /// <summary>
-        /// 接受投稿
-        /// </summary>
-        /// <param name="post"></param>
-        /// <param name="dbUser"></param>
-        /// <param name="callbackQuery"></param>
-        /// <returns></returns>
         public async Task AcceptPost(Posts post, Users dbUser, CallbackQuery callbackQuery)
         {
             Users poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
@@ -806,31 +756,50 @@ namespace XinjingdailyBot.Service.Data
             }
         }
 
-        public async Task<Posts?> FetchPostFromReplyToMessage(Users dbUser, Message message)
+        public async Task<Posts?> FetchPostFromReplyToMessage(Message message)
         {
-            if (message.ReplyToMessage == null)
+            var replyMessage = message.ReplyToMessage;
+            if (replyMessage == null)
             {
                 return null;
             }
 
-            if (string.IsNullOrEmpty(message.MediaGroupId))
+            Posts? post;
+
+            var mediaGroup = await _mediaGroupService.QueryMediaGroup(replyMessage);
+            if (mediaGroup == null)
             {
-                var messageId = message.ReplyToMessage.MessageId;
-                var post = await Queryable().FirstAsync(x => x.ReviewMsgID == messageId || x.ManageMsgID == messageId);
-                return post;
+                //单条稿件
+                int msgId = replyMessage.MessageId;
+                post = await Queryable().FirstAsync(x => x.ReviewMsgID == msgId || x.ManageMsgID == msgId);
             }
             else
             {
-                //var 
+                post = await Queryable().FirstAsync(x => x.MediaGroupID == mediaGroup.MediaGroupID);
             }
 
-            return null;
+            return post;
         }
 
-        public async Task<Posts?> FetchPostFromCallbackQuery(Users dbUser, CallbackQuery message)
+        public async Task<Posts?> FetchPostFromReviewCallbackQuery(CallbackQuery query)
         {
-            //if (message.forwa)
-            return null;
+            if (query.Message == null)
+            {
+                return null;
+            }
+            var post = await GetFirstAsync(x => x.ManageMsgID == query.Message.MessageId);
+            return post;
+        }
+
+        public async Task<Posts?> FetchPostFromConfirmCallbackQuery(CallbackQuery query)
+        {
+            if (query.Message == null)
+            {
+                return null;
+            }
+
+            var post = await GetFirstAsync(x => x.ActionMsgID == query.Message.MessageId);
+            return post;
         }
     }
 }

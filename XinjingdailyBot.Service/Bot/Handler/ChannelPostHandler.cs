@@ -10,6 +10,7 @@ using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
+using XinjingdailyBot.Service.Data;
 
 namespace XinjingdailyBot.Service.Bot.Handler
 {
@@ -24,6 +25,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
         private readonly TagRepository _tagRepository;
         private readonly ITelegramBotClient _botClient;
         private readonly ILogger<ChannelPostHandler> _logger;
+        private readonly IMediaGroupService _mediaGroupService;
 
         public ChannelPostHandler(
             IPostService postService,
@@ -33,7 +35,8 @@ namespace XinjingdailyBot.Service.Bot.Handler
             IChannelOptionService channelOptionService,
             TagRepository tagRepository,
             ITelegramBotClient botClient,
-            ILogger<ChannelPostHandler> logger)
+            ILogger<ChannelPostHandler> logger,
+            IMediaGroupService mediaGroupService)
         {
             _postService = postService;
             _textHelperService = textHelperService;
@@ -43,6 +46,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             _tagRepository = tagRepository;
             _botClient = botClient;
             _logger = logger;
+            _mediaGroupService = mediaGroupService;
         }
 
         /// <summary>
@@ -254,15 +258,17 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 }
             }
 
-            //更新附件
             if (postID > 0)
             {
+                //更新附件
                 Attachments? attachment = _attachmentService.GenerateAttachment(message, postID);
-
                 if (attachment != null)
                 {
                     await _attachmentService.Insertable(attachment).ExecuteCommandAsync();
                 }
+
+                //记录媒体组
+                await _mediaGroupService.AddPostMediaGroup(message);
             }
         }
     }
