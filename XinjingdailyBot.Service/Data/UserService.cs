@@ -61,11 +61,6 @@ namespace XinjingdailyBot.Service.Data
         /// </summary>
         private static readonly TimeSpan UpdatePeriod = TimeSpan.FromDays(14);
 
-        /// <summary>
-        /// 根据Update获取发送消息的用户
-        /// </summary>
-        /// <param name="update"></param>
-        /// <returns></returns>
         public async Task<Users?> FetchUserFromUpdate(Update update)
         {
             var msgChat = update.Type switch
@@ -322,11 +317,6 @@ namespace XinjingdailyBot.Service.Data
             return dbUser;
         }
 
-        /// <summary>
-        /// 查找用户
-        /// </summary>
-        /// <param name="UserId"></param>
-        /// <returns></returns>
         public async Task<Users?> QueryUserByUserId(long UserId)
         {
             var user = await Queryable().FirstAsync(x => x.UserID == UserId);
@@ -401,22 +391,12 @@ namespace XinjingdailyBot.Service.Data
             }
         }
 
-        /// <summary>
-        /// 根据UserID获取用户
-        /// </summary>
-        /// <param name="userID"></param>
-        /// <returns></returns>
         public async Task<Users?> FetchUserByUserID(long userID)
         {
             var dbUser = await Queryable().FirstAsync(x => x.UserID == userID);
             return dbUser;
         }
 
-        /// <summary>
-        /// 根据UserName获取用户
-        /// </summary>
-        /// <param name="userID"></param>
-        /// <returns></returns>
         public async Task<Users?> FetchUserByUserName(string? userName)
         {
             if (string.IsNullOrEmpty(userName))
@@ -430,11 +410,6 @@ namespace XinjingdailyBot.Service.Data
             }
         }
 
-        /// <summary>
-        /// 根据ReplyToMessage获取目标用户
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
         public async Task<Users?> FetchTargetUser(Message message)
         {
             if (message.ReplyToMessage == null)
@@ -495,11 +470,6 @@ namespace XinjingdailyBot.Service.Data
             return await FetchUserByUserID(replyToMsg.From.Id);
         }
 
-        /// <summary>
-        /// 根据用户输入查找指定用户
-        /// </summary>
-        /// <param name="target"></param>
-        /// <returns></returns>
         public async Task<Users?> FetchUserByUserNameOrUserID(string? target)
         {
             if (string.IsNullOrEmpty(target))
@@ -522,28 +492,7 @@ namespace XinjingdailyBot.Service.Data
                 return await FetchUserByUserName(target);
             }
         }
-
-        /// <summary>
-        /// 根据UserID查找指定用户
-        /// </summary>
-        /// <param name="target"></param>
-        /// <returns></returns>
-        public async Task<Users?> FetchDbUserByUserID(string? target)
-        {
-            if (long.TryParse(target, out var userID))
-            {
-                return await FetchUserByUserID(userID);
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// 查找用户
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="page"></param>
-        /// <returns></returns>
+        
         public async Task<(string, InlineKeyboardMarkup?)> QueryUserList(Users dbUser, string query, int page)
         {
             //每页数量
@@ -649,11 +598,6 @@ namespace XinjingdailyBot.Service.Data
         /// </summary>
         private const int MiniumRankPost = 10;
 
-        /// <summary>
-        /// 获取用户排名
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <returns></returns>
         public async Task<string> GetUserRank(Users dbUser)
         {
             var now = DateTime.Now;

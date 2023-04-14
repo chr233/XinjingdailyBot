@@ -14,5 +14,7 @@ namespace XinjingdailyBot.Interface.Data
         /// <param name="messages"></param>
         /// <returns></returns>
         Task AddPostMediaGroup(IEnumerable<Message> messages);
+        Task AddPostMediaGroup(Message message);
+        Task<MediaGroups?> QueryMediaGroup(Message message);
     }
 }

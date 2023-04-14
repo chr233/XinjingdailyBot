@@ -60,7 +60,7 @@ namespace XinjingdailyBot.Command
                     return "请回复审核消息并输入拒绝理由";
                 }
 
-                var post = await _postService.FetchPostFromReplyToMessage(dbUser, message);
+                var post = await _postService.FetchPostFromReplyToMessage(message);
                 if (post == null)
                 {
                     return "未找到稿件";
@@ -110,7 +110,7 @@ namespace XinjingdailyBot.Command
                     return "请回复审核消息并输入需要替换的描述";
                 }
 
-                var post = await _postService.FetchPostFromReplyToMessage(dbUser, message);
+                var post = await _postService.FetchPostFromReplyToMessage(message);
                 if (post == null)
                 {
                     return "未找到稿件";
@@ -130,7 +130,7 @@ namespace XinjingdailyBot.Command
                 post.Text = string.Join(' ', args).Trim();
                 await _postService.Updateable(post).UpdateColumns(x => new { x.Text }).ExecuteCommandAsync();
 
-                return $"稿件描述已更新";
+                return "稿件描述已更新";
             }
 
             var text = await exec();
@@ -147,8 +147,7 @@ namespace XinjingdailyBot.Command
         public async Task HandleQuery(Users dbUser, CallbackQuery callbackQuery)
         {
             var message = callbackQuery.Message!;
-            var post = await _postService.Queryable().FirstAsync(x => x.ManageMsgID == message.MessageId);
-
+            var post = await _postService.FetchPostFromReviewCallbackQuery(callbackQuery);
             if (post == null)
             {
                 await _botClient.AutoReplyAsync("未找到稿件", callbackQuery, true);

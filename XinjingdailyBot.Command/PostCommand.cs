@@ -53,7 +53,7 @@ namespace XinjingdailyBot.Command
         public async Task HandlePostQuery(Users dbUser, CallbackQuery query)
         {
             var message = query.Message!;
-            var post = await _postService.Queryable().FirstAsync(x => x.ActionMsgID == message.MessageId);
+            var post = await _postService.FetchPostFromConfirmCallbackQuery(query);
 
             if (post == null)
             {
