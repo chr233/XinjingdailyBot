@@ -9,12 +9,22 @@ namespace XinjingdailyBot.Interface.Data
     public interface IMediaGroupService
     {
         /// <summary>
-        /// 添加媒体组消息
+        /// 批量添加媒体组消息
         /// </summary>
         /// <param name="messages"></param>
         /// <returns></returns>
         Task AddPostMediaGroup(IEnumerable<Message> messages);
+        /// <summary>
+        /// 添加媒体组消息
+        /// </summary>
+        /// <param name="messages"></param>
+        /// <returns></returns>
         Task AddPostMediaGroup(Message message);
+        /// <summary>
+        /// 查询媒体组消息
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         Task<MediaGroups?> QueryMediaGroup(Message message);
     }
 }

@@ -41,11 +41,6 @@ namespace XinjingdailyBot.Service.Helper
         private static readonly Regex MatchTag = new(@"(^#\S+)|(\s#\S+)");
         private static readonly Regex MatchSpace = new(@"^\s*$");
 
-        /// <summary>
-        /// 去除所有HashTag和连续换行
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
         public string PureText(string? text)
         {
             if (string.IsNullOrEmpty(text))
@@ -69,13 +64,6 @@ namespace XinjingdailyBot.Service.Helper
             return text;
         }
 
-        /// <summary>
-        /// Html格式的用户链接
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="userName"></param>
-        /// <param name="userNick"></param>
-        /// <returns></returns>
         public string HtmlUserLink(long userId, string userName, string userNick)
         {
             var nick = EscapeHtml(userNick);
@@ -90,44 +78,21 @@ namespace XinjingdailyBot.Service.Helper
             }
         }
 
-        /// <summary>
-        /// Html链接
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="text"></param>
-        /// <returns></returns>
         public string HtmlLink(string url, string text)
         {
             return $"<a href=\"{url}\">{text}</a>";
         }
 
-        /// <summary>
-        /// Html格式的用户链接
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
         public string HtmlUserLink(Users user)
         {
             return HtmlUserLink(user.UserID, user.UserName, user.FullName);
         }
 
-        /// <summary>
-        /// HTML格式的消息链接
-        /// </summary>
-        /// <param name="messageID"></param>
-        /// <param name="chatName"></param>
-        /// <param name="linkName"></param>
-        /// <returns></returns>
         public string HtmlMessageLink(long messageID, string chatName, string linkName)
         {
             return $"<a href=\"https://t.me/{chatName}/{messageID}\">{linkName}</a>";
         }
 
-        /// <summary>
-        /// HTML转义
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
         public string EscapeHtml(string? text)
         {
             if (string.IsNullOrEmpty(text))
@@ -148,12 +113,6 @@ namespace XinjingdailyBot.Service.Helper
             }
         }
 
-        /// <summary>
-        /// 生成审核消息(待审核)
-        /// </summary>
-        /// <param name="poster"></param>
-        /// <param name="anymouse"></param>
-        /// <returns></returns>
         public string MakeReviewMessage(Users poster, bool anymouse)
         {
             var pUser = HtmlUserLink(poster);
@@ -164,13 +123,6 @@ namespace XinjingdailyBot.Service.Helper
             return msg;
         }
 
-        /// <summary>
-        /// 生成审核消息(审核通过)
-        /// </summary>
-        /// <param name="poster"></param>
-        /// <param name="reviewer"></param>
-        /// <param name="anymouse"></param>
-        /// <returns></returns>
         public string MakeReviewMessage(Users poster, Users reviewer, bool anymouse)
         {
             var pUser = HtmlUserLink(poster);
@@ -182,13 +134,6 @@ namespace XinjingdailyBot.Service.Helper
             return msg;
         }
 
-        /// <summary>
-        /// 生成审核消息(审核通过, 直接发布)
-        /// </summary>
-        /// <param name="poster"></param>
-        /// <param name="reviewer"></param>
-        /// <param name="anymouse"></param>
-        /// <returns></returns>
         public string MakeReviewMessage(Users poster, long messageID, bool anymouse)
         {
             var pUser = HtmlUserLink(poster);
@@ -200,12 +145,6 @@ namespace XinjingdailyBot.Service.Helper
             return msg;
         }
 
-        /// <summary>
-        /// 生成审核消息(审核未通过)
-        /// </summary>
-        /// <param name="poster"></param>
-        /// <param name="reviewer"></param>
-        /// <returns></returns>
         public string MakeReviewMessage(Users poster, Users reviewer, bool anymouse, string rejectReason)
         {
             var pUser = HtmlUserLink(poster);
@@ -217,11 +156,6 @@ namespace XinjingdailyBot.Service.Helper
             return msg;
         }
 
-        /// <summary>
-        /// 格式化RejectReason
-        /// </summary>
-        /// <param name="rejectReason"></param>
-        /// <returns></returns>
         public string RejectReasonToString(RejectReason rejectReason)
         {
             var reason = rejectReason switch
@@ -240,11 +174,6 @@ namespace XinjingdailyBot.Service.Helper
             return reason;
         }
 
-        /// <summary>
-        /// 生成通知消息(审核通过）
-        /// </summary>
-        /// <param name="rejectReason"></param>
-        /// <returns></returns>
         public string MakeNotification(bool isDirect, long messageID)
         {
             var msgLink = HtmlMessageLink(messageID, _channelService.AcceptChannel.Username ?? _channelService.AcceptChannel.Id.ToString(), "消息直链");
@@ -252,23 +181,12 @@ namespace XinjingdailyBot.Service.Helper
             return isDirect ? $"稿件已发布, {msgLink}" : $"稿件已通过, 感谢您的支持 {msgLink}";
         }
 
-        /// <summary>
-        /// 生成通知消息(审核未通过）
-        /// </summary>
-        /// <param name="rejectReason"></param>
-        /// <returns></returns>
         public string MakeNotification(string reason)
         {
             var msg = string.Join('\n', "稿件未通过", $"原因: {reason}");
             return msg;
         }
 
-        /// <summary>
-        /// 生成投稿人信息
-        /// </summary>
-        /// <param name="post"></param>
-        /// <param name="poster"></param>
-        /// <returns></returns>
         public string MakePoster(Posts post, Users poster)
         {
             var user = HtmlUserLink(poster);
@@ -298,12 +216,6 @@ namespace XinjingdailyBot.Service.Helper
             }
         }
 
-        /// <summary>
-        /// 生成稿件
-        /// </summary>
-        /// <param name="post"></param>
-        /// <param name="poster"></param>
-        /// <returns></returns>
         public string MakePostText(Posts post, Users poster)
         {
             var tag = _tagRepository.GetActiviedHashTags(post.NewTags);
@@ -332,11 +244,6 @@ namespace XinjingdailyBot.Service.Helper
             return sb.ToString();
         }
 
-        /// <summary>
-        /// 根据Message.Enetities的字段格式生成HTML文本, 自动过滤无用HashTag
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
         public string ParseMessage(Message message)
         {
             MessageEntity[]? entities;

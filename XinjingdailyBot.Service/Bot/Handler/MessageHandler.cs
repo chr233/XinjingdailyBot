@@ -29,12 +29,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
             _forwardMessageHandler = forwardMessageHandler;
         }
 
-        /// <summary>
-        /// 处理文本消息
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
         public async Task OnTextMessageReceived(Users dbUser, Message message)
         {
             if (dbUser.IsBan)
@@ -63,12 +57,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
             }
         }
 
-        /// <summary>
-        /// 处理非文本消息
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
         public async Task OnMediaMessageReceived(Users dbUser, Message message)
         {
             if (dbUser.IsBan)

@@ -74,12 +74,6 @@ namespace XinjingdailyBot.Service.Bot.Common
             }
         }
 
-        /// <summary>
-        /// 收到私聊或者群组消息消息
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
         public async Task OnMessageReceived(Users dbUser, Message message)
         {
             await _dialogueService.RecordMessage(message);
@@ -110,12 +104,6 @@ namespace XinjingdailyBot.Service.Bot.Common
             }
         }
 
-        /// <summary>
-        /// 收到频道消息
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
         public async Task OnChannalPostReceived(Users dbUser, Message message)
         {
             //仅监听发布频道的消息
@@ -140,23 +128,11 @@ namespace XinjingdailyBot.Service.Bot.Common
             }
         }
 
-        /// <summary>
-        /// 收到CallbackQuery
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="query"></param>
-        /// <returns></returns>
         public async Task OnCallbackQueryReceived(Users dbUser, CallbackQuery query)
         {
             await _commandHandler.OnQueryCommandReceived(dbUser, query);
         }
 
-        /// <summary>
-        /// 收到加群请求
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="request"></param>
-        /// <returns></returns>
         public async Task OnJoinRequestReceived(Users dbUser, ChatJoinRequest request)
         {
             if (_channelService.IsGroupMessage(request.Chat.Id))
@@ -165,23 +141,11 @@ namespace XinjingdailyBot.Service.Bot.Common
             }
         }
 
-        /// <summary>
-        /// 收到Query消息
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="query"></param>
-        /// <returns></returns>
         public async Task OnInlineQueryReceived(Users dbUser, InlineQuery query)
         {
             await _inlineQueryHandler.OnInlineQueryReceived(dbUser, query);
         }
 
-        /// <summary>
-        /// 收到其他消息
-        /// </summary>
-        /// <param name="dbUser"></param>
-        /// <param name="update"></param>
-        /// <returns></returns>
         public Task OnOtherUpdateReceived(Users dbUser, Update update)
         {
             _logger.LogInformation("收到未知消息类型的消息, [{type}]", update.Type);
