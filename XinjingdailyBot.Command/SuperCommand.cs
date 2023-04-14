@@ -112,7 +112,7 @@ namespace XinjingdailyBot.Command
                     return ("请回复审核消息并输入拒绝理由", null);
                 }
 
-                var post = await _postService.FetchPostFromReplyToMessage(dbUser,message);
+                var post = await _postService.FetchPostFromReplyToMessage(message);
 
                 if (post == null)
                 {
