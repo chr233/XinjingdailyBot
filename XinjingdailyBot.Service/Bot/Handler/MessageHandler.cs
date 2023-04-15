@@ -69,7 +69,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 if (message.ForwardFromChat != null)
                 {
                     var handled = await _forwardMessageHandler.OnForwardMessageReceived(dbUser, message);
-                    if (!handled)
+                    if (handled)
                     {
                         return;
                     }

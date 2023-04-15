@@ -26,5 +26,18 @@ namespace XinjingdailyBot.Interface.Data
         /// <param name="message"></param>
         /// <returns></returns>
         Task<MediaGroups?> QueryMediaGroup(Message message);
+        /// <summary>
+        /// 查询媒体组消息
+        /// </summary>
+        /// <param name="mediaGroupId"></param>
+        /// <returns></returns>
+        Task<List<MediaGroups>> QueryMediaGroup(string? mediaGroupId);
+        /// <summary>
+        /// 查询媒体组消息
+        /// </summary>
+        /// <param name="chat"></param>
+        /// <param name="msgId"></param>
+        /// <returns></returns>
+        Task<MediaGroups?> QueryMediaGroup(Chat chat, long msgId);
     }
 }

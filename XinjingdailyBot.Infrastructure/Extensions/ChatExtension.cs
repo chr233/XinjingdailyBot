@@ -38,7 +38,6 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         {
             string link = !string.IsNullOrEmpty(chat.Username) ? $"https://t.me/{chat.Username}/{messageId}" : $"https://t.me/c/{chat.Id}/{messageId}";
             return link;
-
         }
     }
 }

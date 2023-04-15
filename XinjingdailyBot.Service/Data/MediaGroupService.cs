@@ -42,5 +42,17 @@ namespace XinjingdailyBot.Service.Data
             var mediaGroup = await Queryable().FirstAsync(x => x.ChatID == message.Chat.Id && x.MessageID == message.MessageId);
             return mediaGroup;
         }
+
+        public async Task<List<MediaGroups>> QueryMediaGroup(string? mediaGroupId)
+        {
+            var mediaGroups = await Queryable().Where(x => x.MediaGroupID == mediaGroupId).ToListAsync();
+            return mediaGroups;
+        }
+
+        public async Task<MediaGroups?> QueryMediaGroup(Chat chat,long msgId)
+        {
+            var mediaGroup = await Queryable().FirstAsync(x => x.ChatID == chat.Id && x.MessageID == msgId);
+            return mediaGroup;
+        }
     }
 }
