@@ -26,6 +26,14 @@ namespace XinjingdailyBot.Interface.Helper
         /// <returns></returns>
         InlineKeyboardMarkup? LinkToOriginPostKeyboard(long messageId);
         /// <summary>
+        /// Nuke命令菜单键盘
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="targetUser"></param>
+        /// <returns></returns>
+        InlineKeyboardMarkup NukeMenuKeyboard(Users dbUser, Users targetUser, string reason);
+
+        /// <summary>
         /// 投稿键盘
         /// </summary>
         /// <param name="anymouse"></param>

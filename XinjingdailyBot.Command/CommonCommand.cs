@@ -123,7 +123,8 @@ namespace XinjingdailyBot.Command
             string variant = BuildInfo.Variant;
             sb.AppendLine($"程序版本: <code>{version}</code>");
             sb.AppendLine($"子版本: <code>{variant}</code>");
-            sb.AppendLine(string.Format("获取开源程序: {0}", _textHelperService.HtmlLink("https://github.com/chr233/XinjingdailyBot/", "Xinjingdaily")));
+            sb.AppendLine(string.Format("获取开源程序: {0}", _textHelperService.HtmlLink("https://github.com/chr233/XinjingdailyBot/", "XinjingdailyBot")));
+            sb.AppendLine(string.Format("爱发电: {0}", _textHelperService.HtmlLink("https://afdian.net/@ylnflp", "@ylnflp")));
             await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
         }
 
@@ -136,7 +137,8 @@ namespace XinjingdailyBot.Command
         [TextCmd("MYBAN", UserRights.None, Description = "查询自己是否被封禁")]
         public async Task ResponseMyBan(Users dbUser, Message message)
         {
-            var records = await _banRecordService.Queryable().Where(x => x.UserID == dbUser.UserID).ToListAsync();
+            var records = await _banRecordService.Queryable().Where(x => x.UserID == dbUser.UserID)
+                .OrderByDescending(x => new { x.BanTime }).ToListAsync();
 
             StringBuilder sb = new();
 
