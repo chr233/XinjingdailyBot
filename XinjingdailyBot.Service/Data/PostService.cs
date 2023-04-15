@@ -365,7 +365,7 @@ namespace XinjingdailyBot.Service.Data
         /// <summary>
         /// mediaGroupID字典
         /// </summary>
-        private ConcurrentDictionary<string, long> MediaGroupIDs { get; } = new();
+        private ConcurrentDictionary<string, int> MediaGroupIDs { get; } = new();
 
         public async Task HandleMediaGroupPosts(Users dbUser, Message message)
         {
@@ -381,7 +381,7 @@ namespace XinjingdailyBot.Service.Data
             }
 
             string mediaGroupId = message.MediaGroupId!;
-            if (!MediaGroupIDs.TryGetValue(mediaGroupId, out long postID)) //如果mediaGroupId不存在则创建新Post
+            if (!MediaGroupIDs.TryGetValue(mediaGroupId, out int postID)) //如果mediaGroupId不存在则创建新Post
             {
                 MediaGroupIDs.TryAdd(mediaGroupId, -1);
 
@@ -469,7 +469,7 @@ namespace XinjingdailyBot.Service.Data
                         newPost.ManageMsgID = msg.MessageId;
                     }
 
-                    postID = await Insertable(newPost).ExecuteReturnBigIdentityAsync();
+                    postID = await Insertable(newPost).ExecuteReturnIdentityAsync();
 
                     MediaGroupIDs[mediaGroupId] = postID;
 

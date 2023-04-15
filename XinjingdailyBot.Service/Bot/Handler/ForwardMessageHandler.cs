@@ -12,6 +12,7 @@ using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
+using XinjingdailyBot.Service.Bot.Common;
 
 namespace XinjingdailyBot.Service.Bot.Handler
 {
@@ -24,14 +25,16 @@ namespace XinjingdailyBot.Service.Bot.Handler
         private readonly IPostService _postService;
         private readonly IMarkupHelperService _markupHelperService;
         private readonly IUserService _userService;
+        private readonly IMediaGroupService _mediaGroupService;
 
         public ForwardMessageHandler(
             ILogger<ForwardMessageHandler> logger,
             ITelegramBotClient botClient,
             IChannelService channelService,
             IPostService postService,
-           IMarkupHelperService markupHelperService,
-           IUserService userService)
+            IMarkupHelperService markupHelperService,
+            IUserService userService,
+            IMediaGroupService mediaGroupService)
         {
             _logger = logger;
             _botClient = botClient;
@@ -39,56 +42,82 @@ namespace XinjingdailyBot.Service.Bot.Handler
             _postService = postService;
             _markupHelperService = markupHelperService;
             _userService = userService;
+            _mediaGroupService = mediaGroupService;
         }
 
         public async Task<bool> OnForwardMessageReceived(Users dbUser, Message message)
         {
-            if (!dbUser.Right.HasFlag(UserRights.AdminCmd))
+            if (dbUser.Right.HasFlag(UserRights.AdminCmd))
             {
-                return false;
-            }
+                var forwardFrom = message.ForwardFrom!;
+                var forwardFromChat = message.ForwardFromChat;
+                var foreardMsgId = message.ForwardFromMessageId;
 
-            var forwardFrom = message.ForwardFrom!;
-            var forwardFromChat = message.ForwardFromChat;
-
-            if (forwardFromChat != null
-                && (forwardFromChat.Id == _channelService.AcceptChannel.Id || forwardFromChat.Id == _channelService.RejectChannel.Id))
-            {
-                var post = await _postService.GetFirstAsync(x => x.PublicMsgID == message.ForwardFromMessageId);
-                var poster = await _userService.FetchUserByUserID(post.PosterUID);
-
-                if (post != null && poster != null)
+                if (forwardFromChat != null && foreardMsgId != null
+                    && (_channelService.IsChannelMessage(forwardFromChat.Id) || _channelService.IsGroupMessage(forwardFromChat.Id)))
                 {
-                    if (post.Status == PostStatus.Reviewing)
+                    Posts? post = null;
+
+                    bool isMediaGroup = !string.IsNullOrEmpty(message.MediaGroupId);
+                    if (!isMediaGroup)
                     {
-                        await _botClient.AutoReplyAsync("无法操作审核中的稿件", message);
-                        return false;
+                        if (forwardFromChat.Id == _channelService.AcceptChannel.Id)
+                        {
+                            post = await _postService.GetFirstAsync(x => x.PublicMsgID == foreardMsgId);
+                        }
+                        else if (forwardFromChat.Id == _channelService.ReviewGroup.Id)
+                        {
+                            post = await _postService.GetFirstAsync(x => x.ReviewMsgID == foreardMsgId || x.ManageMsgID == foreardMsgId);
+                        }
+                    }
+                    else
+                    {
+                        var groupMsgs = await _mediaGroupService.QueryMediaGroup(message.MediaGroupId);
+                        var msgIds = groupMsgs.Select(x => x.MessageID).ToList();
+
+                        if (forwardFromChat.Id == _channelService.AcceptChannel.Id)
+                        {
+                            post = await _postService.GetFirstAsync(x => msgIds.Contains(x.PublicMsgID));
+                        }
+                        else if (forwardFromChat.Id == _channelService.ReviewGroup.Id)
+                        {
+                            post = await _postService.GetFirstAsync(x => msgIds.Contains(x.ReviewMsgID) || msgIds.Contains(x.ManageMsgID));
+                        }
                     }
 
-                    var keyboard = _markupHelperService.QueryPostMenuKeyboard(dbUser, post);
-
-                    string postStatus = post.Status switch
+                    if (post != null)
                     {
-                        PostStatus.ConfirmTimeout => "投递超时",
-                        PostStatus.ReviewTimeout => "审核超时",
-                        PostStatus.Rejected => "已拒绝",
-                        PostStatus.Accepted => "已发布",
-                        _ => "未知",
-                    };
-                    string postMode = post.IsDirectPost ? "直接发布" : (post.Anonymous ? "匿名投稿" : "保留来源");
-                    string posterLink = poster.HtmlUserLink();
+                        var poster = await _userService.FetchUserByUserID(post.PosterUID);
+                        if (poster != null)
+                        {
+                            if (post.Status == PostStatus.Reviewing)
+                            {
+                                await _botClient.AutoReplyAsync("无法操作审核中的稿件", message);
+                                return false;
+                            }
 
-                    StringBuilder sb = new();
-                    sb.AppendLine($"投稿人: {posterLink}");
-                    sb.AppendLine($"模式: {postMode}");
-                    sb.AppendLine($"状态: {postStatus}");
+                            var keyboard = _markupHelperService.QueryPostMenuKeyboard(dbUser, post);
 
-                    await _botClient.SendTextMessageAsync(message.Chat, sb.ToString(), parseMode: ParseMode.Html, disableWebPagePreview: true, replyMarkup: keyboard, replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
-                    return true;
-                }
-                else
-                {
-                    return false;
+                            string postStatus = post.Status switch
+                            {
+                                PostStatus.ConfirmTimeout => "投递超时",
+                                PostStatus.ReviewTimeout => "审核超时",
+                                PostStatus.Rejected => "已拒绝",
+                                PostStatus.Accepted => "已发布",
+                                _ => "未知",
+                            };
+                            string postMode = post.IsDirectPost ? "直接发布" : (post.Anonymous ? "匿名投稿" : "保留来源");
+                            string posterLink = poster.HtmlUserLink();
+
+                            StringBuilder sb = new();
+                            sb.AppendLine($"投稿人: {posterLink}");
+                            sb.AppendLine($"模式: {postMode}");
+                            sb.AppendLine($"状态: {postStatus}");
+
+                            await _botClient.SendTextMessageAsync(message.Chat, sb.ToString(), parseMode: ParseMode.Html, disableWebPagePreview: true, replyMarkup: keyboard, replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
+                            return true;
+                        }
+                    }
                 }
             }
             return false;
