@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualBasic;
 using SqlSugar;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -500,10 +501,11 @@ namespace XinjingdailyBot.Command
             }
             else
             {
-                var records = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID).ToListAsync();
+                var records = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID)
+                    .OrderByDescending(x => new { x.BanTime }).ToListAsync();
 
                 var status = targetUser.IsBan ? "已封禁" : "正常";
-                sb.AppendLine($"用户名: <code>{targetUser.EscapedFullName()}</code>");
+                sb.AppendLine($"用户名: {targetUser.HtmlUserLink()}");
                 sb.AppendLine($"用户ID: <code>{targetUser.UserID}</code>");
                 sb.AppendLine($"状态: <code>{status}</code>");
                 sb.AppendLine();
@@ -530,6 +532,10 @@ namespace XinjingdailyBot.Command
                             BanType.UnBan => "解封",
                             BanType.Ban => "封禁",
                             BanType.Warning => "警告",
+                            BanType.GlobalMute => "全局禁言",
+                            BanType.GlobalBan => "全局封禁",
+                            BanType.GlobalUnMute => "撤销全局禁言",
+                            BanType.GlobalUnBan => "撤销全局封禁",
                             _ => "未知",
                         };
 
@@ -1133,6 +1139,187 @@ namespace XinjingdailyBot.Command
         }
 
         /// <summary>
+        /// 联BAN用户
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        [TextCmd("NUKE", UserRights.AdminCmd, Alias = "SB,SUPERBAN", Description = "联BAN用户")]
+        public async Task ResponseNuke(Users dbUser, Message message, string[] args)
+        {
+            async Task<(InlineKeyboardMarkup?, string)> exec()
+            {
+                var targetUser = await _userService.FetchTargetUser(message);
+
+                if (targetUser == null)
+                {
+                    if (args.Any())
+                    {
+                        targetUser = await _userService.FetchUserByUserNameOrUserID(args.First());
+                        args = args[1..];
+                    }
+                }
+
+                if (targetUser == null)
+                {
+                    return (null, "找不到指定用户");
+                }
+
+                if (targetUser.Id == dbUser.Id)
+                {
+                    return (null, "无法对自己进行操作");
+                }
+
+                if (targetUser.GroupID >= dbUser.GroupID)
+                {
+                    return (null, "无法对同级管理员进行此操作");
+                }
+
+                var reason = string.Join(' ', args);
+                if (string.IsNullOrEmpty(reason))
+                {
+                    return (null, "请指定NUKE理由");
+                }
+
+                //获取最近一条解封记录
+                var lastUnbaned = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && (x.Type == BanType.UnBan || x.Type == BanType.Ban))
+                    .OrderByDescending(x => x.BanTime).FirstAsync();
+
+                int warnCount;
+                if (lastUnbaned == null)
+                {
+                    warnCount = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && x.Type == BanType.Warning).CountAsync();
+                }
+                else
+                {
+                    warnCount = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && x.Type == BanType.Warning && x.BanTime >= lastUnbaned.BanTime).CountAsync();
+                }
+
+                StringBuilder sb = new();
+                sb.AppendLine($"用户名: {targetUser.HtmlUserLink()}");
+                sb.AppendLine($"用户ID: <code>{targetUser.UserID}</code>");
+                var status = targetUser.IsBan ? "已封禁" : "正常";
+                sb.AppendLine($"状态: <code>{status}</code>");
+                sb.AppendLine($"累计警告 <code>{warnCount}</code> / <code>{WarningLimit}</code> 次");
+                sb.AppendLine("请选择 NUKE 操作");
+
+                return (_markupHelperService.NukeMenuKeyboard(dbUser, targetUser, reason), sb.ToString());
+            }
+
+            var (keyboard, text) = await exec();
+            await _botClient.SendCommandReply(text, message, false, parsemode: ParseMode.Html, replyMarkup: keyboard);
+        }
+
+        /// <summary>
+        /// 联BAN用户
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        [QueryCmd("NUKE", UserRights.AdminCmd, Description = "联BAN用户")]
+        public async Task QResponseNuke(Users dbUser, CallbackQuery callbackQuery, string[] args)
+        {
+            if (args.Length < 4)
+            {
+                await _botClient.AutoReplyAsync("参数有误", callbackQuery, true);
+                await _botClient.EditMessageTextAsync(callbackQuery.Message!, "参数有误", replyMarkup: null);
+            }
+            else
+            {
+                var targetUser = await _userService.FetchUserByUserNameOrUserID(args[2]);
+                if (targetUser == null)
+                {
+                    await _botClient.AutoReplyAsync("用户不存在", callbackQuery, true);
+                    await _botClient.EditMessageTextAsync(callbackQuery.Message!, "用户不存在", replyMarkup: null);
+                }
+                else
+                {
+                    switch (args[1])
+                    {
+                        case "mute":
+                            {
+                                ChatPermissions permission = new() { CanSendMessages = false, };
+                                await _botClient.RestrictChatMemberAsync(_channelService.SubGroup, targetUser.UserID, permission);
+                                await _botClient.RestrictChatMemberAsync(_channelService.SubGroup, targetUser.UserID, permission);
+                            }
+                            break;
+                        case "ban":
+                            await _botClient.BanChatMemberAsync(_channelService.SubGroup, targetUser.UserID);
+                            await _botClient.BanChatMemberAsync(_channelService.CommentGroup, targetUser.UserID);
+                            break;
+                        case "unmute":
+                            {
+                                ChatPermissions permission = new() { CanSendMessages = true, };
+                                await _botClient.RestrictChatMemberAsync(_channelService.SubGroup, targetUser.UserID, permission);
+                                await _botClient.RestrictChatMemberAsync(_channelService.SubGroup, targetUser.UserID, permission);
+                            }
+                            break;
+                        case "unban":
+                            await _botClient.UnbanChatMemberAsync(_channelService.SubGroup, targetUser.UserID);
+                            await _botClient.UnbanChatMemberAsync(_channelService.CommentGroup, targetUser.UserID);
+                            break;
+                        default:
+                            await _botClient.AutoReplyAsync("参数有误", callbackQuery, true);
+                            await _botClient.EditMessageTextAsync(callbackQuery.Message!, "参数有误", replyMarkup: null);
+                            return;
+                    }
+
+                    string action = args[1] switch
+                    {
+                        "mute" => "全局禁言",
+                        "ban" => "全局封禁",
+                        "unmute" => "撤销全局禁言",
+                        "unban" => "撤销全局封禁",
+                        _ => "未知",
+                    };
+                    BanType banType = args[1] switch
+                    {
+                        "mute" => BanType.GlobalMute,
+                        "ban" => BanType.GlobalBan,
+                        "unmute" => BanType.GlobalUnMute,
+                        "unban" => BanType.GlobalUnBan,
+                        _ => BanType.GlobalMute,
+                    };
+
+
+                    string reason = string.Join(' ', args[3..]);
+
+                    var record = new BanRecords
+                    {
+                        UserID = targetUser.UserID,
+                        OperatorUID = dbUser.UserID,
+                        Type = banType,
+                        BanTime = DateTime.Now,
+                        Reason = reason,
+                    };
+                    await _banRecordService.Insertable(record).ExecuteCommandAsync();
+
+                    try
+                    {
+                        if (targetUser.PrivateChatID > 0)
+                        {
+                            string msg = $"您因为 {reason} 被管理员设置了 {action}, 如有异议请联系频道管理员";
+                            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg);
+                        }
+                        else
+                        {
+                            _logger.LogInformation("用户未私聊过机器人, 无法发送消息");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "发送私聊消息失败");
+                    }
+
+
+                    await _botClient.AutoReplyAsync("操作执行成功", callbackQuery, true);
+                    await _botClient.EditMessageTextAsync(callbackQuery.Message!, $"成功 {action} 了用户 {targetUser.EscapedFullName()}", replyMarkup: null);
+                }
+            }
+        }
+
+        /// <summary>
         /// 补发稿件
         /// </summary>
         /// <param name="dbUser"></param>
@@ -1144,5 +1331,7 @@ namespace XinjingdailyBot.Command
             //TODO
             _logger.LogInformation(args.ToString());
         }
+
+
     }
 }

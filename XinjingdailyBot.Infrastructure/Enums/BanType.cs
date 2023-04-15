@@ -12,10 +12,14 @@
         /// <summary>
         /// 封禁
         /// </summary>
-        Ban = 1,
+        Ban,
         /// <summary>
         /// 警告
         /// </summary>
-        Warning = 2,
+        Warning,
+        GlobalMute,
+        GlobalBan,
+        GlobalUnMute,
+        GlobalUnBan,
     }
 }

@@ -1,4 +1,6 @@
-﻿using Telegram.Bot.Types.ReplyMarkups;
+﻿using System.Threading.Channels;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
@@ -416,6 +418,35 @@ namespace XinjingdailyBot.Service.Helper
                     },
                 });
             }
+
+            return keyboard;
+        }
+
+        public InlineKeyboardMarkup NukeMenuKeyboard(Users dbUser, Users targetUser, string reason)
+        {
+            InlineKeyboardMarkup keyboard = new(new[]
+            {
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("全局禁言", $"cmd {dbUser.UserID} nuke mute {targetUser.UserID} {reason}"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("全局封禁",$"cmd {dbUser.UserID} nuke ban {targetUser.UserID} {reason}"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("撤销全局禁言",$"cmd {dbUser.UserID} nuke unmute {targetUser.UserID} {reason}"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("撤销全局封禁",$"cmd {dbUser.UserID} nuke unban {targetUser.UserID} {reason}"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData( "取消操作", $"cmd {dbUser.UserID} cancel"),
+                }
+            });
 
             return keyboard;
         }
