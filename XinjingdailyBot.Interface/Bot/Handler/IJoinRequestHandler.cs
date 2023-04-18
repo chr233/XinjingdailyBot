@@ -8,7 +8,7 @@ namespace XinjingdailyBot.Interface.Bot.Handler
         /// <summary>
         /// 投稿超过设定自动同意加群请求
         /// </summary>
-        public const int AutoApproveLimit = 5;
+        public static readonly int AutoApproveLimit = 5;
         /// <summary>
         /// 收到加群请求处理器
         /// </summary>
