@@ -607,7 +607,7 @@ namespace XinjingdailyBot.Command
                 try
                 {
                     await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"来自管理员的消息:\n<code>{msg.EscapeHtml()}</code>", parseMode: ParseMode.Html);
-                    return "消息发送成功";
+                    return $"消息成功发送给 {targetUser.EscapedFullName()}";
                 }
                 catch (Exception ex)
                 {
@@ -1235,12 +1235,21 @@ namespace XinjingdailyBot.Command
                 }
                 else
                 {
+                    StringBuilder sb = new();
+                    sb.AppendLine("");
+
                     switch (args[1])
                     {
                         case "mute":
                             {
                                 ChatPermissions permission = new() { CanSendMessages = false, };
-                                await _botClient.RestrictChatMemberAsync(_channelService.SubGroup, targetUser.UserID, permission);
+                                try
+                                {
+                                    await _botClient.RestrictChatMemberAsync(_channelService.SubGroup, targetUser.UserID, permission);
+                                }
+                                catch { 
+                                    
+                                }
                                 await _botClient.RestrictChatMemberAsync(_channelService.SubGroup, targetUser.UserID, permission);
                             }
                             break;
@@ -1311,7 +1320,6 @@ namespace XinjingdailyBot.Command
                     {
                         _logger.LogError(ex, "发送私聊消息失败");
                     }
-
 
                     await _botClient.AutoReplyAsync("操作执行成功", callbackQuery, true);
                     await _botClient.EditMessageTextAsync(callbackQuery.Message!, $"成功 {action} 了用户 {targetUser.EscapedFullName()}", replyMarkup: null);
