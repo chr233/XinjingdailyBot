@@ -1333,12 +1333,12 @@ namespace XinjingdailyBot.Command
         /// <param name="dbUser"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [QueryCmd("REPOST", UserRights.AdminCmd)]
-        public async Task QResponseRepost(Users dbUser, CallbackQuery callbackQuery, string[] args)
-        {
-            //TODO
-            _logger.LogInformation(args.ToString());
-        }
+        //[QueryCmd("REPOST", UserRights.AdminCmd)]
+        //public async Task QResponseRepost(Users dbUser, CallbackQuery callbackQuery, string[] args)
+        //{
+        //    //TODO
+        //    _logger.LogInformation(args.ToString());
+        //}
 
 
     }
