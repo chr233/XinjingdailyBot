@@ -57,13 +57,13 @@ namespace XinjingdailyBot.Repository
             //请不要修改ID为0和1的字段
             List<Groups> groups = new()
             {
-                new() { Id = 0, Name = "封禁用户", DefaultRight = UserRights.None },
-                new() { Id = 1, Name = "普通用户", DefaultRight = UserRights.SendPost | UserRights.NormalCmd },
-                new() { Id = 10, Name = "审核员", DefaultRight = UserRights.SendPost | UserRights.ReviewPost | UserRights.NormalCmd },
-                new() { Id = 11, Name = "发布员", DefaultRight = UserRights.SendPost | UserRights.DirectPost | UserRights.NormalCmd },
-                new() { Id = 20, Name = "狗管理", DefaultRight = UserRights.SendPost | UserRights.ReviewPost | UserRights.DirectPost | UserRights.NormalCmd | UserRights.AdminCmd },
-                new() { Id = 30, Name = "超级狗管理", DefaultRight = UserRights.ALL },
-                new() { Id = 50, Name = "*超级狗管理*", DefaultRight = UserRights.ALL },
+                new() { Id = 0, Name = "封禁用户", DefaultRight = EUserRights.None },
+                new() { Id = 1, Name = "普通用户", DefaultRight = EUserRights.SendPost | EUserRights.NormalCmd },
+                new() { Id = 10, Name = "审核员", DefaultRight = EUserRights.SendPost | EUserRights.ReviewPost | EUserRights.NormalCmd },
+                new() { Id = 11, Name = "发布员", DefaultRight = EUserRights.SendPost | EUserRights.DirectPost | EUserRights.NormalCmd },
+                new() { Id = 20, Name = "狗管理", DefaultRight = EUserRights.SendPost | EUserRights.ReviewPost | EUserRights.DirectPost | EUserRights.NormalCmd | EUserRights.AdminCmd },
+                new() { Id = 30, Name = "超级狗管理", DefaultRight = EUserRights.ALL },
+                new() { Id = 50, Name = "*超级狗管理*", DefaultRight = EUserRights.ALL },
             };
 
             await Storageable(groups).ExecuteCommandAsync();

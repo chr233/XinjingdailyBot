@@ -447,7 +447,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
         {
             List<BotCommand> cmds = new();
 
-            void AddCommands(UserRights right)
+            void AddCommands(EUserRights right)
             {
                 foreach (var type in _commandClass.Keys)
                 {
@@ -466,15 +466,15 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 }
             }
 
-            AddCommands(UserRights.None);
-            AddCommands(UserRights.NormalCmd);
+            AddCommands(EUserRights.None);
+            AddCommands(EUserRights.NormalCmd);
             await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllPrivateChats());
             await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllGroupChats());
 
-            AddCommands(UserRights.AdminCmd);
+            AddCommands(EUserRights.AdminCmd);
             await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllChatAdministrators());
 
-            AddCommands(UserRights.ReviewPost);
+            AddCommands(EUserRights.ReviewPost);
             await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeChatAdministrators { ChatId = _channelService.ReviewGroup.Id });
             return true;
         }

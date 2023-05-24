@@ -27,7 +27,7 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 封禁类型
         /// </summary>
-        public ChannelOption Option { get; set; } = ChannelOption.Normal;
+        public EChannelOption Option { get; set; } = EChannelOption.Normal;
 
         public int Count { get; set; }
 

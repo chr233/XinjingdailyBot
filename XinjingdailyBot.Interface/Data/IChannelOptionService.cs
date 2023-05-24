@@ -19,13 +19,13 @@ namespace XinjingdailyBot.Interface.Data
         /// <param name="channelName"></param>
         /// <param name="channelTitle"></param>
         /// <returns></returns>
-        Task<ChannelOption> FetchChannelOption(long channelId, string? channelName, string? channelTitle);
+        Task<EChannelOption> FetchChannelOption(long channelId, string? channelName, string? channelTitle);
         /// <summary>
         /// 更新频道设定
         /// </summary>
         /// <param name="channelId"></param>
         /// <param name="channelOption"></param>
         /// <returns></returns>
-        Task<ChannelOptions?> UpdateChannelOptionById(long channelId, ChannelOption channelOption);
+        Task<ChannelOptions?> UpdateChannelOptionById(long channelId, EChannelOption channelOption);
     }
 }

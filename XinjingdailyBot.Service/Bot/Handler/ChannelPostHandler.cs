@@ -68,7 +68,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 long channelId = message.ForwardFromChat.Id;
                 var option = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
 
-                if (option == ChannelOption.AutoReject)
+                if (option == EChannelOption.AutoReject)
                 {
                     await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
                     _logger.LogInformation("删除消息 {msgid}", message.MessageId);
@@ -80,7 +80,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             string text = _textHelperService.ParseMessage(message);
 
             //生成数据库实体
-            Posts newPost = new()
+            OldPosts newPost = new()
             {
                 OriginChatID = message.Chat.Id,
                 OriginMsgID = message.MessageId,
@@ -93,7 +93,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 RawText = message.Text ?? "",
                 ChannelName = channelName ?? "",
                 ChannelTitle = channelTitle ?? "",
-                Status = PostStatus.Accepted,
+                Status = EPostStatus.Accepted,
                 PostType = message.Type,
                 NewTags = newTag,
                 PosterUID = dbUser.UserID,
@@ -118,7 +118,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 long channelId = message.ForwardFromChat.Id;
                 var option = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
 
-                if (option == ChannelOption.AutoReject)
+                if (option == EChannelOption.AutoReject)
                 {
                     await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
                     _logger.LogInformation("删除消息 {msgid}", message.MessageId);
@@ -130,7 +130,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             string text = _textHelperService.ParseMessage(message);
 
             //生成数据库实体
-            Posts newPost = new()
+            OldPosts newPost = new()
             {
                 OriginChatID = message.Chat.Id,
                 OriginMsgID = message.MessageId,
@@ -143,7 +143,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 RawText = message.Text ?? "",
                 ChannelName = channelName ?? "",
                 ChannelTitle = channelTitle ?? "",
-                Status = PostStatus.Accepted,
+                Status = EPostStatus.Accepted,
                 PostType = message.Type,
                 NewTags = newTags,
                 HasSpoiler = message.HasMediaSpoiler ?? false,
@@ -189,7 +189,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                         long channelId = message.ForwardFromChat.Id;
                         var option = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
 
-                        if (option == ChannelOption.AutoReject)
+                        if (option == EChannelOption.AutoReject)
                         {
                             await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
                             _logger.LogInformation("删除消息 {msgid}", message.MessageId);
@@ -201,7 +201,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                     string text = _textHelperService.ParseMessage(message);
 
                     //生成数据库实体
-                    Posts newPost = new()
+                    OldPosts newPost = new()
                     {
                         OriginChatID = message.Chat.Id,
                         OriginMsgID = message.MessageId,
@@ -214,7 +214,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                         RawText = message.Text ?? "",
                         ChannelName = channelName ?? "",
                         ChannelTitle = channelTitle ?? "",
-                        Status = PostStatus.Accepted,
+                        Status = EPostStatus.Accepted,
                         PostType = message.Type,
                         NewTags = newTags,
                         HasSpoiler = message.HasMediaSpoiler ?? false,

@@ -34,14 +34,14 @@ namespace XinjingdailyBot.Service.Bot.Handler
 
         public async Task OnInlineQueryReceived(Users dbUser, InlineQuery query)
         {
-            if (dbUser.Right.HasFlag(UserRights.AdminCmd))
+            if (dbUser.Right.HasFlag(EUserRights.AdminCmd))
             {
                 List<InlineQueryResult> results = new();
 
                 for (int i = 0; i < 10; i++)
                 {
                     var randomPost = await _postService.Queryable()
-                        .Where(x => x.Status == PostStatus.Accepted && x.PostType == MessageType.Photo)
+                        .Where(x => x.Status == EPostStatus.Accepted && x.PostType == MessageType.Photo)
                         .OrderBy(x => SqlFunc.GetRandom()).Take(1).FirstAsync();
 
                     if (randomPost == null)

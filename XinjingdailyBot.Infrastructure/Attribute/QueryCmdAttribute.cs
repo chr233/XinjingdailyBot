@@ -24,7 +24,7 @@ namespace XinjingdailyBot.Infrastructure.Attribute
         /// <summary>
         /// 需求的权限
         /// </summary>
-        public UserRights Rights { get; set; } = UserRights.None;
+        public EUserRights Rights { get; set; } = EUserRights.None;
 
         /// <summary>
         /// 创建特性
@@ -33,14 +33,14 @@ namespace XinjingdailyBot.Infrastructure.Attribute
         public QueryCmdAttribute(string command)
         {
             Command = command;
-            Rights = UserRights.None;
+            Rights = EUserRights.None;
         }
         /// <summary>
         /// 创建特性
         /// </summary>
         /// <param name="command"></param>
         /// <param name="rights"></param>
-        public QueryCmdAttribute(string command, UserRights rights)
+        public QueryCmdAttribute(string command, EUserRights rights)
         {
             Command = command;
             Rights = rights;

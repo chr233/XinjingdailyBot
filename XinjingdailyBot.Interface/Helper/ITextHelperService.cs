@@ -59,14 +59,14 @@ namespace XinjingdailyBot.Interface.Helper
         /// <param name="post"></param>
         /// <param name="poster"></param>
         /// <returns></returns>
-        string MakePoster(Posts post, Users poster);
+        string MakePoster(OldPosts post, Users poster);
         /// <summary>
         /// 生成稿件
         /// </summary>
         /// <param name="post"></param>
         /// <param name="poster"></param>
         /// <returns></returns>
-        string MakePostText(Posts post, Users poster);
+        string MakePostText(OldPosts post, Users poster);
         /// <summary>
         /// 生成审核消息(待审核)
         /// </summary>
@@ -114,6 +114,6 @@ namespace XinjingdailyBot.Interface.Helper
         /// </summary>
         /// <param name="rejectReason"></param>
         /// <returns></returns>
-        string RejectReasonToString(RejectReason rejectReason);
+        string RejectReasonToString(ERejectReason rejectReason);
     }
 }

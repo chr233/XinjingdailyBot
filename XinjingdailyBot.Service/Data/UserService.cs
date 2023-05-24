@@ -432,7 +432,7 @@ namespace XinjingdailyBot.Service.Data
                 {
                     var msgID = replyToMsg.MessageId;
 
-                    var exp = Expressionable.Create<Posts>();
+                    var exp = Expressionable.Create<OldPosts>();
                     exp.Or(x => x.ManageMsgID == msgID);
 
                     if (string.IsNullOrEmpty(replyToMsg.MediaGroupId))

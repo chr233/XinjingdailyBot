@@ -61,7 +61,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("RESTART", UserRights.SuperCmd, Description = "重启机器人")]
+        [TextCmd("RESTART", EUserRights.SuperCmd, Description = "重启机器人")]
         public async Task ResponseRestart(Message message)
         {
             try
@@ -84,7 +84,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("EXIT", UserRights.SuperCmd, Description = "终止机器人")]
+        [TextCmd("EXIT", EUserRights.SuperCmd, Description = "终止机器人")]
         public async Task ResponseExit(Message message)
         {
             await _botClient.SendCommandReply("机器人即将退出", message);
@@ -97,7 +97,7 @@ namespace XinjingdailyBot.Command
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("CHANNELOPTION", UserRights.SuperCmd, Description = "来源频道设置")]
+        [TextCmd("CHANNELOPTION", EUserRights.SuperCmd, Description = "来源频道设置")]
         public async Task ResponseChannalOption(Users dbUser, Message message)
         {
             async Task<(string, InlineKeyboardMarkup?)> exec()
@@ -133,9 +133,9 @@ namespace XinjingdailyBot.Command
 
                 string option = channel.Option switch
                 {
-                    ChannelOption.Normal => "1. 不做特殊处理",
-                    ChannelOption.PurgeOrigin => "2. 抹除频道来源",
-                    ChannelOption.AutoReject => "3. 拒绝此频道的投稿",
+                    EChannelOption.Normal => "1. 不做特殊处理",
+                    EChannelOption.PurgeOrigin => "2. 抹除频道来源",
+                    EChannelOption.AutoReject => "3. 拒绝此频道的投稿",
                     _ => "未知的值",
                 };
 
@@ -154,7 +154,7 @@ namespace XinjingdailyBot.Command
         /// <param name="query"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [QueryCmd("CHANNELOPTION", UserRights.SuperCmd, Description = "来源频道设置")]
+        [QueryCmd("CHANNELOPTION", EUserRights.SuperCmd, Description = "来源频道设置")]
         public async Task QResponseChannalOption(CallbackQuery query, string[] args)
         {
             async Task<string> exec()
@@ -169,19 +169,19 @@ namespace XinjingdailyBot.Command
                     return "参数有误";
                 }
 
-                ChannelOption? option = args[2] switch
+                EChannelOption? option = args[2] switch
                 {
-                    "normal" => ChannelOption.Normal,
-                    "purgeorigin" => ChannelOption.PurgeOrigin,
-                    "autoreject" => ChannelOption.AutoReject,
+                    "normal" => EChannelOption.Normal,
+                    "purgeorigin" => EChannelOption.PurgeOrigin,
+                    "autoreject" => EChannelOption.AutoReject,
                     _ => null
                 };
 
                 string optionStr = option switch
                 {
-                    ChannelOption.Normal => "不做特殊处理",
-                    ChannelOption.PurgeOrigin => "抹除频道来源",
-                    ChannelOption.AutoReject => "拒绝此频道的投稿",
+                    EChannelOption.Normal => "不做特殊处理",
+                    EChannelOption.PurgeOrigin => "抹除频道来源",
+                    EChannelOption.AutoReject => "拒绝此频道的投稿",
                     _ => "未知的值",
                 };
 
@@ -209,7 +209,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("COMMAND", UserRights.SuperCmd, Description = "设置命令菜单")]
+        [TextCmd("COMMAND", EUserRights.SuperCmd, Description = "设置命令菜单")]
         public async Task ResponseCommand(Message message)
         {
             bool result = await _commandHandler.GetCommandsMenu();
@@ -221,7 +221,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("RECALCPOST", UserRights.SuperCmd, Description = "重新计算用户投稿数量")]
+        [TextCmd("RECALCPOST", EUserRights.SuperCmd, Description = "重新计算用户投稿数量")]
         public async Task ResponseReCalcPost(Message message)
         {
             const int threads = 10;
@@ -244,8 +244,8 @@ namespace XinjingdailyBot.Command
                 var tasks = users.Select(async user =>
                 {
                     int postCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID);
-                    int acceptCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == PostStatus.Accepted);
-                    int rejectCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == PostStatus.Rejected);
+                    int acceptCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == EPostStatus.Accepted);
+                    int rejectCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == EPostStatus.Rejected);
                     int expiredCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status < 0);
                     int reviewCount = await _postService.Queryable().CountAsync(x => x.ReviewerUID == user.UserID && x.PosterUID != user.UserID);
 
@@ -294,7 +294,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("MERGEPOST", UserRights.SuperCmd, Description = "迁移旧的稿件数据")]
+        [TextCmd("MERGEPOST", EUserRights.SuperCmd, Description = "迁移旧的稿件数据")]
         [Obsolete("迁移旧数据用")]
         public async Task ResponseMergePost(Message message)
         {
@@ -309,7 +309,7 @@ namespace XinjingdailyBot.Command
 
             while (startId <= totalPosts)
             {
-                var posts = await _postService.Queryable().Where(x => x.Id >= startId && x.Tags != BuildInTags.None).Take(threads).ToListAsync();
+                var posts = await _postService.Queryable().Where(x => x.Id >= startId && x.Tags != EBuildInTags.None).Take(threads).ToListAsync();
                 if (!posts.Any())
                 {
                     break;
@@ -317,31 +317,31 @@ namespace XinjingdailyBot.Command
 
                 var tasks = posts.Select(async post =>
                 {
-                    if (post.Tags != BuildInTags.None)
+                    if (post.Tags != EBuildInTags.None)
                     {
                         var oldTag = post.Tags;
-                        if (oldTag.HasFlag(BuildInTags.Spoiler))
+                        if (oldTag.HasFlag(EBuildInTags.Spoiler))
                         {
                             post.HasSpoiler = true;
                         }
                         int newTag = 0;
-                        if (oldTag.HasFlag(BuildInTags.NSFW))
+                        if (oldTag.HasFlag(EBuildInTags.NSFW))
                         {
                             newTag += 1;
                         }
-                        if (oldTag.HasFlag(BuildInTags.Friend))
+                        if (oldTag.HasFlag(EBuildInTags.Friend))
                         {
                             newTag += 2;
                         }
-                        if (oldTag.HasFlag(BuildInTags.WanAn))
+                        if (oldTag.HasFlag(EBuildInTags.WanAn))
                         {
                             newTag += 4;
                         }
-                        if (oldTag.HasFlag(BuildInTags.AIGraph))
+                        if (oldTag.HasFlag(EBuildInTags.AIGraph))
                         {
                             newTag += 8;
                         }
-                        post.Tags = BuildInTags.None;
+                        post.Tags = EBuildInTags.None;
                         post.NewTags = newTag;
                         post.ModifyAt = DateTime.Now;
 
@@ -378,7 +378,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("UPDATE", UserRights.SuperCmd, Description = "自动升级机器人")]
+        [TextCmd("UPDATE", EUserRights.SuperCmd, Description = "自动升级机器人")]
         public async Task ResponseUpdate(Message message)
         {
             async Task<string> exec()

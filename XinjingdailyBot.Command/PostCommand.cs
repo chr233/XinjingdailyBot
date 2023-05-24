@@ -49,7 +49,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        [QueryCmd("POST", UserRights.SendPost, Description = "投稿消息处理")]
+        [QueryCmd("POST", EUserRights.SendPost, Description = "投稿消息处理")]
         public async Task HandlePostQuery(Users dbUser, CallbackQuery query)
         {
             var message = query.Message!;
@@ -62,7 +62,7 @@ namespace XinjingdailyBot.Command
                 return;
             }
 
-            if (post.Status != PostStatus.Padding)
+            if (post.Status != EPostStatus.Padding)
             {
                 await _botClient.AutoReplyAsync("请不要重复操作", query);
                 await _botClient.EditMessageReplyMarkupAsync(message, null);
@@ -97,7 +97,7 @@ namespace XinjingdailyBot.Command
         /// <param name="post"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        private async Task SetAnymouse(Posts post, CallbackQuery query)
+        private async Task SetAnymouse(OldPosts post, CallbackQuery query)
         {
             await _botClient.AutoReplyAsync("可以使用命令 /anymouse 切换默认匿名投稿", query);
 
@@ -116,9 +116,9 @@ namespace XinjingdailyBot.Command
         /// <param name="post"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        private async Task CancelPost(Posts post, CallbackQuery query)
+        private async Task CancelPost(OldPosts post, CallbackQuery query)
         {
-            post.Status = PostStatus.Cancel;
+            post.Status = EPostStatus.Cancel;
             post.ModifyAt = DateTime.Now;
             await _postService.Updateable(post).UpdateColumns(x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
 
@@ -133,7 +133,7 @@ namespace XinjingdailyBot.Command
         /// <param name="post"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        private async Task ConfirmPost(Posts post, Users dbUser, CallbackQuery query)
+        private async Task ConfirmPost(OldPosts post, Users dbUser, CallbackQuery query)
         {
             if (await _postService.CheckPostLimit(dbUser, null, query) == false)
             {
@@ -182,7 +182,7 @@ namespace XinjingdailyBot.Command
 
             post.ReviewMsgID = reviewMsg.MessageId;
             post.ManageMsgID = manageMsg.MessageId;
-            post.Status = PostStatus.Reviewing;
+            post.Status = EPostStatus.Reviewing;
             post.ModifyAt = DateTime.Now;
             await _postService.Updateable(post).UpdateColumns(x => new { x.ReviewMsgID, x.ManageMsgID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
 

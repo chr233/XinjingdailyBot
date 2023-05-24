@@ -31,7 +31,7 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 广告发布位置
         /// </summary>
-        public AdMode Mode { get; set; } = AdMode.None;
+        public EAdMode Mode { get; set; } = EAdMode.None;
 
         /// <summary>
         /// 展示权重, 数值越大概率越高, 0为不展示

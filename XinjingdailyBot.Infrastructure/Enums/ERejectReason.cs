@@ -3,7 +3,7 @@
     /// <summary>
     /// 拒稿原因
     /// </summary>
-    public enum RejectReason : byte
+    public enum ERejectReason : byte
     {
         /// <summary>
         /// 未拒绝

@@ -4,7 +4,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Data
 {
-    public interface IPostService : IBaseService<Posts>
+    public interface IPostService : IBaseService<OldPosts>
     {
         /// <summary>
         /// 文字投稿长度上限
@@ -18,7 +18,7 @@ namespace XinjingdailyBot.Interface.Data
         /// <param name="dbUser"></param>
         /// <param name="callbackQuery"></param>
         /// <returns></returns>
-        Task AcceptPost(Posts post, Users dbUser, CallbackQuery callbackQuery);
+        Task AcceptPost(OldPosts post, Users dbUser, CallbackQuery callbackQuery);
         /// <summary>
         /// 检查用户是否达到每日投稿上限
         /// </summary>
@@ -30,19 +30,19 @@ namespace XinjingdailyBot.Interface.Data
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        Task<Posts?> FetchPostFromReviewCallbackQuery(CallbackQuery message);
+        Task<OldPosts?> FetchPostFromReviewCallbackQuery(CallbackQuery message);
         /// <summary>
         /// 从回复的消息获取稿件
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        Task<Posts?> FetchPostFromReplyToMessage(Message message);
+        Task<OldPosts?> FetchPostFromReplyToMessage(Message message);
         /// <summary>
         /// 从确认投稿回调中获取稿件
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<Posts?> FetchPostFromConfirmCallbackQuery(CallbackQuery query);
+        Task<OldPosts?> FetchPostFromConfirmCallbackQuery(CallbackQuery query);
 
         /// <summary>
         /// 处理多媒体投稿(mediaGroup)
@@ -72,7 +72,7 @@ namespace XinjingdailyBot.Interface.Data
         /// <param name="dbUser"></param>
         /// <param name="rejectReason"></param>
         /// <returns></returns>
-        Task RejetPost(Posts post, Users dbUser, string rejectReason);
+        Task RejetPost(OldPosts post, Users dbUser, string rejectReason);
         /// <summary>
         /// 设置稿件Tag
         /// </summary>
@@ -80,7 +80,7 @@ namespace XinjingdailyBot.Interface.Data
         /// <param name="tagId"></param>
         /// <param name="callbackQuery"></param>
         /// <returns></returns>
-        Task SetPostTag(Posts post, int tagId, CallbackQuery callbackQuery);
+        Task SetPostTag(OldPosts post, int tagId, CallbackQuery callbackQuery);
         /// <summary>
         /// 设置稿件Tag
         /// </summary>
@@ -88,6 +88,6 @@ namespace XinjingdailyBot.Interface.Data
         /// <param name="payload"></param>
         /// <param name="callbackQuery"></param>
         /// <returns></returns>
-        Task SetPostTag(Posts post, string payload, CallbackQuery callbackQuery);
+        Task SetPostTag(OldPosts post, string payload, CallbackQuery callbackQuery);
     }
 }

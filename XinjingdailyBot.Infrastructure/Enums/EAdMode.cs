@@ -4,7 +4,7 @@
     /// 广告发布位置
     /// </summary>
     [Flags]
-    public enum AdMode
+    public enum EAdMode
     {
         /// <summary>
         /// 不发布

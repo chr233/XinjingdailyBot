@@ -5,7 +5,7 @@
     /// </summary>
     [Flags]
     [Obsolete("过时的方法")]
-    public enum BuildInTags : int
+    public enum EBuildInTags : int
     {
         /// <summary>
         /// 无
