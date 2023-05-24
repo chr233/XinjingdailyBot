@@ -156,19 +156,19 @@ namespace XinjingdailyBot.Service.Helper
             return msg;
         }
 
-        public string RejectReasonToString(RejectReason rejectReason)
+        public string RejectReasonToString(ERejectReason rejectReason)
         {
             var reason = rejectReason switch
             {
-                RejectReason.Fuzzy => "图片模糊/看不清",
-                RejectReason.Duplicate => "重复的稿件",
-                RejectReason.Boring => "内容不够有趣",
-                RejectReason.Confused => "审核没看懂,建议配文说明",
-                RejectReason.Deny => "不合适发布的内容",
-                RejectReason.QRCode => "稿件包含二维码水印",
-                RejectReason.Other => "其他原因",
-                RejectReason.CustomReason => "其他原因",
-                RejectReason.AutoReject => "稿件审核超时, 自动拒绝",
+                ERejectReason.Fuzzy => "图片模糊/看不清",
+                ERejectReason.Duplicate => "重复的稿件",
+                ERejectReason.Boring => "内容不够有趣",
+                ERejectReason.Confused => "审核没看懂,建议配文说明",
+                ERejectReason.Deny => "不合适发布的内容",
+                ERejectReason.QRCode => "稿件包含二维码水印",
+                ERejectReason.Other => "其他原因",
+                ERejectReason.CustomReason => "其他原因",
+                ERejectReason.AutoReject => "稿件审核超时, 自动拒绝",
                 _ => "未知",
             };
             return reason;
@@ -187,7 +187,7 @@ namespace XinjingdailyBot.Service.Helper
             return msg;
         }
 
-        public string MakePoster(Posts post, Users poster)
+        public string MakePoster(OldPosts post, Users poster)
         {
             var user = HtmlUserLink(poster);
 
@@ -216,7 +216,7 @@ namespace XinjingdailyBot.Service.Helper
             }
         }
 
-        public string MakePostText(Posts post, Users poster)
+        public string MakePostText(OldPosts post, Users poster)
         {
             var tag = _tagRepository.GetActiviedHashTags(post.NewTags);
 

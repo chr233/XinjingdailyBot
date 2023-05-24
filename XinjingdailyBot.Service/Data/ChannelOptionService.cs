@@ -9,7 +9,7 @@ namespace XinjingdailyBot.Service.Data
     [AppService(typeof(IChannelOptionService), LifeTime.Transient)]
     public sealed class ChannelOptionService : BaseService<ChannelOptions>, IChannelOptionService
     {
-        public async Task<ChannelOption> FetchChannelOption(long channelId, string? channelName, string? channelTitle)
+        public async Task<EChannelOption> FetchChannelOption(long channelId, string? channelName, string? channelTitle)
         {
             var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync();
             if (channel == null)
@@ -19,7 +19,7 @@ namespace XinjingdailyBot.Service.Data
                     ChannelID = channelId,
                     ChannelName = channelName ?? "",
                     ChannelTitle = channelTitle ?? "",
-                    Option = ChannelOption.Normal,
+                    Option = EChannelOption.Normal,
                     Count = 1,
                     CreateAt = DateTime.Now,
                     ModifyAt = DateTime.Now,
@@ -47,7 +47,7 @@ namespace XinjingdailyBot.Service.Data
             return channel;
         }
 
-        public async Task<ChannelOptions?> UpdateChannelOptionById(long channelId, ChannelOption channelOption)
+        public async Task<ChannelOptions?> UpdateChannelOptionById(long channelId, EChannelOption channelOption)
         {
             var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync();
             if (channel != null)

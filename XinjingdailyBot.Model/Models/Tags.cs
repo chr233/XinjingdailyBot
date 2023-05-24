@@ -4,8 +4,6 @@ using XinjingdailyBot.Model.Base;
 namespace XinjingdailyBot.Model.Models
 {
     [SugarTable("tag", TableDescription = "投稿标签")]
-    [SugarIndex("index_name", nameof(Name), OrderByType.Asc, true)]
-    [SugarIndex("index_payload", nameof(Payload), OrderByType.Asc, true)]
     public sealed record Tags : BaseModel
     {
         [SugarColumn(IsPrimaryKey = true)]

@@ -77,7 +77,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("GROUPINFO", UserRights.AdminCmd, Description = "获取群组信息")]
+        [TextCmd("GROUPINFO", EUserRights.AdminCmd, Description = "获取群组信息")]
         public async Task ResponseGroupInfo(Message message)
         {
             var chat = message.Chat;
@@ -113,7 +113,7 @@ namespace XinjingdailyBot.Command
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [TextCmd("USERINFO", UserRights.AdminCmd, Alias = "UINFO", Description = "获取用户信息")]
+        [TextCmd("USERINFO", EUserRights.AdminCmd, Alias = "UINFO", Description = "获取用户信息")]
         public async Task ResponseUserInfo(Message message, string[] args)
         {
             StringBuilder sb = new();
@@ -152,7 +152,7 @@ namespace XinjingdailyBot.Command
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [TextCmd("BAN", UserRights.AdminCmd, Description = "封禁用户")]
+        [TextCmd("BAN", EUserRights.AdminCmd, Description = "封禁用户")]
         public async Task ResponseBan(Users dbUser, Message message, string[] args)
         {
             async Task<string> exec()
@@ -203,7 +203,7 @@ namespace XinjingdailyBot.Command
                     {
                         UserID = targetUser.UserID,
                         OperatorUID = dbUser.UserID,
-                        Type = BanType.Ban,
+                        Type = EBanType.Ban,
                         BanTime = DateTime.Now,
                         Reason = reason,
                     };
@@ -247,7 +247,7 @@ namespace XinjingdailyBot.Command
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [TextCmd("UNBAN", UserRights.AdminCmd, Description = "解封用户")]
+        [TextCmd("UNBAN", EUserRights.AdminCmd, Description = "解封用户")]
         public async Task ResponseUnban(Users dbUser, Message message, string[] args)
         {
             async Task<string> exec()
@@ -298,7 +298,7 @@ namespace XinjingdailyBot.Command
                     {
                         UserID = targetUser.UserID,
                         OperatorUID = dbUser.UserID,
-                        Type = BanType.UnBan,
+                        Type = EBanType.UnBan,
                         BanTime = DateTime.Now,
                         Reason = reason,
                     };
@@ -342,7 +342,7 @@ namespace XinjingdailyBot.Command
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [TextCmd("WARN", UserRights.AdminCmd, Description = "警告用户")]
+        [TextCmd("WARN", EUserRights.AdminCmd, Description = "警告用户")]
         public async Task ResponseWarning(Users dbUser, Message message, string[] args)
         {
             async Task<string> exec()
@@ -386,24 +386,24 @@ namespace XinjingdailyBot.Command
                 else
                 {
                     //获取最近一条解封记录
-                    var lastUnbaned = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && (x.Type == BanType.UnBan || x.Type == BanType.Ban))
+                    var lastUnbaned = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && (x.Type == EBanType.UnBan || x.Type == EBanType.Ban))
                         .OrderByDescending(x => x.BanTime).FirstAsync();
 
                     int warnCount;
                     if (lastUnbaned == null)
                     {
-                        warnCount = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && x.Type == BanType.Warning).CountAsync();
+                        warnCount = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && x.Type == EBanType.Warning).CountAsync();
                     }
                     else
                     {
-                        warnCount = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && x.Type == BanType.Warning && x.BanTime >= lastUnbaned.BanTime).CountAsync();
+                        warnCount = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && x.Type == EBanType.Warning && x.BanTime >= lastUnbaned.BanTime).CountAsync();
                     }
 
                     var record = new BanRecords
                     {
                         UserID = targetUser.UserID,
                         OperatorUID = dbUser.UserID,
-                        Type = BanType.Warning,
+                        Type = EBanType.Warning,
                         BanTime = DateTime.Now,
                         Reason = reason,
                     };
@@ -424,7 +424,7 @@ namespace XinjingdailyBot.Command
                         {
                             UserID = targetUser.UserID,
                             OperatorUID = 0,
-                            Type = BanType.Ban,
+                            Type = EBanType.Ban,
                             BanTime = DateTime.Now,
                             Reason = "受到警告过多, 自动封禁",
                         };
@@ -480,7 +480,7 @@ namespace XinjingdailyBot.Command
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [TextCmd("QUERYBAN", UserRights.AdminCmd, Alias = "QBAN", Description = "查询封禁记录")]
+        [TextCmd("QUERYBAN", EUserRights.AdminCmd, Alias = "QBAN", Description = "查询封禁记录")]
         public async Task ResponseQueryBan(Message message, string[] args)
         {
             StringBuilder sb = new();
@@ -529,13 +529,13 @@ namespace XinjingdailyBot.Command
                         var date = record.BanTime.ToString("d");
                         var operate = record.Type switch
                         {
-                            BanType.UnBan => "解封",
-                            BanType.Ban => "封禁",
-                            BanType.Warning => "警告",
-                            BanType.GlobalMute => "全局禁言",
-                            BanType.GlobalBan => "全局封禁",
-                            BanType.GlobalUnMute => "撤销全局禁言",
-                            BanType.GlobalUnBan => "撤销全局封禁",
+                            EBanType.UnBan => "解封",
+                            EBanType.Ban => "封禁",
+                            EBanType.Warning => "警告",
+                            EBanType.GlobalMute => "全局禁言",
+                            EBanType.GlobalBan => "全局封禁",
+                            EBanType.GlobalUnMute => "撤销全局禁言",
+                            EBanType.GlobalUnBan => "撤销全局封禁",
                             _ => "未知",
                         };
 
@@ -564,7 +564,7 @@ namespace XinjingdailyBot.Command
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [TextCmd("ECHO", UserRights.AdminCmd, Description = "回复用户")]
+        [TextCmd("ECHO", EUserRights.AdminCmd, Description = "回复用户")]
         public async Task ResponseEcho(Users dbUser, Message message, string[] args)
         {
             var autoDelete = true;
@@ -626,7 +626,7 @@ namespace XinjingdailyBot.Command
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [TextCmd("SEARCHUSER", UserRights.AdminCmd, Alias = "QUSER", Description = "搜索用户")]
+        [TextCmd("SEARCHUSER", EUserRights.AdminCmd, Alias = "QUSER", Description = "搜索用户")]
         public async Task ResponseSearchUser(Users dbUser, Message message, string[] args)
         {
             if (!args.Any())
@@ -661,7 +661,7 @@ namespace XinjingdailyBot.Command
         /// <param name="callbackQuery"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [QueryCmd("SEARCHUSER", UserRights.AdminCmd, Alias = "QUERYUSER")]
+        [QueryCmd("SEARCHUSER", EUserRights.AdminCmd, Alias = "QUERYUSER")]
         public async Task QResponseSearchUser(Users dbUser, CallbackQuery callbackQuery, string[] args)
         {
             async Task<(string, InlineKeyboardMarkup?)> exec()
@@ -690,7 +690,7 @@ namespace XinjingdailyBot.Command
         /// <param name="callbackQuery"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [QueryCmd("CANCELSEARCHUSER", UserRights.AdminCmd, Alias = "CANCELCLOSE")]
+        [QueryCmd("CANCELSEARCHUSER", EUserRights.AdminCmd, Alias = "CANCELCLOSE")]
         public async Task QResponseCancelSearchUser(CallbackQuery callbackQuery, string[] args)
         {
             string text = args.Length >= 2 ? args[1] : "参数有误";
@@ -702,7 +702,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("POSTREPORT", UserRights.AdminCmd, Alias = "POSTSTATUS", Description = "生成投稿统计信息")]
+        [TextCmd("POSTREPORT", EUserRights.AdminCmd, Alias = "POSTSTATUS", Description = "生成投稿统计信息")]
         public async Task ResponsePostReport(Message message)
         {
             var now = DateTime.Now;
@@ -714,9 +714,9 @@ namespace XinjingdailyBot.Command
 
             StringBuilder sb = new();
 
-            var todayPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status > PostStatus.Cancel).CountAsync();
-            var todayAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status == PostStatus.Accepted).CountAsync();
-            var todayRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status == PostStatus.Rejected).CountAsync();
+            var todayPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status > EPostStatus.Cancel).CountAsync();
+            var todayAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status == EPostStatus.Accepted).CountAsync();
+            var todayRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status == EPostStatus.Rejected).CountAsync();
             var todayExpiredPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status < 0).CountAsync();
 
             sb.AppendLine("-- 24小时投稿统计 --");
@@ -725,9 +725,9 @@ namespace XinjingdailyBot.Command
             sb.AppendLine($"过期投稿: <code>{todayExpiredPost}</code>");
             sb.AppendLine($"累计投稿: <code>{todayPost + todayExpiredPost}</code>");
 
-            var weekPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status > PostStatus.Cancel).CountAsync();
-            var weekAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status == PostStatus.Accepted).CountAsync();
-            var weekRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status == PostStatus.Rejected).CountAsync();
+            var weekPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status > EPostStatus.Cancel).CountAsync();
+            var weekAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status == EPostStatus.Accepted).CountAsync();
+            var weekRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status == EPostStatus.Rejected).CountAsync();
             var weekExpiredPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status < 0).CountAsync();
 
             sb.AppendLine();
@@ -737,9 +737,9 @@ namespace XinjingdailyBot.Command
             sb.AppendLine($"过期投稿: <code>{weekExpiredPost}</code>");
             sb.AppendLine($"累计投稿: <code>{weekPost + weekExpiredPost}</code>");
 
-            var monthPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status > PostStatus.Cancel).CountAsync();
-            var monthAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Accepted).CountAsync();
-            var monthRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status == PostStatus.Rejected).CountAsync();
+            var monthPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status > EPostStatus.Cancel).CountAsync();
+            var monthAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status == EPostStatus.Accepted).CountAsync();
+            var monthRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status == EPostStatus.Rejected).CountAsync();
             var monthExpiredPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status < 0).CountAsync();
 
             sb.AppendLine();
@@ -749,9 +749,9 @@ namespace XinjingdailyBot.Command
             sb.AppendLine($"过期投稿: <code>{monthExpiredPost}</code>");
             sb.AppendLine($"累计投稿: <code>{monthPost}</code>");
 
-            var yearPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status > PostStatus.Cancel).CountAsync();
-            var yearAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status == PostStatus.Accepted).CountAsync();
-            var yearRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status == PostStatus.Rejected).CountAsync();
+            var yearPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status > EPostStatus.Cancel).CountAsync();
+            var yearAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status == EPostStatus.Accepted).CountAsync();
+            var yearRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status == EPostStatus.Rejected).CountAsync();
             var yearExpiredPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status < 0).CountAsync();
 
             sb.AppendLine();
@@ -761,9 +761,9 @@ namespace XinjingdailyBot.Command
             sb.AppendLine($"过期投稿: <code>{yearExpiredPost}</code>");
             sb.AppendLine($"累计投稿: <code>{yearPost}</code>");
 
-            var totalPost = await _postService.Queryable().Where(x => x.Status > PostStatus.Cancel).CountAsync();
-            var totalAcceptPost = await _postService.Queryable().Where(x => x.Status == PostStatus.Accepted).CountAsync();
-            var totalRejectPost = await _postService.Queryable().Where(x => x.Status == PostStatus.Rejected).CountAsync();
+            var totalPost = await _postService.Queryable().Where(x => x.Status > EPostStatus.Cancel).CountAsync();
+            var totalAcceptPost = await _postService.Queryable().Where(x => x.Status == EPostStatus.Accepted).CountAsync();
+            var totalRejectPost = await _postService.Queryable().Where(x => x.Status == EPostStatus.Rejected).CountAsync();
             var totalExpiredPost = await _postService.Queryable().Where(x => x.Status < 0).CountAsync();
             var totalChannel = await _channelOptionService.Queryable().CountAsync();
             var totalAttachment = await _attachmentService.Queryable().CountAsync();
@@ -799,7 +799,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("SYSREPORT", UserRights.AdminCmd, Alias = "SYSSTATUS", Description = "生成系统报表")]
+        [TextCmd("SYSREPORT", EUserRights.AdminCmd, Alias = "SYSSTATUS", Description = "生成系统报表")]
         public async Task ResponseSystemReport(Message message)
         {
             StringBuilder sb = new();
@@ -868,7 +868,7 @@ namespace XinjingdailyBot.Command
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("INVITE", UserRights.AdminCmd, Description = "创建审核群的邀请链接")]
+        [TextCmd("INVITE", EUserRights.AdminCmd, Description = "创建审核群的邀请链接")]
         public async Task ResponseInviteToReviewGroup(Users dbUser, Message message)
         {
             if (_channelService.ReviewGroup.Id == -1)
@@ -907,7 +907,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("USERRANK", UserRights.AdminCmd, Alias = "URANK", Description = "查看用户排行榜")]
+        [TextCmd("USERRANK", EUserRights.AdminCmd, Alias = "URANK", Description = "查看用户排行榜")]
         public async Task ResponseUserRank(Message message)
         {
             var now = DateTime.Now;
@@ -978,7 +978,7 @@ namespace XinjingdailyBot.Command
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [TextCmd("SETUSERGROUP", UserRights.AdminCmd, Alias = "SUGROUP", Description = "设置用户组")]
+        [TextCmd("SETUSERGROUP", EUserRights.AdminCmd, Alias = "SUGROUP", Description = "设置用户组")]
         public async Task SetUserGroup(Users dbUser, Message message, string[] args)
         {
             async Task<(string, InlineKeyboardMarkup?)> exec()
@@ -1028,7 +1028,7 @@ namespace XinjingdailyBot.Command
         /// <param name="dbUser"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [QueryCmd("SETUSERGROUP", UserRights.AdminCmd)]
+        [QueryCmd("SETUSERGROUP", EUserRights.AdminCmd)]
         public async Task QResponseSetUserGroup(Users dbUser, CallbackQuery callbackQuery, string[] args)
         {
             async Task<string> exec()
@@ -1092,7 +1092,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("MESSAGE", UserRights.AdminCmd, Alias = "MSG", Description = "查看消息详情")]
+        [TextCmd("MESSAGE", EUserRights.AdminCmd, Alias = "MSG", Description = "查看消息详情")]
         public async Task GetMessageDetail(Message message)
         {
             var msg = message.ReplyToMessage ?? message;
@@ -1144,7 +1144,7 @@ namespace XinjingdailyBot.Command
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [TextCmd("NUKE", UserRights.AdminCmd, Alias = "SB,SUPERBAN", Description = "联BAN用户")]
+        [TextCmd("NUKE", EUserRights.AdminCmd, Alias = "SB,SUPERBAN", Description = "联BAN用户")]
         public async Task ResponseNuke(Users dbUser, Message message, string[] args)
         {
             async Task<(InlineKeyboardMarkup?, string)> exec()
@@ -1182,17 +1182,17 @@ namespace XinjingdailyBot.Command
                 }
 
                 //获取最近一条解封记录
-                var lastUnbaned = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && (x.Type == BanType.UnBan || x.Type == BanType.Ban))
+                var lastUnbaned = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && (x.Type == EBanType.UnBan || x.Type == EBanType.Ban))
                     .OrderByDescending(x => x.BanTime).FirstAsync();
 
                 int warnCount;
                 if (lastUnbaned == null)
                 {
-                    warnCount = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && x.Type == BanType.Warning).CountAsync();
+                    warnCount = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && x.Type == EBanType.Warning).CountAsync();
                 }
                 else
                 {
-                    warnCount = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && x.Type == BanType.Warning && x.BanTime >= lastUnbaned.BanTime).CountAsync();
+                    warnCount = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && x.Type == EBanType.Warning && x.BanTime >= lastUnbaned.BanTime).CountAsync();
                 }
 
                 StringBuilder sb = new();
@@ -1217,7 +1217,7 @@ namespace XinjingdailyBot.Command
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [QueryCmd("NUKE", UserRights.AdminCmd, Description = "联BAN用户")]
+        [QueryCmd("NUKE", EUserRights.AdminCmd, Description = "联BAN用户")]
         public async Task QResponseNuke(Users dbUser, CallbackQuery callbackQuery, string[] args)
         {
             if (args.Length < 4)
@@ -1282,13 +1282,13 @@ namespace XinjingdailyBot.Command
                         "unban" => "撤销全局封禁",
                         _ => "未知",
                     };
-                    BanType banType = args[1] switch
+                    EBanType banType = args[1] switch
                     {
-                        "mute" => BanType.GlobalMute,
-                        "ban" => BanType.GlobalBan,
-                        "unmute" => BanType.GlobalUnMute,
-                        "unban" => BanType.GlobalUnBan,
-                        _ => BanType.GlobalMute,
+                        "mute" => EBanType.GlobalMute,
+                        "ban" => EBanType.GlobalBan,
+                        "unmute" => EBanType.GlobalUnMute,
+                        "unban" => EBanType.GlobalUnBan,
+                        _ => EBanType.GlobalMute,
                     };
 
 

@@ -47,7 +47,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
 
         public async Task<bool> OnForwardMessageReceived(Users dbUser, Message message)
         {
-            if (dbUser.Right.HasFlag(UserRights.AdminCmd))
+            if (dbUser.Right.HasFlag(EUserRights.AdminCmd))
             {
                 var forwardFrom = message.ForwardFrom!;
                 var forwardFromChat = message.ForwardFromChat;
@@ -56,7 +56,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 if (forwardFromChat != null && foreardMsgId != null
                     && (_channelService.IsChannelMessage(forwardFromChat.Id) || _channelService.IsGroupMessage(forwardFromChat.Id)))
                 {
-                    Posts? post = null;
+                    OldPosts? post = null;
 
                     bool isMediaGroup = !string.IsNullOrEmpty(message.MediaGroupId);
                     if (!isMediaGroup)
@@ -90,7 +90,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                         var poster = await _userService.FetchUserByUserID(post.PosterUID);
                         if (poster != null)
                         {
-                            if (post.Status == PostStatus.Reviewing)
+                            if (post.Status == EPostStatus.Reviewing)
                             {
                                 await _botClient.AutoReplyAsync("无法操作审核中的稿件", message);
                                 return false;
@@ -100,10 +100,10 @@ namespace XinjingdailyBot.Service.Bot.Handler
 
                             string postStatus = post.Status switch
                             {
-                                PostStatus.ConfirmTimeout => "投递超时",
-                                PostStatus.ReviewTimeout => "审核超时",
-                                PostStatus.Rejected => "已拒绝",
-                                PostStatus.Accepted => "已发布",
+                                EPostStatus.ConfirmTimeout => "投递超时",
+                                EPostStatus.ReviewTimeout => "审核超时",
+                                EPostStatus.Rejected => "已拒绝",
+                                EPostStatus.Accepted => "已发布",
                                 _ => "未知",
                             };
                             string postMode = post.IsDirectPost ? "直接发布" : (post.Anonymous ? "匿名投稿" : "保留来源");

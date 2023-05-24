@@ -54,7 +54,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("PING", UserRights.NormalCmd, Description = "检测机器人是否存活")]
+        [TextCmd("PING", EUserRights.NormalCmd, Description = "检测机器人是否存活")]
         public async Task ResponsePing(Message message)
         {
             await _botClient.SendCommandReply("PONG!", message);
@@ -66,7 +66,7 @@ namespace XinjingdailyBot.Command
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("ANONYMOUS", UserRights.NormalCmd, Alias = "ANYMOUSE", Description = "设置是否匿名")]
+        [TextCmd("ANONYMOUS", EUserRights.NormalCmd, Alias = "ANYMOUSE", Description = "设置是否匿名")]
         public async Task ResponseAnonymous(Users dbUser, Message message)
         {
             if (message.Chat.Type != ChatType.Private)
@@ -91,7 +91,7 @@ namespace XinjingdailyBot.Command
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("NOTIFICATION", UserRights.NormalCmd, Description = "设置稿件审核后是否通知")]
+        [TextCmd("NOTIFICATION", EUserRights.NormalCmd, Description = "设置稿件审核后是否通知")]
         public async Task ResponseNotification(Users dbUser, Message message)
         {
             if (message.Chat.Type != ChatType.Private)
@@ -116,7 +116,7 @@ namespace XinjingdailyBot.Command
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("MYINFO", UserRights.NormalCmd, Description = "获取自己的信息")]
+        [TextCmd("MYINFO", EUserRights.NormalCmd, Description = "获取自己的信息")]
         public async Task ResponseMyInfo(Users dbUser, Message message)
         {
             StringBuilder sb = new();
@@ -138,16 +138,16 @@ namespace XinjingdailyBot.Command
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("MYRIGHT", UserRights.NormalCmd, Description = "获取自己的权限")]
+        [TextCmd("MYRIGHT", EUserRights.NormalCmd, Description = "获取自己的权限")]
         public async Task ResponseMyRight(Users dbUser, Message message)
         {
             var right = dbUser.Right;
-            bool superCmd = right.HasFlag(UserRights.SuperCmd);
-            bool adminCmd = right.HasFlag(UserRights.AdminCmd);
-            bool normalCmd = right.HasFlag(UserRights.NormalCmd);
-            bool sendPost = right.HasFlag(UserRights.SendPost);
-            bool reviewPost = right.HasFlag(UserRights.ReviewPost);
-            bool directPost = right.HasFlag(UserRights.DirectPost);
+            bool superCmd = right.HasFlag(EUserRights.SuperCmd);
+            bool adminCmd = right.HasFlag(EUserRights.AdminCmd);
+            bool normalCmd = right.HasFlag(EUserRights.NormalCmd);
+            bool sendPost = right.HasFlag(EUserRights.SendPost);
+            bool reviewPost = right.HasFlag(EUserRights.ReviewPost);
+            bool directPost = right.HasFlag(EUserRights.DirectPost);
             string userNick = message.From!.EscapedNickName();
 
             string group = _groupRepository.GetGroupName(dbUser.GroupID);
@@ -178,7 +178,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("ADMIN", UserRights.NormalCmd, Description = "艾特群管理")]
+        [TextCmd("ADMIN", EUserRights.NormalCmd, Description = "艾特群管理")]
         public async Task ResponseCallAdmins(Message message)
         {
             StringBuilder sb = new();
@@ -210,7 +210,7 @@ namespace XinjingdailyBot.Command
         /// <param name="query"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [QueryCmd("CANCEL", UserRights.NormalCmd, Alias = "CANCELCLOSE CANCELANDCLOSE")]
+        [QueryCmd("CANCEL", EUserRights.NormalCmd, Alias = "CANCELCLOSE CANCELANDCLOSE")]
         public async Task QResponseCancel(CallbackQuery query, string[] args)
         {
             string text = args.Length > 1 ? string.Join(' ', args[1..]) : "操作已取消";
@@ -225,7 +225,7 @@ namespace XinjingdailyBot.Command
         /// <param name="query"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [QueryCmd("SAY", UserRights.NormalCmd)]
+        [QueryCmd("SAY", EUserRights.NormalCmd)]
         public async Task QResponseSay(CallbackQuery query, string[] args)
         {
             string text;
@@ -246,10 +246,10 @@ namespace XinjingdailyBot.Command
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("RANDOMPOST", UserRights.NormalCmd, Description = "获取随机稿件")]
+        [TextCmd("RANDOMPOST", EUserRights.NormalCmd, Description = "获取随机稿件")]
         public async Task ResponseRandomPost(Users dbUser, Message message)
         {
-            if (!dbUser.Right.HasFlag(UserRights.AdminCmd))
+            if (!dbUser.Right.HasFlag(EUserRights.AdminCmd))
             {
                 if (message.Chat.Type != ChatType.Private)
                 {
@@ -268,7 +268,7 @@ namespace XinjingdailyBot.Command
         /// <param name="callbackQuery"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [QueryCmd("SETRANDOMPOST", UserRights.NormalCmd)]
+        [QueryCmd("SETRANDOMPOST", EUserRights.NormalCmd)]
         public async Task QResponseSetRandomPost(Users dbUser, CallbackQuery callbackQuery, string[] args)
         {
             if (args.Length < 1)
@@ -301,7 +301,7 @@ namespace XinjingdailyBot.Command
         /// <param name="callbackQuery"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [QueryCmd("BACKRANDOMPOST", UserRights.NormalCmd)]
+        [QueryCmd("BACKRANDOMPOST", EUserRights.NormalCmd)]
         public async Task QResponseBackRandomPost(Users dbUser, CallbackQuery callbackQuery)
         {
             var keyboard = _markupHelperService.RandomPostMenuKeyboard(dbUser);
@@ -315,7 +315,7 @@ namespace XinjingdailyBot.Command
         /// <param name="callbackQuery"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [QueryCmd("RANDOMPOST", UserRights.NormalCmd)]
+        [QueryCmd("RANDOMPOST", EUserRights.NormalCmd)]
         public async Task QGetRandomPost(Users dbUser, CallbackQuery callbackQuery, string[] args)
         {
             if (args.Length < 3 || !int.TryParse(args[1], out int tagId))
@@ -338,7 +338,7 @@ namespace XinjingdailyBot.Command
             var tag = tagId != 0 ? _tagRepository.GetTagById(tagId) : null;
 
             var randomPost = await _postService.Queryable()
-                        .Where(x => x.Status == PostStatus.Accepted)
+                        .Where(x => x.Status == EPostStatus.Accepted)
                         .WhereIF(postType == null, x => x.PostType != MessageType.Text)
                         .WhereIF(postType != null, x => x.PostType == postType)
                         .WhereIF(tag != null, x => (x.NewTags & tag!.Seg) > 0)
@@ -420,7 +420,7 @@ namespace XinjingdailyBot.Command
             }
         }
 
-        [TextCmd("IP", UserRights.NormalCmd, Alias = "IPINFO", Description = "查询IP信息")]
+        [TextCmd("IP", EUserRights.NormalCmd, Alias = "IPINFO", Description = "查询IP信息")]
         public async Task GetIpInfo(Message message, string[] args)
         {
             StringBuilder sb = new();

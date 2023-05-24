@@ -5,7 +5,7 @@ using XinjingdailyBot.Repository.Base;
 namespace XinjingdailyBot.Repository
 {
     [AppService(LifeTime.Transient)]
-    public class PostRepository : BaseRepository<Posts>
+    public class PostRepository : BaseRepository<OldPosts>
     {
     }
 }

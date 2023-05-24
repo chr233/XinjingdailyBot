@@ -3,7 +3,7 @@
     /// <summary>
     /// 封禁类型
     /// </summary>
-    public enum BanType : byte
+    public enum EBanType : byte
     {
         /// <summary>
         /// 解封

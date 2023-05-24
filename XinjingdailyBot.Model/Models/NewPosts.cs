@@ -2,21 +2,20 @@
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Model.Base;
+using XinjingdailyBot.Model.Columns;
 
 namespace XinjingdailyBot.Model.Models
 {
-    [SugarTable("post", TableDescription = "投稿记录")]
-    [SugarIndex("index_origin_cid", nameof(OriginChatID), OrderByType.Asc)]
-    [SugarIndex("index_origin_mid", nameof(OriginMsgID), OrderByType.Asc)]
-    [SugarIndex("index_action_mid", nameof(ActionMsgID), OrderByType.Asc)]
-    [SugarIndex("index_review_mid", nameof(ReviewMsgID), OrderByType.Asc)]
-    [SugarIndex("index_manage_mid", nameof(ManageMsgID), OrderByType.Asc)]
-    [SugarIndex("index_review_mid_manage_mid", nameof(ReviewMsgID), OrderByType.Asc, nameof(ManageMsgID), OrderByType.Asc)]
+    [SugarTable("new_post", TableDescription = "投稿记录")]
+    [SugarIndex("index_origin", nameof(OriginChatID), OrderByType.Asc, nameof(OriginMsgID), OrderByType.Asc)]
+    [SugarIndex("index_originaction", nameof(OriginActionChatID), OrderByType.Asc, nameof(OriginActionMsgID), OrderByType.Asc)]
+    [SugarIndex("index_review", nameof(ReviewChatID), OrderByType.Asc, nameof(ReviewMsgID), OrderByType.Asc)]
+    [SugarIndex("index_reviewaction", nameof(ReviewActionChatID), OrderByType.Asc, nameof(ReviewActionMsgID), OrderByType.Asc)]
     [SugarIndex("index_media_group_id", nameof(MediaGroupID), OrderByType.Asc)]
     [SugarIndex("index_posterid", nameof(PosterUID), OrderByType.Asc)]
     [SugarIndex("index_reviewerid", nameof(ReviewerUID), OrderByType.Asc)]
     [SugarIndex("index_status_modifyat", nameof(Status), OrderByType.Asc, nameof(ModifyAt), OrderByType.Asc)]
-    public sealed record Posts : BaseModel
+    public sealed record NewPosts : BaseModel, ICreateModifyAt
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
@@ -28,18 +27,35 @@ namespace XinjingdailyBot.Model.Models
         /// 原始消息ID
         /// </summary>
         public long OriginMsgID { get; set; } = -1;
+
+        /// <summary>
+        /// 投稿控制消息会话ID
+        /// </summary>
+        public long OriginActionChatID { get; set; } = -1;
+
         /// <summary>
         /// 投稿控制消息ID
         /// </summary>
-        public long ActionMsgID { get; set; } = -1;
+        public long OriginActionMsgID { get; set; } = -1;
+
+        /// <summary>
+        /// 审核消息会话ID
+        /// </summary>
+        public long ReviewChatID { get; set; } = -1;
         /// <summary>
         /// 审核群消息ID
         /// </summary>
         public long ReviewMsgID { get; set; } = -1;
+
+        /// <summary>
+        /// 审核群控制消息会话ID
+        /// </summary>
+        public long ReviewActionChatID { get; set; } = -1;
         /// <summary>
         /// 审核群控制消息ID
         /// </summary>
-        public long ManageMsgID { get; set; } = -1;
+        public long ReviewActionMsgID { get; set; } = -1;
+
         /// <summary>
         /// 发布的消息Id
         /// </summary>
@@ -49,12 +65,11 @@ namespace XinjingdailyBot.Model.Models
         /// 是否为直接投稿
         /// </summary>
         [SugarColumn(IsIgnore = true)]
-        public bool IsDirectPost => ManageMsgID == ActionMsgID;
+        public bool IsDirectPost => OriginActionChatID == ReviewActionChatID;
 
         /// <summary>
         /// 匿名投稿
         /// </summary>
-        [SugarColumn(OldColumnName = "Anymouse")]
         public bool Anonymous { get; set; }
 
         /// <summary>
@@ -69,23 +84,24 @@ namespace XinjingdailyBot.Model.Models
         public string RawText { get; set; } = "";
 
         /// <summary>
+        /// 来源频道ID
+        /// </summary>
+        public long ChannelID { get; set; } = -1;
+
+        /// <summary>
+        /// 来源频道链接
+        /// </summary>
+        public string ChannelLink { get; set; } = "";
+        /// <summary>
         /// 是否为频道转发
         /// </summary>
         [SugarColumn(IsIgnore = true)]
-        public bool IsFromChannel => !string.IsNullOrEmpty(ChannelName) && !ChannelName.EndsWith('~');
+        public bool IsFromChannel => ChannelID != -1;
 
-        /// <summary>
-        /// 来源频道ID
-        /// </summary>
-        public string ChannelName { get; set; } = "";
-        /// <summary>
-        /// 来源频道名称
-        /// </summary>
-        public string ChannelTitle { get; set; } = "";
         /// <summary>
         /// 投稿状态
         /// </summary>
-        public PostStatus Status { get; set; } = PostStatus.Unknown;
+        public EPostStatus Status { get; set; } = EPostStatus.Unknown;
         /// <summary>
         /// 是否有附件
         /// </summary>
@@ -105,14 +121,9 @@ namespace XinjingdailyBot.Model.Models
         /// </summary>
         public string MediaGroupID { get; set; } = "";
         /// <summary>
-        /// 标签
-        /// </summary>
-        [Obsolete("过时的属性")]
-        public BuildInTags Tags { get; set; }
-        /// <summary>
         /// 稿件标签
         /// </summary>
-        public int NewTags { get; set; }
+        public int Tags { get; set; }
         /// <summary>
         /// 是否启用遮罩
         /// </summary>
@@ -122,18 +133,17 @@ namespace XinjingdailyBot.Model.Models
         /// </summary>
         [SugarColumn(IsIgnore = true)]
         public bool CanSpoiler => PostType == MessageType.Photo || PostType == MessageType.Video;
+
         /// <summary>
         /// 拒绝原因(如果拒绝)
         /// </summary>
-        public RejectReason Reason { get; set; } = RejectReason.NotReject;
-        /// <summary>
-        /// 创建时间
-        /// </summary>
+        public string Reason { get; set; } = "";
+
+        /// <inheritdoc cref="ICreateModifyAt.CreateAt"/>
         public DateTime CreateAt { get; set; } = DateTime.Now;
-        /// <summary>
-        /// 修改时间
-        /// </summary>
+        /// <inheritdoc cref="ICreateModifyAt.ModifyAt"/>
         public DateTime ModifyAt { get; set; } = DateTime.Now;
+
         /// <summary>
         /// 投稿人用户ID
         /// </summary>

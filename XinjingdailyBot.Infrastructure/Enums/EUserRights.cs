@@ -4,7 +4,7 @@
     /// 用户权限
     /// </summary>
     [Flags]
-    public enum UserRights : byte
+    public enum EUserRights : byte
     {
         /// <summary>
         /// 无权限

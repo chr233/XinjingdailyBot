@@ -3,7 +3,7 @@
     /// <summary>
     /// 稿件状态
     /// </summary>
-    public enum PostStatus : int
+    public enum EPostStatus : int
     {
         /// <summary>
         /// 确认投稿超时
