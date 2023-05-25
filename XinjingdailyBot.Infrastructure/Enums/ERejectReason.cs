@@ -3,6 +3,7 @@
     /// <summary>
     /// 拒稿原因
     /// </summary>
+    [Obsolete("弃用")]
     public enum ERejectReason : byte
     {
         /// <summary>
