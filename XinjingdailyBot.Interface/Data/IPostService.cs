@@ -4,6 +4,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Data
 {
+    [Obsolete("待重构")]
     public interface IPostService : IBaseService<OldPosts>
     {
         /// <summary>

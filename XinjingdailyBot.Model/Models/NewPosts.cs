@@ -15,7 +15,7 @@ namespace XinjingdailyBot.Model.Models
     [SugarIndex("index_posterid", nameof(PosterUID), OrderByType.Asc)]
     [SugarIndex("index_reviewerid", nameof(ReviewerUID), OrderByType.Asc)]
     [SugarIndex("index_status_modifyat", nameof(Status), OrderByType.Asc, nameof(ModifyAt), OrderByType.Asc)]
-    public sealed record NewPosts : BaseModel, ICreateModifyAt
+    public sealed record NewPosts : BaseModel, IModifyAt, ICreateAt
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
@@ -139,9 +139,9 @@ namespace XinjingdailyBot.Model.Models
         /// </summary>
         public string Reason { get; set; } = "";
 
-        /// <inheritdoc cref="ICreateModifyAt.CreateAt"/>
+        /// <inheritdoc cref="ICreateAt.CreateAt"/>
         public DateTime CreateAt { get; set; } = DateTime.Now;
-        /// <inheritdoc cref="ICreateModifyAt.ModifyAt"/>
+        /// <inheritdoc cref="IModifyAt.ModifyAt"/>
         public DateTime ModifyAt { get; set; } = DateTime.Now;
 
         /// <summary>

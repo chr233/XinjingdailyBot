@@ -1,10 +1,12 @@
 ﻿using SqlSugar;
 using XinjingdailyBot.Model.Base;
+using XinjingdailyBot.Model.Columns;
 
 namespace XinjingdailyBot.Model.Models
 {
     [SugarTable("dialogue", TableDescription = "消息记录")]
-    public sealed record Dialogue : BaseModel
+    [SugarIndex("index_chat", nameof(ChatID), OrderByType.Asc, nameof(MessageID), OrderByType.Asc, true)]
+    public sealed record Dialogue : BaseModel, ICreateAt
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
@@ -37,9 +39,9 @@ namespace XinjingdailyBot.Model.Models
         /// 消息类型
         /// </summary>
         public string Type { get; set; } = "";
-        /// <summary>
-        /// 消息事件
-        /// </summary>
-        public DateTime Date { get; set; } = DateTime.Now;
+
+        /// <inheritdoc cref="ICreateAt.CreateAt"/>
+        [SugarColumn(OldColumnName = "Data", DefaultValue = "1970-01-01 00:00:00")]
+        public DateTime CreateAt { get; set; }
     }
 }

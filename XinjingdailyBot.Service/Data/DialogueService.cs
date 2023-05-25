@@ -37,7 +37,7 @@ namespace XinjingdailyBot.Service.Data
                 ReplyMessageID = message.ReplyToMessage?.MessageId ?? -1,
                 Type = message.Type.ToString(),
                 Content = content ?? "",
-                Date = message.Date,
+                CreateAt = message.Date,
             };
 
             await InsertAsync(dialogue);

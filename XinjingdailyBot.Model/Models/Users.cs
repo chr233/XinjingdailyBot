@@ -11,6 +11,7 @@ namespace XinjingdailyBot.Model.Models
     [SugarTable("user", TableDescription = "用户表")]
     [SugarIndex("index_userid", nameof(UserID), OrderByType.Asc, true)]
     [SugarIndex("index_username", nameof(UserName), OrderByType.Asc)]
+    [SugarIndex("index_token", nameof(APIToken), OrderByType.Asc, false)]
     public sealed record Users : BaseModel
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
@@ -106,6 +107,11 @@ namespace XinjingdailyBot.Model.Models
         /// 修改时间
         /// </summary>
         public DateTime ModifyAt { get; set; } = DateTime.Now;
+
+        /// <summary>
+        /// API Token
+        /// </summary>
+        public Guid? APIToken { get; set; }
 
         public override string ToString()
         {
