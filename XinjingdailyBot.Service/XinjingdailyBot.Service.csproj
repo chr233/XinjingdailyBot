@@ -1,19 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Library</OutputType>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
-    <PackageReference Include="Microsoft.Extensions.Http" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+		<PackageReference Include="Microsoft.Extensions.Http" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\XinjingdailyBot.Infrastructure\XinjingdailyBot.Infrastructure.csproj" />
-    <ProjectReference Include="..\XinjingdailyBot.Interface\XinjingdailyBot.Interface.csproj" />
-    <ProjectReference Include="..\XinjingdailyBot.Model\XinjingdailyBot.Model.csproj" />
-    <ProjectReference Include="..\XinjingdailyBot.Repository\XinjingdailyBot.Repository.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\XinjingdailyBot.Infrastructure\XinjingdailyBot.Infrastructure.csproj" />
+		<ProjectReference Include="..\XinjingdailyBot.Interface\XinjingdailyBot.Interface.csproj" />
+		<ProjectReference Include="..\XinjingdailyBot.Model\XinjingdailyBot.Model.csproj" />
+		<ProjectReference Include="..\XinjingdailyBot.Repository\XinjingdailyBot.Repository.csproj" />
+	</ItemGroup>
 
 </Project>

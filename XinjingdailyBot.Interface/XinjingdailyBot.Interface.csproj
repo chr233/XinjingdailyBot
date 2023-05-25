@@ -1,13 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Library</OutputType>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\XinjingdailyBot.Infrastructure\XinjingdailyBot.Infrastructure.csproj" />
-    <ProjectReference Include="..\XinjingdailyBot.Model\XinjingdailyBot.Model.csproj" />
-    <ProjectReference Include="..\XinjingdailyBot.Repository\XinjingdailyBot.Repository.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\XinjingdailyBot.Infrastructure\XinjingdailyBot.Infrastructure.csproj" />
+		<ProjectReference Include="..\XinjingdailyBot.Model\XinjingdailyBot.Model.csproj" />
+		<ProjectReference Include="..\XinjingdailyBot.Repository\XinjingdailyBot.Repository.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
 
 </Project>
