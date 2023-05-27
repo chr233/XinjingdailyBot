@@ -108,11 +108,6 @@ namespace XinjingdailyBot.Model.Models
         /// </summary>
         public DateTime ModifyAt { get; set; } = DateTime.Now;
 
-        /// <summary>
-        /// API Token
-        /// </summary>
-        public Guid? APIToken { get; set; }
-
         public override string ToString()
         {
             if (string.IsNullOrEmpty(UserName))
