@@ -84,7 +84,7 @@ namespace XinjingdailyBot.Repository
                 new() { Id = 2, Name = "重复", Payload = "duplicate", FullText = "重复的稿件", IsCount = false },
                 new() { Id = 3, Name = "无趣", Payload = "boring", FullText = "内容不够有趣" },
                 new() { Id = 4, Name = "没懂", Payload = "confusing", FullText = "审核没看懂,建议配文说明" },
-                new() { Id = 5, Name = "内容不合适", Payload = "deny", FullText = "不合适发布的内容" },
+                new() { Id = 5, Name = "不合适", Payload = "deny", FullText = "不合适发布的内容" },
                 new() { Id = 6, Name = "广告水印", Payload = "qrcode", FullText = "稿件包含二维码水印" },
                 new() { Id = 7, Name = "其他原因", Payload = "other", FullText = "其他原因" },
                 new() { Id = 8, Name = "太多了", Payload = "toomuch", FullText = "太多了" },
@@ -120,7 +120,7 @@ namespace XinjingdailyBot.Repository
         /// 获取所有标签
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<RejectReason> GetAllTags()
+        public IEnumerable<RejectReason> GetAllRejectReasons()
         {
             return RejectReasonCache.Values;
         }
