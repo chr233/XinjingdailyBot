@@ -168,7 +168,7 @@ namespace XinjingdailyBot.Command
                 var messages = await _botClient.SendMediaGroupAsync(_channelService.ReviewGroup.Id, group);
                 reviewMsg = messages.First();
                 post.ReviewMediaGroupID = reviewMsg.MediaGroupId ?? "";
-                
+
                 //记录媒体组消息
                 await _mediaGroupService.AddPostMediaGroup(messages);
             }
