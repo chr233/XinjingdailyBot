@@ -38,8 +38,6 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 $"Host={dbConfig.DbHost};Port={dbConfig.DbPort};Database={dbConfig.DbName};UserID={dbConfig.DbUser};Password={dbConfig.DbPassword};CharSet=utf8mb4;AllowZeroDateTime=true" :
                 $"DataSource={dbConfig.DbName}.db";
 
-            services.AddHttpContextAccessor();
-
             services.AddSqlSugar(new IocConfig {
                 ConfigId = 0,
                 ConnectionString = connStr,
