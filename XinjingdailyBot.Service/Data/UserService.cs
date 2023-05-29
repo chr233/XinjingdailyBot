@@ -31,6 +31,7 @@ namespace XinjingdailyBot.Service.Data
         private readonly ITelegramBotClient _botClient;
         private readonly LevelRepository _levelRepository;
         private readonly INameHistoryService _nameHistoryService;
+        private readonly IMediaGroupService _mediaGroupService;
 
         public UserService(
             ILogger<UserService> logger,
@@ -42,7 +43,8 @@ namespace XinjingdailyBot.Service.Data
             PostRepository postRepository,
             ITelegramBotClient botClient,
             LevelRepository levelRepository,
-            INameHistoryService nameHistoryService)
+            INameHistoryService nameHistoryService,
+            IMediaGroupService mediaGroupService)
         {
             _logger = logger;
             _optionsSetting = configuration.Value;
@@ -54,6 +56,7 @@ namespace XinjingdailyBot.Service.Data
             _botClient = botClient;
             _levelRepository = levelRepository;
             _nameHistoryService = nameHistoryService;
+            _mediaGroupService = mediaGroupService;
         }
 
         /// <summary>
@@ -431,9 +434,8 @@ namespace XinjingdailyBot.Service.Data
                 {
                     NewPosts? post;
 
-                    var msgGroupId = message.MediaGroupId;
-
-                    if (string.IsNullOrEmpty(msgGroupId))//单条稿件
+                    var mediaGroup = await _mediaGroupService.QueryMediaGroup(chatId, msgId);
+                    if (mediaGroup == null)//单条稿件
                     {
                         post = await _postRepository.Queryable().FirstAsync(x =>
                             (x.ReviewChatID == chatId && x.ReviewMsgID == msgId) || (x.ReviewActionChatID == chatId && x.ReviewActionMsgID == msgId)
@@ -441,7 +443,7 @@ namespace XinjingdailyBot.Service.Data
                     }
                     else //媒体组稿件
                     {
-                        post = await _postRepository.Queryable().FirstAsync(x => x.ReviewChatID == chatId && x.ReviewMediaGroupID == msgGroupId);
+                        post = await _postRepository.Queryable().FirstAsync(x => x.ReviewChatID == chatId && x.ReviewMediaGroupID == mediaGroup.MediaGroupID);
                     }
 
                     //判断是不是审核相关消息
