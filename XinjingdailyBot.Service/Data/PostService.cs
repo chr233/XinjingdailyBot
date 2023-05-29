@@ -31,6 +31,7 @@ namespace XinjingdailyBot.Service.Data
         private readonly IUserService _userService;
         private readonly OptionsSetting.PostOption _postOption;
         private readonly TagRepository _tagRepository;
+        private readonly IMediaGroupService _mediaGroupService;
 
         public PostService(
             ILogger<PostService> logger,
@@ -42,7 +43,8 @@ namespace XinjingdailyBot.Service.Data
             ITelegramBotClient botClient,
             IUserService userService,
             IOptions<OptionsSetting> options,
-            TagRepository tagRepository)
+            TagRepository tagRepository,
+            IMediaGroupService mediaGroupService)
         {
             _logger = logger;
             _attachmentService = attachmentService;
@@ -54,6 +56,7 @@ namespace XinjingdailyBot.Service.Data
             _userService = userService;
             _postOption = options.Value.Post;
             _tagRepository = tagRepository;
+            _mediaGroupService = mediaGroupService;
         }
 
         public async Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null)
@@ -718,7 +721,7 @@ namespace XinjingdailyBot.Service.Data
                 post.PublishMediaGroupID = postMessages.First().MediaGroupId ?? "";
 
                 //记录媒体组消息
-                //await _mediaGroupService.AddPostMediaGroup(postMessages);
+                await _mediaGroupService.AddPostMediaGroup(postMessages);
             }
 
             await _botClient.AutoReplyAsync("稿件已发布", callbackQuery);
@@ -793,7 +796,8 @@ namespace XinjingdailyBot.Service.Data
                 long chatId = replyMessage.Chat.Id;
                 int msgId = replyMessage.MessageId;
                 post = await Queryable().FirstAsync(x =>
-                    (x.ReviewChatID == chatId && x.ReviewMsgID == msgId) || (x.ReviewActionChatID == chatId && x.ReviewActionMsgID == msgId)
+                  (x.OriginChatID == chatId && x.OriginMsgID == msgId) || (x.OriginActionChatID == chatId && x.OriginActionMsgID == msgId) ||
+                  (x.ReviewChatID == chatId && x.ReviewMsgID == msgId) || (x.ReviewActionChatID == chatId && x.ReviewActionMsgID == msgId)
                 );
             }
             else

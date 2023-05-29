@@ -21,19 +21,22 @@ namespace XinjingdailyBot.Service.Bot.Handler
         private readonly IPostService _postService;
         private readonly IMarkupHelperService _markupHelperService;
         private readonly IUserService _userService;
+        private readonly IMediaGroupService _mediaGroupService;
 
         public ForwardMessageHandler(
             ITelegramBotClient botClient,
             IChannelService channelService,
             IPostService postService,
             IMarkupHelperService markupHelperService,
-            IUserService userService)
+            IUserService userService,
+            IMediaGroupService mediaGroupService)
         {
             _botClient = botClient;
             _channelService = channelService;
             _postService = postService;
             _markupHelperService = markupHelperService;
             _userService = userService;
+            _mediaGroupService = mediaGroupService;
         }
 
         public async Task<bool> OnForwardMessageReceived(Users dbUser, Message message)
@@ -42,16 +45,15 @@ namespace XinjingdailyBot.Service.Bot.Handler
             {
                 var forwardFrom = message.ForwardFrom!;
                 var forwardChatId = message.ForwardFromChat?.Id ?? -1;
-                var foreardMsgId = message.ForwardFromMessageId;
+                var foreardMsgId = message.ForwardFromMessageId ?? -1;
 
-                if (forwardChatId != -1 && foreardMsgId != null &&
+                if (forwardChatId != -1 && foreardMsgId != -1 &&
                    (_channelService.IsChannelMessage(forwardChatId) || _channelService.IsGroupMessage(forwardChatId)))
                 {
                     NewPosts? post = null;
 
-                    var msgGroupId = message.MediaGroupId;
-                    bool isMediaGroup = !string.IsNullOrEmpty(msgGroupId);
-                    if (!isMediaGroup)
+                    var mediaGroup = await _mediaGroupService.QueryMediaGroup(forwardChatId, foreardMsgId);
+                    if (mediaGroup == null)
                     {
                         if (_channelService.IsChannelMessage(forwardChatId)) //转发自发布频道或拒绝存档
                         {
@@ -69,11 +71,11 @@ namespace XinjingdailyBot.Service.Bot.Handler
                     {
                         if (_channelService.IsChannelMessage(forwardChatId)) //转发自发布频道或拒绝存档
                         {
-                            post = await _postService.GetFirstAsync(x => x.PublishMediaGroupID == msgGroupId);
+                            post = await _postService.GetFirstAsync(x => x.PublishMediaGroupID == mediaGroup.MediaGroupID);
                         }
                         else //转发自关联群组 (仅支持审核群)
                         {
-                            post = await _postService.GetFirstAsync(x => x.ReviewMediaGroupID == msgGroupId);
+                            post = await _postService.GetFirstAsync(x => x.ReviewMediaGroupID == mediaGroup.MediaGroupID);
                         }
                     }
 
