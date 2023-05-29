@@ -87,11 +87,10 @@ namespace XinjingdailyBot.Model.Models
         /// 来源频道ID
         /// </summary>
         public long ChannelID { get; set; } = -1;
-
         /// <summary>
         /// 来源频道链接
         /// </summary>
-        public string ChannelLink { get; set; } = "";
+        public long ChannelMsgId { get; set; } = -1;
         /// <summary>
         /// 是否为频道转发
         /// </summary>

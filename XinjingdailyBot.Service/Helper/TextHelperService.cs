@@ -193,7 +193,7 @@ namespace XinjingdailyBot.Service.Helper
 
             if (post.IsFromChannel)
             {
-                var channel = HtmlUserLink(0, post.ChannelName, post.ChannelTitle);
+                var channel = HtmlMessageLink(0, post.ChannelName, post.ChannelTitle);
                 if (post.Anonymous)
                 {
                     return $"<i>from</i> {channel}";
