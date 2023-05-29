@@ -12,13 +12,13 @@ namespace XinjingdailyBot.Service.Bot.Handler
     [AppService(typeof(IMessageHandler), LifeTime.Singleton)]
     public class MessageHandler : IMessageHandler
     {
-        private readonly IPostService _postService;
+        private readonly INewPostService _postService;
         private readonly IGroupMessageHandler _groupMessageHandler;
         private readonly ITelegramBotClient _botClient;
         private readonly IForwardMessageHandler _forwardMessageHandler;
 
         public MessageHandler(
-            IPostService postService,
+            INewPostService postService,
             IGroupMessageHandler groupMessageHandler,
             ITelegramBotClient botClient,
             IForwardMessageHandler forwardMessageHandler)

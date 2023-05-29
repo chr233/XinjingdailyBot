@@ -192,7 +192,7 @@ namespace XinjingdailyBot.Service.Data
                 }
 
                 channelMsgId = message.ForwardFromMessageId ?? -1;
-                channelOption = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, message.ForwardFromChat.Title);
+                channelOption = await _channelOptionService.FetchChannelOption(message.ForwardFromChat);
             }
 
             int newTags = _tagRepository.FetchTags(message.Text);
@@ -287,7 +287,7 @@ namespace XinjingdailyBot.Service.Data
                     }
                 }
                 channelMsgId = message.ForwardFromMessageId ?? -1;
-                channelOption = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, message.ForwardFromChat.Title);
+                channelOption = await _channelOptionService.FetchChannelOption(message.ForwardFromChat);
             }
 
             int newTags = _tagRepository.FetchTags(message.Caption);
@@ -387,7 +387,7 @@ namespace XinjingdailyBot.Service.Data
             {
                 MediaGroupIDs.TryAdd(mediaGroupId, -1);
 
-                bool exists = await Queryable().AnyAsync(x => x.MediaGroupID == mediaGroupId);
+                bool exists = await Queryable().AnyAsync(x => x.OriginMediaGroupID == mediaGroupId);
                 if (!exists)
                 {
                     var channelOption = EChannelOption.Normal;
@@ -407,7 +407,7 @@ namespace XinjingdailyBot.Service.Data
                         }
 
                         channelMsgId = message.ForwardFromMessageId ?? -1;
-                        channelOption = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, message.ForwardFromChat.Title);
+                        channelOption = await _channelOptionService.FetchChannelOption( message.ForwardFromChat);
                     }
 
                     int newTags = _tagRepository.FetchTags(message.Caption);
@@ -440,7 +440,7 @@ namespace XinjingdailyBot.Service.Data
                         ChannelMsgId = channelMsgId,
                         Status = directPost ? EPostStatus.Reviewing : EPostStatus.Padding,
                         PostType = message.Type,
-                        MediaGroupID = mediaGroupId,
+                        OriginMediaGroupID = mediaGroupId,
                         Tags = newTags,
                         HasSpoiler = hasSpoiler ?? false,
                         PosterUID = dbUser.UserID,
@@ -547,11 +547,11 @@ namespace XinjingdailyBot.Service.Data
             post.ModifyAt = DateTime.Now;
             await Updateable(post).UpdateColumns(x => new { x.Reason, x.ReviewerUID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
 
-            Users poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
+            var poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
 
             //修改审核群消息
             string reviewMsg = _textHelperService.MakeReviewMessage(poster, dbUser, post.Anonymous, rejectReason);
-            await _botClient.EditMessageTextAsync(_channelService.ReviewGroup.Id, (int)post.ManageMsgID, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
+            await _botClient.EditMessageTextAsync(post.ReviewActionChatID, (int)post.ReviewActionMsgID, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
 
             //拒稿频道发布消息
             if (!post.IsMediaGroup)
@@ -582,7 +582,7 @@ namespace XinjingdailyBot.Service.Data
                 var group = new IAlbumInputMedia[attachments.Count];
                 for (int i = 0; i < attachments.Count; i++)
                 {
-                    MessageType attachmentType = attachments[i].Type;
+                    var attachmentType = attachments[i].Type;
                     if (attachmentType == MessageType.Unknown)
                     {
                         attachmentType = post.PostType;
@@ -597,10 +597,10 @@ namespace XinjingdailyBot.Service.Data
                         _ => throw new Exception("未知的稿件类型"),
                     };
                 }
-                var messages = await _botClient.SendMediaGroupAsync(_channelService.RejectChannel.Id, group);
+                var postMessages = await _botClient.SendMediaGroupAsync(_channelService.RejectChannel.Id, group);
 
                 //处理媒体组消息
-                await _mediaGroupService.AddPostMediaGroup(messages);
+                await _mediaGroupService.AddPostMediaGroup(postMessages);
             }
 
             //通知投稿人
@@ -611,7 +611,7 @@ namespace XinjingdailyBot.Service.Data
             }
             else
             {
-                await _botClient.EditMessageTextAsync(post.OriginChatID, (int)post.ActionMsgID, posterMsg);
+                await _botClient.EditMessageTextAsync(post.OriginActionChatID, (int)post.OriginActionMsgID, posterMsg);
             }
 
             poster.RejectCount++;
@@ -628,7 +628,7 @@ namespace XinjingdailyBot.Service.Data
 
         public async Task AcceptPost(NewPosts post, Users dbUser, CallbackQuery callbackQuery)
         {
-            Users poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
+            var poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
 
             if (post.IsDirectPost)
             {
@@ -648,14 +648,14 @@ namespace XinjingdailyBot.Service.Data
                     await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, warnText, allowSendingWithoutReply: true);
                 }
 
-                Message? msg = null;
+                Message? postMessage = null;
                 if (post.PostType == MessageType.Text)
                 {
-                    msg = await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, postText, parseMode: ParseMode.Html, disableWebPagePreview: true);
+                    postMessage = await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, postText, parseMode: ParseMode.Html, disableWebPagePreview: true);
                 }
                 else
                 {
-                    Attachments attachment = await _attachmentService.Queryable().FirstAsync(x => x.PostID == post.Id);
+                    var attachment = await _attachmentService.Queryable().FirstAsync(x => x.PostID == post.Id);
 
                     var handler = post.PostType switch {
                         MessageType.Photo => _botClient.SendPhotoAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
@@ -673,9 +673,9 @@ namespace XinjingdailyBot.Service.Data
                         return;
                     }
 
-                    msg = await handler;
+                    postMessage = await handler;
                 }
-                post.PublicMsgID = msg?.MessageId ?? -1;
+                post.PublicMsgID = postMessage?.MessageId ?? -1;
             }
             else
             {
@@ -683,7 +683,7 @@ namespace XinjingdailyBot.Service.Data
                 var group = new IAlbumInputMedia[attachments.Count];
                 for (int i = 0; i < attachments.Count; i++)
                 {
-                    MessageType attachmentType = attachments[i].Type;
+                    var attachmentType = attachments[i].Type;
                     if (attachmentType == MessageType.Unknown)
                     {
                         attachmentType = post.PostType;
@@ -704,11 +704,12 @@ namespace XinjingdailyBot.Service.Data
                     await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, warnText, allowSendingWithoutReply: true);
                 }
 
-                var messages = await _botClient.SendMediaGroupAsync(_channelService.AcceptChannel.Id, group);
-                post.PublicMsgID = messages.First().MessageId;
+                var postMessages = await _botClient.SendMediaGroupAsync(_channelService.AcceptChannel.Id, group);
+                post.PublicMsgID = postMessages.First().MessageId;
+                post.PublishMediaGroupID = postMessages.First().MediaGroupId ?? "";
 
                 //记录媒体组消息
-                await _mediaGroupService.AddPostMediaGroup(messages);
+                await _mediaGroupService.AddPostMediaGroup(postMessages);
             }
 
             await _botClient.AutoReplyAsync("稿件已发布", callbackQuery);
@@ -730,7 +731,7 @@ namespace XinjingdailyBot.Service.Data
                 post.ReviewMsgID = msg.MessageId;
             }
 
-            await Updateable(post).UpdateColumns(x => new { x.ReviewMsgID, x.PublicMsgID, x.ReviewerUID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
+            await Updateable(post).UpdateColumns(x => new { x.ReviewMsgID, x.PublicMsgID, x.PublishMediaGroupID, x.ReviewerUID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
 
             //通知投稿人
             string posterMsg = _textHelperService.MakeNotification(post.IsDirectPost, post.PublicMsgID);
@@ -741,7 +742,7 @@ namespace XinjingdailyBot.Service.Data
             }
             else
             {//静默模式, 不单独发送通知消息
-                await _botClient.EditMessageTextAsync(post.OriginChatID, (int)post.ActionMsgID, posterMsg, ParseMode.Html, disableWebPagePreview: true);
+                await _botClient.EditMessageTextAsync(post.OriginChatID, (int)post.OriginActionMsgID, posterMsg, ParseMode.Html, disableWebPagePreview: true);
             }
 
             //增加通过数量
@@ -780,35 +781,28 @@ namespace XinjingdailyBot.Service.Data
             if (mediaGroup == null)
             {
                 //单条稿件
+                long chatId = replyMessage.Chat.Id;
                 int msgId = replyMessage.MessageId;
-                post = await Queryable().FirstAsync(x => x.ReviewMsgID == msgId || x.ManageMsgID == msgId);
+                post = await Queryable().FirstAsync(x =>
+                    (x.ReviewChatID == chatId && x.ReviewMsgID == msgId) || (x.ReviewActionChatID == chatId && x.ReviewActionMsgID == msgId)
+                );
             }
             else
             {
-                post = await Queryable().FirstAsync(x => x.MediaGroupID == mediaGroup.MediaGroupID);
+                var mediaGroupID = mediaGroup.MediaGroupID;
+                post = await Queryable().FirstAsync(x => x.OriginMediaGroupID == mediaGroupID || x.ReviewMediaGroupID == mediaGroupID);
             }
 
             return post;
         }
 
-        public async Task<NewPosts?> FetchPostFromReviewCallbackQuery(CallbackQuery query)
+        public async Task<NewPosts?> FetchPostFromCallbackQuery(CallbackQuery query)
         {
             if (query.Message == null)
             {
                 return null;
             }
-            var post = await GetFirstAsync(x => x.ManageMsgID == query.Message.MessageId);
-            return post;
-        }
-
-        public async Task<NewPosts?> FetchPostFromConfirmCallbackQuery(CallbackQuery query)
-        {
-            if (query.Message == null)
-            {
-                return null;
-            }
-
-            var post = await GetFirstAsync(x => x.ActionMsgID == query.Message.MessageId);
+            var post = await FetchPostFromReplyToMessage(query.Message);
             return post;
         }
     }

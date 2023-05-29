@@ -18,7 +18,7 @@ namespace XinjingdailyBot.Command
         private readonly ITelegramBotClient _botClient;
         private readonly IUserService _userService;
         private readonly IChannelService _channelService;
-        private readonly IPostService _postService;
+        private readonly INewPostService _postService;
         private readonly ITextHelperService _textHelperService;
         private readonly IMarkupHelperService _markupHelperService;
 
@@ -26,7 +26,7 @@ namespace XinjingdailyBot.Command
             ITelegramBotClient botClient,
             IUserService userService,
             IChannelService channelService,
-            IPostService postService,
+            INewPostService postService,
             ITextHelperService textHelperService,
             IMarkupHelperService markupHelperService)
         {
@@ -147,7 +147,7 @@ namespace XinjingdailyBot.Command
         public async Task HandleQuery(Users dbUser, CallbackQuery callbackQuery)
         {
             var message = callbackQuery.Message!;
-            var post = await _postService.FetchPostFromReviewCallbackQuery(callbackQuery);
+            var post = await _postService.FetchPostFromCallbackQuery(callbackQuery);
             if (post == null)
             {
                 await _botClient.AutoReplyAsync("未找到稿件", callbackQuery, true);
@@ -246,7 +246,7 @@ namespace XinjingdailyBot.Command
         /// <param name="post"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        private async Task SetAnymouse(OldPosts post, CallbackQuery query)
+        private async Task SetAnymouse(NewPosts post, CallbackQuery query)
         {
             await _botClient.AutoReplyAsync("可以使用命令 /anymouse 切换默认匿名投稿", query);
 
@@ -257,7 +257,7 @@ namespace XinjingdailyBot.Command
 
             bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
 
-            var keyboard = _markupHelperService.DirectPostKeyboard(anonymous, post.NewTags, hasSpoiler);
+            var keyboard = _markupHelperService.DirectPostKeyboard(anonymous, post.Tags, hasSpoiler);
             await _botClient.EditMessageReplyMarkupAsync(query.Message!, keyboard);
         }
 
@@ -267,7 +267,7 @@ namespace XinjingdailyBot.Command
         /// <param name="post"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        private async Task SetSpoiler(OldPosts post, CallbackQuery query)
+        private async Task SetSpoiler(NewPosts post, CallbackQuery query)
         {
             if (!post.CanSpoiler)
             {
@@ -282,8 +282,8 @@ namespace XinjingdailyBot.Command
             await _botClient.AutoReplyAsync(post.HasSpoiler ? "启用遮罩" : "禁用遮罩", query);
 
             var keyboard = post.IsDirectPost ?
-                _markupHelperService.DirectPostKeyboard(post.Anonymous, post.NewTags, post.HasSpoiler) :
-                _markupHelperService.ReviewKeyboardA(post.NewTags, post.HasSpoiler);
+                _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags, post.HasSpoiler) :
+                _markupHelperService.ReviewKeyboardA(post.Tags, post.HasSpoiler);
             await _botClient.EditMessageReplyMarkupAsync(query.Message!, keyboard);
         }
 
@@ -293,7 +293,7 @@ namespace XinjingdailyBot.Command
         /// <param name="post"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        private async Task CancelPost(OldPosts post, CallbackQuery query)
+        private async Task CancelPost(NewPosts post, CallbackQuery query)
         {
             post.Status = EPostStatus.Cancel;
             post.ModifyAt = DateTime.Now;
@@ -311,7 +311,7 @@ namespace XinjingdailyBot.Command
         /// <param name="dbUser"></param>
         /// <param name="rejectReason"></param>
         /// <returns></returns>
-        private async Task RejectPostHelper(OldPosts post, Users dbUser, ERejectReason rejectReason)
+        private async Task RejectPostHelper(NewPosts post, Users dbUser, ERejectReason rejectReason)
         {
             post.Reason = rejectReason;
             string reason = _textHelperService.RejectReasonToString(rejectReason);
@@ -324,7 +324,7 @@ namespace XinjingdailyBot.Command
         /// <param name="rejectMode"></param>
         /// <param name="callbackQuery"></param>
         /// <returns></returns>
-        private async Task SwitchKeyboard(bool rejectMode, OldPosts post, CallbackQuery callbackQuery)
+        private async Task SwitchKeyboard(bool rejectMode, NewPosts post, CallbackQuery callbackQuery)
         {
             if (rejectMode)
             {
@@ -335,7 +335,7 @@ namespace XinjingdailyBot.Command
 
             var keyboard = rejectMode ?
                 _markupHelperService.ReviewKeyboardB() :
-                _markupHelperService.ReviewKeyboardA(post.NewTags, hasSpoiler);
+                _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
 
             await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, keyboard);
         }

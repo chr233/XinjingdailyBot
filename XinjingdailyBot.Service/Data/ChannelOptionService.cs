@@ -1,4 +1,5 @@
-﻿using XinjingdailyBot.Infrastructure.Attribute;
+﻿using Telegram.Bot.Types;
+using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
@@ -14,8 +15,7 @@ namespace XinjingdailyBot.Service.Data
             var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync();
             if (channel == null)
             {
-                channel = new()
-                {
+                channel = new() {
                     ChannelID = channelId,
                     ChannelName = channelName ?? "",
                     ChannelTitle = channelTitle ?? "",
@@ -32,6 +32,41 @@ namespace XinjingdailyBot.Service.Data
                 {
                     channel.ChannelTitle = channelTitle ?? "";
                     channel.ChannelName = channelName ?? "";
+                    channel.ModifyAt = DateTime.Now;
+                }
+                channel.Count++;
+                await Updateable(channel).ExecuteCommandAsync();
+            }
+
+            return channel.Option;
+        }
+
+        public async Task<EChannelOption> FetchChannelOption(Chat channelChat)
+        {
+            var chatId = channelChat.Id;
+            var chatTitle = channelChat.Title;
+            var chatUserName = channelChat.Username;
+
+            var channel = await Queryable().Where(x => x.ChannelID == chatId).FirstAsync();
+            if (channel == null)
+            {
+                channel = new ChannelOptions {
+                    ChannelID = chatId,
+                    ChannelName = chatUserName ?? "",
+                    ChannelTitle = chatTitle ?? "",
+                    Option = EChannelOption.Normal,
+                    Count = 1,
+                    CreateAt = DateTime.Now,
+                    ModifyAt = DateTime.Now,
+                };
+                await Insertable(channel).ExecuteCommandAsync();
+            }
+            else
+            {
+                if (channel.ChannelName != chatUserName || channel.ChannelTitle != chatTitle)
+                {
+                    channel.ChannelTitle = chatTitle ?? "";
+                    channel.ChannelName = chatUserName ?? "";
                     channel.ModifyAt = DateTime.Now;
                 }
                 channel.Count++;

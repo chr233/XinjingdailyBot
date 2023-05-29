@@ -30,7 +30,7 @@ namespace XinjingdailyBot.Command
         //private readonly LevelRepository _levelRepository;
         private readonly GroupRepository _groupRepository;
         private readonly IBanRecordService _banRecordService;
-        private readonly IPostService _postService;
+        private readonly INewPostService _postService;
         private readonly IAttachmentService _attachmentService;
         private readonly IChannelOptionService _channelOptionService;
         private readonly IChannelService _channelService;
@@ -44,7 +44,7 @@ namespace XinjingdailyBot.Command
             //LevelRepository levelRepository,
             GroupRepository groupRepository,
             IBanRecordService banRecordService,
-            IPostService postService,
+            INewPostService postService,
             IAttachmentService attachmentService,
             IChannelOptionService channelOptionService,
             IChannelService channelService,

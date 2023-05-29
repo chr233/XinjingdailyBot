@@ -30,19 +30,13 @@ namespace XinjingdailyBot.Interface.Data
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        Task<NewPosts?> FetchPostFromReviewCallbackQuery(CallbackQuery message);
+        Task<NewPosts?> FetchPostFromCallbackQuery(CallbackQuery message);
         /// <summary>
         /// 从回复的消息获取稿件
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
         Task<NewPosts?> FetchPostFromReplyToMessage(Message message);
-        /// <summary>
-        /// 从确认投稿回调中获取稿件
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        Task<NewPosts?> FetchPostFromConfirmCallbackQuery(CallbackQuery query);
 
         /// <summary>
         /// 处理多媒体投稿(mediaGroup)

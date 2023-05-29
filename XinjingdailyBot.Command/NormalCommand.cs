@@ -22,7 +22,7 @@ namespace XinjingdailyBot.Command
         private readonly GroupRepository _groupRepository;
         private readonly IMarkupHelperService _markupHelperService;
         private readonly IAttachmentService _attachmentService;
-        private readonly IPostService _postService;
+        private readonly INewPostService _postService;
         private readonly TagRepository _tagRepository;
         private readonly IHttpHelperService _httpHelperService;
         private readonly IMediaGroupService _mediaGroupService;
@@ -33,7 +33,7 @@ namespace XinjingdailyBot.Command
             GroupRepository groupRepository,
             IMarkupHelperService markupHelperService,
             IAttachmentService attachmentService,
-            IPostService postService,
+            INewPostService postService,
             TagRepository tagRepository,
             IHttpHelperService httpHelperService,
             IMediaGroupService mediaGroupService)
@@ -341,7 +341,7 @@ namespace XinjingdailyBot.Command
                         .Where(x => x.Status == EPostStatus.Accepted)
                         .WhereIF(postType == null, x => x.PostType != MessageType.Text)
                         .WhereIF(postType != null, x => x.PostType == postType)
-                        .WhereIF(tag != null, x => (x.NewTags & tag!.Seg) > 0)
+                        .WhereIF(tag != null, x => (x.Tags & tag!.Seg) > 0)
                         .OrderBy(x => SqlFunc.GetRandom()).FirstAsync();
 
             if (randomPost != null)
