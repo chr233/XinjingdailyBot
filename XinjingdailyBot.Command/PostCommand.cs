@@ -18,7 +18,7 @@ namespace XinjingdailyBot.Command
         private readonly ITelegramBotClient _botClient;
         private readonly IUserService _userService;
         private readonly IChannelService _channelService;
-        private readonly INewPostService _postService;
+        private readonly IPostService _postService;
         private readonly IMarkupHelperService _markupHelperService;
         private readonly IAttachmentService _attachmentService;
         private readonly ITextHelperService _textHelperService;
@@ -27,7 +27,7 @@ namespace XinjingdailyBot.Command
             ITelegramBotClient botClient,
             IUserService userService,
             IChannelService channelService,
-            INewPostService postService,
+            IPostService postService,
             IMarkupHelperService markupHelperService,
             IAttachmentService attachmentService,
             ITextHelperService textHelperService)

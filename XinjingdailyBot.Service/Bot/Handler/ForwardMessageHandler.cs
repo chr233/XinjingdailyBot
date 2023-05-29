@@ -18,14 +18,14 @@ namespace XinjingdailyBot.Service.Bot.Handler
     {
         private readonly IChannelService _channelService;
         private readonly ITelegramBotClient _botClient;
-        private readonly INewPostService _postService;
+        private readonly IPostService _postService;
         private readonly IMarkupHelperService _markupHelperService;
         private readonly IUserService _userService;
 
         public ForwardMessageHandler(
             ITelegramBotClient botClient,
             IChannelService channelService,
-            INewPostService postService,
+            IPostService postService,
             IMarkupHelperService markupHelperService,
             IUserService userService)
         {

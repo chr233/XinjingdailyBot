@@ -16,7 +16,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
     [AppService(typeof(IChannelPostHandler), LifeTime.Singleton)]
     public class ChannelPostHandler : IChannelPostHandler
     {
-        private readonly INewPostService _postService;
+        private readonly IPostService _postService;
         private readonly ITextHelperService _textHelperService;
         private readonly IAttachmentService _attachmentService;
         private readonly IUserService _userService;
@@ -26,7 +26,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
         private readonly ILogger<ChannelPostHandler> _logger;
 
         public ChannelPostHandler(
-            INewPostService postService,
+            IPostService postService,
             ITextHelperService textHelperService,
             IAttachmentService attachmentService,
             IUserService userService,
@@ -51,7 +51,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             {
                 return;
             }
-            if (message.Text.Length > INewPostService.MaxPostText)
+            if (message.Text.Length > IPostService.MaxPostText)
             {
                 return;
             }
