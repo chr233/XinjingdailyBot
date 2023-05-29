@@ -1,7 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using SqlSugar;
+﻿using SqlSugar;
 using SqlSugar.IOC;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using XinjingdailyBot.Infrastructure;
 
 namespace XinjingdailyBot.WebAPI.Extensions
@@ -38,26 +38,22 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 $"Host={dbConfig.DbHost};Port={dbConfig.DbPort};Database={dbConfig.DbName};UserID={dbConfig.DbUser};Password={dbConfig.DbPassword};CharSet=utf8mb4;AllowZeroDateTime=true" :
                 $"DataSource={dbConfig.DbName}.db";
 
-            services.AddSqlSugar(new IocConfig
-            {
+            services.AddSqlSugar(new IocConfig {
                 ConfigId = 0,
                 ConnectionString = connStr,
                 DbType = dbConfig.UseMySQL ? IocDbType.MySql : IocDbType.Sqlite,
                 IsAutoCloseConnection = true//自动释放
             });
 
-            SugarIocServices.ConfigurationSugar(db =>
-            {
+            SugarIocServices.ConfigurationSugar(db => {
                 if (dbConfig.LogSQL)
                 {
-                    db.Aop.OnLogExecuting = (sql, pars) =>
-                    {
+                    db.Aop.OnLogExecuting = (sql, pars) => {
                         var param = db.GetConnectionScope(0).Utilities.SerializeObject(pars.ToDictionary(it => it.ParameterName, it => it.Value));
                         _logger.Debug("{sql}，{param}", sql, param);
                     };
 
-                    db.Aop.OnError = (e) =>
-                    {
+                    db.Aop.OnError = (e) => {
                         _logger.Error("执行SQL出错：", e);
                     };
                 }

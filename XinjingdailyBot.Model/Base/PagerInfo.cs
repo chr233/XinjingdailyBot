@@ -17,10 +17,8 @@
         /// <summary>
         /// 总页数
         /// </summary>
-        public int TotalPage
-        {
-            get
-            {
+        public int TotalPage {
+            get {
                 return TotalNum > 0 ? TotalNum % PageSize == 0 ? TotalNum / PageSize : TotalNum / PageSize + 1 : 0;
             }
         }

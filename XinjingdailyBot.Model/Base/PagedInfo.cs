@@ -20,10 +20,8 @@
         /// <summary>
         /// 总页数
         /// </summary>
-        public int TotalPage
-        {
-            get
-            {
+        public int TotalPage {
+            get {
                 if (TotalNum > 0)
                 {
                     return TotalNum % PageSize == 0 ? TotalNum / PageSize : TotalNum / PageSize + 1;

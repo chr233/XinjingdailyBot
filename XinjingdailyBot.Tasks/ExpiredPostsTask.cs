@@ -1,6 +1,6 @@
-﻿using System.Text;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure;
@@ -17,13 +17,13 @@ namespace XinjingdailyBot.Tasks
     public class ExpiredPostsTask : IJob
     {
         private readonly ILogger<ExpiredPostsTask> _logger;
-        private readonly IPostService _postService;
+        private readonly INewPostService _postService;
         private readonly IUserService _userService;
         private readonly ITelegramBotClient _botClient;
 
         public ExpiredPostsTask(
             ILogger<ExpiredPostsTask> logger,
-            IPostService postService,
+            INewPostService postService,
             IUserService userService,
             ITelegramBotClient botClient,
             IOptions<OptionsSetting> options)

@@ -46,8 +46,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         /// <param name="message"></param>
         public static void LogMessage(this ILogger logger, Message message)
         {
-            string content = message.Type switch
-            {
+            string content = message.Type switch {
                 MessageType.Text => $"[文本] {message.Text}",
                 MessageType.Photo => $"[图片] {message.Caption}",
                 MessageType.Audio => $"[音频] {message.Caption}",
@@ -69,8 +68,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
 
             var chat = message.Chat;
 
-            string chatFrom = chat.Type switch
-            {
+            string chatFrom = chat.Type switch {
                 ChatType.Private => $"【私聊|{chat.FirstName}{chat.LastName}】",
                 ChatType.Group => $"【群组|{chat.Title}】",
                 ChatType.Channel => $"【频道|{chat.Title}】",

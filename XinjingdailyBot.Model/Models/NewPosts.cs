@@ -59,7 +59,7 @@ namespace XinjingdailyBot.Model.Models
         public long ReviewActionMsgID { get; set; } = -1;
 
         /// <summary>
-        /// 发布的消息Id
+        /// 发布频道的消息Id
         /// </summary>
         public long PublicMsgID { get; set; } = -1;
 
@@ -146,7 +146,7 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 拒绝原因(如果拒绝)
         /// </summary>
-        public string Reason { get; set; } = "";
+        public string RejectReason { get; set; } = "";
 
         /// <inheritdoc cref="ICreateAt.CreateAt"/>
         public DateTime CreateAt { get; set; } = DateTime.Now;

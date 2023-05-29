@@ -126,8 +126,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
 
             if (delete)
             {
-                _ = Task.Run(async () =>
-                {
+                _ = Task.Run(async () => {
                     await Task.Delay(TimeSpan.FromSeconds(30));
                     try
                     {

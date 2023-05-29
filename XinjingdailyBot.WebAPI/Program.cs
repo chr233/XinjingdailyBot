@@ -1,6 +1,6 @@
 ﻿
-using System.Diagnostics.CodeAnalysis;
 using NLog.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.WebAPI.Extensions;
 
@@ -28,8 +28,7 @@ namespace XinjingdailyBot.WebAPI
             builder.Services.AddOptions().Configure<OptionsSetting>(builder.Configuration);
 
             //NLog
-            builder.Services.AddLogging(loggingBuilder =>
-            {
+            builder.Services.AddLogging(loggingBuilder => {
                 loggingBuilder.ClearProviders();
                 loggingBuilder.SetMinimumLevel(LogLevel.Debug);
                 loggingBuilder.AddNLog();

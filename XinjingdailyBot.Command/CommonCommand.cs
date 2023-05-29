@@ -1,5 +1,5 @@
-﻿using System.Text;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
+using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -161,8 +161,7 @@ namespace XinjingdailyBot.Command
                 foreach (var record in records)
                 {
                     string date = record.BanTime.ToString("d");
-                    string operate = record.Type switch
-                    {
+                    string operate = record.Type switch {
                         EBanType.UnBan => "解封",
                         EBanType.Ban => "封禁",
                         EBanType.Warning => "警告",

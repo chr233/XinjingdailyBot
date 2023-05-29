@@ -144,10 +144,18 @@ namespace XinjingdailyBot.Service.Bot.Common
         {
             return chatId == _acceptChannel.Id || chatId == _rejectChannel.Id;
         }
+        public bool IsChannelMessage(Chat chat)
+        {
+            return chat.Id == _acceptChannel.Id || chat.Id == _rejectChannel.Id;
+        }
 
         public bool IsGroupMessage(long chatId)
         {
             return chatId == _subGroup.Id || chatId == _commentGroup.Id;
+        }
+        public bool IsGroupMessage(Chat chat)
+        {
+            return chat.Id == _subGroup.Id || chat.Id == _commentGroup.Id;
         }
     }
 }

@@ -9,6 +9,7 @@ using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
+using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Command
 {
@@ -19,23 +20,23 @@ namespace XinjingdailyBot.Command
         private readonly IUserService _userService;
         private readonly IChannelService _channelService;
         private readonly INewPostService _postService;
-        private readonly ITextHelperService _textHelperService;
         private readonly IMarkupHelperService _markupHelperService;
+        private readonly RejectReasonRepository _rejectReasonRepository;
 
         public ReviewCommand(
             ITelegramBotClient botClient,
             IUserService userService,
             IChannelService channelService,
             INewPostService postService,
-            ITextHelperService textHelperService,
-            IMarkupHelperService markupHelperService)
+            IMarkupHelperService markupHelperService,
+            RejectReasonRepository rejectReasonRepository)
         {
             _botClient = botClient;
             _userService = userService;
             _channelService = channelService;
             _postService = postService;
-            _textHelperService = textHelperService;
             _markupHelperService = markupHelperService;
+            _rejectReasonRepository = rejectReasonRepository;
         }
 
         /// <summary>
@@ -78,8 +79,12 @@ namespace XinjingdailyBot.Command
                     return "请输入拒绝理由";
                 }
 
-                post.Reason = ERejectReason.CustomReason;
-                await _postService.RejetPost(post, dbUser, reason);
+                post.RejectReason = reason;
+                var rejectReason = new RejectReasons {
+                    Name = reason,
+                    FullText = reason,
+                };
+                await _postService.RejetPost(post, dbUser, rejectReason);
 
                 return $"已拒绝该稿件, 理由: {reason}";
             }
@@ -188,28 +193,6 @@ namespace XinjingdailyBot.Command
                     await SetSpoiler(post, callbackQuery);
                     break;
 
-                case "reject fuzzy":
-                    await RejectPostHelper(post, dbUser, ERejectReason.Fuzzy);
-                    break;
-                case "reject duplicate":
-                    await RejectPostHelper(post, dbUser, ERejectReason.Duplicate);
-                    break;
-                case "reject boring":
-                    await RejectPostHelper(post, dbUser, ERejectReason.Boring);
-                    break;
-                case "reject confusing":
-                    await RejectPostHelper(post, dbUser, ERejectReason.Confused);
-                    break;
-                case "reject deny":
-                    await RejectPostHelper(post, dbUser, ERejectReason.Deny);
-                    break;
-                case "reject qrcode":
-                    await RejectPostHelper(post, dbUser, ERejectReason.QRCode);
-                    break;
-                case "reject other":
-                    await RejectPostHelper(post, dbUser, ERejectReason.Other);
-                    break;
-
                 case "review accept":
                     await _postService.AcceptPost(post, dbUser, callbackQuery);
                     break;
@@ -234,6 +217,11 @@ namespace XinjingdailyBot.Command
                         {
                             await SetSpoiler(post, callbackQuery);
                         }
+                    }
+                    else if (data.StartsWith("reject "))
+                    {
+                        var payload = data[7..];
+                        await RejectPostHelper(post, dbUser, callbackQuery, payload);
                     }
                     break;
             }
@@ -309,12 +297,17 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="post"></param>
         /// <param name="dbUser"></param>
-        /// <param name="rejectReason"></param>
+        /// <param name="query"></param>
+        /// <param name="payload"></param>
         /// <returns></returns>
-        private async Task RejectPostHelper(NewPosts post, Users dbUser, ERejectReason rejectReason)
+        private async Task RejectPostHelper(NewPosts post, Users dbUser, CallbackQuery query, string payload)
         {
-            post.Reason = rejectReason;
-            string reason = _textHelperService.RejectReasonToString(rejectReason);
+            var reason = _rejectReasonRepository.GetReasonByPayload(payload);
+            if (reason == null)
+            {
+                await _botClient.AutoReplyAsync($"找不到 {payload} 对应的拒绝理由", query, true);
+                return;
+            }
             await _postService.RejetPost(post, dbUser, reason);
         }
 
@@ -322,6 +315,7 @@ namespace XinjingdailyBot.Command
         /// 设置inlineKeyboard
         /// </summary>
         /// <param name="rejectMode"></param>
+        /// <param name="post"></param>
         /// <param name="callbackQuery"></param>
         /// <returns></returns>
         private async Task SwitchKeyboard(bool rejectMode, NewPosts post, CallbackQuery callbackQuery)

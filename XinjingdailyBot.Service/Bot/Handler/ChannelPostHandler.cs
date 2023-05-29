@@ -1,6 +1,5 @@
-﻿using System.Collections.Concurrent;
-using System.Threading.Channels;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -11,7 +10,6 @@ using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
-using XinjingdailyBot.Service.Data;
 
 namespace XinjingdailyBot.Service.Bot.Handler
 {
@@ -26,7 +24,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
         private readonly TagRepository _tagRepository;
         private readonly ITelegramBotClient _botClient;
         private readonly ILogger<ChannelPostHandler> _logger;
-        private readonly IMediaGroupService _mediaGroupService;
 
         public ChannelPostHandler(
             INewPostService postService,
@@ -36,8 +33,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             IChannelOptionService channelOptionService,
             TagRepository tagRepository,
             ITelegramBotClient botClient,
-            ILogger<ChannelPostHandler> logger,
-            IMediaGroupService mediaGroupService)
+            ILogger<ChannelPostHandler> logger)
         {
             _postService = postService;
             _textHelperService = textHelperService;
@@ -47,7 +43,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
             _tagRepository = tagRepository;
             _botClient = botClient;
             _logger = logger;
-            _mediaGroupService = mediaGroupService;
         }
 
         public async Task OnTextChannelPostReceived(Users dbUser, Message message)
@@ -259,7 +254,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 }
 
                 //记录媒体组
-                await _mediaGroupService.AddPostMediaGroup(message);
+                //await _mediaGroupService.AddPostMediaGroup(message);
             }
         }
     }

@@ -5,10 +5,10 @@ namespace XinjingdailyBot.Model.Models
 {
     [SugarTable("reject", TableDescription = "拒绝理由")]
     [SugarIndex("payload", nameof(Payload), OrderByType.Asc, true)]
-    public sealed record RejectReason : BaseModel
+    public sealed record RejectReasons : BaseModel
     {
         [SugarColumn(IsPrimaryKey = true)]
-        public int Id { get; set; }
+        public int Id { get; set; } = -1;
 
         /// <summary>
         /// 显示名称
@@ -19,7 +19,7 @@ namespace XinjingdailyBot.Model.Models
         /// CallbackData
         /// </summary>
         public string Payload { get; set; } = "";
-        
+
         /// <summary>
         /// 发给用户的拒绝理由
         /// </summary>

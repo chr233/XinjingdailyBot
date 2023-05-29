@@ -15,7 +15,7 @@ namespace XinjingdailyBot.Repository
             _logger = logger;
         }
 
-        private  Dictionary<int, Levels> _levelCache { get; } = new();
+        private Dictionary<int, Levels> _levelCache { get; } = new();
 
         /// <summary>
         /// 初始化缓存

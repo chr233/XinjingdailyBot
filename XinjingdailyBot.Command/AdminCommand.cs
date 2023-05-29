@@ -1,10 +1,9 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Extensions.Logging;
+using SqlSugar;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using Microsoft.Extensions.Logging;
-using Microsoft.VisualBasic;
-using SqlSugar;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -199,8 +198,7 @@ namespace XinjingdailyBot.Command
                     targetUser.ModifyAt = DateTime.Now;
                     await _userService.Updateable(targetUser).UpdateColumns(x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
 
-                    var record = new BanRecords
-                    {
+                    var record = new BanRecords {
                         UserID = targetUser.UserID,
                         OperatorUID = dbUser.UserID,
                         Type = EBanType.Ban,
@@ -294,8 +292,7 @@ namespace XinjingdailyBot.Command
                     targetUser.ModifyAt = DateTime.Now;
                     await _userService.Updateable(targetUser).UpdateColumns(x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
 
-                    var record = new BanRecords
-                    {
+                    var record = new BanRecords {
                         UserID = targetUser.UserID,
                         OperatorUID = dbUser.UserID,
                         Type = EBanType.UnBan,
@@ -399,8 +396,7 @@ namespace XinjingdailyBot.Command
                         warnCount = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && x.Type == EBanType.Warning && x.BanTime >= lastUnbaned.BanTime).CountAsync();
                     }
 
-                    var record = new BanRecords
-                    {
+                    var record = new BanRecords {
                         UserID = targetUser.UserID,
                         OperatorUID = dbUser.UserID,
                         Type = EBanType.Warning,
@@ -420,8 +416,7 @@ namespace XinjingdailyBot.Command
 
                     if (warnCount >= WarningLimit)
                     {
-                        record = new BanRecords
-                        {
+                        record = new BanRecords {
                             UserID = targetUser.UserID,
                             OperatorUID = 0,
                             Type = EBanType.Ban,
@@ -527,8 +522,7 @@ namespace XinjingdailyBot.Command
                     foreach (var record in records)
                     {
                         var date = record.BanTime.ToString("d");
-                        var operate = record.Type switch
-                        {
+                        var operate = record.Type switch {
                             EBanType.UnBan => "解封",
                             EBanType.Ban => "封禁",
                             EBanType.Warning => "警告",
@@ -1247,8 +1241,9 @@ namespace XinjingdailyBot.Command
                                 {
                                     await _botClient.RestrictChatMemberAsync(_channelService.SubGroup, targetUser.UserID, permission);
                                 }
-                                catch { 
-                                    
+                                catch
+                                {
+
                                 }
                                 await _botClient.RestrictChatMemberAsync(_channelService.SubGroup, targetUser.UserID, permission);
                             }
@@ -1274,16 +1269,14 @@ namespace XinjingdailyBot.Command
                             return;
                     }
 
-                    string action = args[1] switch
-                    {
+                    string action = args[1] switch {
                         "mute" => "全局禁言",
                         "ban" => "全局封禁",
                         "unmute" => "撤销全局禁言",
                         "unban" => "撤销全局封禁",
                         _ => "未知",
                     };
-                    EBanType banType = args[1] switch
-                    {
+                    EBanType banType = args[1] switch {
                         "mute" => EBanType.GlobalMute,
                         "ban" => EBanType.GlobalBan,
                         "unmute" => EBanType.GlobalUnMute,
@@ -1294,8 +1287,7 @@ namespace XinjingdailyBot.Command
 
                     string reason = string.Join(' ', args[3..]);
 
-                    var record = new BanRecords
-                    {
+                    var record = new BanRecords {
                         UserID = targetUser.UserID,
                         OperatorUID = dbUser.UserID,
                         Type = banType,
