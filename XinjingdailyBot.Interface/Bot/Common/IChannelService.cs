@@ -44,10 +44,23 @@ namespace XinjingdailyBot.Interface.Bot.Common
         /// <returns></returns>
         bool IsChannelMessage(long chatId);
         /// <summary>
+        /// 判断是不是频道的消息
+        /// </summary>
+        /// <param name="chat"></param>
+        /// <returns></returns>
+        bool IsChannelMessage(Chat chat);
+
+        /// <summary>
         /// 判断是不是关联群组的消息
         /// </summary>
         /// <param name="chatId"></param>
         /// <returns></returns>
         bool IsGroupMessage(long chatId);
+        /// <summary>
+        /// 判断是不是关联群组的消息
+        /// </summary>
+        /// <param name="chat"></param>
+        /// <returns></returns>
+        bool IsGroupMessage(Chat chat);
     }
 }

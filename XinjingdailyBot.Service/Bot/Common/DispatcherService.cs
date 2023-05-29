@@ -109,8 +109,7 @@ namespace XinjingdailyBot.Service.Bot.Common
             //仅监听发布频道的消息
             if (message.Chat.Id == _channelService.AcceptChannel.Id)
             {
-                var handler = message.Type switch
-                {
+                var handler = message.Type switch {
                     MessageType.Text => _channelPostHandler.OnTextChannelPostReceived(dbUser, message),
                     MessageType.Photo => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),
                     MessageType.Audio => _channelPostHandler.OnMediaChannelPostReceived(dbUser, message),

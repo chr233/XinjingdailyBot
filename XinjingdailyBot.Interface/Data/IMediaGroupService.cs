@@ -6,6 +6,7 @@ namespace XinjingdailyBot.Interface.Data
     /// <summary>
     /// 媒体组消息服务
     /// </summary>
+    [Obsolete("貌似用不到了")]
     public interface IMediaGroupService
     {
         /// <summary>

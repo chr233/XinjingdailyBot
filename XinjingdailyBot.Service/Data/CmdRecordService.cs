@@ -19,8 +19,7 @@ namespace XinjingdailyBot.Service.Data
                 text = text[..1000];
             }
 
-            CmdRecords record = new()
-            {
+            CmdRecords record = new() {
                 ChatID = message.Chat.Id,
                 MessageID = message.MessageId,
                 UserID = dbUser.UserID,
@@ -46,8 +45,7 @@ namespace XinjingdailyBot.Service.Data
             }
 
             var message = query.Message!;
-            CmdRecords record = new()
-            {
+            CmdRecords record = new() {
                 ChatID = message.Chat.Id,
                 MessageID = message.MessageId,
                 UserID = dbUser.UserID,

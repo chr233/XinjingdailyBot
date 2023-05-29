@@ -10,37 +10,6 @@ namespace XinjingdailyBot.Service.Data
     [AppService(typeof(IChannelOptionService), LifeTime.Transient)]
     public sealed class ChannelOptionService : BaseService<ChannelOptions>, IChannelOptionService
     {
-        public async Task<EChannelOption> FetchChannelOption(long channelId, string? channelName, string? channelTitle)
-        {
-            var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync();
-            if (channel == null)
-            {
-                channel = new() {
-                    ChannelID = channelId,
-                    ChannelName = channelName ?? "",
-                    ChannelTitle = channelTitle ?? "",
-                    Option = EChannelOption.Normal,
-                    Count = 1,
-                    CreateAt = DateTime.Now,
-                    ModifyAt = DateTime.Now,
-                };
-                await Insertable(channel).ExecuteCommandAsync();
-            }
-            else
-            {
-                if (channel.ChannelName != channelName || channel.ChannelTitle != channelTitle)
-                {
-                    channel.ChannelTitle = channelTitle ?? "";
-                    channel.ChannelName = channelName ?? "";
-                    channel.ModifyAt = DateTime.Now;
-                }
-                channel.Count++;
-                await Updateable(channel).ExecuteCommandAsync();
-            }
-
-            return channel.Option;
-        }
-
         public async Task<EChannelOption> FetchChannelOption(Chat channelChat)
         {
             var chatId = channelChat.Id;
@@ -79,6 +48,16 @@ namespace XinjingdailyBot.Service.Data
         public async Task<ChannelOptions?> FetchChannelByTitle(string channelTitle)
         {
             var channel = await Queryable().Where(x => x.ChannelTitle == channelTitle).FirstAsync();
+            return channel;
+        }
+
+        public async Task<ChannelOptions?> FetchChannelByChannelId(long channelId)
+        {
+            if (channelId <= 0)
+            {
+                return null;
+            }
+            var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync();
             return channel;
         }
 

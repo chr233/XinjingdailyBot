@@ -1,6 +1,6 @@
-﻿using System.Net;
+﻿using SqlSugar;
+using System.Net;
 using System.Text;
-using SqlSugar;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -324,8 +324,7 @@ namespace XinjingdailyBot.Command
                 return;
             }
 
-            MessageType? postType = args[2] switch
-            {
+            MessageType? postType = args[2] switch {
                 "photo" => MessageType.Photo,
                 "video" => MessageType.Video,
                 "audio" => MessageType.Audio,
@@ -361,8 +360,7 @@ namespace XinjingdailyBot.Command
                         {
                             attachmentType = randomPost.PostType;
                         }
-                        group[i] = attachmentType switch
-                        {
+                        group[i] = attachmentType switch {
                             MessageType.Photo => new InputMediaPhoto(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? randomPost.Text : null, ParseMode = ParseMode.Html, HasSpoiler = hasSpoiler },
                             MessageType.Audio => new InputMediaAudio(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? randomPost.Text : null, ParseMode = ParseMode.Html },
                             MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? randomPost.Text : null, ParseMode = ParseMode.Html, HasSpoiler = hasSpoiler },
@@ -381,8 +379,7 @@ namespace XinjingdailyBot.Command
                 else
                 {
                     Attachments attachment = await _attachmentService.Queryable().FirstAsync(x => x.PostID == randomPost.Id);
-                    var handler = randomPost.PostType switch
-                    {
+                    var handler = randomPost.PostType switch {
                         MessageType.Text => _botClient.SendTextMessageAsync(chat, randomPost.Text),
                         MessageType.Photo => _botClient.SendPhotoAsync(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard, hasSpoiler: hasSpoiler),
                         MessageType.Audio => _botClient.SendAudioAsync(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard, title: attachment.FileName),

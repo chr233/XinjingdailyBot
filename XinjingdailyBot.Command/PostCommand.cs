@@ -22,7 +22,6 @@ namespace XinjingdailyBot.Command
         private readonly IMarkupHelperService _markupHelperService;
         private readonly IAttachmentService _attachmentService;
         private readonly ITextHelperService _textHelperService;
-        private readonly IMediaGroupService _mediaGroupService;
 
         public PostCommand(
             ITelegramBotClient botClient,
@@ -31,8 +30,7 @@ namespace XinjingdailyBot.Command
             INewPostService postService,
             IMarkupHelperService markupHelperService,
             IAttachmentService attachmentService,
-            ITextHelperService textHelperService,
-            IMediaGroupService mediaGroupService)
+            ITextHelperService textHelperService)
         {
             _botClient = botClient;
             _userService = userService;
@@ -41,7 +39,6 @@ namespace XinjingdailyBot.Command
             _markupHelperService = markupHelperService;
             _attachmentService = attachmentService;
             _textHelperService = textHelperService;
-            _mediaGroupService = mediaGroupService;
         }
 
         /// <summary>
@@ -169,7 +166,7 @@ namespace XinjingdailyBot.Command
                 reviewMsg = messages.First();
                 post.ReviewMediaGroupID = reviewMsg.MediaGroupId ?? "";
                 //记录媒体组消息
-                await _mediaGroupService.AddPostMediaGroup(messages);
+                //await _mediaGroupService.AddPostMediaGroup(messages);
             }
 
             string msg = _textHelperService.MakeReviewMessage(dbUser, post.Anonymous);

@@ -1,6 +1,6 @@
-﻿using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Collections.Concurrent;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -31,7 +31,6 @@ namespace XinjingdailyBot.Service.Data
         private readonly IUserService _userService;
         private readonly OptionsSetting.PostOption _postOption;
         private readonly TagRepository _tagRepository;
-        private readonly IMediaGroupService _mediaGroupService;
 
         public NewPostService(
             ILogger<NewPostService> logger,
@@ -43,8 +42,7 @@ namespace XinjingdailyBot.Service.Data
             ITelegramBotClient botClient,
             IUserService userService,
             IOptions<OptionsSetting> options,
-            TagRepository tagRepository,
-            IMediaGroupService mediaGroupService)
+            TagRepository tagRepository)
         {
             _logger = logger;
             _attachmentService = attachmentService;
@@ -56,7 +54,6 @@ namespace XinjingdailyBot.Service.Data
             _userService = userService;
             _postOption = options.Value.Post;
             _tagRepository = tagRepository;
-            _mediaGroupService = mediaGroupService;
         }
 
         public async Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null)
@@ -407,7 +404,7 @@ namespace XinjingdailyBot.Service.Data
                         }
 
                         channelMsgId = message.ForwardFromMessageId ?? -1;
-                        channelOption = await _channelOptionService.FetchChannelOption( message.ForwardFromChat);
+                        channelOption = await _channelOptionService.FetchChannelOption(message.ForwardFromChat);
                     }
 
                     int newTags = _tagRepository.FetchTags(message.Caption);
@@ -540,17 +537,18 @@ namespace XinjingdailyBot.Service.Data
             }
         }
 
-        public async Task RejetPost(NewPosts post, Users dbUser, string rejectReason)
+        public async Task RejetPost(NewPosts post, Users dbUser, RejectReasons rejectReason)
         {
+            post.RejectReason = rejectReason.Name;
             post.ReviewerUID = dbUser.UserID;
             post.Status = EPostStatus.Rejected;
             post.ModifyAt = DateTime.Now;
-            await Updateable(post).UpdateColumns(x => new { x.Reason, x.ReviewerUID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
+            await Updateable(post).UpdateColumns(x => new { x.RejectReason, x.ReviewerUID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
 
             var poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
 
             //修改审核群消息
-            string reviewMsg = _textHelperService.MakeReviewMessage(poster, dbUser, post.Anonymous, rejectReason);
+            string reviewMsg = _textHelperService.MakeReviewMessage(poster, dbUser, post.Anonymous, rejectReason.FullText);
             await _botClient.EditMessageTextAsync(post.ReviewActionChatID, (int)post.ReviewActionMsgID, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
 
             //拒稿频道发布消息
@@ -599,12 +597,22 @@ namespace XinjingdailyBot.Service.Data
                 }
                 var postMessages = await _botClient.SendMediaGroupAsync(_channelService.RejectChannel.Id, group);
 
+                var postMessage = postMessages.FirstOrDefault();
+                if (postMessage != null)
+                {
+                    post.PublicMsgID = postMessage.MessageId;
+                    post.PublishMediaGroupID = postMessage.MediaGroupId ?? "";
+                    post.ModifyAt = DateTime.Now;
+
+                    await Updateable(post).UpdateColumns(x => new { x.PublicMsgID, x.PublishMediaGroupID, x.ModifyAt }).ExecuteCommandAsync();
+                }
+
                 //处理媒体组消息
-                await _mediaGroupService.AddPostMediaGroup(postMessages);
+                //await _mediaGroupService.AddPostMediaGroup(postMessages);
             }
 
             //通知投稿人
-            string posterMsg = _textHelperService.MakeNotification(rejectReason);
+            string posterMsg = _textHelperService.MakeNotification(rejectReason.FullText);
             if (poster.Notification)
             {
                 await _botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true);
@@ -635,7 +643,8 @@ namespace XinjingdailyBot.Service.Data
                 poster.PostCount++;
             }
 
-            string postText = _textHelperService.MakePostText(post, poster);
+            var channel = await _channelOptionService.FetchChannelByChannelId(post.ChannelID);
+            string postText = _textHelperService.MakePostText(post, poster, channel);
 
             bool hasSpoiler = post.HasSpoiler;
 
@@ -709,7 +718,7 @@ namespace XinjingdailyBot.Service.Data
                 post.PublishMediaGroupID = postMessages.First().MediaGroupId ?? "";
 
                 //记录媒体组消息
-                await _mediaGroupService.AddPostMediaGroup(postMessages);
+                //await _mediaGroupService.AddPostMediaGroup(postMessages);
             }
 
             await _botClient.AutoReplyAsync("稿件已发布", callbackQuery);
@@ -777,8 +786,8 @@ namespace XinjingdailyBot.Service.Data
 
             NewPosts? post;
 
-            var mediaGroup = await _mediaGroupService.QueryMediaGroup(replyMessage);
-            if (mediaGroup == null)
+            var msgGroupId = message.MediaGroupId;
+            if (string.IsNullOrEmpty(msgGroupId))
             {
                 //单条稿件
                 long chatId = replyMessage.Chat.Id;
@@ -789,8 +798,7 @@ namespace XinjingdailyBot.Service.Data
             }
             else
             {
-                var mediaGroupID = mediaGroup.MediaGroupID;
-                post = await Queryable().FirstAsync(x => x.OriginMediaGroupID == mediaGroupID || x.ReviewMediaGroupID == mediaGroupID);
+                post = await Queryable().FirstAsync(x => x.OriginMediaGroupID == msgGroupId || x.ReviewMediaGroupID == msgGroupId);
             }
 
             return post;

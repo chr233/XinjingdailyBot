@@ -1,6 +1,4 @@
 ﻿using SqlSugar;
-using XinjingdailyBot.Infrastructure.Enums;
-using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
 

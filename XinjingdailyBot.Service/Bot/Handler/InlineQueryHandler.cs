@@ -51,8 +51,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
 
                     var postAttachment = await _attachmentService.Queryable().Where(x => x.PostID == randomPost.Id).FirstAsync();
                     var keyboard = _markupHelperService.LinkToOriginPostKeyboard(randomPost);
-                    results.Add(new InlineQueryResultCachedPhoto(i.ToString(), postAttachment.FileID)
-                    {
+                    results.Add(new InlineQueryResultCachedPhoto(i.ToString(), postAttachment.FileID) {
                         Title = randomPost.Text,
                         Description = randomPost.Text,
                         Caption = randomPost.Text,

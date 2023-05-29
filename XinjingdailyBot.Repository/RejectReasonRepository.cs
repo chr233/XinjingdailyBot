@@ -6,7 +6,7 @@ using XinjingdailyBot.Repository.Base;
 namespace XinjingdailyBot.Repository
 {
     [AppService(LifeTime.Singleton)]
-    public class RejectReasonRepository : BaseRepository<RejectReason>
+    public class RejectReasonRepository : BaseRepository<RejectReasons>
     {
         private readonly ILogger<RejectReasonRepository> _logger;
 
@@ -18,11 +18,11 @@ namespace XinjingdailyBot.Repository
         /// <summary>
         /// 拒绝理由缓存, Key=Id
         /// </summary>
-        private Dictionary<int, RejectReason> RejectReasonCache { get; } = new();
+        private Dictionary<int, RejectReasons> RejectReasonCache { get; } = new();
         /// <summary>
         /// 标签缓存, Key=Payload
         /// </summary>
-        private Dictionary<string, RejectReason> RejectReasonPayloadCache { get; } = new();
+        private Dictionary<string, RejectReasons> RejectReasonPayloadCache { get; } = new();
 
         /// <summary>
         /// 初始化缓存
@@ -72,13 +72,12 @@ namespace XinjingdailyBot.Repository
         }
 
         /// <summary>
-        /// 创建内置群组
+        /// 创建内置拒绝理由
         /// </summary>
         /// <returns></returns>
         private async Task InsertBuildInRejectReasons()
         {
-            //请不要修改ID为0和1的字段
-            var levels = new List<RejectReason>()
+            var levels = new List<RejectReasons>()
             {
                 new() { Id = 1, Name = "模糊", Payload = "fuzzy", FullText = "图片模糊/看不清", IsCount = false },
                 new() { Id = 2, Name = "重复", Payload = "duplicate", FullText = "重复的稿件", IsCount = false },
@@ -87,13 +86,18 @@ namespace XinjingdailyBot.Repository
                 new() { Id = 5, Name = "不合适", Payload = "deny", FullText = "不合适发布的内容" },
                 new() { Id = 6, Name = "广告水印", Payload = "qrcode", FullText = "稿件包含二维码水印" },
                 new() { Id = 7, Name = "其他原因", Payload = "other", FullText = "其他原因" },
-                new() { Id = 8, Name = "太多了", Payload = "toomuch", FullText = "太多了" },
+                new() { Id = 8, Name = "太多了", Payload = "toomuch", FullText = "今天此类型的稿件的数量太多了" },
             };
 
             await Storageable(levels).ExecuteCommandAsync();
         }
 
-        public RejectReason? GetReasonById(int reasonId)
+        /// <summary>
+        /// 根据Id获取拒绝理由
+        /// </summary>
+        /// <param name="reasonId"></param>
+        /// <returns></returns>
+        public RejectReasons? GetReasonById(int reasonId)
         {
             if (RejectReasonCache.TryGetValue(reasonId, out var level))
             {
@@ -103,11 +107,11 @@ namespace XinjingdailyBot.Repository
         }
 
         /// <summary>
-        /// 根据Payload获取标签
+        /// 根据Payload获取拒绝理由
         /// </summary>
         /// <param name="payload"></param>
         /// <returns></returns>
-        public RejectReason? GetTagByPayload(string payload)
+        public RejectReasons? GetReasonByPayload(string payload)
         {
             if (RejectReasonPayloadCache.TryGetValue(payload, out var reason))
             {
@@ -117,10 +121,10 @@ namespace XinjingdailyBot.Repository
         }
 
         /// <summary>
-        /// 获取所有标签
+        /// 获取所有拒绝理由
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<RejectReason> GetAllRejectReasons()
+        public IEnumerable<RejectReasons> GetAllRejectReasons()
         {
             return RejectReasonCache.Values;
         }

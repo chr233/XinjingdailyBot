@@ -8,12 +8,12 @@ using XinjingdailyBot.Service.Data.Base;
 namespace XinjingdailyBot.Service.Data
 {
     [AppService(typeof(IMediaGroupService), LifeTime.Singleton)]
+    [Obsolete("过时表")]
     public sealed class MediaGroupService : BaseService<MediaGroups>, IMediaGroupService
     {
         public async Task AddPostMediaGroup(Message message)
         {
-            var postGeoup = new MediaGroups
-            {
+            var postGeoup = new MediaGroups {
                 ChatID = message.Chat.Id,
                 MessageID = message.MessageId,
                 MediaGroupID = message.MediaGroupId!,
@@ -26,8 +26,7 @@ namespace XinjingdailyBot.Service.Data
         public async Task AddPostMediaGroup(IEnumerable<Message> messages)
         {
             var now = DateTime.Now;
-            var postGeoups = messages.Select(x => new MediaGroups
-            {
+            var postGeoups = messages.Select(x => new MediaGroups {
                 ChatID = x.Chat.Id,
                 MessageID = x.MessageId,
                 MediaGroupID = x.MediaGroupId!,
@@ -49,7 +48,7 @@ namespace XinjingdailyBot.Service.Data
             return mediaGroups;
         }
 
-        public async Task<MediaGroups?> QueryMediaGroup(Chat chat,long msgId)
+        public async Task<MediaGroups?> QueryMediaGroup(Chat chat, long msgId)
         {
             var mediaGroup = await Queryable().FirstAsync(x => x.ChatID == chat.Id && x.MessageID == msgId);
             return mediaGroup;

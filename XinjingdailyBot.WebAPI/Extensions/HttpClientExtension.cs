@@ -1,6 +1,6 @@
-﻿using System.Net;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
+using System.Net;
 using XinjingdailyBot.Infrastructure;
 
 namespace XinjingdailyBot.WebAPI.Extensions
@@ -17,15 +17,13 @@ namespace XinjingdailyBot.WebAPI.Extensions
         /// <param name="services"></param>
         public static void AddHttpClients(this IServiceCollection services)
         {
-            services.AddHttpClient("Telegram", (serviceProvider, httpClient) =>
-            {
+            services.AddHttpClient("Telegram", (serviceProvider, httpClient) => {
                 var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
                 string? baseUrl = config.Bot.BaseUrl;
                 httpClient.BaseAddress = new Uri(baseUrl ?? "https://api.telegram.org/");
                 httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
                 httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(XinjingdailyBot));
-            }).ConfigurePrimaryHttpMessageHandler(serviceProvider =>
-            {
+            }).ConfigurePrimaryHttpMessageHandler(serviceProvider => {
                 var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
                 string? proxy = config.Bot.Proxy;
 
@@ -35,15 +33,13 @@ namespace XinjingdailyBot.WebAPI.Extensions
                     _logger.Info("已配置代理: {0}", proxy);
                     tgProxy = new WebProxy { Address = new Uri(proxy) };
                 }
-                return new HttpClientHandler
-                {
+                return new HttpClientHandler {
                     Proxy = tgProxy,
                     UseProxy = tgProxy != null,
                 };
             });
 
-            services.AddHttpClient("GitHub", (serviceProvider, httpClient) =>
-            {
+            services.AddHttpClient("GitHub", (serviceProvider, httpClient) => {
                 var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
                 string? baseUrl = config.GitHub.BaseUrl;
                 httpClient.BaseAddress = new Uri(baseUrl ?? "https://hub.chrxw.com/");
@@ -51,8 +47,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(XinjingdailyBot));
             });
 
-            services.AddHttpClient("IpInfo", (serviceProvider, httpClient) =>
-            {
+            services.AddHttpClient("IpInfo", (serviceProvider, httpClient) => {
                 var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
                 httpClient.BaseAddress = new Uri("https://ipinfo.io/");
                 httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");

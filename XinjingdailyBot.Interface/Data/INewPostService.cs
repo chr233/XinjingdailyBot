@@ -66,7 +66,7 @@ namespace XinjingdailyBot.Interface.Data
         /// <param name="dbUser"></param>
         /// <param name="rejectReason"></param>
         /// <returns></returns>
-        Task RejetPost(NewPosts post, Users dbUser, string rejectReason);
+        Task RejetPost(NewPosts post, Users dbUser, RejectReasons rejectReason);
         /// <summary>
         /// 设置稿件Tag
         /// </summary>
