@@ -2,29 +2,28 @@
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Model.Base;
+using XinjingdailyBot.Model.Columns;
 
 namespace XinjingdailyBot.Model.Models
 {
     /// <summary>
-    /// 用户表, 储存所有用户的基本信息, 权限设定, 以及投稿信息统计
+    /// 用户密钥表, 储存WebAPI的Token
     /// </summary>
     [SugarTable("user_token", TableDescription = "用户密钥表")]
-    [SugarIndex("index_userid", nameof(UserID), OrderByType.Asc, true)]
-    [SugarIndex("index_username", nameof(UserName), OrderByType.Asc)]
     [SugarIndex("index_token", nameof(APIToken), OrderByType.Asc, false)]
-    public sealed record UserToken : BaseModel
+    public sealed record UserToken : BaseModel, ICreateAt, IExpiredAt
     {
-        [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
-        public int Id { get; set; }
+        [SugarColumn(IsPrimaryKey = true)]
         /// <summary>
         /// 用户ID
         /// </summary>
         public long UserID { get; set; }
-       
+
         /// <summary>
-        /// 私聊ChatID, 默认 -1;
+        /// API Token
         /// </summary>
-        public long PrivateChatID { get; set; } = -1;
+        public Guid APIToken { get; set; }
+
         /// <summary>
         /// 创建时间
         /// </summary>
@@ -32,12 +31,6 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 修改时间
         /// </summary>
-        public DateTime ModifyAt { get; set; } = DateTime.Now;
-
-        /// <summary>
-        /// API Token
-        /// </summary>
-        public Guid? APIToken { get; set; }
-
+        public DateTime ExpiredAt { get; set; } = DateTime.MaxValue;
     }
 }
