@@ -52,7 +52,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                             try
                             {
                                 ChatPermissions permission = new() { CanSendMessages = false, };
-                                await _botClient.RestrictChatMemberAsync(chatId, dbUser.UserID, permission, banTime);
+                                await _botClient.RestrictChatMemberAsync(chatId, dbUser.UserID, permission, untilDate: banTime);
                             }
                             catch
                             {

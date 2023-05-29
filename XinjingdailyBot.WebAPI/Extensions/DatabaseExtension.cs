@@ -38,6 +38,8 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 $"Host={dbConfig.DbHost};Port={dbConfig.DbPort};Database={dbConfig.DbName};UserID={dbConfig.DbUser};Password={dbConfig.DbPassword};CharSet=utf8mb4;AllowZeroDateTime=true" :
                 $"DataSource={dbConfig.DbName}.db";
 
+            services.AddHttpContextAccessor();
+            
             services.AddSqlSugar(new IocConfig {
                 ConfigId = 0,
                 ConnectionString = connStr,
@@ -68,7 +70,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
                     }
 
                     //创建数据表
-                    Assembly assembly = Assembly.Load("XinjingdailyBot.Model");
+                    var assembly = Assembly.Load("XinjingdailyBot.Model");
                     var types = assembly.GetTypes()
                         .Where(x => x.GetCustomAttribute<SugarTable>() != null);
 

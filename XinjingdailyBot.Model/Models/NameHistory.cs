@@ -22,7 +22,7 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 用户昵称 名
         /// </summary>
-        public string LastName { get; set; }
+        public string LastName { get; set; } = "";
         /// <summary>
         /// 添加日期
         /// </summary>

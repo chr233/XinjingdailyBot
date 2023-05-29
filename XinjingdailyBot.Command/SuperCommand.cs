@@ -15,6 +15,7 @@ using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
+using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Command
 {
@@ -23,9 +24,9 @@ namespace XinjingdailyBot.Command
     {
         private readonly ILogger<SuperCommand> _logger;
         private readonly ITelegramBotClient _botClient;
-        private readonly INewPostService _postService;
+        private readonly IPostService _postService;
         [Obsolete("迁移使用")]
-        private readonly IPostService _oldPostService;
+        private readonly OldPostRepository _oldPostService;
         private readonly IChannelOptionService _channelOptionService;
         private readonly IChannelService _channelService;
         private readonly IMarkupHelperService _markupHelperService;
@@ -38,8 +39,8 @@ namespace XinjingdailyBot.Command
         public SuperCommand(
             ILogger<SuperCommand> logger,
             ITelegramBotClient botClient,
-            INewPostService postService,
-            IPostService oldPostService,
+            IPostService postService,
+            OldPostRepository oldPostService,
             IChannelOptionService channelOptionService,
             IChannelService channelService,
             IMarkupHelperService markupHelperService,

@@ -17,13 +17,13 @@ namespace XinjingdailyBot.Tasks
     public class ExpiredPostsTask : IJob
     {
         private readonly ILogger<ExpiredPostsTask> _logger;
-        private readonly INewPostService _postService;
+        private readonly IPostService _postService;
         private readonly IUserService _userService;
         private readonly ITelegramBotClient _botClient;
 
         public ExpiredPostsTask(
             ILogger<ExpiredPostsTask> logger,
-            INewPostService postService,
+            IPostService postService,
             IUserService userService,
             ITelegramBotClient botClient,
             IOptions<OptionsSetting> options)
