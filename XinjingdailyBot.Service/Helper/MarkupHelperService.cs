@@ -276,7 +276,7 @@ namespace XinjingdailyBot.Service.Helper
             return keyboard;
         }
 
-        public InlineKeyboardMarkup? LinkToOriginPostKeyboard(OldPosts post)
+        public InlineKeyboardMarkup? LinkToOriginPostKeyboard(NewPosts post)
         {
             var channel = _channelService.AcceptChannel;
             string link = channel.GetMessageLink(post.PublicMsgID);
@@ -373,7 +373,7 @@ namespace XinjingdailyBot.Service.Helper
             return keyboard;
         }
 
-        public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, OldPosts post, int tagId, string postType)
+        public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, NewPosts post, int tagId, string postType)
         {
             var channel = _channelService.AcceptChannel;
             string link = channel.GetMessageLink(post.PublicMsgID);
@@ -390,7 +390,7 @@ namespace XinjingdailyBot.Service.Helper
             return keyboard;
         }
 
-        public InlineKeyboardMarkup QueryPostMenuKeyboard(Users dbUser, OldPosts post)
+        public InlineKeyboardMarkup QueryPostMenuKeyboard(Users dbUser, NewPosts post)
         {
             InlineKeyboardMarkup keyboard;
 

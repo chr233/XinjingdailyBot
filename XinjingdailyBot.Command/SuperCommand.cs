@@ -23,7 +23,9 @@ namespace XinjingdailyBot.Command
     {
         private readonly ILogger<SuperCommand> _logger;
         private readonly ITelegramBotClient _botClient;
-        private readonly IPostService _postService;
+        private readonly INewPostService _postService;
+        [Obsolete("迁移使用")]
+        private readonly IPostService _oldPostService;
         private readonly IChannelOptionService _channelOptionService;
         private readonly IChannelService _channelService;
         private readonly IMarkupHelperService _markupHelperService;
@@ -32,10 +34,12 @@ namespace XinjingdailyBot.Command
         private readonly IHttpHelperService _httpHelperService;
         private readonly ITextHelperService _textHelperService;
 
+        [Obsolete("迁移使用")]
         public SuperCommand(
             ILogger<SuperCommand> logger,
             ITelegramBotClient botClient,
-            IPostService postService,
+            INewPostService postService,
+            IPostService oldPostService,
             IChannelOptionService channelOptionService,
             IChannelService channelService,
             IMarkupHelperService markupHelperService,
@@ -47,6 +51,7 @@ namespace XinjingdailyBot.Command
             _logger = logger;
             _botClient = botClient;
             _postService = postService;
+            _oldPostService = oldPostService;
             _channelOptionService = channelOptionService;
             _channelService = channelService;
             _markupHelperService = markupHelperService;
@@ -124,15 +129,14 @@ namespace XinjingdailyBot.Command
                     return ("不是来自其他频道的投稿, 无法设置频道选项", null);
                 }
 
-                var channel = await _channelOptionService.FetchChannelByTitle(post.ChannelTitle);
+                var channel = await _channelOptionService.Queryable().FirstAsync(x => x.ChannelID == post.ChannelID);
 
                 if (channel == null)
                 {
                     return ("未找到对应频道", null);
                 }
 
-                string option = channel.Option switch
-                {
+                string option = channel.Option switch {
                     EChannelOption.Normal => "1. 不做特殊处理",
                     EChannelOption.PurgeOrigin => "2. 抹除频道来源",
                     EChannelOption.AutoReject => "3. 拒绝此频道的投稿",
@@ -169,16 +173,14 @@ namespace XinjingdailyBot.Command
                     return "参数有误";
                 }
 
-                EChannelOption? option = args[2] switch
-                {
+                EChannelOption? option = args[2] switch {
                     "normal" => EChannelOption.Normal,
                     "purgeorigin" => EChannelOption.PurgeOrigin,
                     "autoreject" => EChannelOption.AutoReject,
                     _ => null
                 };
 
-                string optionStr = option switch
-                {
+                string optionStr = option switch {
                     EChannelOption.Normal => "不做特殊处理",
                     EChannelOption.PurgeOrigin => "抹除频道来源",
                     EChannelOption.AutoReject => "拒绝此频道的投稿",
@@ -241,8 +243,7 @@ namespace XinjingdailyBot.Command
                     break;
                 }
 
-                var tasks = users.Select(async user =>
-                {
+                var tasks = users.Select(async user => {
                     int postCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID);
                     int acceptCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == EPostStatus.Accepted);
                     int rejectCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == EPostStatus.Rejected);
@@ -260,8 +261,7 @@ namespace XinjingdailyBot.Command
 
                         effectCount++;
 
-                        await _userService.Updateable(user).UpdateColumns(x => new
-                        {
+                        await _userService.Updateable(user).UpdateColumns(x => new {
                             x.PostCount,
                             x.AcceptCount,
                             x.RejectCount,
@@ -309,14 +309,13 @@ namespace XinjingdailyBot.Command
 
             while (startId <= totalPosts)
             {
-                var posts = await _postService.Queryable().Where(x => x.Id >= startId && x.Tags != EBuildInTags.None).Take(threads).ToListAsync();
+                var posts = await _oldPostService.Queryable().Where(x => x.Id >= startId && x.Tags != EBuildInTags.None).Take(threads).ToListAsync();
                 if (!posts.Any())
                 {
                     break;
                 }
 
-                var tasks = posts.Select(async post =>
-                {
+                var tasks = posts.Select(async post => {
                     if (post.Tags != EBuildInTags.None)
                     {
                         var oldTag = post.Tags;
@@ -347,8 +346,7 @@ namespace XinjingdailyBot.Command
 
                         effectCount++;
 
-                        await _postService.Updateable(post).UpdateColumns(x => new
-                        {
+                        await _oldPostService.Updateable(post).UpdateColumns(x => new {
                             x.Tags,
                             x.NewTags,
                             x.ModifyAt

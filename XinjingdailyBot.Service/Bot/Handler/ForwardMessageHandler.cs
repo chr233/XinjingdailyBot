@@ -1,18 +1,16 @@
-﻿using System.Text;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
-using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
-using XinjingdailyBot.Service.Bot.Common;
 
 namespace XinjingdailyBot.Service.Bot.Handler
 {
@@ -22,7 +20,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
         private readonly ILogger<ForwardMessageHandler> _logger;
         private readonly IChannelService _channelService;
         private readonly ITelegramBotClient _botClient;
-        private readonly IPostService _postService;
+        private readonly INewPostService _postService;
         private readonly IMarkupHelperService _markupHelperService;
         private readonly IUserService _userService;
         private readonly IMediaGroupService _mediaGroupService;
@@ -31,7 +29,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             ILogger<ForwardMessageHandler> logger,
             ITelegramBotClient botClient,
             IChannelService channelService,
-            IPostService postService,
+            INewPostService postService,
             IMarkupHelperService markupHelperService,
             IUserService userService,
             IMediaGroupService mediaGroupService)
@@ -56,7 +54,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 if (forwardFromChat != null && foreardMsgId != null
                     && (_channelService.IsChannelMessage(forwardFromChat.Id) || _channelService.IsGroupMessage(forwardFromChat.Id)))
                 {
-                    OldPosts? post = null;
+                    NewPosts? post = null;
 
                     bool isMediaGroup = !string.IsNullOrEmpty(message.MediaGroupId);
                     if (!isMediaGroup)

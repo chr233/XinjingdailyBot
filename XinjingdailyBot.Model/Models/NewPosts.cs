@@ -11,7 +11,9 @@ namespace XinjingdailyBot.Model.Models
     [SugarIndex("index_originaction", nameof(OriginActionChatID), OrderByType.Asc, nameof(OriginActionMsgID), OrderByType.Asc)]
     [SugarIndex("index_review", nameof(ReviewChatID), OrderByType.Asc, nameof(ReviewMsgID), OrderByType.Asc)]
     [SugarIndex("index_reviewaction", nameof(ReviewActionChatID), OrderByType.Asc, nameof(ReviewActionMsgID), OrderByType.Asc)]
-    [SugarIndex("index_media_group_id", nameof(MediaGroupID), OrderByType.Asc)]
+    [SugarIndex("index_origin_media_group_id", nameof(OriginMediaGroupID), OrderByType.Asc)]
+    [SugarIndex("index_review_media_group_id", nameof(ReviewMediaGroupID), OrderByType.Asc)]
+    [SugarIndex("index_post_media_group_id", nameof(PublishMediaGroupID), OrderByType.Asc)]
     [SugarIndex("index_posterid", nameof(PosterUID), OrderByType.Asc)]
     [SugarIndex("index_reviewerid", nameof(ReviewerUID), OrderByType.Asc)]
     [SugarIndex("index_status_modifyat", nameof(Status), OrderByType.Asc, nameof(ModifyAt), OrderByType.Asc)]
@@ -114,11 +116,19 @@ namespace XinjingdailyBot.Model.Models
         /// 是否为媒体组消息
         /// </summary>
         [SugarColumn(IsIgnore = true)]
-        public bool IsMediaGroup => !string.IsNullOrEmpty(MediaGroupID);
+        public bool IsMediaGroup => !string.IsNullOrEmpty(OriginMediaGroupID);
         /// <summary>
-        /// 媒体组ID
+        /// 原始媒体组ID
         /// </summary>
-        public string MediaGroupID { get; set; } = "";
+        public string OriginMediaGroupID { get; set; } = "";
+        /// <summary>
+        /// 审核消息媒体组ID
+        /// </summary>
+        public string ReviewMediaGroupID { get; set; } = "";
+        /// <summary>
+        /// 发布频道或者拒绝频道的媒体组ID
+        /// </summary>
+        public string PublishMediaGroupID { get; set; } = "";
         /// <summary>
         /// 稿件标签
         /// </summary>

@@ -59,14 +59,14 @@ namespace XinjingdailyBot.Interface.Helper
         /// <param name="post"></param>
         /// <param name="poster"></param>
         /// <returns></returns>
-        string MakePoster(OldPosts post, Users poster);
+        string MakePoster(NewPosts post, Users poster);
         /// <summary>
         /// 生成稿件
         /// </summary>
         /// <param name="post"></param>
         /// <param name="poster"></param>
         /// <returns></returns>
-        string MakePostText(OldPosts post, Users poster);
+        string MakePostText(NewPosts post, Users poster);
         /// <summary>
         /// 生成审核消息(待审核)
         /// </summary>

@@ -187,7 +187,7 @@ namespace XinjingdailyBot.Service.Helper
             return msg;
         }
 
-        public string MakePoster(OldPosts post, Users poster)
+        public string MakePoster(NewPosts post, Users poster)
         {
             var user = HtmlUserLink(poster);
 
@@ -216,9 +216,9 @@ namespace XinjingdailyBot.Service.Helper
             }
         }
 
-        public string MakePostText(OldPosts post, Users poster)
+        public string MakePostText(NewPosts post, Users poster)
         {
-            var tag = _tagRepository.GetActiviedHashTags(post.NewTags);
+            var tag = _tagRepository.GetActiviedHashTags(post.Tags);
 
             StringBuilder sb = new();
 

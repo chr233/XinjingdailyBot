@@ -18,7 +18,7 @@ namespace XinjingdailyBot.Command
         private readonly ITelegramBotClient _botClient;
         private readonly IUserService _userService;
         private readonly IChannelService _channelService;
-        private readonly IPostService _postService;
+        private readonly INewPostService _postService;
         private readonly IMarkupHelperService _markupHelperService;
         private readonly IAttachmentService _attachmentService;
         private readonly ITextHelperService _textHelperService;
@@ -28,7 +28,7 @@ namespace XinjingdailyBot.Command
             ITelegramBotClient botClient,
             IUserService userService,
             IChannelService channelService,
-            IPostService postService,
+            INewPostService postService,
             IMarkupHelperService markupHelperService,
             IAttachmentService attachmentService,
             ITextHelperService textHelperService,
@@ -53,7 +53,7 @@ namespace XinjingdailyBot.Command
         public async Task HandlePostQuery(Users dbUser, CallbackQuery query)
         {
             var message = query.Message!;
-            var post = await _postService.FetchPostFromConfirmCallbackQuery(query);
+            var post = await _postService.FetchPostFromCallbackQuery(query);
 
             if (post == null)
             {
@@ -97,7 +97,7 @@ namespace XinjingdailyBot.Command
         /// <param name="post"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        private async Task SetAnymouse(OldPosts post, CallbackQuery query)
+        private async Task SetAnymouse(NewPosts post, CallbackQuery query)
         {
             await _botClient.AutoReplyAsync("可以使用命令 /anymouse 切换默认匿名投稿", query);
 
@@ -116,7 +116,7 @@ namespace XinjingdailyBot.Command
         /// <param name="post"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        private async Task CancelPost(OldPosts post, CallbackQuery query)
+        private async Task CancelPost(NewPosts post, CallbackQuery query)
         {
             post.Status = EPostStatus.Cancel;
             post.ModifyAt = DateTime.Now;
@@ -133,7 +133,7 @@ namespace XinjingdailyBot.Command
         /// <param name="post"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        private async Task ConfirmPost(OldPosts post, Users dbUser, CallbackQuery query)
+        private async Task ConfirmPost(NewPosts post, Users dbUser, CallbackQuery query)
         {
             if (await _postService.CheckPostLimit(dbUser, null, query) == false)
             {
@@ -157,8 +157,7 @@ namespace XinjingdailyBot.Command
                         attachmentType = post.PostType;
                     }
 
-                    group[i] = attachmentType switch
-                    {
+                    group[i] = attachmentType switch {
                         MessageType.Photo => new InputMediaPhoto(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
                         MessageType.Audio => new InputMediaAudio(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
                         MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
@@ -168,7 +167,7 @@ namespace XinjingdailyBot.Command
                 }
                 var messages = await _botClient.SendMediaGroupAsync(_channelService.ReviewGroup.Id, group);
                 reviewMsg = messages.First();
-
+                post.ReviewMediaGroupID = reviewMsg.MediaGroupId ?? "";
                 //记录媒体组消息
                 await _mediaGroupService.AddPostMediaGroup(messages);
             }
@@ -176,15 +175,25 @@ namespace XinjingdailyBot.Command
             string msg = _textHelperService.MakeReviewMessage(dbUser, post.Anonymous);
 
             bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
-            var keyboard = _markupHelperService.ReviewKeyboardA(post.NewTags, hasSpoiler);
+            var keyboard = _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
 
             Message manageMsg = await _botClient.SendTextMessageAsync(_channelService.ReviewGroup.Id, msg, parseMode: ParseMode.Html, disableWebPagePreview: true, replyToMessageId: reviewMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
+            post.ReviewChatID = reviewMsg.Chat.Id;
             post.ReviewMsgID = reviewMsg.MessageId;
-            post.ManageMsgID = manageMsg.MessageId;
+            post.ReviewActionChatID = manageMsg.MessageId;
+            post.ReviewActionMsgID = manageMsg.MessageId;
             post.Status = EPostStatus.Reviewing;
             post.ModifyAt = DateTime.Now;
-            await _postService.Updateable(post).UpdateColumns(x => new { x.ReviewMsgID, x.ManageMsgID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
+            await _postService.Updateable(post).UpdateColumns(x => new {
+                x.ReviewChatID,
+                x.ReviewMsgID,
+                x.ReviewActionChatID,
+                x.ReviewActionMsgID,
+                x.ReviewMediaGroupID,
+                x.Status,
+                x.ModifyAt
+            }).ExecuteCommandAsync();
 
             await _botClient.AutoReplyAsync(Langs.PostSendSuccess, query);
             await _botClient.EditMessageTextAsync(query.Message!, Langs.ThanksForSendingPost, replyMarkup: null);

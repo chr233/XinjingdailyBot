@@ -17,13 +17,13 @@ namespace XinjingdailyBot.Service.Bot.Handler
     {
         private readonly ITelegramBotClient _botClient;
         private readonly IAttachmentService _attachmentService;
-        private readonly IPostService _postService;
+        private readonly INewPostService _postService;
         private readonly IMarkupHelperService _markupHelperService;
 
         public InlineQueryHandler(
             ITelegramBotClient botClient,
             IAttachmentService attachmentService,
-            IPostService postService,
+            INewPostService postService,
             IMarkupHelperService markupHelperService)
         {
             _botClient = botClient;
