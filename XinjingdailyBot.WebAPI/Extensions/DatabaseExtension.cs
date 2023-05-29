@@ -39,7 +39,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 $"DataSource={dbConfig.DbName}.db";
 
             services.AddHttpContextAccessor();
-            
+
             services.AddSqlSugar(new IocConfig {
                 ConfigId = 0,
                 ConnectionString = connStr,
