@@ -1,7 +1,8 @@
 ﻿
-using System.Diagnostics.CodeAnalysis;
 using NLog.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.WebAPI.Extensions;
 
 namespace XinjingdailyBot.WebAPI
@@ -20,7 +21,15 @@ namespace XinjingdailyBot.WebAPI
         [RequiresUnreferencedCode("不兼容剪裁")]
         public static void Main(string[] args)
         {
-            _logger.Info("欢迎使用 XinjingdailyBot Version: {0} - {1}", Utils.Version, BuildInfo.Variant);
+            _logger.Info(Langs.Line);
+            _logger.Info("欢迎使用 XinjingdailyBot");
+            _logger.Info(Langs.Version, Utils.Version, BuildInfo.Variant);
+            _logger.Info(Langs.Copyright, BuildInfo.Author);
+            _logger.Info(Langs.Line);
+            _logger.Warn("欢迎订阅心惊报 https://t.me/xinjingdaily");
+            _logger.Info(Langs.Line);
+
+            Thread.Sleep(2000);
 
             var builder = WebApplication.CreateBuilder(args);
 
@@ -28,8 +37,7 @@ namespace XinjingdailyBot.WebAPI
             builder.Services.AddOptions().Configure<OptionsSetting>(builder.Configuration);
 
             //NLog
-            builder.Services.AddLogging(loggingBuilder =>
-            {
+            builder.Services.AddLogging(loggingBuilder => {
                 loggingBuilder.ClearProviders();
                 loggingBuilder.SetMinimumLevel(LogLevel.Debug);
                 loggingBuilder.AddNLog();

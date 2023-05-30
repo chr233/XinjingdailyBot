@@ -1,11 +1,12 @@
 ﻿using SqlSugar;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Model.Base;
+using XinjingdailyBot.Model.Columns;
 
 namespace XinjingdailyBot.Model.Models
 {
     [SugarTable("ad", TableDescription = "广告投放")]
-    public sealed record Advertises : BaseModel
+    public sealed record Advertises : BaseModel, ICreateAt
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
@@ -31,7 +32,7 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 广告发布位置
         /// </summary>
-        public AdMode Mode { get; set; } = AdMode.None;
+        public EAdMode Mode { get; set; } = EAdMode.None;
 
         /// <summary>
         /// 展示权重, 数值越大概率越高, 0为不展示
@@ -57,9 +58,7 @@ namespace XinjingdailyBot.Model.Models
         /// </summary>
         public DateTime ExpireAt { get; set; } = DateTime.MaxValue;
 
-        /// <summary>
-        /// 创建时间
-        /// </summary>
+        /// <inheritdoc cref="ICreateAt.CreateAt"/>
         public DateTime CreateAt { get; set; } = DateTime.Now;
     }
 }

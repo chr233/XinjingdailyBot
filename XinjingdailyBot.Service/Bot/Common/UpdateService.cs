@@ -39,8 +39,7 @@ namespace XinjingdailyBot.Service.Bot.Common
                 return;
             }
 
-            var handler = update.Type switch
-            {
+            var handler = update.Type switch {
                 UpdateType.ChannelPost => _dispatcherService.OnChannalPostReceived(dbUser, update.ChannelPost!),
                 UpdateType.Message => _dispatcherService.OnMessageReceived(dbUser, update.Message!),
                 UpdateType.CallbackQuery => _dispatcherService.OnCallbackQueryReceived(dbUser, update.CallbackQuery!),
@@ -57,8 +56,7 @@ namespace XinjingdailyBot.Service.Bot.Common
 
         public async Task HandlePollingErrorAsync(ITelegramBotClient _, Exception exception, CancellationToken cancellationToken)
         {
-            var ErrorMessage = exception switch
-            {
+            var ErrorMessage = exception switch {
                 ApiRequestException apiRequestException => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
                 _ => exception.ToString()
             };

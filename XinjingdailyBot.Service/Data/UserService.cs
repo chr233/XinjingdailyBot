@@ -1,7 +1,7 @@
-﻿using System.Text;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SqlSugar;
+using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -31,6 +31,7 @@ namespace XinjingdailyBot.Service.Data
         private readonly ITelegramBotClient _botClient;
         private readonly LevelRepository _levelRepository;
         private readonly INameHistoryService _nameHistoryService;
+        private readonly IMediaGroupService _mediaGroupService;
 
         public UserService(
             ILogger<UserService> logger,
@@ -42,7 +43,8 @@ namespace XinjingdailyBot.Service.Data
             PostRepository postRepository,
             ITelegramBotClient botClient,
             LevelRepository levelRepository,
-            INameHistoryService nameHistoryService)
+            INameHistoryService nameHistoryService,
+            IMediaGroupService mediaGroupService)
         {
             _logger = logger;
             _optionsSetting = configuration.Value;
@@ -54,6 +56,7 @@ namespace XinjingdailyBot.Service.Data
             _botClient = botClient;
             _levelRepository = levelRepository;
             _nameHistoryService = nameHistoryService;
+            _mediaGroupService = mediaGroupService;
         }
 
         /// <summary>
@@ -63,8 +66,7 @@ namespace XinjingdailyBot.Service.Data
 
         public async Task<Users?> FetchUserFromUpdate(Update update)
         {
-            var msgChat = update.Type switch
-            {
+            var msgChat = update.Type switch {
                 UpdateType.ChannelPost => update.ChannelPost!.Chat,
                 UpdateType.EditedChannelPost => update.EditedChannelPost!.Chat,
                 UpdateType.Message => update.Message!.Chat,
@@ -88,8 +90,7 @@ namespace XinjingdailyBot.Service.Data
             }
             else
             {
-                var msgUser = update.Type switch
-                {
+                var msgUser = update.Type switch {
                     UpdateType.ChannelPost => update.ChannelPost!.From,
                     UpdateType.EditedChannelPost => update.EditedChannelPost!.From,
                     UpdateType.Message => update.Message!.From,
@@ -187,8 +188,7 @@ namespace XinjingdailyBot.Service.Data
                     return null;
                 }
 
-                dbUser = new()
-                {
+                dbUser = new() {
                     UserID = msgUser.Id,
                     UserName = msgUser.Username ?? "",
                     FirstName = msgUser.FirstName,
@@ -271,8 +271,7 @@ namespace XinjingdailyBot.Service.Data
                     try
                     {
                         dbUser.ModifyAt = DateTime.Now;
-                        await Updateable(dbUser).UpdateColumns(x => new
-                        {
+                        await Updateable(dbUser).UpdateColumns(x => new {
                             x.UserName,
                             x.FirstName,
                             x.LastName,
@@ -427,26 +426,25 @@ namespace XinjingdailyBot.Service.Data
             //被回复的消息是Bot发的消息
             if (replyToMsg.From.Id == _channelService.BotUser.Id)
             {
+                var chatId = message.Chat.Id;
+                var msgId = replyToMsg.MessageId;
+
                 //在审核群内
-                if (message.Chat.Id == _channelService.ReviewGroup.Id)
+                if (chatId == _channelService.ReviewGroup.Id)
                 {
-                    var msgID = replyToMsg.MessageId;
+                    NewPosts? post;
 
-                    var exp = Expressionable.Create<Posts>();
-                    exp.Or(x => x.ManageMsgID == msgID);
-
-                    if (string.IsNullOrEmpty(replyToMsg.MediaGroupId))
+                    var mediaGroup = await _mediaGroupService.QueryMediaGroup(chatId, msgId);
+                    if (mediaGroup == null)//单条稿件
                     {
-                        //普通消息
-                        exp.Or(x => x.ReviewMsgID == msgID);
+                        post = await _postRepository.Queryable().FirstAsync(x =>
+                            (x.ReviewChatID == chatId && x.ReviewMsgID == msgId) || (x.ReviewActionChatID == chatId && x.ReviewActionMsgID == msgId)
+                        );
                     }
-                    else
+                    else //媒体组稿件
                     {
-                        //媒体组消息
-                        exp.Or(x => x.ReviewMsgID <= msgID && x.ManageMsgID > msgID);
+                        post = await _postRepository.Queryable().FirstAsync(x => x.ReviewChatID == chatId && x.ReviewMediaGroupID == mediaGroup.MediaGroupID);
                     }
-
-                    var post = await _postRepository.Queryable().FirstAsync(exp.ToExpression());
 
                     //判断是不是审核相关消息
                     if (post != null)
@@ -492,7 +490,7 @@ namespace XinjingdailyBot.Service.Data
                 return await FetchUserByUserName(target);
             }
         }
-        
+
         public async Task<(string, InlineKeyboardMarkup?)> QueryUserList(Users dbUser, string query, int page)
         {
             //每页数量

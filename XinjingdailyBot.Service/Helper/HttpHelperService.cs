@@ -1,6 +1,6 @@
-﻿using System.Net;
+﻿using Microsoft.Extensions.Logging;
+using System.Net;
 using System.Text.Json;
-using Microsoft.Extensions.Logging;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Model;
 using XinjingdailyBot.Interface.Helper;
@@ -87,7 +87,7 @@ namespace XinjingdailyBot.Service.Helper
         {
             HttpRequestMessage request = new(HttpMethod.Get, $"/{ip}");
             using var rawResponse = await SendRequestToStream("IpInfo", request);
-            if(rawResponse==null)
+            if (rawResponse == null)
             {
                 return null;
             }

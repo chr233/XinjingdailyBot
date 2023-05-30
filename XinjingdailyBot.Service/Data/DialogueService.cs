@@ -12,8 +12,7 @@ namespace XinjingdailyBot.Service.Data
     {
         public async Task RecordMessage(Message message)
         {
-            string? content = message.Type switch
-            {
+            string? content = message.Type switch {
                 MessageType.Text => message.Text,
                 MessageType.Photo => message.Caption,
                 MessageType.Audio => message.Caption,
@@ -29,15 +28,14 @@ namespace XinjingdailyBot.Service.Data
                 content = content[..2000];
             }
 
-            var dialogue = new Dialogue
-            {
+            var dialogue = new Dialogue {
                 ChatID = message.Chat.Id,
                 MessageID = message.MessageId,
                 UserID = message.From?.Id ?? -1,
                 ReplyMessageID = message.ReplyToMessage?.MessageId ?? -1,
                 Type = message.Type.ToString(),
                 Content = content ?? "",
-                Date = message.Date,
+                CreateAt = message.Date,
             };
 
             await InsertAsync(dialogue);

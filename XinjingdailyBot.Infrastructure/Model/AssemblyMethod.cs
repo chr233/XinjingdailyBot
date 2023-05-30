@@ -7,9 +7,9 @@ namespace XinjingdailyBot.Infrastructure.Model
     {
         public MethodInfo Method { get; set; }
         public string? Description { get; set; }
-        public UserRights Rights { get; set; }
+        public EUserRights Rights { get; set; }
 
-        public AssemblyMethod(MethodInfo method, string? description, UserRights rights)
+        public AssemblyMethod(MethodInfo method, string? description, EUserRights rights)
         {
             Method = method;
             Description = description;

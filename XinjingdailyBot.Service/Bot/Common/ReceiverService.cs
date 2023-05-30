@@ -31,8 +31,7 @@ namespace XinjingdailyBot.Service.Bot.Common
 
         public async Task ReceiveAsync(CancellationToken stoppingToken)
         {
-            ReceiverOptions receiverOptions = new()
-            {
+            ReceiverOptions receiverOptions = new() {
                 AllowedUpdates = Array.Empty<UpdateType>(),
                 ThrowPendingUpdates = true || _optionsSetting.Bot.ThrowPendingUpdates,
             };

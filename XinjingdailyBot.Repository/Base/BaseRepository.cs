@@ -1,7 +1,7 @@
-﻿using System.Data;
-using System.Linq.Expressions;
-using SqlSugar;
+﻿using SqlSugar;
 using SqlSugar.IOC;
+using System.Data;
+using System.Linq.Expressions;
 using XinjingdailyBot.Model.Base;
 
 namespace XinjingdailyBot.Repository.Base

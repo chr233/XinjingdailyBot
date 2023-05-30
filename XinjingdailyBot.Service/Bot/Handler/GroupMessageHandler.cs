@@ -37,7 +37,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                     //制裁复读机
                     if (message.Text == replyMessage.Text)
                     {
-                        if (dbUser.Right.HasFlag(UserRights.AdminCmd) || dbUser.Right.HasFlag(UserRights.SuperCmd))
+                        if (dbUser.Right.HasFlag(EUserRights.AdminCmd) || dbUser.Right.HasFlag(EUserRights.SuperCmd))
                         {
                             await _botClient.AutoReplyAsync("原来是狗管理, 惹不起惹不起...", message);
                         }
@@ -52,7 +52,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                             try
                             {
                                 ChatPermissions permission = new() { CanSendMessages = false, };
-                                await _botClient.RestrictChatMemberAsync(chatId, dbUser.UserID, permission, banTime);
+                                await _botClient.RestrictChatMemberAsync(chatId, dbUser.UserID, permission, untilDate: banTime);
                             }
                             catch
                             {
@@ -65,7 +65,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
 
                     if (message.Text == "爬" || message.Text == "爪巴")
                     {
-                        if (dbUser.Right.HasFlag(UserRights.AdminCmd) || dbUser.Right.HasFlag(UserRights.SuperCmd))
+                        if (dbUser.Right.HasFlag(EUserRights.AdminCmd) || dbUser.Right.HasFlag(EUserRights.SuperCmd))
                         {
                             await _botClient.AutoReplyAsync("嗻", message);
                         }

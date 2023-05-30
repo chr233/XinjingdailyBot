@@ -225,4 +225,13 @@
   <data name="NSFWWarning" xml:space="preserve">
     <value>⚠️ NSFW 提前预警 ⚠️</value>
   </data>
+  <data name="Line" xml:space="preserve">
+    <value>==========================================================</value>
+  </data>
+  <data name="Copyright" xml:space="preserve">
+    <value>Copyright © 2022-2023 {0}</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>Version: {0} - {1}</value>
+  </data>
 </root>

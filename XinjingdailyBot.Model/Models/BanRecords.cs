@@ -28,7 +28,7 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 是否封禁 true: 封禁, false: 解封
         /// </summary>
-        public BanType Type { get; set; } = BanType.UnBan;
+        public EBanType Type { get; set; } = EBanType.UnBan;
         /// <summary>
         /// 封禁时间
         /// </summary>

@@ -1,11 +1,9 @@
-﻿using System.Text;
-using System.Text.RegularExpressions;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
+using System.Text;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Model;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Helper;
@@ -38,9 +36,6 @@ namespace XinjingdailyBot.Service.Helper
         private bool PureReturns { get; init; }
         private bool PureHashTag { get; init; }
 
-        private static readonly Regex MatchTag = new(@"(^#\S+)|(\s#\S+)");
-        private static readonly Regex MatchSpace = new(@"^\s*$");
-
         public string PureText(string? text)
         {
             if (string.IsNullOrEmpty(text))
@@ -51,13 +46,14 @@ namespace XinjingdailyBot.Service.Helper
             if (PureHashTag)
             {
                 //过滤HashTag
-                text = MatchTag.Replace(text, "");
+                text = RegexUtils.MatchHashTag().Replace(text, "");
             }
 
             if (PureReturns)
             {
+                var matchSpace = RegexUtils.MatchBlankLine();
                 //过滤连续换行
-                var parts = text.Split('\n', StringSplitOptions.RemoveEmptyEntries).Where(x => !MatchSpace.IsMatch(x)).Select(x => x.Trim());
+                var parts = text.Split('\n', StringSplitOptions.RemoveEmptyEntries).Where(x => !matchSpace.IsMatch(x)).Select(x => x.Trim());
                 text = string.Join('\n', parts);
             }
 
@@ -156,24 +152,6 @@ namespace XinjingdailyBot.Service.Helper
             return msg;
         }
 
-        public string RejectReasonToString(RejectReason rejectReason)
-        {
-            var reason = rejectReason switch
-            {
-                RejectReason.Fuzzy => "图片模糊/看不清",
-                RejectReason.Duplicate => "重复的稿件",
-                RejectReason.Boring => "内容不够有趣",
-                RejectReason.Confused => "审核没看懂,建议配文说明",
-                RejectReason.Deny => "不合适发布的内容",
-                RejectReason.QRCode => "稿件包含二维码水印",
-                RejectReason.Other => "其他原因",
-                RejectReason.CustomReason => "其他原因",
-                RejectReason.AutoReject => "稿件审核超时, 自动拒绝",
-                _ => "未知",
-            };
-            return reason;
-        }
-
         public string MakeNotification(bool isDirect, long messageID)
         {
             var msgLink = HtmlMessageLink(messageID, _channelService.AcceptChannel.Username ?? _channelService.AcceptChannel.Id.ToString(), "消息直链");
@@ -187,13 +165,13 @@ namespace XinjingdailyBot.Service.Helper
             return msg;
         }
 
-        public string MakePoster(Posts post, Users poster)
+        public string MakePoster(NewPosts post, Users poster, ChannelOptions? channel)
         {
             var user = HtmlUserLink(poster);
 
-            if (post.IsFromChannel)
+            if (post.IsFromChannel && !string.IsNullOrEmpty(channel?.ChannelName))
             {
-                var channel = HtmlUserLink(0, post.ChannelName, post.ChannelTitle);
+                var link = HtmlMessageLink(post.ChannelMsgId, channel.ChannelTitle, channel.ChannelName);
                 if (post.Anonymous)
                 {
                     return $"<i>from</i> {channel}";
@@ -216,9 +194,9 @@ namespace XinjingdailyBot.Service.Helper
             }
         }
 
-        public string MakePostText(Posts post, Users poster)
+        public string MakePostText(NewPosts post, Users poster, ChannelOptions? channel)
         {
-            var tag = _tagRepository.GetActiviedHashTags(post.NewTags);
+            var tag = _tagRepository.GetActiviedHashTags(post.Tags);
 
             StringBuilder sb = new();
 
@@ -233,7 +211,7 @@ namespace XinjingdailyBot.Service.Helper
                 sb.AppendLine(text);
             }
 
-            var from = MakePoster(post, poster);
+            var from = MakePoster(post, poster, channel);
 
             if (sb.Length > 0)
             {

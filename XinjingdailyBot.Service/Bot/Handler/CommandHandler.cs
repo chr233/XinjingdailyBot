@@ -1,8 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -81,13 +81,13 @@ namespace XinjingdailyBot.Service.Bot.Handler
         /// 注册命令
         /// </summary>
         /// <param name="type"></param>
-        //[RequiresUnreferencedCode("不兼容剪裁")]
+        [RequiresUnreferencedCode("不兼容剪裁")]
         private void RegisterCommands([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type type)
         {
-            Dictionary<string, AssemblyMethod> commands = new();
-            Dictionary<string, string> commandAlias = new();
-            Dictionary<string, AssemblyMethod> queryCommands = new();
-            Dictionary<string, string> queryAlias = new();
+            var commands = new Dictionary<string, AssemblyMethod>();
+            var commandAlias = new Dictionary<string, string>();
+            var queryCommands = new Dictionary<string, AssemblyMethod>();
+            var queryAlias = new Dictionary<string, string>();
 
             foreach (var method in type.GetMethods())
             {
@@ -199,8 +199,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                         if (_channelService.IsGroupMessage(message.Chat.Id))
                         {
                             //删除原消息
-                            _ = Task.Run(async () =>
-                            {
+                            _ = Task.Run(async () => {
                                 await Task.Delay(TimeSpan.FromSeconds(30));
                                 try
                                 {
@@ -252,7 +251,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             //获取服务
             var service = _serviceScope.ServiceProvider.GetRequiredService(type);
             var method = assemblyMethod.Method;
-            List<object> methodParameters = new();
+            var methodParameters = new List<object>();
             //组装函数的入参
             foreach (var parameter in method.GetParameters())
             {
@@ -384,7 +383,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             //获取服务
             var service = _serviceScope.ServiceProvider.GetRequiredService(type);
             var method = assemblyMethod.Method;
-            List<object> methodParameters = new();
+            var methodParameters = new List<object>();
             //组装函数的入参
             foreach (var parameter in method.GetParameters())
             {
@@ -414,7 +413,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
 
         public string GetAvilabeCommands(Users dbUser)
         {
-            Dictionary<string, string> cmds = new();
+            var cmds = new Dictionary<string, string>();
 
             foreach (var type in _commandClass.Keys)
             {
@@ -445,9 +444,9 @@ namespace XinjingdailyBot.Service.Bot.Handler
 
         public async Task<bool> GetCommandsMenu()
         {
-            List<BotCommand> cmds = new();
+            var cmds = new List<BotCommand>();
 
-            void AddCommands(UserRights right)
+            void AddCommands(EUserRights right)
             {
                 foreach (var type in _commandClass.Keys)
                 {
@@ -466,15 +465,15 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 }
             }
 
-            AddCommands(UserRights.None);
-            AddCommands(UserRights.NormalCmd);
+            AddCommands(EUserRights.None);
+            AddCommands(EUserRights.NormalCmd);
             await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllPrivateChats());
             await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllGroupChats());
 
-            AddCommands(UserRights.AdminCmd);
+            AddCommands(EUserRights.AdminCmd);
             await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllChatAdministrators());
 
-            AddCommands(UserRights.ReviewPost);
+            AddCommands(EUserRights.ReviewPost);
             await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeChatAdministrators { ChatId = _channelService.ReviewGroup.Id });
             return true;
         }

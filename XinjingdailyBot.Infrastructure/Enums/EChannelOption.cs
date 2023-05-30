@@ -3,7 +3,7 @@
     /// <summary>
     /// 频道封禁类型
     /// </summary>
-    public enum ChannelOption : byte
+    public enum EChannelOption : byte
     {
         /// <summary>
         /// 不做处理

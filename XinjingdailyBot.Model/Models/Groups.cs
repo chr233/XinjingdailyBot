@@ -19,6 +19,6 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 默认权限
         /// </summary>
-        public UserRights DefaultRight { get; set; } = UserRights.None;
+        public EUserRights DefaultRight { get; set; } = EUserRights.None;
     }
 }

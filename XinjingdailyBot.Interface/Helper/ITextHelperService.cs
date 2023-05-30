@@ -1,5 +1,4 @@
 ﻿using Telegram.Bot.Types;
-using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Helper
@@ -59,14 +58,14 @@ namespace XinjingdailyBot.Interface.Helper
         /// <param name="post"></param>
         /// <param name="poster"></param>
         /// <returns></returns>
-        string MakePoster(Posts post, Users poster);
+        string MakePoster(NewPosts post, Users poster, ChannelOptions? channel);
         /// <summary>
         /// 生成稿件
         /// </summary>
         /// <param name="post"></param>
         /// <param name="poster"></param>
         /// <returns></returns>
-        string MakePostText(Posts post, Users poster);
+        string MakePostText(NewPosts post, Users poster, ChannelOptions? channel);
         /// <summary>
         /// 生成审核消息(待审核)
         /// </summary>
@@ -109,11 +108,5 @@ namespace XinjingdailyBot.Interface.Helper
         /// <param name="text"></param>
         /// <returns></returns>
         string PureText(string? text);
-        /// <summary>
-        /// 格式化RejectReason
-        /// </summary>
-        /// <param name="rejectReason"></param>
-        /// <returns></returns>
-        string RejectReasonToString(RejectReason rejectReason);
     }
 }

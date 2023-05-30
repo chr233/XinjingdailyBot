@@ -12,7 +12,7 @@ namespace XinjingdailyBot.Tasks
     /// <summary>
     /// 发布广告
     /// </summary>
-    [Job("0 0 19 * * ?")]
+    [Job("0 0 9 * * ?")]
     public class PostAdvertiseTask : IJob
     {
         private readonly ILogger<PostAdvertiseTask> _logger;
@@ -51,13 +51,13 @@ namespace XinjingdailyBot.Tasks
                 return;
             }
 
-            var operates = new List<(AdMode, ChatId)>
+            var operates = new List<(EAdMode, ChatId)>
             {
-               new (AdMode.AcceptChannel, channelService.AcceptChannel.Id),
-               new (AdMode.RejectChannel, channelService.RejectChannel.Id),
-               new (AdMode.ReviewGroup, channelService.ReviewGroup.Id),
-               new (AdMode.CommentGroup, channelService.CommentGroup.Id),
-               new (AdMode.SubGroup, channelService.SubGroup.Id),
+               new (EAdMode.AcceptChannel, channelService.AcceptChannel.Id),
+               new (EAdMode.RejectChannel, channelService.RejectChannel.Id),
+               new (EAdMode.ReviewGroup, channelService.ReviewGroup.Id),
+               new (EAdMode.CommentGroup, channelService.CommentGroup.Id),
+               new (EAdMode.SubGroup, channelService.SubGroup.Id),
             };
 
             foreach (var (mode, chatId) in operates)

@@ -8,14 +8,14 @@ namespace XinjingdailyBot.Repository
     [AppService(LifeTime.Singleton)]
     public class LevelRepository : BaseRepository<Levels>
     {
-        private readonly ILogger<GroupRepository> _logger;
+        private readonly ILogger<LevelRepository> _logger;
 
-        public LevelRepository(ILogger<GroupRepository> logger)
+        public LevelRepository(ILogger<LevelRepository> logger)
         {
             _logger = logger;
         }
 
-        private readonly Dictionary<int, Levels> _levelCache = new();
+        private Dictionary<int, Levels> _levelCache { get; } = new();
 
         /// <summary>
         /// 初始化缓存
@@ -54,7 +54,7 @@ namespace XinjingdailyBot.Repository
         private async Task InsertBuildInLevels()
         {
             //请不要修改ID为0和1的字段
-            List<Levels> levels = new()
+            var levels = new List<Levels>()
             {
                 new() { Id = 0, Name = "Lv-" },
                 new() { Id = 1, Name = "Lv0", MinExp = 0, MaxExp = 10 },
