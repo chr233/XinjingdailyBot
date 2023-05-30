@@ -489,8 +489,10 @@ namespace XinjingdailyBot.Command
                         post.ReviewActionMsgID = oldPost.ManageMsgID;
                     }
 
+                    effectCount++;
+
                     post.ModifyAt = DateTime.Now;
-                    await _postService.InsertAsync(post);
+                    await _postService.Insertable(post).ExecuteCommandAsync();
 
                     oldPost.Merged = true;
                     await _oldPostService.Updateable(oldPost).UpdateColumns(x => x.Merged).ExecuteCommandAsync();
