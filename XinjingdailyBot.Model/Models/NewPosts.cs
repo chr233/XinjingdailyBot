@@ -59,7 +59,7 @@ namespace XinjingdailyBot.Model.Models
         public long ReviewActionMsgID { get; set; } = -1;
 
         /// <summary>
-        /// 发布频道的消息Id
+        /// 发布频道或拒绝频道的消息Id
         /// </summary>
         public long PublicMsgID { get; set; } = -1;
 
@@ -147,11 +147,10 @@ namespace XinjingdailyBot.Model.Models
         /// 拒绝原因(如果拒绝)
         /// </summary>
         public string RejectReason { get; set; } = "";
-
-        /// <inheritdoc cref="ICreateAt.CreateAt"/>
-        public DateTime CreateAt { get; set; } = DateTime.Now;
-        /// <inheritdoc cref="IModifyAt.ModifyAt"/>
-        public DateTime ModifyAt { get; set; } = DateTime.Now;
+        /// <summary>
+        /// 拒绝理由计数
+        /// </summary>
+        public bool CountReject { get; set; }
 
         /// <summary>
         /// 投稿人用户ID
@@ -161,5 +160,10 @@ namespace XinjingdailyBot.Model.Models
         /// 审核人用户ID
         /// </summary>
         public long ReviewerUID { get; set; } = -1;
+        
+        /// <inheritdoc cref="ICreateAt.CreateAt"/>
+        public DateTime CreateAt { get; set; } = DateTime.Now;
+        /// <inheritdoc cref="IModifyAt.ModifyAt"/>
+        public DateTime ModifyAt { get; set; } = DateTime.Now;
     }
 }

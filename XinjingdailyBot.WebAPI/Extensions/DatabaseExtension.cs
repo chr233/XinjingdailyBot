@@ -34,6 +34,8 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 Environment.Exit(1);
             }
 
+            _logger.Info("数据库驱动: {0}",dbConfig.UseMySQL?"MySQL":"SQLite");
+
             string connStr = dbConfig.UseMySQL ?
                 $"Host={dbConfig.DbHost};Port={dbConfig.DbPort};Database={dbConfig.DbName};UserID={dbConfig.DbUser};Password={dbConfig.DbPassword};CharSet=utf8mb4;AllowZeroDateTime=true" :
                 $"DataSource={dbConfig.DbName}.db";

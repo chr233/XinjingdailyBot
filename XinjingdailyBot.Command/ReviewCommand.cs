@@ -185,7 +185,10 @@ namespace XinjingdailyBot.Command
                 case "review reject":
                     await SwitchKeyboard(true, post, callbackQuery);
                     break;
+
+                //兼容旧的callback data
                 case "reject back":
+                case "review reject back":
                     await SwitchKeyboard(false, post, callbackQuery);
                     break;
 

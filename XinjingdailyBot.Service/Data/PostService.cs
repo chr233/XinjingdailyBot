@@ -87,64 +87,44 @@ namespace XinjingdailyBot.Service.Data
             DateTime now = DateTime.Now;
             DateTime today = now.AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
 
-            //待确认
-            var paddingCount = await Queryable()
-                .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today && x.Status == EPostStatus.Padding)
-                .CountAsync();
-
-            if (paddingCount >= paddingLimit)
+            if (message != null)
             {
-                if (message != null)
+                //待确认
+                var paddingCount = await Queryable()
+                    .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today && x.Status == EPostStatus.Padding)
+                    .CountAsync();
+
+                if (paddingCount >= paddingLimit)
                 {
                     await _botClient.AutoReplyAsync($"您的投稿队列已满 {paddingCount} / {paddingLimit}, 请先处理尚未确认的稿件", message);
+                    return false;
                 }
-                if (query != null)
-                {
-                    await _botClient.AutoReplyAsync($"您的投稿队列已满 {paddingCount} / {paddingLimit}, 请先处理尚未确认的稿件", query, true);
-                }
-                return false;
-            }
 
-            //审核中
-            var reviewCount = await Queryable()
-                .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today && x.Status == EPostStatus.Reviewing)
-                .CountAsync();
+                //已通过 + 已拒绝(非重复 / 模糊原因)
+                var postCount = await Queryable()
+                    .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today && (x.Status == EPostStatus.Accepted || (x.Status == EPostStatus.Rejected && x.CountReject)))
+                    .CountAsync();
 
-            if (reviewCount >= reviewLimit)
-            {
-                if (message != null)
+                if (postCount >= dailyLimit)
                 {
-                    await _botClient.AutoReplyAsync($"您的审核队列已满 {reviewCount} / {reviewLimit}, 请耐心等待队列中的稿件审核完毕", message);
+                    await _botClient.AutoReplyAsync($"您已达到每日投稿上限 {postCount} / {dailyLimit}, 暂时无法继续投稿, 请明日再来", message);
                     return true;
                 }
-                if (query != null)
+            }
+
+            if (query != null)
+            {
+                //审核中
+                var reviewCount = await Queryable()
+                    .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today && x.Status == EPostStatus.Reviewing)
+                    .CountAsync();
+
+                if (reviewCount >= reviewLimit)
                 {
                     await _botClient.AutoReplyAsync($"您的审核队列已满 {reviewCount} / {reviewLimit}, 请耐心等待队列中的稿件审核完毕", query, true);
                     return false;
                 }
             }
-
-            // TODO
-
-            //已通过 + 已拒绝(非重复/模糊原因)
-            //var postCount = await Queryable()
-            //    .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today &&
-            //        (x.Status == EPostStatus.Accepted || (x.Status == EPostStatus.Rejected && x.Reason != ERejectReason.Duplicate && x.Reason != ERejectReason.Fuzzy)))
-            //    .CountAsync();
-
-            //if (postCount >= dailyLimit)
-            //{
-            //    if (message != null)
-            //    {
-            //        await _botClient.AutoReplyAsync($"您已达到每日投稿上限 {postCount} / {dailyLimit}, 暂时无法继续投稿, 请明日再来", message);
-            //        return true;
-            //    }
-            //    if (query != null)
-            //    {
-            //        await _botClient.AutoReplyAsync($"您已达到每日投稿上限 {postCount} / {dailyLimit}, 暂时无法继续投稿, 请明日再来", query, true);
-            //        return false;
-            //    }
-            //}
 
             return true;
         }
@@ -543,10 +523,17 @@ namespace XinjingdailyBot.Service.Data
         public async Task RejetPost(NewPosts post, Users dbUser, RejectReasons rejectReason)
         {
             post.RejectReason = rejectReason.Name;
+            post.CountReject = rejectReason.IsCount;
             post.ReviewerUID = dbUser.UserID;
             post.Status = EPostStatus.Rejected;
             post.ModifyAt = DateTime.Now;
-            await Updateable(post).UpdateColumns(x => new { x.RejectReason, x.ReviewerUID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
+            await Updateable(post).UpdateColumns(x => new {
+                x.RejectReason,
+                x.CountReject,
+                x.ReviewerUID,
+                x.Status,
+                x.ModifyAt
+            }).ExecuteCommandAsync();
 
             var poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
 
@@ -594,7 +581,6 @@ namespace XinjingdailyBot.Service.Data
                         MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)),
                         MessageType.Voice => new InputMediaAudio(new InputFileId(attachments[i].FileID)),
                         MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)),
-                        //MessageType.Animation 不支持媒体组
                         _ => throw new Exception("未知的稿件类型"),
                     };
                 }
@@ -607,11 +593,15 @@ namespace XinjingdailyBot.Service.Data
                     post.PublishMediaGroupID = postMessage.MediaGroupId ?? "";
                     post.ModifyAt = DateTime.Now;
 
-                    await Updateable(post).UpdateColumns(x => new { x.PublicMsgID, x.PublishMediaGroupID, x.ModifyAt }).ExecuteCommandAsync();
+                    await Updateable(post).UpdateColumns(x => new {
+                        x.PublicMsgID,
+                        x.PublishMediaGroupID,
+                        x.ModifyAt
+                    }).ExecuteCommandAsync();
                 }
 
                 //处理媒体组消息
-                //await _mediaGroupService.AddPostMediaGroup(postMessages);
+                await _mediaGroupService.AddPostMediaGroup(postMessages);
             }
 
             //通知投稿人
@@ -749,11 +739,13 @@ namespace XinjingdailyBot.Service.Data
             string posterMsg = _textHelperService.MakeNotification(post.IsDirectPost, post.PublicMsgID);
 
             if (poster.Notification && poster.UserID != dbUser.UserID)//启用通知并且审核与投稿不是同一个人
-            {//单独发送通知消息
+            {
+                //单独发送通知消息
                 await _botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, parseMode: ParseMode.Html, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true, disableWebPagePreview: true);
             }
             else
-            {//静默模式, 不单独发送通知消息
+            {
+                //静默模式, 不单独发送通知消息
                 await _botClient.EditMessageTextAsync(post.OriginChatID, (int)post.OriginActionMsgID, posterMsg, ParseMode.Html, disableWebPagePreview: true);
             }
 

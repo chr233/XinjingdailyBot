@@ -30,5 +30,7 @@
         public static bool CanUpdate => false;
         public static string Variant => "source";
 #endif
+        public static string Author => "chr233";
+        public static string Repo => "https://github.com/chr233/XinjingdailyBot/";
     }
 }

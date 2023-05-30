@@ -54,6 +54,8 @@ namespace XinjingdailyBot.Repository
                 TagKeywords.Clear();
                 WarnTexts.Clear();
 
+                bool changed = false;
+
                 foreach (var tag in tags)
                 {
                     if (string.IsNullOrEmpty(tag.Name) || tag.Id <= 0)
@@ -64,22 +66,27 @@ namespace XinjingdailyBot.Repository
                     if (string.IsNullOrEmpty(tag.Payload))
                     {
                         tag.Payload = tag.Name;
+                        changed = true;
                     }
                     if (string.IsNullOrEmpty(tag.OnText))
                     {
                         tag.OnText = "#" + tag.Name;
+                        changed = true;
                     }
                     if (string.IsNullOrEmpty(tag.OffText))
                     {
                         tag.OffText = "#" + tag.Name.First() + new string('_', tag.Name.Length - 1);
+                        changed = true;
                     }
                     if (string.IsNullOrEmpty(tag.HashTag))
                     {
                         tag.HashTag = "#" + tag.Name;
+                        changed = true;
                     }
 
                     tag.Payload = tag.Payload.ToLowerInvariant();
                     tag.Seg = 1 << tag.Id - 1;
+
                     TagCache.Add(tag.Id, tag);
                     TagPayloadCache.Add(tag.Payload, tag);
 
@@ -98,7 +105,10 @@ namespace XinjingdailyBot.Repository
                     }
                 }
 
-                await Storageable(tags).ExecuteCommandAsync();
+                if (changed)
+                {
+                    await Storageable(tags).ExecuteCommandAsync();
+                }
 
                 _logger.LogInformation("已加载 {Count} 个标签", tags.Count);
             }

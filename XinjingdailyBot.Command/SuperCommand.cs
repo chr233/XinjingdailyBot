@@ -295,34 +295,34 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("MERGEPOST", EUserRights.SuperCmd, Description = "迁移旧的稿件数据")]
+        [TextCmd("MERGEPOSTTAG", EUserRights.SuperCmd, Description = "迁移旧的稿件标签数据")]
         [Obsolete("迁移旧数据用")]
-        public async Task ResponseMergePost(Message message)
+        public async Task ResponseMergePostTag(Message message)
         {
-            const int threads = 10;
+            const int threads = 30;
 
             int startId = 1;
             int effectCount = 0;
 
-            int totalPosts = await _postService.Queryable().CountAsync();
+            int totalPosts = await _oldPostService.Queryable().CountAsync();
 
             var msg = await _botClient.SendCommandReply($"开始更新稿件表, 共计 {totalPosts} 条记录", message, autoDelete: false);
 
             while (startId <= totalPosts)
             {
-                var posts = await _oldPostService.Queryable().Where(x => x.Id >= startId && x.Tags != EBuildInTags.None).Take(threads).ToListAsync();
-                if (!posts.Any())
+                var oldOosts = await _oldPostService.Queryable().Where(x => x.Id >= startId && x.Tags != EBuildInTags.None).Take(threads).ToListAsync();
+                if (!oldOosts.Any())
                 {
                     break;
                 }
 
-                var tasks = posts.Select(async post => {
-                    if (post.Tags != EBuildInTags.None)
+                var tasks = oldOosts.Select(async oldPost => {
+                    if (oldPost.Tags != EBuildInTags.None)
                     {
-                        var oldTag = post.Tags;
+                        var oldTag = oldPost.Tags;
                         if (oldTag.HasFlag(EBuildInTags.Spoiler))
                         {
-                            post.HasSpoiler = true;
+                            oldPost.HasSpoiler = true;
                         }
                         int newTag = 0;
                         if (oldTag.HasFlag(EBuildInTags.NSFW))
@@ -341,13 +341,13 @@ namespace XinjingdailyBot.Command
                         {
                             newTag += 8;
                         }
-                        post.Tags = EBuildInTags.None;
-                        post.NewTags = newTag;
-                        post.ModifyAt = DateTime.Now;
+                        oldPost.Tags = EBuildInTags.None;
+                        oldPost.NewTags = newTag;
+                        oldPost.ModifyAt = DateTime.Now;
 
                         effectCount++;
 
-                        await _oldPostService.Updateable(post).UpdateColumns(x => new {
+                        await _oldPostService.Updateable(oldPost).UpdateColumns(x => new {
                             x.Tags,
                             x.NewTags,
                             x.ModifyAt
@@ -357,7 +357,7 @@ namespace XinjingdailyBot.Command
 
                 await Task.WhenAll(tasks);
 
-                startId = posts.Last().Id + 1;
+                startId = oldOosts.Last().Id + 1;
 
                 _logger.LogInformation("更新进度 {startId} / {totalUsers}, 更新数量 {effectCount}", startId, totalPosts, effectCount);
             }
@@ -369,6 +369,148 @@ namespace XinjingdailyBot.Command
             catch
             {
                 await _botClient.SendCommandReply($"更新稿件表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
+            }
+        }
+
+        /// <summary>
+        /// 迁移旧的稿件数据
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        [TextCmd("MERGEPOST", EUserRights.SuperCmd, Description = "迁移旧的稿件数据")]
+        [Obsolete("迁移旧数据用")]
+        public async Task ResponseMergePost(Message message)
+        {
+            const int threads = 30;
+
+            int startId = 1;
+            int effectCount = 0;
+
+            int totalPosts = await _oldPostService.Queryable().CountAsync(x => !x.Merged);
+
+            var msg = await _botClient.SendCommandReply($"开始迁移稿件表, 共计 {totalPosts} 条记录", message, autoDelete: false);
+
+            while (startId <= totalPosts)
+            {
+                var oldPosts = await _oldPostService.Queryable().Where(x => x.Id >= startId && !x.Merged).Take(threads).ToListAsync();
+                if (!oldPosts.Any())
+                {
+                    break;
+                }
+
+                var tasks = oldPosts.Select(async oldPost => {
+
+                    long channelId = -1, channelMsgId = -1;
+                    if (oldPost.IsFromChannel)
+                    {
+                        ChannelOptions? channel = null;
+
+                        var name = oldPost.ChannelName;
+                        var title = oldPost.ChannelTitle;
+
+                        if (name.EndsWith('~'))
+                        {
+                            name = name.Substring(0, name.Length - 1);
+                        }
+
+                        var text = name.Split('/');
+                        if (text.Length >= 2)
+                        {
+                            if (!long.TryParse(text[1], out channelMsgId))
+                            {
+                                channelMsgId = -1;
+                            }
+                            channel = await _channelOptionService.FetchChannelByNameOrTitle(text[0], title);
+                        }
+                        else
+                        {
+                            channel = await _channelOptionService.FetchChannelByNameOrTitle(name, title);
+                        }
+
+                        if (channel != null)
+                        {
+                            channelId = channel.ChannelID;
+                        }
+                    }
+
+                    string reason = oldPost.Reason switch {
+                        ERejectReason.Fuzzy => "模糊",
+                        ERejectReason.Duplicate => "重复",
+                        ERejectReason.Boring => "无趣",
+                        ERejectReason.Confused => "没懂",
+                        ERejectReason.Deny => "内容不合适",
+                        ERejectReason.QRCode => "广告水印",
+                        ERejectReason.Other => "其他原因",
+                        ERejectReason.CustomReason => "自定义拒绝理由",
+                        ERejectReason.AutoReject => "稿件审核超时",
+                        _ => "",
+                    };
+
+                    bool countReject = oldPost.Status != EPostStatus.Rejected ? false :
+                        (oldPost.Reason != ERejectReason.Fuzzy && oldPost.Reason != ERejectReason.Duplicate);
+
+                    var post = new NewPosts {
+                        OriginChatID = oldPost.OriginChatID,
+                        OriginMsgID = oldPost.OriginMsgID,
+                        OriginActionChatID = oldPost.OriginChatID,
+                        OriginActionMsgID = oldPost.ActionMsgID,
+                        PublicMsgID = oldPost.PublicMsgID,
+                        Anonymous = oldPost.Anonymous,
+                        Text = oldPost.Text,
+                        RawText = oldPost.RawText,
+                        ChannelID = channelId,
+                        ChannelMsgId = channelMsgId,
+                        Status = oldPost.Status,
+                        PostType = oldPost.PostType,
+                        OriginMediaGroupID = "",
+                        ReviewMediaGroupID = "",
+                        PublishMediaGroupID = "",
+                        Tags = oldPost.NewTags,
+                        HasSpoiler = oldPost.HasSpoiler,
+                        RejectReason = reason,
+                        CountReject = countReject,
+                        PosterUID = oldPost.PosterUID,
+                        ReviewerUID = oldPost.ReviewerUID,
+                        CreateAt = oldPost.CreateAt,
+                    };
+
+                    if (oldPost.IsDirectPost)
+                    {
+                        post.ReviewChatID = oldPost.OriginChatID;
+                        post.ReviewMsgID = oldPost.OriginMsgID;
+                        post.ReviewActionChatID = oldPost.OriginChatID;
+                        post.ReviewActionMsgID = oldPost.ActionMsgID;
+                    }
+                    else
+                    {
+                        post.ReviewChatID = _channelService.ReviewGroup.Id;
+                        post.ReviewMsgID = oldPost.ReviewMsgID;
+                        post.ReviewActionChatID = _channelService.ReviewGroup.Id;
+                        post.ReviewActionMsgID = oldPost.ManageMsgID;
+                    }
+
+                    post.ModifyAt = DateTime.Now;
+                    await _postService.InsertAsync(post);
+
+                    oldPost.Merged = true;
+                    await _oldPostService.Updateable(oldPost).UpdateColumns(x => x.Merged).ExecuteCommandAsync();
+
+                }).ToList();
+
+                await Task.WhenAll(tasks);
+
+                startId = oldPosts.Last().Id + 1;
+
+                _logger.LogInformation("迁移进度 {startId} / {totalUsers}, 更新数量 {effectCount}", startId, totalPosts, effectCount);
+            }
+
+            try
+            {
+                await _botClient.EditMessageTextAsync(msg, $"迁移稿件表完成, 更新了 {effectCount} 条记录");
+            }
+            catch
+            {
+                await _botClient.SendCommandReply($"迁移稿件表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
             }
         }
 

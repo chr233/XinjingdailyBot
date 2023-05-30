@@ -156,9 +156,8 @@ namespace XinjingdailyBot.Service.Helper
 
             btns.Add(new[]
             {
-                InlineKeyboardButton.WithCallbackData(Langs.RejectCancel, "reject back"),
+                InlineKeyboardButton.WithCallbackData(Langs.RejectCancel, "review reject back"),
             });
-
 
             return new InlineKeyboardMarkup(btns);
         }

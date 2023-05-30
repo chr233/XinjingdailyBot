@@ -16,6 +16,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
     [AppService(typeof(IChannelPostHandler), LifeTime.Singleton)]
     public class ChannelPostHandler : IChannelPostHandler
     {
+        private readonly ILogger<ChannelPostHandler> _logger;
         private readonly IPostService _postService;
         private readonly ITextHelperService _textHelperService;
         private readonly IAttachmentService _attachmentService;
@@ -23,9 +24,10 @@ namespace XinjingdailyBot.Service.Bot.Handler
         private readonly IChannelOptionService _channelOptionService;
         private readonly TagRepository _tagRepository;
         private readonly ITelegramBotClient _botClient;
-        private readonly ILogger<ChannelPostHandler> _logger;
+        private readonly IMediaGroupService _mediaGroupService;
 
         public ChannelPostHandler(
+            ILogger<ChannelPostHandler> logger,
             IPostService postService,
             ITextHelperService textHelperService,
             IAttachmentService attachmentService,
@@ -33,8 +35,9 @@ namespace XinjingdailyBot.Service.Bot.Handler
             IChannelOptionService channelOptionService,
             TagRepository tagRepository,
             ITelegramBotClient botClient,
-            ILogger<ChannelPostHandler> logger)
+            IMediaGroupService mediaGroupService)
         {
+            _logger = logger;
             _postService = postService;
             _textHelperService = textHelperService;
             _attachmentService = attachmentService;
@@ -42,7 +45,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             _channelOptionService = channelOptionService;
             _tagRepository = tagRepository;
             _botClient = botClient;
-            _logger = logger;
+            _mediaGroupService = mediaGroupService;
         }
 
         public async Task OnTextChannelPostReceived(Users dbUser, Message message)
@@ -211,6 +214,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                         ReviewActionChatID = 0,
                         ReviewActionMsgID = 0,
                         PublicMsgID = message.MessageId,
+                        PublishMediaGroupID = mediaGroupId,
                         Anonymous = false,
                         Text = text,
                         RawText = message.Text ?? "",
@@ -254,7 +258,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 }
 
                 //记录媒体组
-                //await _mediaGroupService.AddPostMediaGroup(message);
+                await _mediaGroupService.AddPostMediaGroup(message);
             }
         }
     }
