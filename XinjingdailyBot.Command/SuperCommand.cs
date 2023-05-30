@@ -398,6 +398,8 @@ namespace XinjingdailyBot.Command
                     break;
                 }
 
+
+
                 var tasks = oldPosts.Select(async oldPost => {
 
                     long channelId = -1, channelMsgId = -1;
@@ -450,6 +452,7 @@ namespace XinjingdailyBot.Command
                         (oldPost.Reason != ERejectReason.Fuzzy && oldPost.Reason != ERejectReason.Duplicate);
 
                     var post = new NewPosts {
+                        Id = oldPost.Id,
                         OriginChatID = oldPost.OriginChatID,
                         OriginMsgID = oldPost.OriginMsgID,
                         OriginActionChatID = oldPost.OriginChatID,
@@ -492,7 +495,15 @@ namespace XinjingdailyBot.Command
                     effectCount++;
 
                     post.ModifyAt = DateTime.Now;
-                    await _postService.Insertable(post).ExecuteCommandAsync();
+
+                    try
+                    {
+                        await _postService.Insertable(post).OffIdentity().ExecuteCommandAsync();
+                    }
+                    catch (Exception)
+                    {
+                        _logger.LogWarning("稿件Id {0} 已存在", oldPost.Id);
+                    }
 
                     oldPost.Merged = true;
                     await _oldPostService.Updateable(oldPost).UpdateColumns(x => x.Merged).ExecuteCommandAsync();
