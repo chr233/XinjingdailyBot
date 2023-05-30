@@ -52,16 +52,17 @@ namespace XinjingdailyBot.Service.Helper
         {
             var tags = _tagRepository.GetTagsPayload(tagNum);
 
-            List<IEnumerable<InlineKeyboardButton>> btns = new();
-            List<InlineKeyboardButton> line = new();
+            var btns = new List<IEnumerable<InlineKeyboardButton>>();
+            var line = new List<InlineKeyboardButton>();
 
-            int lineCount = tags.Count() <= 4 ? 2 : 3;
-
+            int lineChars = 0;
             foreach (var tag in tags)
             {
                 line.Add(InlineKeyboardButton.WithCallbackData(tag.DisplayName, $"review tag {tag.Payload}"));
-                if (line.Count >= lineCount)
+                lineChars += tag.DisplayName.Length;
+                if (lineChars >= IMarkupHelperService.MaxLineChars)
                 {
+                    lineChars = 0;
                     btns.Add(line);
                     line = new();
                 }
@@ -100,15 +101,17 @@ namespace XinjingdailyBot.Service.Helper
         {
             var tags = _tagRepository.GetTagsPayload(tagNum);
 
-            int lineCount = tags.Count() <= 4 ? 2 : 3;
-
             var btns = new List<IEnumerable<InlineKeyboardButton>>();
             var line = new List<InlineKeyboardButton>();
+
+            int lineChars = 0;
             foreach (var tag in tags)
             {
                 line.Add(InlineKeyboardButton.WithCallbackData(tag.DisplayName, $"review tag {tag.Payload}"));
-                if (line.Count >= lineCount)
+                lineChars += tag.DisplayName.Length;
+                if (lineChars >= IMarkupHelperService.MaxLineChars)
                 {
+                    lineChars = 0;
                     btns.Add(line);
                     line = new List<InlineKeyboardButton>();
                 }
@@ -140,18 +143,25 @@ namespace XinjingdailyBot.Service.Helper
         {
             var reasons = _rejectReasonRepository.GetAllRejectReasons();
 
-            int lineCount = reasons.Count() <= 4 ? 2 : 3;
-
             var btns = new List<IEnumerable<InlineKeyboardButton>>();
             var line = new List<InlineKeyboardButton>();
+
+            int lineChars = 0;
             foreach (var reason in reasons)
             {
-                line.Add(InlineKeyboardButton.WithCallbackData(reason.Name, $"review tag {reason.Payload}"));
-                if (line.Count >= lineCount)
+                line.Add(InlineKeyboardButton.WithCallbackData(reason.Name, $"reject {reason.Payload}"));
+                lineChars += reason.Name.Length;
+                if (lineChars >= IMarkupHelperService.MaxLineChars)
                 {
+                    lineChars = 0;
                     btns.Add(line);
                     line = new List<InlineKeyboardButton>();
                 }
+            }
+
+            if (line.Any())
+            {
+                btns.Add(line);
             }
 
             btns.Add(new[]
@@ -172,10 +182,10 @@ namespace XinjingdailyBot.Service.Helper
             }
             else
             {
-                List<IEnumerable<InlineKeyboardButton>> btns = new();
-                List<InlineKeyboardButton> line = new();
+                int lineCount = groups.Count <= 4 ? 2 : 3;
 
-                int lineCount = groups.Count <= 6 ? 2 : 3;
+                var btns = new List<IEnumerable<InlineKeyboardButton>>();
+                var line = new List<InlineKeyboardButton>();
 
                 foreach (var group in groups)
                 {
@@ -308,22 +318,24 @@ namespace XinjingdailyBot.Service.Helper
         {
             var tags = _tagRepository.GetAllTags();
 
-            List<IEnumerable<InlineKeyboardButton>> btns = new()
+            var btns = new List<IEnumerable<InlineKeyboardButton>>
             {
                 new[]
                 {
                     InlineKeyboardButton.WithCallbackData("不限制稿件标签", $"cmd {dbUser.UserID} setrandompost")
                 }
             };
-            List<InlineKeyboardButton> line = new();
+            
+            var line = new List<InlineKeyboardButton>();
 
-            int lineCount = tags.Count() <= 4 ? 2 : 3;
-
+            int lineChars = 0;
             foreach (var tag in tags)
             {
                 line.Add(InlineKeyboardButton.WithCallbackData($"{tag.OnText}", $"cmd {dbUser.UserID} setrandompost {tag.Payload}"));
-                if (line.Count >= lineCount)
+                lineChars += tag.Name.Length;
+                if (lineChars >= IMarkupHelperService.MaxLineChars)
                 {
+                    lineChars = 0;
                     btns.Add(line);
                     line = new();
                 }

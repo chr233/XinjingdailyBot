@@ -6,6 +6,11 @@ namespace XinjingdailyBot.Interface.Helper
     public interface IMarkupHelperService
     {
         /// <summary>
+        /// 一行显示的字数
+        /// </summary>
+        public const int MaxLineChars = 8;
+
+        /// <summary>
         /// 直接发布投稿键盘
         /// </summary>
         /// <param name="anymouse"></param>

@@ -502,7 +502,7 @@ namespace XinjingdailyBot.Command
                     }
                     catch (Exception)
                     {
-                        _logger.LogWarning("稿件Id {0} 已存在", oldPost.Id);
+                        _logger.LogWarning("稿件Id {id} 已存在", oldPost.Id);
                     }
 
                     oldPost.Merged = true;

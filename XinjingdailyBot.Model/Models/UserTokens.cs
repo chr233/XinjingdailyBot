@@ -9,7 +9,7 @@ namespace XinjingdailyBot.Model.Models
     /// </summary>
     [SugarTable("user_token", TableDescription = "用户密钥表")]
     [SugarIndex("index_token", nameof(APIToken), OrderByType.Asc, false)]
-    public sealed record UserToken : BaseModel, ICreateAt, IExpiredAt
+    public sealed record UserTokens : BaseModel, ICreateAt, IExpiredAt
     {
         [SugarColumn(IsPrimaryKey = true)]
         /// <summary>
