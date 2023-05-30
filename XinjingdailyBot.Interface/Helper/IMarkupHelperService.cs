@@ -18,7 +18,7 @@ namespace XinjingdailyBot.Interface.Helper
         /// </summary>
         /// <param name="post"></param>
         /// <returns></returns>
-        InlineKeyboardMarkup? LinkToOriginPostKeyboard(Posts post);
+        InlineKeyboardMarkup? LinkToOriginPostKeyboard(NewPosts post);
         /// <summary>
         /// 跳转链接键盘
         /// </summary>
@@ -45,7 +45,7 @@ namespace XinjingdailyBot.Interface.Helper
         /// <param name="dbUser"></param>
         /// <param name="post"></param>
         /// <returns></returns>
-        InlineKeyboardMarkup QueryPostMenuKeyboard(Users dbUser, Posts post);
+        InlineKeyboardMarkup QueryPostMenuKeyboard(Users dbUser, NewPosts post);
         /// <summary>
         /// 获取随机投稿键盘
         /// </summary>
@@ -60,7 +60,7 @@ namespace XinjingdailyBot.Interface.Helper
         /// 获取随机投稿键盘
         /// </summary>
         /// <returns></returns>
-        InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, Posts post, int tagId, string postType);
+        InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, NewPosts post, int tagId, string postType);
         /// <summary>
         /// 审核键盘A(选择稿件Tag)
         /// </summary>

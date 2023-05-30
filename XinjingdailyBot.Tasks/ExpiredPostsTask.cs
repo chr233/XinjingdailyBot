@@ -1,6 +1,6 @@
-﻿using System.Text;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure;
@@ -48,7 +48,7 @@ namespace XinjingdailyBot.Tasks
 
             //获取有过期稿件的用户
             var userIDList = await _postService.Queryable()
-                .Where(x => (x.Status == PostStatus.Padding || x.Status == PostStatus.Reviewing) && x.ModifyAt < expiredDate)
+                .Where(x => (x.Status == EPostStatus.Padding || x.Status == EPostStatus.Reviewing) && x.ModifyAt < expiredDate)
                 .Distinct().Select(x => x.PosterUID).ToListAsync();
 
             if (!userIDList.Any())
@@ -63,7 +63,7 @@ namespace XinjingdailyBot.Tasks
             {
                 //获取过期投稿
                 var paddingPosts = await _postService.Queryable()
-                    .Where(x => x.PosterUID == userID && (x.Status == PostStatus.Padding || x.Status == PostStatus.Reviewing) && x.ModifyAt < expiredDate)
+                    .Where(x => x.PosterUID == userID && (x.Status == EPostStatus.Padding || x.Status == EPostStatus.Reviewing) && x.ModifyAt < expiredDate)
                     .ToListAsync();
 
                 if (!paddingPosts.Any())
@@ -74,14 +74,14 @@ namespace XinjingdailyBot.Tasks
                 int cTmout = 0, rTmout = 0;
                 foreach (var post in paddingPosts)
                 {
-                    if (post.Status == PostStatus.Padding)
+                    if (post.Status == EPostStatus.Padding)
                     {
-                        post.Status = PostStatus.ConfirmTimeout;
+                        post.Status = EPostStatus.ConfirmTimeout;
                         cTmout++;
                     }
                     else
                     {
-                        post.Status = PostStatus.ReviewTimeout;
+                        post.Status = EPostStatus.ReviewTimeout;
                         rTmout++;
                     }
                     post.ModifyAt = DateTime.Now;

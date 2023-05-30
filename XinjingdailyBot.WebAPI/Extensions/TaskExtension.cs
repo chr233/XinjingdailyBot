@@ -1,6 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Quartz;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Quartz;
 using XinjingdailyBot.Infrastructure.Attribute;
 
 namespace XinjingdailyBot.WebAPI.Extensions
@@ -25,8 +25,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 return;
             }
 
-            services.AddQuartz(qz =>
-            {
+            services.AddQuartz(qz => {
                 qz.UseMicrosoftDependencyInjectionJobFactory();
 
                 _logger.Debug($"===== 注册定时任务 =====");
@@ -53,8 +52,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 _logger.Debug($"===== 注册了 {count} 定时任务 =====");
             });
 
-            services.AddQuartzServer(op =>
-            {
+            services.AddQuartzServer(op => {
                 op.StartDelay = TimeSpan.FromSeconds(10);
                 op.AwaitApplicationStarted = true;
                 op.WaitForJobsToComplete = true;

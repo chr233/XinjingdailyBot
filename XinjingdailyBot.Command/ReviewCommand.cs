@@ -9,6 +9,7 @@ using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
+using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Command
 {
@@ -19,23 +20,23 @@ namespace XinjingdailyBot.Command
         private readonly IUserService _userService;
         private readonly IChannelService _channelService;
         private readonly IPostService _postService;
-        private readonly ITextHelperService _textHelperService;
         private readonly IMarkupHelperService _markupHelperService;
+        private readonly RejectReasonRepository _rejectReasonRepository;
 
         public ReviewCommand(
             ITelegramBotClient botClient,
             IUserService userService,
             IChannelService channelService,
             IPostService postService,
-            ITextHelperService textHelperService,
-            IMarkupHelperService markupHelperService)
+            IMarkupHelperService markupHelperService,
+            RejectReasonRepository rejectReasonRepository)
         {
             _botClient = botClient;
             _userService = userService;
             _channelService = channelService;
             _postService = postService;
-            _textHelperService = textHelperService;
             _markupHelperService = markupHelperService;
+            _rejectReasonRepository = rejectReasonRepository;
         }
 
         /// <summary>
@@ -45,7 +46,7 @@ namespace XinjingdailyBot.Command
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [TextCmd("NO", UserRights.ReviewPost, Description = "自定义拒绝稿件理由")]
+        [TextCmd("NO", EUserRights.ReviewPost, Description = "自定义拒绝稿件理由")]
         public async Task ResponseNo(Users dbUser, Message message, string[] args)
         {
             async Task<string> exec()
@@ -66,7 +67,7 @@ namespace XinjingdailyBot.Command
                     return "未找到稿件";
                 }
 
-                if (post.Status != PostStatus.Reviewing)
+                if (post.Status != EPostStatus.Reviewing)
                 {
                     return "仅能编辑状态为审核中的稿件";
                 }
@@ -78,8 +79,12 @@ namespace XinjingdailyBot.Command
                     return "请输入拒绝理由";
                 }
 
-                post.Reason = RejectReason.CustomReason;
-                await _postService.RejetPost(post, dbUser, reason);
+                post.RejectReason = reason;
+                var rejectReason = new RejectReasons {
+                    Name = reason,
+                    FullText = reason,
+                };
+                await _postService.RejetPost(post, dbUser, rejectReason);
 
                 return $"已拒绝该稿件, 理由: {reason}";
             }
@@ -95,7 +100,7 @@ namespace XinjingdailyBot.Command
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [TextCmd("EDIT", UserRights.ReviewPost, Description = "修改稿件文字说明")]
+        [TextCmd("EDIT", EUserRights.ReviewPost, Description = "修改稿件文字说明")]
         public async Task ResponseEditPost(Users dbUser, Message message, string[] args)
         {
             async Task<string> exec()
@@ -116,7 +121,7 @@ namespace XinjingdailyBot.Command
                     return "未找到稿件";
                 }
 
-                if (post.Status != PostStatus.Reviewing)
+                if (post.Status != EPostStatus.Reviewing)
                 {
                     return "仅能编辑状态为审核中的稿件";
                 }
@@ -143,11 +148,11 @@ namespace XinjingdailyBot.Command
         /// <param name="dbUser"></param>
         /// <param name="callbackQuery"></param>
         /// <returns></returns>
-        [QueryCmd("REVIEW", UserRights.ReviewPost, Alias = "REJECT", Description = "审核稿件")]
+        [QueryCmd("REVIEW", EUserRights.ReviewPost, Alias = "REJECT", Description = "审核稿件")]
         public async Task HandleQuery(Users dbUser, CallbackQuery callbackQuery)
         {
             var message = callbackQuery.Message!;
-            var post = await _postService.FetchPostFromReviewCallbackQuery(callbackQuery);
+            var post = await _postService.FetchPostFromCallbackQuery(callbackQuery);
             if (post == null)
             {
                 await _botClient.AutoReplyAsync("未找到稿件", callbackQuery, true);
@@ -155,14 +160,14 @@ namespace XinjingdailyBot.Command
                 return;
             }
 
-            if (post.Status != PostStatus.Reviewing)
+            if (post.Status != EPostStatus.Reviewing)
             {
                 await _botClient.AutoReplyAsync("请不要重复操作", callbackQuery, true);
                 await _botClient.EditMessageReplyMarkupAsync(message, null);
                 return;
             }
 
-            if (!dbUser.Right.HasFlag(UserRights.ReviewPost))
+            if (!dbUser.Right.HasFlag(EUserRights.ReviewPost))
             {
                 await _botClient.AutoReplyAsync("无权操作", callbackQuery, true);
                 return;
@@ -180,34 +185,15 @@ namespace XinjingdailyBot.Command
                 case "review reject":
                     await SwitchKeyboard(true, post, callbackQuery);
                     break;
+
+                //兼容旧的callback data
                 case "reject back":
+                case "review reject back":
                     await SwitchKeyboard(false, post, callbackQuery);
                     break;
 
                 case "review spoiler":
                     await SetSpoiler(post, callbackQuery);
-                    break;
-
-                case "reject fuzzy":
-                    await RejectPostHelper(post, dbUser, RejectReason.Fuzzy);
-                    break;
-                case "reject duplicate":
-                    await RejectPostHelper(post, dbUser, RejectReason.Duplicate);
-                    break;
-                case "reject boring":
-                    await RejectPostHelper(post, dbUser, RejectReason.Boring);
-                    break;
-                case "reject confusing":
-                    await RejectPostHelper(post, dbUser, RejectReason.Confused);
-                    break;
-                case "reject deny":
-                    await RejectPostHelper(post, dbUser, RejectReason.Deny);
-                    break;
-                case "reject qrcode":
-                    await RejectPostHelper(post, dbUser, RejectReason.QRCode);
-                    break;
-                case "reject other":
-                    await RejectPostHelper(post, dbUser, RejectReason.Other);
                     break;
 
                 case "review accept":
@@ -235,6 +221,11 @@ namespace XinjingdailyBot.Command
                             await SetSpoiler(post, callbackQuery);
                         }
                     }
+                    else if (data.StartsWith("reject "))
+                    {
+                        var payload = data[7..];
+                        await RejectPostHelper(post, dbUser, callbackQuery, payload);
+                    }
                     break;
             }
 
@@ -246,7 +237,7 @@ namespace XinjingdailyBot.Command
         /// <param name="post"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        private async Task SetAnymouse(Posts post, CallbackQuery query)
+        private async Task SetAnymouse(NewPosts post, CallbackQuery query)
         {
             await _botClient.AutoReplyAsync("可以使用命令 /anymouse 切换默认匿名投稿", query);
 
@@ -257,7 +248,7 @@ namespace XinjingdailyBot.Command
 
             bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
 
-            var keyboard = _markupHelperService.DirectPostKeyboard(anonymous, post.NewTags, hasSpoiler);
+            var keyboard = _markupHelperService.DirectPostKeyboard(anonymous, post.Tags, hasSpoiler);
             await _botClient.EditMessageReplyMarkupAsync(query.Message!, keyboard);
         }
 
@@ -267,7 +258,7 @@ namespace XinjingdailyBot.Command
         /// <param name="post"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        private async Task SetSpoiler(Posts post, CallbackQuery query)
+        private async Task SetSpoiler(NewPosts post, CallbackQuery query)
         {
             if (!post.CanSpoiler)
             {
@@ -282,8 +273,8 @@ namespace XinjingdailyBot.Command
             await _botClient.AutoReplyAsync(post.HasSpoiler ? "启用遮罩" : "禁用遮罩", query);
 
             var keyboard = post.IsDirectPost ?
-                _markupHelperService.DirectPostKeyboard(post.Anonymous, post.NewTags, post.HasSpoiler) :
-                _markupHelperService.ReviewKeyboardA(post.NewTags, post.HasSpoiler);
+                _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags, post.HasSpoiler) :
+                _markupHelperService.ReviewKeyboardA(post.Tags, post.HasSpoiler);
             await _botClient.EditMessageReplyMarkupAsync(query.Message!, keyboard);
         }
 
@@ -293,9 +284,9 @@ namespace XinjingdailyBot.Command
         /// <param name="post"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        private async Task CancelPost(Posts post, CallbackQuery query)
+        private async Task CancelPost(NewPosts post, CallbackQuery query)
         {
-            post.Status = PostStatus.Cancel;
+            post.Status = EPostStatus.Cancel;
             post.ModifyAt = DateTime.Now;
             await _postService.Updateable(post).UpdateColumns(x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
 
@@ -309,12 +300,17 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="post"></param>
         /// <param name="dbUser"></param>
-        /// <param name="rejectReason"></param>
+        /// <param name="query"></param>
+        /// <param name="payload"></param>
         /// <returns></returns>
-        private async Task RejectPostHelper(Posts post, Users dbUser, RejectReason rejectReason)
+        private async Task RejectPostHelper(NewPosts post, Users dbUser, CallbackQuery query, string payload)
         {
-            post.Reason = rejectReason;
-            string reason = _textHelperService.RejectReasonToString(rejectReason);
+            var reason = _rejectReasonRepository.GetReasonByPayload(payload);
+            if (reason == null)
+            {
+                await _botClient.AutoReplyAsync($"找不到 {payload} 对应的拒绝理由", query, true);
+                return;
+            }
             await _postService.RejetPost(post, dbUser, reason);
         }
 
@@ -322,9 +318,10 @@ namespace XinjingdailyBot.Command
         /// 设置inlineKeyboard
         /// </summary>
         /// <param name="rejectMode"></param>
+        /// <param name="post"></param>
         /// <param name="callbackQuery"></param>
         /// <returns></returns>
-        private async Task SwitchKeyboard(bool rejectMode, Posts post, CallbackQuery callbackQuery)
+        private async Task SwitchKeyboard(bool rejectMode, NewPosts post, CallbackQuery callbackQuery)
         {
             if (rejectMode)
             {
@@ -335,7 +332,7 @@ namespace XinjingdailyBot.Command
 
             var keyboard = rejectMode ?
                 _markupHelperService.ReviewKeyboardB() :
-                _markupHelperService.ReviewKeyboardA(post.NewTags, hasSpoiler);
+                _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
 
             await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, keyboard);
         }

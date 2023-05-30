@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using System.IO.Compression;
 using System.Text;
-using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -15,6 +15,7 @@ using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
+using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Command
 {
@@ -24,6 +25,8 @@ namespace XinjingdailyBot.Command
         private readonly ILogger<SuperCommand> _logger;
         private readonly ITelegramBotClient _botClient;
         private readonly IPostService _postService;
+        [Obsolete("迁移使用")]
+        private readonly OldPostRepository _oldPostService;
         private readonly IChannelOptionService _channelOptionService;
         private readonly IChannelService _channelService;
         private readonly IMarkupHelperService _markupHelperService;
@@ -32,10 +35,12 @@ namespace XinjingdailyBot.Command
         private readonly IHttpHelperService _httpHelperService;
         private readonly ITextHelperService _textHelperService;
 
+        [Obsolete("迁移使用")]
         public SuperCommand(
             ILogger<SuperCommand> logger,
             ITelegramBotClient botClient,
             IPostService postService,
+            OldPostRepository oldPostService,
             IChannelOptionService channelOptionService,
             IChannelService channelService,
             IMarkupHelperService markupHelperService,
@@ -47,6 +52,7 @@ namespace XinjingdailyBot.Command
             _logger = logger;
             _botClient = botClient;
             _postService = postService;
+            _oldPostService = oldPostService;
             _channelOptionService = channelOptionService;
             _channelService = channelService;
             _markupHelperService = markupHelperService;
@@ -61,7 +67,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("RESTART", UserRights.SuperCmd, Description = "重启机器人")]
+        [TextCmd("RESTART", EUserRights.SuperCmd, Description = "重启机器人")]
         public async Task ResponseRestart(Message message)
         {
             try
@@ -84,7 +90,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("EXIT", UserRights.SuperCmd, Description = "终止机器人")]
+        [TextCmd("EXIT", EUserRights.SuperCmd, Description = "终止机器人")]
         public async Task ResponseExit(Message message)
         {
             await _botClient.SendCommandReply("机器人即将退出", message);
@@ -97,7 +103,7 @@ namespace XinjingdailyBot.Command
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("CHANNELOPTION", UserRights.SuperCmd, Description = "来源频道设置")]
+        [TextCmd("CHANNELOPTION", EUserRights.SuperCmd, Description = "来源频道设置")]
         public async Task ResponseChannalOption(Users dbUser, Message message)
         {
             async Task<(string, InlineKeyboardMarkup?)> exec()
@@ -124,18 +130,17 @@ namespace XinjingdailyBot.Command
                     return ("不是来自其他频道的投稿, 无法设置频道选项", null);
                 }
 
-                var channel = await _channelOptionService.FetchChannelByTitle(post.ChannelTitle);
+                var channel = await _channelOptionService.Queryable().FirstAsync(x => x.ChannelID == post.ChannelID);
 
                 if (channel == null)
                 {
                     return ("未找到对应频道", null);
                 }
 
-                string option = channel.Option switch
-                {
-                    ChannelOption.Normal => "1. 不做特殊处理",
-                    ChannelOption.PurgeOrigin => "2. 抹除频道来源",
-                    ChannelOption.AutoReject => "3. 拒绝此频道的投稿",
+                string option = channel.Option switch {
+                    EChannelOption.Normal => "1. 不做特殊处理",
+                    EChannelOption.PurgeOrigin => "2. 抹除频道来源",
+                    EChannelOption.AutoReject => "3. 拒绝此频道的投稿",
                     _ => "未知的值",
                 };
 
@@ -154,7 +159,7 @@ namespace XinjingdailyBot.Command
         /// <param name="query"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [QueryCmd("CHANNELOPTION", UserRights.SuperCmd, Description = "来源频道设置")]
+        [QueryCmd("CHANNELOPTION", EUserRights.SuperCmd, Description = "来源频道设置")]
         public async Task QResponseChannalOption(CallbackQuery query, string[] args)
         {
             async Task<string> exec()
@@ -169,19 +174,17 @@ namespace XinjingdailyBot.Command
                     return "参数有误";
                 }
 
-                ChannelOption? option = args[2] switch
-                {
-                    "normal" => ChannelOption.Normal,
-                    "purgeorigin" => ChannelOption.PurgeOrigin,
-                    "autoreject" => ChannelOption.AutoReject,
+                EChannelOption? option = args[2] switch {
+                    "normal" => EChannelOption.Normal,
+                    "purgeorigin" => EChannelOption.PurgeOrigin,
+                    "autoreject" => EChannelOption.AutoReject,
                     _ => null
                 };
 
-                string optionStr = option switch
-                {
-                    ChannelOption.Normal => "不做特殊处理",
-                    ChannelOption.PurgeOrigin => "抹除频道来源",
-                    ChannelOption.AutoReject => "拒绝此频道的投稿",
+                string optionStr = option switch {
+                    EChannelOption.Normal => "不做特殊处理",
+                    EChannelOption.PurgeOrigin => "抹除频道来源",
+                    EChannelOption.AutoReject => "拒绝此频道的投稿",
                     _ => "未知的值",
                 };
 
@@ -209,7 +212,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("COMMAND", UserRights.SuperCmd, Description = "设置命令菜单")]
+        [TextCmd("COMMAND", EUserRights.SuperCmd, Description = "设置命令菜单")]
         public async Task ResponseCommand(Message message)
         {
             bool result = await _commandHandler.GetCommandsMenu();
@@ -221,7 +224,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("RECALCPOST", UserRights.SuperCmd, Description = "重新计算用户投稿数量")]
+        [TextCmd("RECALCPOST", EUserRights.SuperCmd, Description = "重新计算用户投稿数量")]
         public async Task ResponseReCalcPost(Message message)
         {
             const int threads = 10;
@@ -241,11 +244,10 @@ namespace XinjingdailyBot.Command
                     break;
                 }
 
-                var tasks = users.Select(async user =>
-                {
+                var tasks = users.Select(async user => {
                     int postCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID);
-                    int acceptCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == PostStatus.Accepted);
-                    int rejectCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == PostStatus.Rejected);
+                    int acceptCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == EPostStatus.Accepted);
+                    int rejectCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == EPostStatus.Rejected);
                     int expiredCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status < 0);
                     int reviewCount = await _postService.Queryable().CountAsync(x => x.ReviewerUID == user.UserID && x.PosterUID != user.UserID);
 
@@ -260,8 +262,7 @@ namespace XinjingdailyBot.Command
 
                         effectCount++;
 
-                        await _userService.Updateable(user).UpdateColumns(x => new
-                        {
+                        await _userService.Updateable(user).UpdateColumns(x => new {
                             x.PostCount,
                             x.AcceptCount,
                             x.RejectCount,
@@ -294,61 +295,59 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("MERGEPOST", UserRights.SuperCmd, Description = "迁移旧的稿件数据")]
+        [TextCmd("MERGEPOSTTAG", EUserRights.SuperCmd, Description = "迁移旧的稿件标签数据")]
         [Obsolete("迁移旧数据用")]
-        public async Task ResponseMergePost(Message message)
+        public async Task ResponseMergePostTag(Message message)
         {
-            const int threads = 10;
+            const int threads = 30;
 
             int startId = 1;
             int effectCount = 0;
 
-            int totalPosts = await _postService.Queryable().CountAsync();
+            int totalPosts = await _oldPostService.Queryable().CountAsync();
 
             var msg = await _botClient.SendCommandReply($"开始更新稿件表, 共计 {totalPosts} 条记录", message, autoDelete: false);
 
             while (startId <= totalPosts)
             {
-                var posts = await _postService.Queryable().Where(x => x.Id >= startId && x.Tags != BuildInTags.None).Take(threads).ToListAsync();
-                if (!posts.Any())
+                var oldOosts = await _oldPostService.Queryable().Where(x => x.Id >= startId && x.Tags != EBuildInTags.None).Take(threads).ToListAsync();
+                if (!oldOosts.Any())
                 {
                     break;
                 }
 
-                var tasks = posts.Select(async post =>
-                {
-                    if (post.Tags != BuildInTags.None)
+                var tasks = oldOosts.Select(async oldPost => {
+                    if (oldPost.Tags != EBuildInTags.None)
                     {
-                        var oldTag = post.Tags;
-                        if (oldTag.HasFlag(BuildInTags.Spoiler))
+                        var oldTag = oldPost.Tags;
+                        if (oldTag.HasFlag(EBuildInTags.Spoiler))
                         {
-                            post.HasSpoiler = true;
+                            oldPost.HasSpoiler = true;
                         }
                         int newTag = 0;
-                        if (oldTag.HasFlag(BuildInTags.NSFW))
+                        if (oldTag.HasFlag(EBuildInTags.NSFW))
                         {
                             newTag += 1;
                         }
-                        if (oldTag.HasFlag(BuildInTags.Friend))
+                        if (oldTag.HasFlag(EBuildInTags.Friend))
                         {
                             newTag += 2;
                         }
-                        if (oldTag.HasFlag(BuildInTags.WanAn))
+                        if (oldTag.HasFlag(EBuildInTags.WanAn))
                         {
                             newTag += 4;
                         }
-                        if (oldTag.HasFlag(BuildInTags.AIGraph))
+                        if (oldTag.HasFlag(EBuildInTags.AIGraph))
                         {
                             newTag += 8;
                         }
-                        post.Tags = BuildInTags.None;
-                        post.NewTags = newTag;
-                        post.ModifyAt = DateTime.Now;
+                        oldPost.Tags = EBuildInTags.None;
+                        oldPost.NewTags = newTag;
+                        oldPost.ModifyAt = DateTime.Now;
 
                         effectCount++;
 
-                        await _postService.Updateable(post).UpdateColumns(x => new
-                        {
+                        await _oldPostService.Updateable(oldPost).UpdateColumns(x => new {
                             x.Tags,
                             x.NewTags,
                             x.ModifyAt
@@ -358,7 +357,7 @@ namespace XinjingdailyBot.Command
 
                 await Task.WhenAll(tasks);
 
-                startId = posts.Last().Id + 1;
+                startId = oldOosts.Last().Id + 1;
 
                 _logger.LogInformation("更新进度 {startId} / {totalUsers}, 更新数量 {effectCount}", startId, totalPosts, effectCount);
             }
@@ -374,11 +373,153 @@ namespace XinjingdailyBot.Command
         }
 
         /// <summary>
+        /// 迁移旧的稿件数据
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        [TextCmd("MERGEPOST", EUserRights.SuperCmd, Description = "迁移旧的稿件数据")]
+        [Obsolete("迁移旧数据用")]
+        public async Task ResponseMergePost(Message message)
+        {
+            const int threads = 30;
+
+            int startId = 1;
+            int effectCount = 0;
+
+            int totalPosts = await _oldPostService.Queryable().CountAsync(x => !x.Merged);
+
+            var msg = await _botClient.SendCommandReply($"开始迁移稿件表, 共计 {totalPosts} 条记录", message, autoDelete: false);
+
+            while (startId <= totalPosts)
+            {
+                var oldPosts = await _oldPostService.Queryable().Where(x => x.Id >= startId && !x.Merged).Take(threads).ToListAsync();
+                if (!oldPosts.Any())
+                {
+                    break;
+                }
+
+                var tasks = oldPosts.Select(async oldPost => {
+
+                    long channelId = -1, channelMsgId = -1;
+                    if (oldPost.IsFromChannel)
+                    {
+                        ChannelOptions? channel = null;
+
+                        var name = oldPost.ChannelName;
+                        var title = oldPost.ChannelTitle;
+
+                        if (name.EndsWith('~'))
+                        {
+                            name = name.Substring(0, name.Length - 1);
+                        }
+
+                        var text = name.Split('/');
+                        if (text.Length >= 2)
+                        {
+                            if (!long.TryParse(text[1], out channelMsgId))
+                            {
+                                channelMsgId = -1;
+                            }
+                            channel = await _channelOptionService.FetchChannelByNameOrTitle(text[0], title);
+                        }
+                        else
+                        {
+                            channel = await _channelOptionService.FetchChannelByNameOrTitle(name, title);
+                        }
+
+                        if (channel != null)
+                        {
+                            channelId = channel.ChannelID;
+                        }
+                    }
+
+                    string reason = oldPost.Reason switch {
+                        ERejectReason.Fuzzy => "模糊",
+                        ERejectReason.Duplicate => "重复",
+                        ERejectReason.Boring => "无趣",
+                        ERejectReason.Confused => "没懂",
+                        ERejectReason.Deny => "内容不合适",
+                        ERejectReason.QRCode => "广告水印",
+                        ERejectReason.Other => "其他原因",
+                        ERejectReason.CustomReason => "自定义拒绝理由",
+                        ERejectReason.AutoReject => "稿件审核超时",
+                        _ => "",
+                    };
+
+                    bool countReject = oldPost.Status != EPostStatus.Rejected ? false :
+                        (oldPost.Reason != ERejectReason.Fuzzy && oldPost.Reason != ERejectReason.Duplicate);
+
+                    var post = new NewPosts {
+                        OriginChatID = oldPost.OriginChatID,
+                        OriginMsgID = oldPost.OriginMsgID,
+                        OriginActionChatID = oldPost.OriginChatID,
+                        OriginActionMsgID = oldPost.ActionMsgID,
+                        PublicMsgID = oldPost.PublicMsgID,
+                        Anonymous = oldPost.Anonymous,
+                        Text = oldPost.Text,
+                        RawText = oldPost.RawText,
+                        ChannelID = channelId,
+                        ChannelMsgId = channelMsgId,
+                        Status = oldPost.Status,
+                        PostType = oldPost.PostType,
+                        OriginMediaGroupID = "",
+                        ReviewMediaGroupID = "",
+                        PublishMediaGroupID = "",
+                        Tags = oldPost.NewTags,
+                        HasSpoiler = oldPost.HasSpoiler,
+                        RejectReason = reason,
+                        CountReject = countReject,
+                        PosterUID = oldPost.PosterUID,
+                        ReviewerUID = oldPost.ReviewerUID,
+                        CreateAt = oldPost.CreateAt,
+                    };
+
+                    if (oldPost.IsDirectPost)
+                    {
+                        post.ReviewChatID = oldPost.OriginChatID;
+                        post.ReviewMsgID = oldPost.OriginMsgID;
+                        post.ReviewActionChatID = oldPost.OriginChatID;
+                        post.ReviewActionMsgID = oldPost.ActionMsgID;
+                    }
+                    else
+                    {
+                        post.ReviewChatID = _channelService.ReviewGroup.Id;
+                        post.ReviewMsgID = oldPost.ReviewMsgID;
+                        post.ReviewActionChatID = _channelService.ReviewGroup.Id;
+                        post.ReviewActionMsgID = oldPost.ManageMsgID;
+                    }
+
+                    post.ModifyAt = DateTime.Now;
+                    await _postService.InsertAsync(post);
+
+                    oldPost.Merged = true;
+                    await _oldPostService.Updateable(oldPost).UpdateColumns(x => x.Merged).ExecuteCommandAsync();
+
+                }).ToList();
+
+                await Task.WhenAll(tasks);
+
+                startId = oldPosts.Last().Id + 1;
+
+                _logger.LogInformation("迁移进度 {startId} / {totalUsers}, 更新数量 {effectCount}", startId, totalPosts, effectCount);
+            }
+
+            try
+            {
+                await _botClient.EditMessageTextAsync(msg, $"迁移稿件表完成, 更新了 {effectCount} 条记录");
+            }
+            catch
+            {
+                await _botClient.SendCommandReply($"迁移稿件表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
+            }
+        }
+
+        /// <summary>
         /// 自动升级机器人
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("UPDATE", UserRights.SuperCmd, Description = "自动升级机器人")]
+        [TextCmd("UPDATE", EUserRights.SuperCmd, Description = "自动升级机器人")]
         public async Task ResponseUpdate(Message message)
         {
             async Task<string> exec()

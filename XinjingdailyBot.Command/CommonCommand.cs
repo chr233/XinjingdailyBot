@@ -1,5 +1,5 @@
-﻿using System.Text;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
+using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -43,7 +43,7 @@ namespace XinjingdailyBot.Command
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("HELP", UserRights.None, Description = "显示命令帮助")]
+        [TextCmd("HELP", EUserRights.None, Description = "显示命令帮助")]
         public async Task ResponseHelp(Users dbUser, Message message)
         {
             StringBuilder sb = new();
@@ -68,7 +68,7 @@ namespace XinjingdailyBot.Command
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("START", UserRights.None, Description = "首次欢迎语")]
+        [TextCmd("START", EUserRights.None, Description = "首次欢迎语")]
         public async Task ResponseStart(Users dbUser, Message message)
         {
             StringBuilder sb = new();
@@ -97,7 +97,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("ABOUT", UserRights.None, Description = "关于机器人")]
+        [TextCmd("ABOUT", EUserRights.None, Description = "关于机器人")]
         public async Task ResponseAbout(Message message)
         {
             StringBuilder sb = new();
@@ -115,7 +115,7 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("VERSION", UserRights.None, Description = "查看机器人版本")]
+        [TextCmd("VERSION", EUserRights.None, Description = "查看机器人版本")]
         public async Task ResponseVersion(Message message)
         {
             StringBuilder sb = new();
@@ -134,7 +134,7 @@ namespace XinjingdailyBot.Command
         /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        [TextCmd("MYBAN", UserRights.None, Description = "查询自己是否被封禁")]
+        [TextCmd("MYBAN", EUserRights.None, Description = "查询自己是否被封禁")]
         public async Task ResponseMyBan(Users dbUser, Message message)
         {
             var records = await _banRecordService.Queryable().Where(x => x.UserID == dbUser.UserID)
@@ -161,11 +161,10 @@ namespace XinjingdailyBot.Command
                 foreach (var record in records)
                 {
                     string date = record.BanTime.ToString("d");
-                    string operate = record.Type switch
-                    {
-                        BanType.UnBan => "解封",
-                        BanType.Ban => "封禁",
-                        BanType.Warning => "警告",
+                    string operate = record.Type switch {
+                        EBanType.UnBan => "解封",
+                        EBanType.Ban => "封禁",
+                        EBanType.Warning => "警告",
                         _ => "其他",
                     };
                     sb.AppendLine($"在 <code>{date}</code> 因为 <code>{record.Reason}</code> 被 {operate}");

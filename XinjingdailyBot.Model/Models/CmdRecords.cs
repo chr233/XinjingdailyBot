@@ -1,5 +1,6 @@
 ﻿using SqlSugar;
 using XinjingdailyBot.Model.Base;
+using XinjingdailyBot.Model.Columns;
 
 namespace XinjingdailyBot.Model.Models
 {
@@ -10,7 +11,7 @@ namespace XinjingdailyBot.Model.Models
     [SugarIndex("index_cid", nameof(ChatID), OrderByType.Asc)]
     [SugarIndex("index_mid", nameof(MessageID), OrderByType.Asc)]
     [SugarIndex("index_uid", nameof(UserID), OrderByType.Asc)]
-    public sealed record CmdRecords : BaseModel
+    public sealed record CmdRecords : BaseModel, IExecuteAt
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
@@ -49,9 +50,8 @@ namespace XinjingdailyBot.Model.Models
         /// </summary>
         public bool Error { get; set; }
 
-        /// <summary>
-        /// 记录命令调用时间
-        /// </summary>
+        /// <inheritdoc cref="IExecuteAt.ExecuteAt"/>
+
         public DateTime ExecuteAt { get; set; } = DateTime.Now;
     }
 }

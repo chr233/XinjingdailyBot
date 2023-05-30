@@ -1,4 +1,5 @@
-﻿using XinjingdailyBot.Infrastructure.Attribute;
+﻿using Telegram.Bot.Types;
+using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
@@ -9,17 +10,20 @@ namespace XinjingdailyBot.Service.Data
     [AppService(typeof(IChannelOptionService), LifeTime.Transient)]
     public sealed class ChannelOptionService : BaseService<ChannelOptions>, IChannelOptionService
     {
-        public async Task<ChannelOption> FetchChannelOption(long channelId, string? channelName, string? channelTitle)
+        public async Task<EChannelOption> FetchChannelOption(Chat channelChat)
         {
-            var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync();
+            var chatId = channelChat.Id;
+            var chatTitle = channelChat.Title;
+            var chatUserName = channelChat.Username;
+
+            var channel = await Queryable().Where(x => x.ChannelID == chatId).FirstAsync();
             if (channel == null)
             {
-                channel = new()
-                {
-                    ChannelID = channelId,
-                    ChannelName = channelName ?? "",
-                    ChannelTitle = channelTitle ?? "",
-                    Option = ChannelOption.Normal,
+                channel = new ChannelOptions {
+                    ChannelID = chatId,
+                    ChannelName = chatUserName ?? "",
+                    ChannelTitle = chatTitle ?? "",
+                    Option = EChannelOption.Normal,
                     Count = 1,
                     CreateAt = DateTime.Now,
                     ModifyAt = DateTime.Now,
@@ -28,10 +32,10 @@ namespace XinjingdailyBot.Service.Data
             }
             else
             {
-                if (channel.ChannelName != channelName || channel.ChannelTitle != channelTitle)
+                if (channel.ChannelName != chatUserName || channel.ChannelTitle != chatTitle)
                 {
-                    channel.ChannelTitle = channelTitle ?? "";
-                    channel.ChannelName = channelName ?? "";
+                    channel.ChannelTitle = chatTitle ?? "";
+                    channel.ChannelName = chatUserName ?? "";
                     channel.ModifyAt = DateTime.Now;
                 }
                 channel.Count++;
@@ -47,7 +51,23 @@ namespace XinjingdailyBot.Service.Data
             return channel;
         }
 
-        public async Task<ChannelOptions?> UpdateChannelOptionById(long channelId, ChannelOption channelOption)
+        public async Task<ChannelOptions?> FetchChannelByNameOrTitle(string channelName, string channelTitle)
+        {
+            var channel = await Queryable().Where(x => x.ChannelName == channelName || x.ChannelTitle == channelTitle).FirstAsync();
+            return channel;
+        }
+
+        public async Task<ChannelOptions?> FetchChannelByChannelId(long channelId)
+        {
+            if (channelId <= 0)
+            {
+                return null;
+            }
+            var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync();
+            return channel;
+        }
+
+        public async Task<ChannelOptions?> UpdateChannelOptionById(long channelId, EChannelOption channelOption)
         {
             var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync();
             if (channel != null)

@@ -1,12 +1,13 @@
 ﻿using SqlSugar;
 using XinjingdailyBot.Model.Base;
+using XinjingdailyBot.Model.Columns;
 
 namespace XinjingdailyBot.Model.Models
 {
     [SugarTable("post_group", TableDescription = "媒体组稿件记录")]
-    [SugarIndex("index_msgid", nameof(ChatID), OrderByType.Asc, nameof(MessageID), OrderByType.Asc)]
+    [SugarIndex("index_msg", nameof(ChatID), OrderByType.Asc, nameof(MessageID), OrderByType.Asc)]
     [SugarIndex("index_groupid", nameof(MediaGroupID), OrderByType.Asc)]
-    public sealed record MediaGroups : BaseModel
+    public sealed record MediaGroups : BaseModel, ICreateAt
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
@@ -22,9 +23,7 @@ namespace XinjingdailyBot.Model.Models
         /// 稿件ID
         /// </summary>
         public string MediaGroupID { get; set; } = "";
-        /// <summary>
-        /// 创建时间
-        /// </summary>
+        /// <inheritdoc cref="ICreateAt.CreateAt"/>
         public DateTime CreateAt { get; set; } = DateTime.Now;
     }
 }

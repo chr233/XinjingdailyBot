@@ -5,6 +5,7 @@ using XinjingdailyBot.Model.Base;
 
 namespace XinjingdailyBot.Model.Models
 {
+    [Obsolete("弃用表")]
     [SugarTable("post", TableDescription = "投稿记录")]
     [SugarIndex("index_origin_cid", nameof(OriginChatID), OrderByType.Asc)]
     [SugarIndex("index_origin_mid", nameof(OriginMsgID), OrderByType.Asc)]
@@ -16,7 +17,7 @@ namespace XinjingdailyBot.Model.Models
     [SugarIndex("index_posterid", nameof(PosterUID), OrderByType.Asc)]
     [SugarIndex("index_reviewerid", nameof(ReviewerUID), OrderByType.Asc)]
     [SugarIndex("index_status_modifyat", nameof(Status), OrderByType.Asc, nameof(ModifyAt), OrderByType.Asc)]
-    public sealed record Posts : BaseModel
+    public sealed record OldPosts : BaseModel
     {
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
@@ -85,7 +86,7 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 投稿状态
         /// </summary>
-        public PostStatus Status { get; set; } = PostStatus.Unknown;
+        public EPostStatus Status { get; set; } = EPostStatus.Unknown;
         /// <summary>
         /// 是否有附件
         /// </summary>
@@ -108,7 +109,7 @@ namespace XinjingdailyBot.Model.Models
         /// 标签
         /// </summary>
         [Obsolete("过时的属性")]
-        public BuildInTags Tags { get; set; }
+        public EBuildInTags Tags { get; set; }
         /// <summary>
         /// 稿件标签
         /// </summary>
@@ -125,7 +126,7 @@ namespace XinjingdailyBot.Model.Models
         /// <summary>
         /// 拒绝原因(如果拒绝)
         /// </summary>
-        public RejectReason Reason { get; set; } = RejectReason.NotReject;
+        public ERejectReason Reason { get; set; } = ERejectReason.NotReject;
         /// <summary>
         /// 创建时间
         /// </summary>
@@ -142,5 +143,10 @@ namespace XinjingdailyBot.Model.Models
         /// 审核人用户ID
         /// </summary>
         public long ReviewerUID { get; set; } = -1;
+
+        /// <summary>
+        /// 是否已完成迁移
+        /// </summary>
+        public bool Merged { get; set; }
     }
 }

@@ -1,25 +1,21 @@
 ﻿using System.Text;
-using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
-using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
-using XinjingdailyBot.Service.Bot.Common;
 
 namespace XinjingdailyBot.Service.Bot.Handler
 {
     [AppService(typeof(IForwardMessageHandler), LifeTime.Singleton)]
     public class ForwardMessageHandler : IForwardMessageHandler
     {
-        private readonly ILogger<ForwardMessageHandler> _logger;
         private readonly IChannelService _channelService;
         private readonly ITelegramBotClient _botClient;
         private readonly IPostService _postService;
@@ -28,7 +24,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
         private readonly IMediaGroupService _mediaGroupService;
 
         public ForwardMessageHandler(
-            ILogger<ForwardMessageHandler> logger,
             ITelegramBotClient botClient,
             IChannelService channelService,
             IPostService postService,
@@ -36,7 +31,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
             IUserService userService,
             IMediaGroupService mediaGroupService)
         {
-            _logger = logger;
             _botClient = botClient;
             _channelService = channelService;
             _postService = postService;
@@ -47,41 +41,41 @@ namespace XinjingdailyBot.Service.Bot.Handler
 
         public async Task<bool> OnForwardMessageReceived(Users dbUser, Message message)
         {
-            if (dbUser.Right.HasFlag(UserRights.AdminCmd))
+            if (dbUser.Right.HasFlag(EUserRights.AdminCmd))
             {
                 var forwardFrom = message.ForwardFrom!;
-                var forwardFromChat = message.ForwardFromChat;
-                var foreardMsgId = message.ForwardFromMessageId;
+                var forwardChatId = message.ForwardFromChat?.Id ?? -1;
+                var foreardMsgId = message.ForwardFromMessageId ?? -1;
 
-                if (forwardFromChat != null && foreardMsgId != null
-                    && (_channelService.IsChannelMessage(forwardFromChat.Id) || _channelService.IsGroupMessage(forwardFromChat.Id)))
+                if (forwardChatId != -1 && foreardMsgId != -1 &&
+                   (_channelService.IsChannelMessage(forwardChatId) || _channelService.IsGroupMessage(forwardChatId)))
                 {
-                    Posts? post = null;
+                    NewPosts? post = null;
 
-                    bool isMediaGroup = !string.IsNullOrEmpty(message.MediaGroupId);
-                    if (!isMediaGroup)
+                    var mediaGroup = await _mediaGroupService.QueryMediaGroup(forwardChatId, foreardMsgId);
+                    if (mediaGroup == null)
                     {
-                        if (forwardFromChat.Id == _channelService.AcceptChannel.Id)
+                        if (_channelService.IsChannelMessage(forwardChatId)) //转发自发布频道或拒绝存档
                         {
                             post = await _postService.GetFirstAsync(x => x.PublicMsgID == foreardMsgId);
                         }
-                        else if (forwardFromChat.Id == _channelService.ReviewGroup.Id)
+                        else //转发自关联群组
                         {
-                            post = await _postService.GetFirstAsync(x => x.ReviewMsgID == foreardMsgId || x.ManageMsgID == foreardMsgId);
+                            post = await _postService.GetFirstAsync(x =>
+                                (x.ReviewChatID == forwardChatId && x.ReviewMsgID == foreardMsgId) ||
+                                (x.ReviewActionChatID == forwardChatId && x.ReviewActionMsgID == foreardMsgId)
+                            );
                         }
                     }
                     else
                     {
-                        var groupMsgs = await _mediaGroupService.QueryMediaGroup(message.MediaGroupId);
-                        var msgIds = groupMsgs.Select(x => x.MessageID).ToList();
-
-                        if (forwardFromChat.Id == _channelService.AcceptChannel.Id)
+                        if (_channelService.IsChannelMessage(forwardChatId)) //转发自发布频道或拒绝存档
                         {
-                            post = await _postService.GetFirstAsync(x => msgIds.Contains(x.PublicMsgID));
+                            post = await _postService.GetFirstAsync(x => x.PublishMediaGroupID == mediaGroup.MediaGroupID);
                         }
-                        else if (forwardFromChat.Id == _channelService.ReviewGroup.Id)
+                        else //转发自关联群组 (仅支持审核群)
                         {
-                            post = await _postService.GetFirstAsync(x => msgIds.Contains(x.ReviewMsgID) || msgIds.Contains(x.ManageMsgID));
+                            post = await _postService.GetFirstAsync(x => x.ReviewMediaGroupID == mediaGroup.MediaGroupID);
                         }
                     }
 
@@ -90,7 +84,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                         var poster = await _userService.FetchUserByUserID(post.PosterUID);
                         if (poster != null)
                         {
-                            if (post.Status == PostStatus.Reviewing)
+                            if (post.Status == EPostStatus.Reviewing)
                             {
                                 await _botClient.AutoReplyAsync("无法操作审核中的稿件", message);
                                 return false;
@@ -98,12 +92,11 @@ namespace XinjingdailyBot.Service.Bot.Handler
 
                             var keyboard = _markupHelperService.QueryPostMenuKeyboard(dbUser, post);
 
-                            string postStatus = post.Status switch
-                            {
-                                PostStatus.ConfirmTimeout => "投递超时",
-                                PostStatus.ReviewTimeout => "审核超时",
-                                PostStatus.Rejected => "已拒绝",
-                                PostStatus.Accepted => "已发布",
+                            string postStatus = post.Status switch {
+                                EPostStatus.ConfirmTimeout => "投递超时",
+                                EPostStatus.ReviewTimeout => "审核超时",
+                                EPostStatus.Rejected => "已拒绝",
+                                EPostStatus.Accepted => "已发布",
                                 _ => "未知",
                             };
                             string postMode = post.IsDirectPost ? "直接发布" : (post.Anonymous ? "匿名投稿" : "保留来源");

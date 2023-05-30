@@ -19,15 +19,19 @@ namespace XinjingdailyBot.Repository
         /// <summary>
         /// 标签缓存, Key=Id
         /// </summary>
-        private readonly Dictionary<int, Tags> _tagCache = new();
+        private Dictionary<int, Tags> TagCache { get; } = new();
+        /// <summary>
+        /// 标签缓存, Key=Payload
+        /// </summary>
+        private Dictionary<string, Tags> TagPayloadCache { get; } = new();
         /// <summary>
         /// 标签缓存, Key=Id
         /// </summary>
-        private readonly Dictionary<int, string[]> _tagKeywords = new();
+        private Dictionary<int, string[]> TagKeywords { get; } = new();
         /// <summary>
         /// 警告文本缓存
         /// </summary>
-        private readonly List<string> _warnTexts = new();
+        private List<string> WarnTexts { get; } = new();
 
         /// <summary>
         /// 初始化缓存
@@ -45,9 +49,13 @@ namespace XinjingdailyBot.Repository
             var tags = await GetListAsync(x => x.Id > 0 && x.Id < 32);
             if (tags?.Count > 0)
             {
-                _tagCache.Clear();
-                _tagKeywords.Clear();
-                _warnTexts.Clear();
+                TagCache.Clear();
+                TagPayloadCache.Clear();
+                TagKeywords.Clear();
+                WarnTexts.Clear();
+
+                bool changed = false;
+
                 foreach (var tag in tags)
                 {
                     if (string.IsNullOrEmpty(tag.Name) || tag.Id <= 0)
@@ -58,40 +66,49 @@ namespace XinjingdailyBot.Repository
                     if (string.IsNullOrEmpty(tag.Payload))
                     {
                         tag.Payload = tag.Name;
+                        changed = true;
                     }
                     if (string.IsNullOrEmpty(tag.OnText))
                     {
                         tag.OnText = "#" + tag.Name;
+                        changed = true;
                     }
                     if (string.IsNullOrEmpty(tag.OffText))
                     {
                         tag.OffText = "#" + tag.Name.First() + new string('_', tag.Name.Length - 1);
+                        changed = true;
                     }
                     if (string.IsNullOrEmpty(tag.HashTag))
                     {
                         tag.HashTag = "#" + tag.Name;
+                        changed = true;
                     }
 
                     tag.Payload = tag.Payload.ToLowerInvariant();
                     tag.Seg = 1 << tag.Id - 1;
-                    _tagCache.Add(tag.Id, tag);
+
+                    TagCache.Add(tag.Id, tag);
+                    TagPayloadCache.Add(tag.Payload, tag);
 
                     if (!string.IsNullOrEmpty(tag.KeyWords))
                     {
                         var keyWords = tag.KeyWords.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
                         if (keyWords?.Length > 0)
                         {
-                            _tagKeywords.Add(tag.Seg, keyWords);
+                            TagKeywords.Add(tag.Seg, keyWords);
                         }
                     }
 
                     if (!string.IsNullOrEmpty(tag.WarnText))
                     {
-                        _warnTexts.Add(tag.WarnText);
+                        WarnTexts.Add(tag.WarnText);
                     }
                 }
 
-                await Storageable(tags).ExecuteCommandAsync();
+                if (changed)
+                {
+                    await Storageable(tags).ExecuteCommandAsync();
+                }
 
                 _logger.LogInformation("已加载 {Count} 个标签", tags.Count);
             }
@@ -110,10 +127,10 @@ namespace XinjingdailyBot.Repository
         {
             List<Tags> tags = new()
             {
-                new() { Id = 1,Name = "NSFW", Payload = "nsfw", KeyWords = "NSFW", WarnText = Langs.NSFWWarning },
-                new() { Id = 2,Name = "我有一个朋友", Payload = "friend", KeyWords = "朋友|英雄" },
-                new() { Id = 3,Name = "晚安", Payload = "wanan", KeyWords = "晚安" },
-                new() { Id = 4,Name = "AI怪图", Payload = "ai", KeyWords = "#AI" },
+                new() { Id = 1, Name = "NSFW", Payload = "nsfw", KeyWords = "NSFW", WarnText = Langs.NSFWWarning },
+                new() { Id = 2, Name = "我有一个朋友", Payload = "friend", KeyWords = "朋友|英雄" },
+                new() { Id = 3, Name = "晚安", Payload = "wanan", KeyWords = "晚安" },
+                new() { Id = 4, Name = "AI怪图", Payload = "ai", KeyWords = "#AI" },
             };
 
             await Storageable(tags).ExecuteCommandAsync();
@@ -126,7 +143,7 @@ namespace XinjingdailyBot.Repository
         /// <returns></returns>
         public Tags? GetTagById(int tagId)
         {
-            if (_tagCache.TryGetValue(tagId, out var tag))
+            if (TagCache.TryGetValue(tagId, out var tag))
             {
                 return tag;
             }
@@ -140,12 +157,9 @@ namespace XinjingdailyBot.Repository
         /// <returns></returns>
         public Tags? GetTagByPayload(string payload)
         {
-            foreach (var tag in _tagCache.Values)
+            if (TagPayloadCache.TryGetValue(payload, out var tag))
             {
-                if (tag.Payload == payload)
-                {
-                    return tag;
-                }
+                return tag;
             }
             return null;
         }
@@ -156,7 +170,7 @@ namespace XinjingdailyBot.Repository
         /// <returns></returns>
         public IEnumerable<Tags> GetAllTags()
         {
-            return _tagCache.Values;
+            return TagCache.Values;
         }
 
         /// <summary>
@@ -166,12 +180,12 @@ namespace XinjingdailyBot.Repository
         /// <returns></returns>
         public int FetchTags(string? text)
         {
-            if (string.IsNullOrEmpty(text) || _tagCache.Count == 0)
+            if (string.IsNullOrEmpty(text) || TagCache.Count == 0)
             {
                 return 0;
             }
             int tagNum = 0;
-            foreach (var (seg, words) in _tagKeywords)
+            foreach (var (seg, words) in TagKeywords)
             {
                 foreach (var word in words)
                 {
@@ -193,7 +207,7 @@ namespace XinjingdailyBot.Repository
         public IEnumerable<Tags> GetActiviedTags(int tagNum)
         {
             List<Tags> tags = new();
-            foreach (var tag in _tagCache.Values)
+            foreach (var tag in TagCache.Values)
             {
                 if ((tag.Seg & tagNum) > 0)
                 {
@@ -256,7 +270,7 @@ namespace XinjingdailyBot.Repository
         public IEnumerable<TagPayload> GetTagsPayload(int tagNum)
         {
             List<TagPayload> tags = new();
-            foreach (var tag in _tagCache.Values)
+            foreach (var tag in TagCache.Values)
             {
                 bool status = (tag.Seg & tagNum) > 0;
 
@@ -281,7 +295,7 @@ namespace XinjingdailyBot.Repository
             {
                 text = text.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).First();
             }
-            bool result = _warnTexts.Any(x => x == text);
+            bool result = WarnTexts.Any(x => x == text);
             return result;
         }
     }

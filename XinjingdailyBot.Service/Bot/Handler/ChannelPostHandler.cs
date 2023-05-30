@@ -1,5 +1,5 @@
-﻿using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -10,13 +10,13 @@ using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
-using XinjingdailyBot.Service.Data;
 
 namespace XinjingdailyBot.Service.Bot.Handler
 {
     [AppService(typeof(IChannelPostHandler), LifeTime.Singleton)]
     public class ChannelPostHandler : IChannelPostHandler
     {
+        private readonly ILogger<ChannelPostHandler> _logger;
         private readonly IPostService _postService;
         private readonly ITextHelperService _textHelperService;
         private readonly IAttachmentService _attachmentService;
@@ -24,10 +24,10 @@ namespace XinjingdailyBot.Service.Bot.Handler
         private readonly IChannelOptionService _channelOptionService;
         private readonly TagRepository _tagRepository;
         private readonly ITelegramBotClient _botClient;
-        private readonly ILogger<ChannelPostHandler> _logger;
         private readonly IMediaGroupService _mediaGroupService;
 
         public ChannelPostHandler(
+            ILogger<ChannelPostHandler> logger,
             IPostService postService,
             ITextHelperService textHelperService,
             IAttachmentService attachmentService,
@@ -35,9 +35,9 @@ namespace XinjingdailyBot.Service.Bot.Handler
             IChannelOptionService channelOptionService,
             TagRepository tagRepository,
             ITelegramBotClient botClient,
-            ILogger<ChannelPostHandler> logger,
             IMediaGroupService mediaGroupService)
         {
+            _logger = logger;
             _postService = postService;
             _textHelperService = textHelperService;
             _attachmentService = attachmentService;
@@ -45,7 +45,6 @@ namespace XinjingdailyBot.Service.Bot.Handler
             _channelOptionService = channelOptionService;
             _tagRepository = tagRepository;
             _botClient = botClient;
-            _logger = logger;
             _mediaGroupService = mediaGroupService;
         }
 
@@ -60,42 +59,45 @@ namespace XinjingdailyBot.Service.Bot.Handler
                 return;
             }
 
-            string? channelName = null, channelTitle = null;
+            long channelId = -1, channelMsgId = -1;
             if (message.ForwardFromChat?.Type == ChatType.Channel)
             {
-                channelTitle = message.ForwardFromChat.Title;
-                channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
-                long channelId = message.ForwardFromChat.Id;
-                var option = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
+                channelId = message.ForwardFromChat.Id;
+                channelMsgId = message.ForwardFromMessageId ?? -1;
 
-                if (option == ChannelOption.AutoReject)
+                var option = await _channelOptionService.FetchChannelOption(message.ForwardFromChat);
+
+                if (option == EChannelOption.AutoReject)
                 {
                     await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
                     _logger.LogInformation("删除消息 {msgid}", message.MessageId);
                     return;
                 }
+
             }
 
             int newTag = _tagRepository.FetchTags(message.Text);
             string text = _textHelperService.ParseMessage(message);
 
             //生成数据库实体
-            Posts newPost = new()
-            {
+            var newPost = new NewPosts {
                 OriginChatID = message.Chat.Id,
                 OriginMsgID = message.MessageId,
-                ActionMsgID = 0,
+                OriginActionChatID = 0,
+                OriginActionMsgID = 0,
+                ReviewChatID = 0,
                 ReviewMsgID = 0,
-                ManageMsgID = 0,
+                ReviewActionChatID = 0,
+                ReviewActionMsgID = 0,
                 PublicMsgID = message.MessageId,
                 Anonymous = false,
                 Text = text,
                 RawText = message.Text ?? "",
-                ChannelName = channelName ?? "",
-                ChannelTitle = channelTitle ?? "",
-                Status = PostStatus.Accepted,
+                ChannelID = channelId,
+                ChannelMsgId = channelMsgId,
+                Status = EPostStatus.Accepted,
                 PostType = message.Type,
-                NewTags = newTag,
+                Tags = newTag,
                 PosterUID = dbUser.UserID,
                 ReviewerUID = dbUser.UserID
             };
@@ -110,15 +112,14 @@ namespace XinjingdailyBot.Service.Bot.Handler
 
         public async Task OnMediaChannelPostReceived(Users dbUser, Message message)
         {
-            string? channelName = null, channelTitle = null;
+            long channelId = -1, channelMsgId = -1;
             if (message.ForwardFromChat?.Type == ChatType.Channel)
             {
-                channelTitle = message.ForwardFromChat.Title;
-                channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
-                long channelId = message.ForwardFromChat.Id;
-                var option = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
+                channelId = message.ForwardFromChat.Id;
+                channelMsgId = message.ForwardFromMessageId ?? -1;
+                var option = await _channelOptionService.FetchChannelOption(message.ForwardFromChat);
 
-                if (option == ChannelOption.AutoReject)
+                if (option == EChannelOption.AutoReject)
                 {
                     await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
                     _logger.LogInformation("删除消息 {msgid}", message.MessageId);
@@ -130,22 +131,24 @@ namespace XinjingdailyBot.Service.Bot.Handler
             string text = _textHelperService.ParseMessage(message);
 
             //生成数据库实体
-            Posts newPost = new()
-            {
+            var newPost = new NewPosts {
                 OriginChatID = message.Chat.Id,
                 OriginMsgID = message.MessageId,
-                ActionMsgID = 0,
+                OriginActionChatID = 0,
+                OriginActionMsgID = 0,
+                ReviewChatID = 0,
                 ReviewMsgID = 0,
-                ManageMsgID = 0,
+                ReviewActionChatID = 0,
+                ReviewActionMsgID = 0,
                 PublicMsgID = message.MessageId,
                 Anonymous = false,
                 Text = text,
                 RawText = message.Text ?? "",
-                ChannelName = channelName ?? "",
-                ChannelTitle = channelTitle ?? "",
-                Status = PostStatus.Accepted,
+                ChannelID = channelId,
+                ChannelMsgId = channelMsgId,
+                Status = EPostStatus.Accepted,
                 PostType = message.Type,
-                NewTags = newTags,
+                Tags = newTags,
                 HasSpoiler = message.HasMediaSpoiler ?? false,
                 PosterUID = dbUser.UserID,
                 ReviewerUID = dbUser.UserID
@@ -178,18 +181,18 @@ namespace XinjingdailyBot.Service.Bot.Handler
             {
                 MediaGroupIDs.TryAdd(mediaGroupId, -1);
 
-                bool exists = await _postService.Queryable().AnyAsync(x => x.MediaGroupID == mediaGroupId);
+                bool exists = await _postService.Queryable().AnyAsync(x => x.OriginMediaGroupID == mediaGroupId);
                 if (!exists)
                 {
-                    string? channelName = null, channelTitle = null;
+                    long channelId = -1, channelMsgId = -1;
                     if (message.ForwardFromChat?.Type == ChatType.Channel)
                     {
-                        channelTitle = message.ForwardFromChat.Title;
-                        channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
-                        long channelId = message.ForwardFromChat.Id;
-                        var option = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
+                        channelId = message.ForwardFromChat.Id;
+                        channelMsgId = message.ForwardFromMessageId ?? -1;
 
-                        if (option == ChannelOption.AutoReject)
+                        var option = await _channelOptionService.FetchChannelOption(message.ForwardFromChat);
+
+                        if (option == EChannelOption.AutoReject)
                         {
                             await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
                             _logger.LogInformation("删除消息 {msgid}", message.MessageId);
@@ -201,22 +204,25 @@ namespace XinjingdailyBot.Service.Bot.Handler
                     string text = _textHelperService.ParseMessage(message);
 
                     //生成数据库实体
-                    Posts newPost = new()
-                    {
+                    var newPost = new NewPosts {
                         OriginChatID = message.Chat.Id,
                         OriginMsgID = message.MessageId,
-                        ActionMsgID = 0,
+                        OriginActionChatID = 0,
+                        OriginActionMsgID = 0,
+                        ReviewChatID = 0,
                         ReviewMsgID = 0,
-                        ManageMsgID = 0,
+                        ReviewActionChatID = 0,
+                        ReviewActionMsgID = 0,
                         PublicMsgID = message.MessageId,
+                        PublishMediaGroupID = mediaGroupId,
                         Anonymous = false,
                         Text = text,
                         RawText = message.Text ?? "",
-                        ChannelName = channelName ?? "",
-                        ChannelTitle = channelTitle ?? "",
-                        Status = PostStatus.Accepted,
+                        ChannelID = channelId,
+                        ChannelMsgId = channelMsgId,
+                        Status = EPostStatus.Accepted,
                         PostType = message.Type,
-                        NewTags = newTags,
+                        Tags = newTags,
                         HasSpoiler = message.HasMediaSpoiler ?? false,
                         PosterUID = dbUser.UserID,
                         ReviewerUID = dbUser.UserID
@@ -227,15 +233,17 @@ namespace XinjingdailyBot.Service.Bot.Handler
                     MediaGroupIDs[mediaGroupId] = postID;
 
                     //两秒后停止接收媒体组消息
-                    _ = Task.Run(async () =>
-                    {
+                    _ = Task.Run(async () => {
                         await Task.Delay(1500);
                         MediaGroupIDs.Remove(mediaGroupId, out _);
 
                         //增加通过数量
                         dbUser.AcceptCount++;
                         dbUser.ModifyAt = DateTime.Now;
-                        await _userService.Updateable(dbUser).UpdateColumns(x => new { x.AcceptCount, x.ModifyAt }).ExecuteCommandAsync();
+                        await _userService.Updateable(dbUser).UpdateColumns(x => new {
+                            x.AcceptCount,
+                            x.ModifyAt
+                        }).ExecuteCommandAsync();
                     });
                 }
             }

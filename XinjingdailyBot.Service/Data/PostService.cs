@@ -1,6 +1,6 @@
-﻿using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Collections.Concurrent;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -19,7 +19,7 @@ using XinjingdailyBot.Service.Data.Base;
 namespace XinjingdailyBot.Service.Data
 {
     [AppService(typeof(IPostService), LifeTime.Singleton)]
-    public sealed class PostService : BaseService<Posts>, IPostService
+    public sealed class PostService : BaseService<NewPosts>, IPostService
     {
         private readonly ILogger<PostService> _logger;
         private readonly IAttachmentService _attachmentService;
@@ -62,7 +62,7 @@ namespace XinjingdailyBot.Service.Data
         public async Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null)
         {
             //未开启限制或者用户为管理员时不受限制
-            if ((dbUser.AcceptCount > 0 && !_postOption.EnablePostLimit) || dbUser.Right.HasFlag(UserRights.Admin))
+            if ((dbUser.AcceptCount > 0 && !_postOption.EnablePostLimit) || dbUser.Right.HasFlag(EUserRights.Admin))
             {
                 return true;
             }
@@ -87,59 +87,41 @@ namespace XinjingdailyBot.Service.Data
             DateTime now = DateTime.Now;
             DateTime today = now.AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
 
-            //待确认
-            var paddingCount = await Queryable()
-                .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today && x.Status == PostStatus.Padding)
-                .CountAsync();
-
-            if (paddingCount >= paddingLimit)
+            if (message != null)
             {
-                if (message != null)
+                //待确认
+                var paddingCount = await Queryable()
+                    .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today && x.Status == EPostStatus.Padding)
+                    .CountAsync();
+
+                if (paddingCount >= paddingLimit)
                 {
                     await _botClient.AutoReplyAsync($"您的投稿队列已满 {paddingCount} / {paddingLimit}, 请先处理尚未确认的稿件", message);
-                }
-                if (query != null)
-                {
-                    await _botClient.AutoReplyAsync($"您的投稿队列已满 {paddingCount} / {paddingLimit}, 请先处理尚未确认的稿件", query, true);
-                }
-                return false;
-            }
-
-            //审核中
-            var reviewCount = await Queryable()
-                .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today && x.Status == PostStatus.Reviewing)
-                .CountAsync();
-
-            if (reviewCount >= reviewLimit)
-            {
-                if (message != null)
-                {
-                    await _botClient.AutoReplyAsync($"您的审核队列已满 {reviewCount} / {reviewLimit}, 请耐心等待队列中的稿件审核完毕", message);
-                    return true;
-                }
-                if (query != null)
-                {
-                    await _botClient.AutoReplyAsync($"您的审核队列已满 {reviewCount} / {reviewLimit}, 请耐心等待队列中的稿件审核完毕", query, true);
                     return false;
                 }
-            }
 
-            //已通过 + 已拒绝(非重复/模糊原因)
-            var postCount = await Queryable()
-                .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today &&
-                    (x.Status == PostStatus.Accepted || (x.Status == PostStatus.Rejected && x.Reason != RejectReason.Duplicate && x.Reason != RejectReason.Fuzzy)))
-                .CountAsync();
+                //已通过 + 已拒绝(非重复 / 模糊原因)
+                var postCount = await Queryable()
+                    .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today && (x.Status == EPostStatus.Accepted || (x.Status == EPostStatus.Rejected && x.CountReject)))
+                    .CountAsync();
 
-            if (postCount >= dailyLimit)
-            {
-                if (message != null)
+                if (postCount >= dailyLimit)
                 {
                     await _botClient.AutoReplyAsync($"您已达到每日投稿上限 {postCount} / {dailyLimit}, 暂时无法继续投稿, 请明日再来", message);
                     return true;
                 }
-                if (query != null)
+            }
+
+            if (query != null)
+            {
+                //审核中
+                var reviewCount = await Queryable()
+                    .Where(x => x.PosterUID == dbUser.UserID && x.CreateAt >= today && x.Status == EPostStatus.Reviewing)
+                    .CountAsync();
+
+                if (reviewCount >= reviewLimit)
                 {
-                    await _botClient.AutoReplyAsync($"您已达到每日投稿上限 {postCount} / {dailyLimit}, 暂时无法继续投稿, 请明日再来", query, true);
+                    await _botClient.AutoReplyAsync($"您的审核队列已满 {reviewCount} / {reviewLimit}, 请耐心等待队列中的稿件审核完毕", query, true);
                     return false;
                 }
             }
@@ -150,7 +132,7 @@ namespace XinjingdailyBot.Service.Data
 
         public async Task HandleTextPosts(Users dbUser, Message message)
         {
-            if (!dbUser.Right.HasFlag(UserRights.SendPost))
+            if (!dbUser.Right.HasFlag(EUserRights.SendPost))
             {
                 await _botClient.AutoReplyAsync(Langs.NoPostRight, message);
                 return;
@@ -173,13 +155,14 @@ namespace XinjingdailyBot.Service.Data
                 return;
             }
 
-            ChannelOption channelOption = ChannelOption.Normal;
-            string? channelName = null, channelTitle = null;
+            var channelOption = EChannelOption.Normal;
+
+            long channelId = -1, channelMsgId = -1;
             if (message.ForwardFromChat?.Type == ChatType.Channel)
             {
-                long channelId = message.ForwardFromChat.Id;
+                channelId = message.ForwardFromChat.Id;
                 //非管理员禁止从自己的频道转发
-                if (!dbUser.Right.HasFlag(UserRights.ReviewPost))
+                if (!dbUser.Right.HasFlag(EUserRights.ReviewPost))
                 {
                     if (channelId == _channelService.AcceptChannel.Id || channelId == _channelService.RejectChannel.Id)
                     {
@@ -188,9 +171,8 @@ namespace XinjingdailyBot.Service.Data
                     }
                 }
 
-                channelTitle = message.ForwardFromChat.Title;
-                channelOption = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
-                channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
+                channelMsgId = message.ForwardFromMessageId ?? -1;
+                channelOption = await _channelOptionService.FetchChannelOption(message.ForwardFromChat);
             }
 
             int newTags = _tagRepository.FetchTags(message.Text);
@@ -199,23 +181,22 @@ namespace XinjingdailyBot.Service.Data
             bool anonymous = dbUser.PreferAnonymous;
 
             //直接发布模式
-            bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
+            bool directPost = dbUser.Right.HasFlag(EUserRights.DirectPost);
 
             //发送确认消息
             var keyboard = directPost ? _markupHelperService.DirectPostKeyboard(anonymous, newTags, null) : _markupHelperService.PostKeyboard(anonymous);
             string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
             //生成数据库实体
-            Posts newPost = new()
-            {
+            var newPost = new NewPosts {
                 Anonymous = anonymous,
                 Text = text,
                 RawText = message.Text ?? "",
-                ChannelName = channelName ?? "",
-                ChannelTitle = channelTitle ?? "",
-                Status = directPost ? PostStatus.Reviewing : PostStatus.Padding,
+                ChannelID = channelId,
+                ChannelMsgId = channelMsgId,
+                Status = directPost ? EPostStatus.Reviewing : EPostStatus.Padding,
                 PostType = message.Type,
-                NewTags = newTags,
+                Tags = newTags,
                 HasSpoiler = message.HasMediaSpoiler ?? false,
                 PosterUID = dbUser.UserID
             };
@@ -223,33 +204,35 @@ namespace XinjingdailyBot.Service.Data
             //套用频道设定
             switch (channelOption)
             {
-                case ChannelOption.Normal:
+                case EChannelOption.Normal:
                     break;
-                case ChannelOption.PurgeOrigin:
+                case EChannelOption.PurgeOrigin:
                     postText += "\n由于系统设定, 来自该频道的投稿将不会显示来源";
-                    newPost.ChannelName += '~';
                     break;
-                case ChannelOption.AutoReject:
+                case EChannelOption.AutoReject:
                     postText = "由于系统设定, 暂不接受来自此频道的投稿";
                     keyboard = null;
-                    newPost.Status = PostStatus.Rejected;
+                    newPost.Status = EPostStatus.Rejected;
                     break;
                 default:
                     _logger.LogError("未知的频道选项 {channelOption}", channelOption);
                     return;
             }
 
-            Message msg = await _botClient.SendTextMessageAsync(message.Chat.Id, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+            var actionMsg = await _botClient.SendTextMessageAsync(message.Chat.Id, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
             //修改数据库实体
             newPost.OriginChatID = message.Chat.Id;
             newPost.OriginMsgID = message.MessageId;
-            newPost.ActionMsgID = msg.MessageId;
+            newPost.OriginActionChatID = actionMsg.Chat.Id;
+            newPost.OriginActionMsgID = actionMsg.MessageId;
 
             if (directPost)
             {
-                newPost.ReviewMsgID = msg.MessageId;
-                newPost.ManageMsgID = msg.MessageId;
+                newPost.ReviewChatID = newPost.OriginChatID;
+                newPost.ReviewMsgID = newPost.OriginMsgID;
+                newPost.ReviewActionChatID = newPost.OriginActionChatID;
+                newPost.ReviewActionMsgID = newPost.OriginActionMsgID;
             }
 
             await Insertable(newPost).ExecuteCommandAsync();
@@ -257,7 +240,7 @@ namespace XinjingdailyBot.Service.Data
 
         public async Task HandleMediaPosts(Users dbUser, Message message)
         {
-            if (!dbUser.Right.HasFlag(UserRights.SendPost))
+            if (!dbUser.Right.HasFlag(EUserRights.SendPost))
             {
                 await _botClient.AutoReplyAsync("没有权限", message);
                 return;
@@ -268,13 +251,14 @@ namespace XinjingdailyBot.Service.Data
                 return;
             }
 
-            ChannelOption channelOption = ChannelOption.Normal;
-            string? channelName = null, channelTitle = null;
+            var channelOption = EChannelOption.Normal;
+
+            long channelId = -1, channelMsgId = -1;
             if (message.ForwardFromChat?.Type == ChatType.Channel)
             {
-                long channelId = message.ForwardFromChat.Id;
+                channelId = message.ForwardFromChat.Id;
                 //非管理员禁止从自己的频道转发
-                if (!dbUser.Right.HasFlag(UserRights.ReviewPost))
+                if (!dbUser.Right.HasFlag(EUserRights.ReviewPost))
                 {
                     if (channelId == _channelService.AcceptChannel.Id || channelId == _channelService.RejectChannel.Id)
                     {
@@ -282,20 +266,17 @@ namespace XinjingdailyBot.Service.Data
                         return;
                     }
                 }
-
-                channelTitle = message.ForwardFromChat.Title;
-                channelOption = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
-                channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
+                channelMsgId = message.ForwardFromMessageId ?? -1;
+                channelOption = await _channelOptionService.FetchChannelOption(message.ForwardFromChat);
             }
 
-            //BuildInTags tags = _textHelperService.FetchTags(message.Caption);
             int newTags = _tagRepository.FetchTags(message.Caption);
             string text = _textHelperService.ParseMessage(message);
 
             bool anonymous = dbUser.PreferAnonymous;
 
             //直接发布模式
-            bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
+            bool directPost = dbUser.Right.HasFlag(EUserRights.DirectPost);
 
             bool? hasSpoiler = message.CanSpoiler() ? message.HasMediaSpoiler ?? false : null;
 
@@ -306,16 +287,15 @@ namespace XinjingdailyBot.Service.Data
             string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
             //生成数据库实体
-            Posts newPost = new()
-            {
+            var newPost = new NewPosts {
                 Anonymous = anonymous,
                 Text = text,
                 RawText = message.Text ?? "",
-                ChannelName = channelName ?? "",
-                ChannelTitle = channelTitle ?? "",
-                Status = directPost ? PostStatus.Reviewing : PostStatus.Padding,
+                ChannelID = channelId,
+                ChannelMsgId = channelMsgId,
+                Status = directPost ? EPostStatus.Reviewing : EPostStatus.Padding,
                 PostType = message.Type,
-                NewTags = newTags,
+                Tags = newTags,
                 HasSpoiler = message.HasMediaSpoiler ?? false,
                 PosterUID = dbUser.UserID
             };
@@ -323,33 +303,35 @@ namespace XinjingdailyBot.Service.Data
             //套用频道设定
             switch (channelOption)
             {
-                case ChannelOption.Normal:
+                case EChannelOption.Normal:
                     break;
-                case ChannelOption.PurgeOrigin:
+                case EChannelOption.PurgeOrigin:
                     postText += "\n由于系统设定, 来自该频道的投稿将不会显示来源";
-                    newPost.ChannelName += '~';
                     break;
-                case ChannelOption.AutoReject:
+                case EChannelOption.AutoReject:
                     postText = "由于系统设定, 暂不接受来自此频道的投稿";
                     keyboard = null;
-                    newPost.Status = PostStatus.Rejected;
+                    newPost.Status = EPostStatus.Rejected;
                     break;
                 default:
                     _logger.LogError("未知的频道选项 {channelOption}", channelOption);
                     return;
             }
 
-            Message msg = await _botClient.SendTextMessageAsync(message.Chat.Id, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+            var actionMsg = await _botClient.SendTextMessageAsync(message.Chat.Id, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
             //修改数据库实体
             newPost.OriginChatID = message.Chat.Id;
             newPost.OriginMsgID = message.MessageId;
-            newPost.ActionMsgID = msg.MessageId;
+            newPost.OriginActionChatID = actionMsg.Chat.Id;
+            newPost.OriginActionMsgID = actionMsg.MessageId;
 
             if (directPost)
             {
-                newPost.ReviewMsgID = msg.MessageId;
-                newPost.ManageMsgID = msg.MessageId;
+                newPost.ReviewChatID = newPost.OriginChatID;
+                newPost.ReviewMsgID = newPost.OriginMsgID;
+                newPost.ReviewActionChatID = newPost.OriginActionChatID;
+                newPost.ReviewActionMsgID = newPost.OriginActionMsgID;
             }
 
             long postID = await Insertable(newPost).ExecuteReturnBigIdentityAsync();
@@ -369,7 +351,7 @@ namespace XinjingdailyBot.Service.Data
 
         public async Task HandleMediaGroupPosts(Users dbUser, Message message)
         {
-            if (!dbUser.Right.HasFlag(UserRights.SendPost))
+            if (!dbUser.Right.HasFlag(EUserRights.SendPost))
             {
                 await _botClient.AutoReplyAsync("没有权限", message);
                 return;
@@ -385,16 +367,17 @@ namespace XinjingdailyBot.Service.Data
             {
                 MediaGroupIDs.TryAdd(mediaGroupId, -1);
 
-                bool exists = await Queryable().AnyAsync(x => x.MediaGroupID == mediaGroupId);
+                bool exists = await Queryable().AnyAsync(x => x.OriginMediaGroupID == mediaGroupId);
                 if (!exists)
                 {
-                    ChannelOption channelOption = ChannelOption.Normal;
-                    string? channelName = null, channelTitle = null;
+                    var channelOption = EChannelOption.Normal;
+
+                    long channelId = -1, channelMsgId = -1;
                     if (message.ForwardFromChat?.Type == ChatType.Channel)
                     {
-                        long channelId = message.ForwardFromChat.Id;
+                        channelId = message.ForwardFromChat.Id;
                         //非管理员禁止从自己的频道转发
-                        if (!dbUser.Right.HasFlag(UserRights.ReviewPost))
+                        if (!dbUser.Right.HasFlag(EUserRights.ReviewPost))
                         {
                             if (channelId == _channelService.AcceptChannel.Id || channelId == _channelService.RejectChannel.Id)
                             {
@@ -403,9 +386,8 @@ namespace XinjingdailyBot.Service.Data
                             }
                         }
 
-                        channelTitle = message.ForwardFromChat.Title;
-                        channelOption = await _channelOptionService.FetchChannelOption(channelId, message.ForwardFromChat.Username, channelTitle);
-                        channelName = $"{message.ForwardFromChat.Username}/{message.ForwardFromMessageId}";
+                        channelMsgId = message.ForwardFromMessageId ?? -1;
+                        channelOption = await _channelOptionService.FetchChannelOption(message.ForwardFromChat);
                     }
 
                     int newTags = _tagRepository.FetchTags(message.Caption);
@@ -414,7 +396,7 @@ namespace XinjingdailyBot.Service.Data
                     bool anonymous = dbUser.PreferAnonymous;
 
                     //直接发布模式
-                    bool directPost = dbUser.Right.HasFlag(UserRights.DirectPost);
+                    bool directPost = dbUser.Right.HasFlag(EUserRights.DirectPost);
                     bool? hasSpoiler = message.CanSpoiler() ? message.HasMediaSpoiler ?? false : null;
 
                     //发送确认消息
@@ -423,23 +405,23 @@ namespace XinjingdailyBot.Service.Data
                         _markupHelperService.PostKeyboard(anonymous);
                     string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
-                    Message msg = await _botClient.SendTextMessageAsync(message.Chat.Id, "处理中, 请稍后", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
+                    var actionMsg = await _botClient.SendTextMessageAsync(message.Chat.Id, "处理中, 请稍后", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
 
                     //生成数据库实体
-                    Posts newPost = new()
-                    {
+                    var newPost = new NewPosts {
                         OriginChatID = message.Chat.Id,
                         OriginMsgID = message.MessageId,
-                        ActionMsgID = msg.MessageId,
+                        OriginActionChatID = actionMsg.Chat.Id,
+                        OriginActionMsgID = actionMsg.MessageId,
                         Anonymous = anonymous,
                         Text = text,
                         RawText = message.Text ?? "",
-                        ChannelName = channelName ?? "",
-                        ChannelTitle = channelTitle ?? "",
-                        Status = directPost ? PostStatus.Reviewing : PostStatus.Padding,
+                        ChannelID = channelId,
+                        ChannelMsgId = channelMsgId,
+                        Status = directPost ? EPostStatus.Reviewing : EPostStatus.Padding,
                         PostType = message.Type,
-                        MediaGroupID = mediaGroupId,
-                        NewTags = newTags,
+                        OriginMediaGroupID = mediaGroupId,
+                        Tags = newTags,
                         HasSpoiler = hasSpoiler ?? false,
                         PosterUID = dbUser.UserID,
                     };
@@ -447,16 +429,15 @@ namespace XinjingdailyBot.Service.Data
                     //套用频道设定
                     switch (channelOption)
                     {
-                        case ChannelOption.Normal:
+                        case EChannelOption.Normal:
                             break;
-                        case ChannelOption.PurgeOrigin:
+                        case EChannelOption.PurgeOrigin:
                             postText += "\n由于系统设定, 来自该频道的投稿将不会显示来源";
-                            newPost.ChannelName += '~';
                             break;
-                        case ChannelOption.AutoReject:
+                        case EChannelOption.AutoReject:
                             postText = "由于系统设定, 暂不接受来自此频道的投稿";
                             keyboard = null;
-                            newPost.Status = PostStatus.Rejected;
+                            newPost.Status = EPostStatus.Rejected;
                             break;
                         default:
                             _logger.LogError("未知的频道选项 {channelOption}", channelOption);
@@ -465,8 +446,10 @@ namespace XinjingdailyBot.Service.Data
 
                     if (directPost)
                     {
-                        newPost.ReviewMsgID = msg.MessageId;
-                        newPost.ManageMsgID = msg.MessageId;
+                        newPost.ReviewChatID = newPost.OriginChatID;
+                        newPost.ReviewMsgID = newPost.OriginMsgID;
+                        newPost.ReviewActionChatID = newPost.OriginActionChatID;
+                        newPost.ReviewActionMsgID = newPost.OriginActionMsgID;
                     }
 
                     postID = await Insertable(newPost).ExecuteReturnIdentityAsync();
@@ -474,12 +457,11 @@ namespace XinjingdailyBot.Service.Data
                     MediaGroupIDs[mediaGroupId] = postID;
 
                     //两秒后停止接收媒体组消息
-                    _ = Task.Run(async () =>
-                    {
+                    _ = Task.Run(async () => {
                         await Task.Delay(1500);
                         MediaGroupIDs.Remove(mediaGroupId, out _);
 
-                        await _botClient.EditMessageTextAsync(msg, postText, replyMarkup: keyboard);
+                        await _botClient.EditMessageTextAsync(actionMsg, postText, replyMarkup: keyboard);
                     });
                 }
             }
@@ -496,7 +478,7 @@ namespace XinjingdailyBot.Service.Data
             }
         }
 
-        public async Task SetPostTag(Posts post, int tagId, CallbackQuery callbackQuery)
+        public async Task SetPostTag(NewPosts post, int tagId, CallbackQuery callbackQuery)
         {
             var tag = _tagRepository.GetTagById(tagId);
             if (tag == null)
@@ -504,31 +486,31 @@ namespace XinjingdailyBot.Service.Data
                 return;
             }
 
-            if ((post.NewTags & tag.Seg) > 0)
+            if ((post.Tags & tag.Seg) > 0)
             {
-                post.NewTags &= ~tag.Seg;
+                post.Tags &= ~tag.Seg;
             }
             else
             {
-                post.NewTags |= tag.Seg;
+                post.Tags |= tag.Seg;
             }
 
-            string tagName = _tagRepository.GetActiviedTagsName(post.NewTags);
+            string tagName = _tagRepository.GetActiviedTagsName(post.Tags);
 
             post.ModifyAt = DateTime.Now;
-            await Updateable(post).UpdateColumns(x => new { x.NewTags, x.ModifyAt }).ExecuteCommandAsync();
+            await Updateable(post).UpdateColumns(x => new { x.Tags, x.ModifyAt }).ExecuteCommandAsync();
 
             await _botClient.AutoReplyAsync($"当前标签: {tagName}", callbackQuery);
 
             bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
 
             var keyboard = post.IsDirectPost ?
-                _markupHelperService.DirectPostKeyboard(post.Anonymous, post.NewTags, hasSpoiler) :
-                _markupHelperService.ReviewKeyboardA(post.NewTags, hasSpoiler);
+                _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags, hasSpoiler) :
+                _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
             await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, keyboard);
         }
 
-        public async Task SetPostTag(Posts post, string payload, CallbackQuery callbackQuery)
+        public async Task SetPostTag(NewPosts post, string payload, CallbackQuery callbackQuery)
         {
             payload = payload.ToLowerInvariant();
             var tag = _tagRepository.GetTagByPayload(payload);
@@ -538,18 +520,26 @@ namespace XinjingdailyBot.Service.Data
             }
         }
 
-        public async Task RejetPost(Posts post, Users dbUser, string rejectReason)
+        public async Task RejetPost(NewPosts post, Users dbUser, RejectReasons rejectReason)
         {
+            post.RejectReason = rejectReason.Name;
+            post.CountReject = rejectReason.IsCount;
             post.ReviewerUID = dbUser.UserID;
-            post.Status = PostStatus.Rejected;
+            post.Status = EPostStatus.Rejected;
             post.ModifyAt = DateTime.Now;
-            await Updateable(post).UpdateColumns(x => new { x.Reason, x.ReviewerUID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
+            await Updateable(post).UpdateColumns(x => new {
+                x.RejectReason,
+                x.CountReject,
+                x.ReviewerUID,
+                x.Status,
+                x.ModifyAt
+            }).ExecuteCommandAsync();
 
-            Users poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
+            var poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
 
             //修改审核群消息
-            string reviewMsg = _textHelperService.MakeReviewMessage(poster, dbUser, post.Anonymous, rejectReason);
-            await _botClient.EditMessageTextAsync(_channelService.ReviewGroup.Id, (int)post.ManageMsgID, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
+            string reviewMsg = _textHelperService.MakeReviewMessage(poster, dbUser, post.Anonymous, rejectReason.FullText);
+            await _botClient.EditMessageTextAsync(post.ReviewActionChatID, (int)post.ReviewActionMsgID, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
 
             //拒稿频道发布消息
             if (!post.IsMediaGroup)
@@ -558,8 +548,7 @@ namespace XinjingdailyBot.Service.Data
                 {
                     var attachment = await _attachmentService.Queryable().Where(x => x.PostID == post.Id).FirstAsync();
 
-                    var handler = post.PostType switch
-                    {
+                    var handler = post.PostType switch {
                         MessageType.Photo => _botClient.SendPhotoAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
                         MessageType.Audio => _botClient.SendAudioAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
                         MessageType.Video => _botClient.SendVideoAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
@@ -581,37 +570,49 @@ namespace XinjingdailyBot.Service.Data
                 var group = new IAlbumInputMedia[attachments.Count];
                 for (int i = 0; i < attachments.Count; i++)
                 {
-                    MessageType attachmentType = attachments[i].Type;
+                    var attachmentType = attachments[i].Type;
                     if (attachmentType == MessageType.Unknown)
                     {
                         attachmentType = post.PostType;
                     }
-                    group[i] = attachmentType switch
-                    {
+                    group[i] = attachmentType switch {
                         MessageType.Photo => new InputMediaPhoto(new InputFileId(attachments[i].FileID)),
                         MessageType.Audio => new InputMediaAudio(new InputFileId(attachments[i].FileID)),
                         MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)),
                         MessageType.Voice => new InputMediaAudio(new InputFileId(attachments[i].FileID)),
                         MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)),
-                        //MessageType.Animation 不支持媒体组
                         _ => throw new Exception("未知的稿件类型"),
                     };
                 }
-                var messages = await _botClient.SendMediaGroupAsync(_channelService.RejectChannel.Id, group);
+                var postMessages = await _botClient.SendMediaGroupAsync(_channelService.RejectChannel.Id, group);
+
+                var postMessage = postMessages.FirstOrDefault();
+                if (postMessage != null)
+                {
+                    post.PublicMsgID = postMessage.MessageId;
+                    post.PublishMediaGroupID = postMessage.MediaGroupId ?? "";
+                    post.ModifyAt = DateTime.Now;
+
+                    await Updateable(post).UpdateColumns(x => new {
+                        x.PublicMsgID,
+                        x.PublishMediaGroupID,
+                        x.ModifyAt
+                    }).ExecuteCommandAsync();
+                }
 
                 //处理媒体组消息
-                await _mediaGroupService.AddPostMediaGroup(messages);
+                await _mediaGroupService.AddPostMediaGroup(postMessages);
             }
 
             //通知投稿人
-            string posterMsg = _textHelperService.MakeNotification(rejectReason);
+            string posterMsg = _textHelperService.MakeNotification(rejectReason.FullText);
             if (poster.Notification)
             {
                 await _botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true);
             }
             else
             {
-                await _botClient.EditMessageTextAsync(post.OriginChatID, (int)post.ActionMsgID, posterMsg);
+                await _botClient.EditMessageTextAsync(post.OriginActionChatID, (int)post.OriginActionMsgID, posterMsg);
             }
 
             poster.RejectCount++;
@@ -626,39 +627,39 @@ namespace XinjingdailyBot.Service.Data
             }
         }
 
-        public async Task AcceptPost(Posts post, Users dbUser, CallbackQuery callbackQuery)
+        public async Task AcceptPost(NewPosts post, Users dbUser, CallbackQuery callbackQuery)
         {
-            Users poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
+            var poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
 
             if (post.IsDirectPost)
             {
                 poster.PostCount++;
             }
 
-            string postText = _textHelperService.MakePostText(post, poster);
+            var channel = await _channelOptionService.FetchChannelByChannelId(post.ChannelID);
+            string postText = _textHelperService.MakePostText(post, poster, channel);
 
             bool hasSpoiler = post.HasSpoiler;
 
             //发布频道发布消息
             if (!post.IsMediaGroup)
             {
-                string? warnText = _tagRepository.GetActivedTagWarnings(post.NewTags);
+                string? warnText = _tagRepository.GetActivedTagWarnings(post.Tags);
                 if (!string.IsNullOrEmpty(warnText))
                 {
                     await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, warnText, allowSendingWithoutReply: true);
                 }
 
-                Message? msg = null;
+                Message? postMessage = null;
                 if (post.PostType == MessageType.Text)
                 {
-                    msg = await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, postText, parseMode: ParseMode.Html, disableWebPagePreview: true);
+                    postMessage = await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, postText, parseMode: ParseMode.Html, disableWebPagePreview: true);
                 }
                 else
                 {
-                    Attachments attachment = await _attachmentService.Queryable().FirstAsync(x => x.PostID == post.Id);
+                    var attachment = await _attachmentService.Queryable().FirstAsync(x => x.PostID == post.Id);
 
-                    var handler = post.PostType switch
-                    {
+                    var handler = post.PostType switch {
                         MessageType.Photo => _botClient.SendPhotoAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
                         MessageType.Audio => _botClient.SendAudioAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html, title: attachment.FileName),
                         MessageType.Video => _botClient.SendVideoAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
@@ -674,9 +675,9 @@ namespace XinjingdailyBot.Service.Data
                         return;
                     }
 
-                    msg = await handler;
+                    postMessage = await handler;
                 }
-                post.PublicMsgID = msg?.MessageId ?? -1;
+                post.PublicMsgID = postMessage?.MessageId ?? -1;
             }
             else
             {
@@ -684,13 +685,12 @@ namespace XinjingdailyBot.Service.Data
                 var group = new IAlbumInputMedia[attachments.Count];
                 for (int i = 0; i < attachments.Count; i++)
                 {
-                    MessageType attachmentType = attachments[i].Type;
+                    var attachmentType = attachments[i].Type;
                     if (attachmentType == MessageType.Unknown)
                     {
                         attachmentType = post.PostType;
                     }
-                    group[i] = attachmentType switch
-                    {
+                    group[i] = attachmentType switch {
                         MessageType.Photo => new InputMediaPhoto(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html, HasSpoiler = hasSpoiler },
                         MessageType.Audio => new InputMediaAudio(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
                         MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html, HasSpoiler = hasSpoiler },
@@ -700,23 +700,24 @@ namespace XinjingdailyBot.Service.Data
                     };
                 }
 
-                string? warnText = _tagRepository.GetActivedTagWarnings(post.NewTags);
+                string? warnText = _tagRepository.GetActivedTagWarnings(post.Tags);
                 if (!string.IsNullOrEmpty(warnText))
                 {
                     await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, warnText, allowSendingWithoutReply: true);
                 }
 
-                var messages = await _botClient.SendMediaGroupAsync(_channelService.AcceptChannel.Id, group);
-                post.PublicMsgID = messages.First().MessageId;
+                var postMessages = await _botClient.SendMediaGroupAsync(_channelService.AcceptChannel.Id, group);
+                post.PublicMsgID = postMessages.First().MessageId;
+                post.PublishMediaGroupID = postMessages.First().MediaGroupId ?? "";
 
                 //记录媒体组消息
-                await _mediaGroupService.AddPostMediaGroup(messages);
+                await _mediaGroupService.AddPostMediaGroup(postMessages);
             }
 
             await _botClient.AutoReplyAsync("稿件已发布", callbackQuery);
 
             post.ReviewerUID = dbUser.UserID;
-            post.Status = PostStatus.Accepted;
+            post.Status = EPostStatus.Accepted;
             post.ModifyAt = DateTime.Now;
 
             //修改审核群消息
@@ -732,18 +733,20 @@ namespace XinjingdailyBot.Service.Data
                 post.ReviewMsgID = msg.MessageId;
             }
 
-            await Updateable(post).UpdateColumns(x => new { x.ReviewMsgID, x.PublicMsgID, x.ReviewerUID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
+            await Updateable(post).UpdateColumns(x => new { x.ReviewMsgID, x.PublicMsgID, x.PublishMediaGroupID, x.ReviewerUID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
 
             //通知投稿人
             string posterMsg = _textHelperService.MakeNotification(post.IsDirectPost, post.PublicMsgID);
 
             if (poster.Notification && poster.UserID != dbUser.UserID)//启用通知并且审核与投稿不是同一个人
-            {//单独发送通知消息
+            {
+                //单独发送通知消息
                 await _botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, parseMode: ParseMode.Html, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true, disableWebPagePreview: true);
             }
             else
-            {//静默模式, 不单独发送通知消息
-                await _botClient.EditMessageTextAsync(post.OriginChatID, (int)post.ActionMsgID, posterMsg, ParseMode.Html, disableWebPagePreview: true);
+            {
+                //静默模式, 不单独发送通知消息
+                await _botClient.EditMessageTextAsync(post.OriginChatID, (int)post.OriginActionMsgID, posterMsg, ParseMode.Html, disableWebPagePreview: true);
             }
 
             //增加通过数量
@@ -768,7 +771,7 @@ namespace XinjingdailyBot.Service.Data
             }
         }
 
-        public async Task<Posts?> FetchPostFromReplyToMessage(Message message)
+        public async Task<NewPosts?> FetchPostFromReplyToMessage(Message message)
         {
             var replyMessage = message.ReplyToMessage;
             if (replyMessage == null)
@@ -776,41 +779,34 @@ namespace XinjingdailyBot.Service.Data
                 return null;
             }
 
-            Posts? post;
+            NewPosts? post;
 
-            var mediaGroup = await _mediaGroupService.QueryMediaGroup(replyMessage);
-            if (mediaGroup == null)
+            var msgGroupId = message.MediaGroupId;
+            if (string.IsNullOrEmpty(msgGroupId))
             {
                 //单条稿件
+                long chatId = replyMessage.Chat.Id;
                 int msgId = replyMessage.MessageId;
-                post = await Queryable().FirstAsync(x => x.ReviewMsgID == msgId || x.ManageMsgID == msgId);
+                post = await Queryable().FirstAsync(x =>
+                  (x.OriginChatID == chatId && x.OriginMsgID == msgId) || (x.OriginActionChatID == chatId && x.OriginActionMsgID == msgId) ||
+                  (x.ReviewChatID == chatId && x.ReviewMsgID == msgId) || (x.ReviewActionChatID == chatId && x.ReviewActionMsgID == msgId)
+                );
             }
             else
             {
-                post = await Queryable().FirstAsync(x => x.MediaGroupID == mediaGroup.MediaGroupID);
+                post = await Queryable().FirstAsync(x => x.OriginMediaGroupID == msgGroupId || x.ReviewMediaGroupID == msgGroupId);
             }
 
             return post;
         }
 
-        public async Task<Posts?> FetchPostFromReviewCallbackQuery(CallbackQuery query)
+        public async Task<NewPosts?> FetchPostFromCallbackQuery(CallbackQuery query)
         {
             if (query.Message == null)
             {
                 return null;
             }
-            var post = await GetFirstAsync(x => x.ManageMsgID == query.Message.MessageId);
-            return post;
-        }
-
-        public async Task<Posts?> FetchPostFromConfirmCallbackQuery(CallbackQuery query)
-        {
-            if (query.Message == null)
-            {
-                return null;
-            }
-
-            var post = await GetFirstAsync(x => x.ActionMsgID == query.Message.MessageId);
+            var post = await FetchPostFromReplyToMessage(query.Message);
             return post;
         }
     }

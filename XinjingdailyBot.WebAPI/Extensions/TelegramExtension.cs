@@ -17,8 +17,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
         /// <param name="services"></param>
         public static void AddTelegramBotClient(this IServiceCollection services)
         {
-            services.AddSingleton<ITelegramBotClient>(serviceProvider =>
-            {
+            services.AddSingleton<ITelegramBotClient>(serviceProvider => {
                 var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
                 var httpClient = httpClientFactory.CreateClient("Telegram");
 

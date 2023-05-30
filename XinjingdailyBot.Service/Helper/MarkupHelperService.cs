@@ -1,6 +1,4 @@
-﻿using System.Threading.Channels;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
+﻿using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
@@ -18,18 +16,22 @@ namespace XinjingdailyBot.Service.Helper
         private readonly GroupRepository _groupRepository;
         private readonly IChannelService _channelService;
         private readonly TagRepository _tagRepository;
+        private readonly RejectReasonRepository _rejectReasonRepository;
 
         public MarkupHelperService(
             GroupRepository groupRepository,
             IChannelService channelService,
-            TagRepository tagRepository)
+            TagRepository tagRepository,
+            RejectReasonRepository rejectReasonRepository)
         {
             _groupRepository = groupRepository;
             _channelService = channelService;
             _tagRepository = tagRepository;
+            _rejectReasonRepository = rejectReasonRepository;
         }
 
         public InlineKeyboardMarkup PostKeyboard(bool anymouse)
+
         {
             InlineKeyboardMarkup keyboard = new(new[]
             {
@@ -98,18 +100,17 @@ namespace XinjingdailyBot.Service.Helper
         {
             var tags = _tagRepository.GetTagsPayload(tagNum);
 
-            List<IEnumerable<InlineKeyboardButton>> btns = new();
-            List<InlineKeyboardButton> line = new();
-
             int lineCount = tags.Count() <= 4 ? 2 : 3;
 
+            var btns = new List<IEnumerable<InlineKeyboardButton>>();
+            var line = new List<InlineKeyboardButton>();
             foreach (var tag in tags)
             {
                 line.Add(InlineKeyboardButton.WithCallbackData(tag.DisplayName, $"review tag {tag.Payload}"));
                 if (line.Count >= lineCount)
                 {
                     btns.Add(line);
-                    line = new();
+                    line = new List<InlineKeyboardButton>();
                 }
             }
 
@@ -132,32 +133,33 @@ namespace XinjingdailyBot.Service.Helper
                 InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
             });
 
-            return new(btns);
+            return new InlineKeyboardMarkup(btns);
         }
 
         public InlineKeyboardMarkup ReviewKeyboardB()
         {
-            InlineKeyboardMarkup keyboard = new(new[]
+            var reasons = _rejectReasonRepository.GetAllRejectReasons();
+
+            int lineCount = reasons.Count() <= 4 ? 2 : 3;
+
+            var btns = new List<IEnumerable<InlineKeyboardButton>>();
+            var line = new List<InlineKeyboardButton>();
+            foreach (var reason in reasons)
             {
-                new []
+                line.Add(InlineKeyboardButton.WithCallbackData(reason.Name, $"review tag {reason.Payload}"));
+                if (line.Count >= lineCount)
                 {
-                    InlineKeyboardButton.WithCallbackData(Langs.RejectFuzzy, "reject fuzzy"),
-                    InlineKeyboardButton.WithCallbackData(Langs.RejectDuplicate, "reject duplicate"),
-                    InlineKeyboardButton.WithCallbackData(Langs.RejectBoring, "reject boring"),
-                    InlineKeyboardButton.WithCallbackData(Langs.RejectConfusing, "reject confusing"),
-                },
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData(Langs.RejectDeny, "reject deny"),
-                    InlineKeyboardButton.WithCallbackData(Langs.RejectQRCode, "reject qrcode"),
-                    InlineKeyboardButton.WithCallbackData(Langs.RejectOther, "reject other"),
-                },
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData(Langs.RejectCancel, "reject back"),
-                },
+                    btns.Add(line);
+                    line = new List<InlineKeyboardButton>();
+                }
+            }
+
+            btns.Add(new[]
+            {
+                InlineKeyboardButton.WithCallbackData(Langs.RejectCancel, "review reject back"),
             });
-            return keyboard;
+
+            return new InlineKeyboardMarkup(btns);
         }
 
         public async Task<InlineKeyboardMarkup?> SetUserGroupKeyboard(Users dbUser, Users targetUser)
@@ -272,7 +274,7 @@ namespace XinjingdailyBot.Service.Helper
             return keyboard;
         }
 
-        public InlineKeyboardMarkup? LinkToOriginPostKeyboard(Posts post)
+        public InlineKeyboardMarkup? LinkToOriginPostKeyboard(NewPosts post)
         {
             var channel = _channelService.AcceptChannel;
             string link = channel.GetMessageLink(post.PublicMsgID);
@@ -369,7 +371,7 @@ namespace XinjingdailyBot.Service.Helper
             return keyboard;
         }
 
-        public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, Posts post, int tagId, string postType)
+        public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, NewPosts post, int tagId, string postType)
         {
             var channel = _channelService.AcceptChannel;
             string link = channel.GetMessageLink(post.PublicMsgID);
@@ -386,11 +388,11 @@ namespace XinjingdailyBot.Service.Helper
             return keyboard;
         }
 
-        public InlineKeyboardMarkup QueryPostMenuKeyboard(Users dbUser, Posts post)
+        public InlineKeyboardMarkup QueryPostMenuKeyboard(Users dbUser, NewPosts post)
         {
             InlineKeyboardMarkup keyboard;
 
-            if (post.Status == PostStatus.Accepted)
+            if (post.Status == EPostStatus.Accepted)
             {
                 keyboard = new(new[]
                 {

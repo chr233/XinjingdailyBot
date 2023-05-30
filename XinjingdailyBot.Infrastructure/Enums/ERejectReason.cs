@@ -3,7 +3,8 @@
     /// <summary>
     /// 拒稿原因
     /// </summary>
-    public enum RejectReason : byte
+    [Obsolete("弃用")]
+    public enum ERejectReason : byte
     {
         /// <summary>
         /// 未拒绝

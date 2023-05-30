@@ -89,7 +89,7 @@ namespace XinjingdailyBot.Model.Models
         /// 用户权限
         /// </summary>
         [SugarColumn(IsIgnore = true)]
-        public UserRights Right { get; set; } = UserRights.None;
+        public EUserRights Right { get; set; } = EUserRights.None;
         /// <summary>
         /// 用户组ID
         /// </summary>

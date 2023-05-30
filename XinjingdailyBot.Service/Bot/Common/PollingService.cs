@@ -1,7 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Repository;
@@ -20,6 +20,7 @@ namespace XinjingdailyBot.Service.Bot.Common
         private readonly GroupRepository _groupRepository;
         private readonly LevelRepository _levelRepository;
         private readonly TagRepository _tagRepository;
+        private readonly RejectReasonRepository _rejectReasonRepository;
 
         public PollingService(
             IServiceProvider serviceProvider,
@@ -28,7 +29,8 @@ namespace XinjingdailyBot.Service.Bot.Common
             ICommandHandler commandHandler,
             GroupRepository groupRepository,
             LevelRepository levelRepository,
-            TagRepository tagRepository)
+            TagRepository tagRepository,
+            RejectReasonRepository rejectReasonRepository)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
@@ -37,6 +39,7 @@ namespace XinjingdailyBot.Service.Bot.Common
             _groupRepository = groupRepository;
             _levelRepository = levelRepository;
             _tagRepository = tagRepository;
+            _rejectReasonRepository = rejectReasonRepository;
         }
 
         [RequiresUnreferencedCode("不兼容剪裁")]
@@ -52,6 +55,7 @@ namespace XinjingdailyBot.Service.Bot.Common
             await _groupRepository.InitGroupCache();
             await _levelRepository.InitLevelCache();
             await _tagRepository.InitPostTagCache();
+            await _rejectReasonRepository.InitRejectReasonCache();
 
             _logger.LogInformation("开始运行 Bot");
             await DoWork(stoppingToken);
