@@ -31,7 +31,7 @@ namespace XinjingdailyBot.WebAPI.Controllers
         /// Root
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet("[action]")]
         public IActionResult Get()
         {
             return Ok("启动完成");
@@ -42,7 +42,7 @@ namespace XinjingdailyBot.WebAPI.Controllers
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPost("[action]")]
         public async Task<ActionResult<Users>> TestToken([FromBody] Guid token)
         {
             var user = await _userTokenService.VerifyToken(token);

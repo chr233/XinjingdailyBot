@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
@@ -54,7 +53,7 @@ namespace XinjingdailyBot.Service.Data
             return token;
         }
 
-        public async Task<Users?> VerifyToken (Guid token)
+        public async Task<Users?> VerifyToken(Guid token)
         {
             var userToken = await Queryable().Where(x => x.APIToken == token).FirstAsync();
             if (userToken == null || userToken.ExpiredAt < DateTime.Now)

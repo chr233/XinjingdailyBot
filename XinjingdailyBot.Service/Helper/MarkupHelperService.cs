@@ -325,7 +325,7 @@ namespace XinjingdailyBot.Service.Helper
                     InlineKeyboardButton.WithCallbackData("不限制稿件标签", $"cmd {dbUser.UserID} setrandompost")
                 }
             };
-            
+
             var line = new List<InlineKeyboardButton>();
 
             int lineChars = 0;

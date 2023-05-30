@@ -733,7 +733,14 @@ namespace XinjingdailyBot.Service.Data
                 post.ReviewMsgID = msg.MessageId;
             }
 
-            await Updateable(post).UpdateColumns(x => new { x.ReviewMsgID, x.PublicMsgID, x.PublishMediaGroupID, x.ReviewerUID, x.Status, x.ModifyAt }).ExecuteCommandAsync();
+            await Updateable(post).UpdateColumns(x => new {
+                x.ReviewMsgID,
+                x.PublicMsgID,
+                x.PublishMediaGroupID,
+                x.ReviewerUID,
+                x.Status,
+                x.ModifyAt
+            }).ExecuteCommandAsync();
 
             //通知投稿人
             string posterMsg = _textHelperService.MakeNotification(post.IsDirectPost, post.PublicMsgID);
