@@ -13,6 +13,12 @@ namespace XinjingdailyBot.Interface.Data
         /// <param name="channelId"></param>
         /// <returns></returns>
         Task<ChannelOptions?> FetchChannelByChannelId(long channelId);
+        /// <summary>
+        /// 根据UserName获取频道
+        /// </summary>
+        /// <param name="channelName"></param>
+        /// <returns></returns>
+        Task<ChannelOptions?> FetchChannelByNameOrTitle(string channelName,string channelTitle);
 
         /// <summary>
         /// 通过频道名称获取频道ID

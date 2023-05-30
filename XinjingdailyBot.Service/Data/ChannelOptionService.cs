@@ -51,6 +51,12 @@ namespace XinjingdailyBot.Service.Data
             return channel;
         }
 
+        public async Task<ChannelOptions?> FetchChannelByNameOrTitle(string channelName, string channelTitle)
+        {
+            var channel = await Queryable().Where(x => x.ChannelName == channelName || x.ChannelTitle == channelTitle).FirstAsync();
+            return channel;
+        }
+
         public async Task<ChannelOptions?> FetchChannelByChannelId(long channelId)
         {
             if (channelId <= 0)

@@ -88,6 +88,24 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
+        ///   查找类似 Copyright © 2022-2023 {0} 的本地化字符串。
+        /// </summary>
+        public static string Copyright {
+            get {
+                return ResourceManager.GetString("Copyright", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 ========================================================== 的本地化字符串。
+        /// </summary>
+        public static string Line {
+            get {
+                return ResourceManager.GetString("Line", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 没有权限 的本地化字符串。
         /// </summary>
         public static string NoPostRight {
@@ -363,6 +381,15 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         public static string UnbanedUserTips {
             get {
                 return ResourceManager.GetString("UnbanedUserTips", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Version: {0} - {1} 的本地化字符串。
+        /// </summary>
+        public static string Version {
+            get {
+                return ResourceManager.GetString("Version", resourceCulture);
             }
         }
         

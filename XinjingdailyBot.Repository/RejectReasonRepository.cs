@@ -43,6 +43,8 @@ namespace XinjingdailyBot.Repository
                 RejectReasonCache.Clear();
                 RejectReasonPayloadCache.Clear();
 
+                bool changed = false;
+
                 foreach (var reason in reasons)
                 {
                     if (string.IsNullOrEmpty(reason.Name) || reason.Id <= 0)
@@ -53,6 +55,7 @@ namespace XinjingdailyBot.Repository
                     if (string.IsNullOrEmpty(reason.Payload))
                     {
                         reason.Payload = reason.Name;
+                        changed = true;
                     }
                     reason.Payload = reason.Payload.ToLowerInvariant();
 
@@ -60,7 +63,10 @@ namespace XinjingdailyBot.Repository
                     RejectReasonPayloadCache.Add(reason.Payload, reason);
                 }
 
-                await Storageable(reasons).ExecuteCommandAsync();
+                if (changed)
+                {
+                    await Storageable(reasons).ExecuteCommandAsync();
+                }
 
                 _logger.LogInformation("已加载 {Count} 个拒绝理由", reasons.Count);
             }

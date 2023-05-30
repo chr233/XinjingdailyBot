@@ -143,5 +143,10 @@ namespace XinjingdailyBot.Model.Models
         /// 审核人用户ID
         /// </summary>
         public long ReviewerUID { get; set; } = -1;
+
+        /// <summary>
+        /// 是否已完成迁移
+        /// </summary>
+        public bool Merged { get; set; }
     }
 }
