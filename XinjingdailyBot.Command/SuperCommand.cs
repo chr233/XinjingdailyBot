@@ -569,7 +569,7 @@ namespace XinjingdailyBot.Command
 
                 startId = posts.Last().Id + 1;
 
-                _logger.LogInformation("迁移进度 {startId} / {totalUsers}, 更新数量 {effectCount}", startId, posts, effectCount);
+                _logger.LogInformation("迁移进度 {startId} / {totalUsers}, 更新数量 {effectCount}", startId, totalPosts, effectCount);
             }
 
             try
