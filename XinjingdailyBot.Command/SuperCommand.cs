@@ -387,7 +387,6 @@ namespace XinjingdailyBot.Command
             int effectCount = 0;
 
             int totalPosts = await _oldPostService.Queryable().CountAsync(x => !x.Merged);
-
             var msg = await _botClient.SendCommandReply($"开始迁移稿件表, 共计 {totalPosts} 条记录", message, autoDelete: false);
 
             while (startId <= totalPosts)
@@ -397,8 +396,6 @@ namespace XinjingdailyBot.Command
                 {
                     break;
                 }
-
-
 
                 var tasks = oldPosts.Select(async oldPost => {
 
@@ -503,10 +500,11 @@ namespace XinjingdailyBot.Command
                     catch (Exception)
                     {
                         _logger.LogWarning("稿件Id {id} 已存在", oldPost.Id);
+                        await _postService.Updateable(post).ExecuteCommandAsync();
                     }
 
                     oldPost.Merged = true;
-                    await _oldPostService.Updateable(oldPost).UpdateColumns(x => x.Merged).ExecuteCommandAsync();
+                    await _oldPostService.Updateable(oldPost).UpdateColumns(x => new { x.Merged }).ExecuteCommandAsync();
 
                 }).ToList();
 
@@ -524,6 +522,63 @@ namespace XinjingdailyBot.Command
             catch
             {
                 await _botClient.SendCommandReply($"迁移稿件表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
+            }
+        }
+
+        /// <summary>
+        /// 修补稿件数据
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        [TextCmd("FIXPOST", EUserRights.SuperCmd, Description = "修补稿件数据")]
+        public async Task ResponseFixPost(Message message)
+        {
+            const int threads = 30;
+
+            int startId = 1;
+            int effectCount = 0;
+
+            int totalPosts = await _postService.Queryable().CountAsync(x => x.ReviewActionChatID == x.ReviewActionMsgID);
+            var msg = await _botClient.SendCommandReply($"开始修补稿件表, 共计 {totalPosts} 条记录", message, autoDelete: false);
+
+            while (startId <= totalPosts)
+            {
+                var posts = await _postService.Queryable().Where(x => x.Id >= startId &&
+                    x.ReviewActionChatID == x.ReviewActionMsgID
+                ).Take(threads).ToListAsync();
+
+                if (!posts.Any())
+                {
+                    break;
+                }
+
+                var tasks = posts.Select(async post => {
+                    effectCount++;
+
+                    post.ReviewActionChatID = post.ReviewChatID;
+                    post.ModifyAt = DateTime.Now;
+
+                    await _postService.Updateable(post).UpdateColumns(x => new {
+                        x.ReviewActionChatID,
+                        x.ModifyAt,
+                    }).ExecuteCommandAsync();
+
+                }).ToList();
+
+                await Task.WhenAll(tasks);
+
+                startId = posts.Last().Id + 1;
+
+                _logger.LogInformation("迁移进度 {startId} / {totalUsers}, 更新数量 {effectCount}", startId, posts, effectCount);
+            }
+
+            try
+            {
+                await _botClient.EditMessageTextAsync(msg, $"修补稿件表完成, 更新了 {effectCount} 条记录");
+            }
+            catch
+            {
+                await _botClient.SendCommandReply($"修补稿件表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
             }
         }
 

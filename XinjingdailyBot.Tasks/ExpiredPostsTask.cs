@@ -134,7 +134,11 @@ namespace XinjingdailyBot.Tasks
                     user.ModifyAt = DateTime.Now;
 
                     //更新用户表
-                    await _userService.Updateable(user).UpdateColumns(x => new { x.PrivateChatID, x.ExpiredPostCount, x.ModifyAt }).ExecuteCommandAsync();
+                    await _userService.Updateable(user).UpdateColumns(x => new {
+                        x.PrivateChatID,
+                        x.ExpiredPostCount,
+                        x.ModifyAt
+                    }).ExecuteCommandAsync();
                 }
             }
         }

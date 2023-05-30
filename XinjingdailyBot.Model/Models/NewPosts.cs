@@ -160,7 +160,7 @@ namespace XinjingdailyBot.Model.Models
         /// 审核人用户ID
         /// </summary>
         public long ReviewerUID { get; set; } = -1;
-        
+
         /// <inheritdoc cref="ICreateAt.CreateAt"/>
         public DateTime CreateAt { get; set; } = DateTime.Now;
         /// <inheritdoc cref="IModifyAt.ModifyAt"/>
