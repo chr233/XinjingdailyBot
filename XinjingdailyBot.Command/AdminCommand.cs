@@ -26,7 +26,6 @@ namespace XinjingdailyBot.Command
         private readonly ILogger<AdminCommand> _logger;
         private readonly ITelegramBotClient _botClient;
         private readonly IUserService _userService;
-        //private readonly LevelRepository _levelRepository;
         private readonly GroupRepository _groupRepository;
         private readonly IBanRecordService _banRecordService;
         private readonly IPostService _postService;
@@ -35,12 +34,12 @@ namespace XinjingdailyBot.Command
         private readonly IChannelService _channelService;
         private readonly IMarkupHelperService _markupHelperService;
         private readonly ICmdRecordService _cmdRecordService;
+        private readonly IUserTokenService _userTokenService;
 
         public AdminCommand(
             ILogger<AdminCommand> logger,
             ITelegramBotClient botClient,
             IUserService userService,
-            //LevelRepository levelRepository,
             GroupRepository groupRepository,
             IBanRecordService banRecordService,
             IPostService postService,
@@ -48,12 +47,12 @@ namespace XinjingdailyBot.Command
             IChannelOptionService channelOptionService,
             IChannelService channelService,
             IMarkupHelperService markupHelperService,
-            ICmdRecordService cmdRecordService)
+            ICmdRecordService cmdRecordService,
+            IUserTokenService userTokenService)
         {
             _logger = logger;
             _botClient = botClient;
             _userService = userService;
-            //_levelRepository = levelRepository;
             _groupRepository = groupRepository;
             _banRecordService = banRecordService;
             _postService = postService;
@@ -62,6 +61,7 @@ namespace XinjingdailyBot.Command
             _channelService = channelService;
             _markupHelperService = markupHelperService;
             _cmdRecordService = cmdRecordService;
+            _userTokenService = userTokenService;
         }
 
         private readonly DateTime StartAt = DateTime.Now;
@@ -1317,6 +1317,20 @@ namespace XinjingdailyBot.Command
                     await _botClient.EditMessageTextAsync(callbackQuery.Message!, $"成功 {action} 了用户 {targetUser.EscapedFullName()}", replyMarkup: null);
                 }
             }
+        }
+
+        /// <summary>
+        /// 获取WebAPI密钥
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        [TextCmd("TOKEN", EUserRights.AdminCmd, Description = "获取WebAPI密钥")]
+        public async Task ResponseToken(Users dbUser, Message message)
+        {
+            var token = await _userTokenService.GenerateNewUserToken(dbUser);
+
+            await _botClient.SendCommandReply(token.APIToken.ToString("N"), message, false);
         }
 
         /// <summary>

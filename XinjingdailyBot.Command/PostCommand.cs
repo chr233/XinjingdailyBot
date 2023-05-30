@@ -182,7 +182,7 @@ namespace XinjingdailyBot.Command
 
             post.ReviewChatID = reviewMsg.Chat.Id;
             post.ReviewMsgID = reviewMsg.MessageId;
-            post.ReviewActionChatID = manageMsg.MessageId;
+            post.ReviewActionChatID = manageMsg.Chat.Id;
             post.ReviewActionMsgID = manageMsg.MessageId;
             post.Status = EPostStatus.Reviewing;
             post.ModifyAt = DateTime.Now;

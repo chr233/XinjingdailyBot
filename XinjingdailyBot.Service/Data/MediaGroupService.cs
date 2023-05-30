@@ -12,6 +12,11 @@ namespace XinjingdailyBot.Service.Data
     {
         public async Task AddPostMediaGroup(Message message)
         {
+            if (string.IsNullOrEmpty(message.MediaGroupId))
+            {
+                return;
+            }
+
             var postGeoup = new MediaGroups {
                 ChatID = message.Chat.Id,
                 MessageID = message.MessageId,
@@ -19,11 +24,16 @@ namespace XinjingdailyBot.Service.Data
                 CreateAt = DateTime.Now,
             };
 
-            await InsertAsync(postGeoup);
+            await Insertable(postGeoup).ExecuteCommandAsync();
         }
 
         public async Task AddPostMediaGroup(IEnumerable<Message> messages)
         {
+            if (messages.Any(x => string.IsNullOrEmpty(x.MediaGroupId)))
+            {
+                return;
+            }
+
             var now = DateTime.Now;
             var postGeoups = messages.Where(x => !string.IsNullOrEmpty(x.MediaGroupId)).Select(x => new MediaGroups {
                 ChatID = x.Chat.Id,
