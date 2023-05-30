@@ -25,7 +25,7 @@ namespace XinjingdailyBot.Service.Data
         public async Task AddPostMediaGroup(IEnumerable<Message> messages)
         {
             var now = DateTime.Now;
-            var postGeoups = messages.Select(x => new MediaGroups {
+            var postGeoups = messages.Where(x => !string.IsNullOrEmpty(x.MediaGroupId)).Select(x => new MediaGroups {
                 ChatID = x.Chat.Id,
                 MessageID = x.MessageId,
                 MediaGroupID = x.MediaGroupId!,
