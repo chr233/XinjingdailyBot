@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
@@ -10,10 +11,14 @@ namespace XinjingdailyBot.Service.Data
     public sealed class UserTokenService : BaseService<UserTokens>, IUserTokenService
     {
         private readonly ILogger<UserTokenService> _logger;
+        private readonly IUserService _userService;
 
-        public UserTokenService(ILogger<UserTokenService> logger)
+        public UserTokenService(
+            ILogger<UserTokenService> logger,
+            IUserService userService)
         {
             _logger = logger;
+            _userService = userService;
         }
 
         public async Task<UserTokens?> GenerateNewUserToken(Users dbUser)
@@ -47,6 +52,18 @@ namespace XinjingdailyBot.Service.Data
                 return null;
             }
             return token;
+        }
+
+        public async Task<Users?> VerifyToken (Guid token)
+        {
+            var userToken = await Queryable().Where(x => x.APIToken == token).FirstAsync();
+            if (userToken == null || userToken.ExpiredAt < DateTime.Now)
+            {
+                return null;
+            }
+
+            var user = await _userService.FetchUserByUserID(userToken.UserID);
+            return user;
         }
     }
 }

@@ -22,5 +22,11 @@ namespace XinjingdailyBot.Interface.Data
         /// <param name="dbUser"></param>
         /// <returns></returns>
         Task<UserTokens?> FetchUserToken(Users dbUser);
+        /// <summary>
+        /// 验证Token是否有效
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        Task<Users?> VerifyToken(Guid token);
     }
 }
