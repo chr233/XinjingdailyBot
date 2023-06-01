@@ -4,6 +4,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Model;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Helper;
@@ -63,7 +64,7 @@ namespace XinjingdailyBot.Service.Helper
 
         public string HtmlUserLink(long userId, string userName, string userNick)
         {
-            var nick = EscapeHtml(userNick);
+            var nick = EscapeHtml(userNick).ReEscapeHtml();
 
             if (string.IsNullOrEmpty(userName))
             {
@@ -208,7 +209,7 @@ namespace XinjingdailyBot.Service.Helper
 
             if (!string.IsNullOrEmpty(post.Text))
             {
-                var text = post.Text;
+                var text = post.Text.EscapeHtml().ReEscapeHtml();
                 sb.AppendLine(text);
             }
 
@@ -244,14 +245,7 @@ namespace XinjingdailyBot.Service.Helper
                 return "";
             }
 
-            if (entities == null)
-            {
-                return text;
-            }
-            else
-            {
-                return ParseMessage(entities, text);
-            }
+            return ParseMessage(entities, text).ReEscapeHtml();
         }
 
         /// <summary>
@@ -260,17 +254,18 @@ namespace XinjingdailyBot.Service.Helper
         /// <param name="entities"></param>
         /// <param name="text"></param>
         /// <returns></returns>
-        private string ParseMessage(MessageEntity[] entities, string text)
+        private string ParseMessage(MessageEntity[]? entities, string text)
         {
-            StringBuilder sb = new(text.Replace('<', '＜').Replace('>', '＞').Replace('&', '＆'));
+            var sb = new StringBuilder(text.EscapeHtml());
 
-            Dictionary<int, TagObjct> tagMap = new();
-
-            int count = entities.Length;
-
-            for (int i = 0; i < count; i++)
+            if (entities == null)
             {
-                var entity = entities[i];
+                return sb.ToString();
+            }
+
+            var tagMap = new Dictionary<int, TagObjct>();
+            foreach (var entity in entities)
+            {
                 string head;
                 string tail;
 
@@ -297,7 +292,7 @@ namespace XinjingdailyBot.Service.Helper
                         tail = "</tg-spoiler>";
                         break;
                     case MessageEntityType.TextLink:
-                        head = $"<a href=\"{EscapeHtml(entity.Url)}\">";
+                        head = $"<a href=\"{EscapeHtml(entity.Url).ReEscapeHtml()}\">";
                         tail = "</a>";
                         break;
                     case MessageEntityType.Code:

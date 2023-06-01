@@ -25,5 +25,26 @@
                 return escapedText;
             }
         }
+
+        /// <summary>
+        /// HTML反转义
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string ReEscapeHtml(this string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return "";
+            }
+            else
+            {
+                var escapedText = text
+                    .Replace("＜", "&lt;")
+                    .Replace("＞", "&gt;")
+                    .Replace("＆", "&amp;");
+                return escapedText;
+            }
+        }
     }
 }
