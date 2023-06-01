@@ -1,5 +1,8 @@
 ﻿namespace XinjingdailyBot.Interface.Bot.Common
 {
+    /// <summary>
+    /// 机器人接收服务
+    /// </summary>
     public interface IReceiverService
     {
         /// <summary>

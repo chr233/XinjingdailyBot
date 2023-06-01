@@ -1,58 +1,60 @@
 <Project>
-  <PropertyGroup>
-    <Version>2.1.0.3</Version>
-  </PropertyGroup>
+	<PropertyGroup>
+		<Version>2.1.0.3</Version>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <Authors>Chr_</Authors>
-    <ApplicationIcon>../resources/icon.ico</ApplicationIcon>
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-    <Company>chrxw.com</Company>
-    <Copyright>Copyright © 2022-$([System.DateTime]::UtcNow.Year) $(Company)</Copyright>
-    <Description>The submission bot of @xinjingdaily developed by Chr_.</Description>
-    <Deterministic>true</Deterministic>
-    <ErrorReport>none</ErrorReport>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>latest</LangVersion>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <NeutralLanguage>zh-cn</NeutralLanguage>
-    <Nullable>enable</Nullable>
-    <PackageIcon>$(ApplicationIcon)</PackageIcon>
-    <PackageLicenseExpression>AGPL-3.0</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/chr233/XinjingdailyBot</PackageProjectUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>$(PackageProjectUrl)/releases</PackageReleaseNotes>
-    <RepositoryBranch>main</RepositoryBranch>
-    <RepositoryType>Git</RepositoryType>
-    <RepositoryUrl>$(PackageProjectUrl).git</RepositoryUrl>
-    <RollForward>LatestMajor</RollForward>
-    <RuntimeIdentifiers>linux-arm;linux-arm64;linux-x64;osx-arm64;osx-x64;win-arm64;win-x64</RuntimeIdentifiers>
-    <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
-    <TargetFramework>net7.0</TargetFramework>
-  </PropertyGroup>
+	<PropertyGroup>
+		<Authors>Chr_</Authors>
+		<ApplicationIcon>../resources/icon.ico</ApplicationIcon>
+		<CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+		<Company>chrxw.com</Company>
+		<Copyright>Copyright © 2022-$([System.DateTime]::UtcNow.Year) $(Company)</Copyright>
+		<Description>The submission bot of @xinjingdaily developed by Chr_.</Description>
+		<Deterministic>true</Deterministic>
+		<ErrorReport>none</ErrorReport>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>latest</LangVersion>
+		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+		<NeutralLanguage>zh-cn</NeutralLanguage>
+		<Nullable>enable</Nullable>
+		<PackageIcon>$(ApplicationIcon)</PackageIcon>
+		<PackageLicenseExpression>AGPL-3.0</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/chr233/XinjingdailyBot</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageReleaseNotes>$(PackageProjectUrl)/releases</PackageReleaseNotes>
+		<RepositoryBranch>main</RepositoryBranch>
+		<RepositoryType>Git</RepositoryType>
+		<RepositoryUrl>$(PackageProjectUrl).git</RepositoryUrl>
+		<RollForward>LatestMajor</RollForward>
+		<RuntimeIdentifiers>linux-arm;linux-arm64;linux-x64;osx-arm64;osx-x64;win-arm64;win-x64</RuntimeIdentifiers>
+		<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
+		<TargetFramework>net7.0</TargetFramework>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<OpenApiGenerateDocuments>true</OpenApiGenerateDocuments>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<DebugType>portable</DebugType>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <DebugType>none</DebugType>
-    <DebugSymbols>false</DebugSymbols>
-    <DebuggerSupport>false</DebuggerSupport>
-    <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
-    <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
-    <EventSourceSupport>false</EventSourceSupport>
-    <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
-    <MetadataUpdaterSupport>false</MetadataUpdaterSupport>
-    <UseNativeHttpHandler>false</UseNativeHttpHandler>
-    <TieredPGO>true</TieredPGO>
-    <TrimMode>partial</TrimMode>
-    <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<DebugType>none</DebugType>
+		<DebugSymbols>false</DebugSymbols>
+		<DebuggerSupport>false</DebuggerSupport>
+		<EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+		<EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
+		<EventSourceSupport>false</EventSourceSupport>
+		<HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
+		<MetadataUpdaterSupport>false</MetadataUpdaterSupport>
+		<UseNativeHttpHandler>false</UseNativeHttpHandler>
+		<TieredPGO>true</TieredPGO>
+		<TrimMode>partial</TrimMode>
+		<SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(XJBVariant)' != ''">
-    <DefineConstants>
-      $(DefineConstants);XJB_VARIANT_$(XJBVariant.Replace('-','_').ToUpperInvariant())
-    </DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(XJBVariant)' != ''">
+		<DefineConstants>
+			$(DefineConstants);XJB_VARIANT_$(XJBVariant.Replace('-','_').ToUpperInvariant())
+		</DefineConstants>
+	</PropertyGroup>
 </Project>

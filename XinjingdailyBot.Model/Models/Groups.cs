@@ -10,6 +10,9 @@ namespace XinjingdailyBot.Model.Models
     [SugarTable("group", TableDescription = "用户组")]
     public sealed record Groups : BaseModel
     {
+        /// <summary>
+        /// 主键
+        /// </summary>
         [SugarColumn(IsPrimaryKey = true)]
         public int Id { get; set; }
         /// <summary>

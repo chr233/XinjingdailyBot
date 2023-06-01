@@ -12,8 +12,11 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Command
 {
+    /// <summary>
+    /// 投稿命令
+    /// </summary>
     [AppService(LifeTime.Scoped)]
-    public class PostCommand
+    internal class PostCommand
     {
         private readonly ITelegramBotClient _botClient;
         private readonly IUserService _userService;
@@ -47,6 +50,7 @@ namespace XinjingdailyBot.Command
         /// <summary>
         /// 投稿消息处理
         /// </summary>
+        /// <param name="dbUser"></param>
         /// <param name="query"></param>
         /// <returns></returns>
         [QueryCmd("POST", EUserRights.SendPost, Description = "投稿消息处理")]
@@ -130,6 +134,7 @@ namespace XinjingdailyBot.Command
         /// <summary>
         /// 确认投稿
         /// </summary>
+        /// <param name="dbUser"></param>
         /// <param name="post"></param>
         /// <param name="query"></param>
         /// <returns></returns>

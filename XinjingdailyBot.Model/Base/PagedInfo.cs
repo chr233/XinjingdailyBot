@@ -32,7 +32,13 @@
                 }
             }
         }
+        /// <summary>
+        /// 结果
+        /// </summary>
         public List<T>? Result { get; set; }
+        /// <summary>
+        /// 额外数据
+        /// </summary>
         public Dictionary<string, object> Extra { get; set; } = new Dictionary<string, object>();
     }
 }

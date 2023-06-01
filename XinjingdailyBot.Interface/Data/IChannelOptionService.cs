@@ -5,6 +5,9 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Data
 {
+    /// <summary>
+    /// 频道设定仓储服务
+    /// </summary>
     public interface IChannelOptionService : IBaseService<ChannelOptions>
     {
         /// <summary>
@@ -17,6 +20,7 @@ namespace XinjingdailyBot.Interface.Data
         /// 根据UserName获取频道
         /// </summary>
         /// <param name="channelName"></param>
+        /// <param name="channelTitle"></param>
         /// <returns></returns>
         Task<ChannelOptions?> FetchChannelByNameOrTitle(string channelName, string channelTitle);
 

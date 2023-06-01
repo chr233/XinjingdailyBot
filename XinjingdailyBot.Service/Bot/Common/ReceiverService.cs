@@ -10,7 +10,7 @@ using XinjingdailyBot.Interface.Bot.Common;
 namespace XinjingdailyBot.Service.Bot.Common
 {
     [AppService(typeof(IReceiverService), LifeTime.Scoped)]
-    public class ReceiverService : IReceiverService
+    internal class ReceiverService : IReceiverService
     {
         private readonly ITelegramBotClient _botClient;
         private readonly IUpdateService _updateService;

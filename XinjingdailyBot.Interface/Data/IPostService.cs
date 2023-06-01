@@ -4,6 +4,9 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Data
 {
+    /// <summary>
+    /// 投稿服务
+    /// </summary>
     public interface IPostService : IBaseService<NewPosts>
     {
         /// <summary>
@@ -23,6 +26,8 @@ namespace XinjingdailyBot.Interface.Data
         /// 检查用户是否达到每日投稿上限
         /// </summary>
         /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <param name="query"></param>
         /// <returns>true: 可以继续投稿 false: 无法继续投稿</returns>
         Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null);
         /// <summary>

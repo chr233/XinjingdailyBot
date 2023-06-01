@@ -5,6 +5,9 @@ using XinjingdailyBot.Model.Base;
 
 namespace XinjingdailyBot.Model.Models
 {
+    /// <summary>
+    /// 旧的稿件表
+    /// </summary>
     [Obsolete("弃用表")]
     [SugarTable("post", TableDescription = "投稿记录")]
     [SugarIndex("index_origin_cid", nameof(OriginChatID), OrderByType.Asc)]
@@ -19,6 +22,9 @@ namespace XinjingdailyBot.Model.Models
     [SugarIndex("index_status_modifyat", nameof(Status), OrderByType.Asc, nameof(ModifyAt), OrderByType.Asc)]
     public sealed record OldPosts : BaseModel
     {
+        /// <summary>
+        /// 主键
+        /// </summary>
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
         /// <summary>

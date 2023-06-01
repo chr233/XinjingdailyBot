@@ -2,6 +2,7 @@
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Model.Base;
+using XinjingdailyBot.Model.Columns;
 
 namespace XinjingdailyBot.Model.Models
 {
@@ -11,8 +12,11 @@ namespace XinjingdailyBot.Model.Models
     [SugarTable("user", TableDescription = "用户表")]
     [SugarIndex("index_userid", nameof(UserID), OrderByType.Asc, true)]
     [SugarIndex("index_username", nameof(UserName), OrderByType.Asc)]
-    public sealed record Users : BaseModel
+    public sealed record Users : BaseModel, IModifyAt, ICreateAt
     {
+        /// <summary>
+        /// 主键
+        /// </summary>
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
         /// <summary>
@@ -24,9 +28,12 @@ namespace XinjingdailyBot.Model.Models
         /// </summary>
         public string UserName { get; set; } = "";
         /// <summary>
-        /// 用户昵称
+        /// 用户昵称 姓
         /// </summary>
         public string FirstName { get; set; } = "";
+        /// <summary>
+        /// 用户昵称 名
+        /// </summary>
         public string LastName { get; set; } = "";
         /// <summary>
         /// 用户昵称
@@ -98,15 +105,15 @@ namespace XinjingdailyBot.Model.Models
         /// 私聊ChatID, 默认 -1;
         /// </summary>
         public long PrivateChatID { get; set; } = -1;
-        /// <summary>
-        /// 创建时间
-        /// </summary>
+        /// <inheritdoc cref="ICreateAt"/>
         public DateTime CreateAt { get; set; } = DateTime.Now;
-        /// <summary>
-        /// 修改时间
-        /// </summary>
+        /// <inheritdoc cref="IModifyAt"/>
         public DateTime ModifyAt { get; set; } = DateTime.Now;
 
+        /// <summary>
+        /// 文本显示
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             if (string.IsNullOrEmpty(UserName))
@@ -119,6 +126,10 @@ namespace XinjingdailyBot.Model.Models
             }
         }
 
+        /// <summary>
+        /// Html链接
+        /// </summary>
+        /// <returns></returns>
         public string HtmlUserLink()
         {
             string nick = FullName.EscapeHtml();
@@ -133,6 +144,10 @@ namespace XinjingdailyBot.Model.Models
             }
         }
 
+        /// <summary>
+        /// 用户名转义
+        /// </summary>
+        /// <returns></returns>
         public string EscapedFullName()
         {
             return FullName.EscapeHtml();

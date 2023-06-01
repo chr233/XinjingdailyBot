@@ -14,7 +14,7 @@ using XinjingdailyBot.Model.Models;
 namespace XinjingdailyBot.Service.Bot.Handler
 {
     [AppService(typeof(IForwardMessageHandler), LifeTime.Singleton)]
-    public class ForwardMessageHandler : IForwardMessageHandler
+    internal class ForwardMessageHandler : IForwardMessageHandler
     {
         private readonly IChannelService _channelService;
         private readonly ITelegramBotClient _botClient;

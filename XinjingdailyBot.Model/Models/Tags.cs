@@ -3,10 +3,16 @@ using XinjingdailyBot.Model.Base;
 
 namespace XinjingdailyBot.Model.Models
 {
+    /// <summary>
+    /// 投稿标签
+    /// </summary>
     [SugarTable("tag", TableDescription = "投稿标签")]
     [SugarIndex("payload", nameof(Payload), OrderByType.Asc, true)]
     public sealed record Tags : BaseModel
     {
+        /// <summary>
+        /// 主键
+        /// </summary>
         [SugarColumn(IsPrimaryKey = true)]
         public int Id { get; set; }
         /// <summary>

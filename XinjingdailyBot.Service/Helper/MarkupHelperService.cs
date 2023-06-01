@@ -10,8 +10,9 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Helper
 {
+    /// <inheritdoc cref="IMarkupHelperService"/>
     [AppService(typeof(IMarkupHelperService), LifeTime.Transient)]
-    public sealed class MarkupHelperService : IMarkupHelperService
+    internal sealed class MarkupHelperService : IMarkupHelperService
     {
         private readonly GroupRepository _groupRepository;
         private readonly IChannelService _channelService;
@@ -108,7 +109,7 @@ namespace XinjingdailyBot.Service.Helper
             foreach (var tag in tags)
             {
                 line.Add(InlineKeyboardButton.WithCallbackData(tag.DisplayName, $"review tag {tag.Payload}"));
-                lineChars += tag.DisplayName.Length;
+                lineChars += tag.DisplayName.Length -1;
                 if (lineChars >= IMarkupHelperService.MaxLineChars)
                 {
                     lineChars = 0;

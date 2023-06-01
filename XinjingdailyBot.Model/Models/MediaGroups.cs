@@ -4,11 +4,17 @@ using XinjingdailyBot.Model.Columns;
 
 namespace XinjingdailyBot.Model.Models
 {
+    /// <summary>
+    /// 媒体组记录
+    /// </summary>
     [SugarTable("post_group", TableDescription = "媒体组稿件记录")]
     [SugarIndex("index_msg", nameof(ChatID), OrderByType.Asc, nameof(MessageID), OrderByType.Asc)]
     [SugarIndex("index_groupid", nameof(MediaGroupID), OrderByType.Asc)]
     public sealed record MediaGroups : BaseModel, ICreateAt
     {
+        /// <summary>
+        /// 主键
+        /// </summary>
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
         /// <summary>

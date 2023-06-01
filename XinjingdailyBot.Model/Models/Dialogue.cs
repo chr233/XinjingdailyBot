@@ -4,10 +4,16 @@ using XinjingdailyBot.Model.Columns;
 
 namespace XinjingdailyBot.Model.Models
 {
+    /// <summary>
+    /// 消息记录
+    /// </summary>
     [SugarTable("dialogue", TableDescription = "消息记录")]
     [SugarIndex("index_chat", nameof(ChatID), OrderByType.Asc, nameof(MessageID), OrderByType.Asc, true)]
     public sealed record Dialogue : BaseModel, ICreateAt
     {
+        /// <summary>
+        /// 主键
+        /// </summary>
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
         /// <summary>

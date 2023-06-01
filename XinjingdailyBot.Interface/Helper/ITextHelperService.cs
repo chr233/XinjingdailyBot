@@ -3,6 +3,9 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Helper
 {
+    /// <summary>
+    /// Text工具类服务
+    /// </summary>
     public interface ITextHelperService
     {
         /// <summary>
@@ -43,13 +46,14 @@ namespace XinjingdailyBot.Interface.Helper
         /// <summary>
         /// 生成通知消息(审核通过）
         /// </summary>
-        /// <param name="rejectReason"></param>
+        /// <param name="isDirect"></param>
+        /// <param name="messageID"></param>
         /// <returns></returns>
         string MakeNotification(bool isDirect, long messageID);
         /// <summary>
         /// 生成通知消息(审核未通过）
         /// </summary>
-        /// <param name="rejectReason"></param>
+        /// <param name="reason"></param>
         /// <returns></returns>
         string MakeNotification(string reason);
         /// <summary>
@@ -57,6 +61,7 @@ namespace XinjingdailyBot.Interface.Helper
         /// </summary>
         /// <param name="post"></param>
         /// <param name="poster"></param>
+        /// <param name="channel"></param>
         /// <returns></returns>
         string MakePoster(NewPosts post, Users poster, ChannelOptions? channel);
         /// <summary>
@@ -64,6 +69,7 @@ namespace XinjingdailyBot.Interface.Helper
         /// </summary>
         /// <param name="post"></param>
         /// <param name="poster"></param>
+        /// <param name="channel"></param>
         /// <returns></returns>
         string MakePostText(NewPosts post, Users poster, ChannelOptions? channel);
         /// <summary>
@@ -77,7 +83,7 @@ namespace XinjingdailyBot.Interface.Helper
         /// 生成审核消息(审核通过, 直接发布)
         /// </summary>
         /// <param name="poster"></param>
-        /// <param name="reviewer"></param>
+        /// <param name="messageID"></param>
         /// <param name="anymouse"></param>
         /// <returns></returns>
         string MakeReviewMessage(Users poster, long messageID, bool anymouse);
@@ -94,6 +100,8 @@ namespace XinjingdailyBot.Interface.Helper
         /// </summary>
         /// <param name="poster"></param>
         /// <param name="reviewer"></param>
+        /// <param name="anymouse"></param>
+        /// <param name="rejectReason"></param>
         /// <returns></returns>
         string MakeReviewMessage(Users poster, Users reviewer, bool anymouse, string rejectReason);
         /// <summary>

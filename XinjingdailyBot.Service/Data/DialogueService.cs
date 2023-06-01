@@ -7,8 +7,9 @@ using XinjingdailyBot.Service.Data.Base;
 
 namespace XinjingdailyBot.Service.Data
 {
+    /// <inheritdoc cref="IDialogueService"/>
     [AppService(typeof(IDialogueService), LifeTime.Transient)]
-    public sealed class DialogueService : BaseService<Dialogue>, IDialogueService
+    internal sealed class DialogueService : BaseService<Dialogue>, IDialogueService
     {
         public async Task RecordMessage(Message message)
         {

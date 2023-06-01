@@ -6,8 +6,9 @@ using XinjingdailyBot.Service.Data.Base;
 
 namespace XinjingdailyBot.Service.Data
 {
+    /// <inheritdoc cref="IUserTokenService"/>
     [AppService(typeof(IUserTokenService), LifeTime.Singleton)]
-    public sealed class UserTokenService : BaseService<UserTokens>, IUserTokenService
+    internal sealed class UserTokenService : BaseService<UserTokens>, IUserTokenService
     {
         private readonly ILogger<UserTokenService> _logger;
         private readonly IUserService _userService;
@@ -20,7 +21,7 @@ namespace XinjingdailyBot.Service.Data
             _userService = userService;
         }
 
-        public async Task<UserTokens?> GenerateNewUserToken(Users dbUser)
+        public async Task<UserTokens> GenerateNewUserToken(Users dbUser)
         {
             var token = await Queryable().Where(x => x.UserID == dbUser.UserID).FirstAsync();
             if (token == null)

@@ -5,9 +5,15 @@ using XinjingdailyBot.Model.Columns;
 
 namespace XinjingdailyBot.Model.Models
 {
+    /// <summary>
+    /// 广告投放
+    /// </summary>
     [SugarTable("ad", TableDescription = "广告投放")]
     public sealed record Advertises : BaseModel, ICreateAt
     {
+        /// <summary>
+        /// 主键
+        /// </summary>
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
         /// <summary>

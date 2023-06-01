@@ -5,11 +5,18 @@ using XinjingdailyBot.Repository.Base;
 
 namespace XinjingdailyBot.Repository
 {
+    /// <summary>
+    /// 拒绝理由仓储类
+    /// </summary>
     [AppService(LifeTime.Singleton)]
     public class RejectReasonRepository : BaseRepository<RejectReasons>
     {
         private readonly ILogger<RejectReasonRepository> _logger;
 
+        /// <summary>
+        /// 拒绝理由仓储类
+        /// </summary>
+        /// <param name="logger"></param>
         public RejectReasonRepository(ILogger<RejectReasonRepository> logger)
         {
             _logger = logger;

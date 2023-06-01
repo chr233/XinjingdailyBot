@@ -2,6 +2,9 @@
 
 namespace XinjingdailyBot.Interface.Bot.Common
 {
+    /// <summary>
+    /// 频道和群组信息服务
+    /// </summary>
     public interface IChannelService
     {
         /// <summary>

@@ -19,8 +19,11 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Command
 {
+    /// <summary>
+    /// 超级管理员命令
+    /// </summary>
     [AppService(LifeTime.Scoped)]
-    public class SuperCommand
+    internal class SuperCommand
     {
         private readonly ILogger<SuperCommand> _logger;
         private readonly ITelegramBotClient _botClient;

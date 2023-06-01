@@ -148,7 +148,7 @@ csharp_style_conditional_delegate_call = true:warning
 csharp_style_prefer_parameter_null_checking = true:suggestion
 csharp_style_var_when_type_is_apparent = false:warning
 csharp_prefer_simple_using_statement = true:warning
-csharp_style_namespace_declarations = block_scoped:suggestion
+csharp_style_namespace_declarations = block_scoped:warning
 csharp_style_prefer_method_group_conversion = true:silent
 
 # IDE0036: 对修饰符排序
@@ -171,6 +171,7 @@ csharp_style_prefer_extended_property_pattern = true:suggestion
 csharp_style_prefer_not_pattern = true:suggestion
 csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimental = true:silent
 csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental = true:silent
+csharp_style_prefer_readonly_struct_member = true:suggestion
 
 [*.vb]
 #### 命名样式 ####

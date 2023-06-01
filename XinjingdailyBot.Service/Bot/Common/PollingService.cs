@@ -9,7 +9,7 @@ using XinjingdailyBot.Repository;
 namespace XinjingdailyBot.Service.Bot.Common
 {
     /// <summary>
-    /// 注册消息接收器
+    /// 消息接收服务
     /// </summary>
     public class PollingService : BackgroundService
     {
@@ -22,6 +22,17 @@ namespace XinjingdailyBot.Service.Bot.Common
         private readonly TagRepository _tagRepository;
         private readonly RejectReasonRepository _rejectReasonRepository;
 
+        /// <summary>
+        /// 消息接收服务
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+        /// <param name="logger"></param>
+        /// <param name="channelService"></param>
+        /// <param name="commandHandler"></param>
+        /// <param name="groupRepository"></param>
+        /// <param name="levelRepository"></param>
+        /// <param name="tagRepository"></param>
+        /// <param name="rejectReasonRepository"></param>
         public PollingService(
             IServiceProvider serviceProvider,
             ILogger<PollingService> logger,
@@ -42,6 +53,11 @@ namespace XinjingdailyBot.Service.Bot.Common
             _rejectReasonRepository = rejectReasonRepository;
         }
 
+        /// <summary>
+        /// 执行
+        /// </summary>
+        /// <param name="stoppingToken"></param>
+        /// <returns></returns>
         [RequiresUnreferencedCode("不兼容剪裁")]
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {

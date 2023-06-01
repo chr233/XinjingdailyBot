@@ -18,8 +18,9 @@ using XinjingdailyBot.Service.Data.Base;
 
 namespace XinjingdailyBot.Service.Data
 {
+    /// <inheritdoc cref="IUserService"/>
     [AppService(typeof(IUserService), LifeTime.Singleton)]
-    public sealed class UserService : BaseService<Users>, IUserService
+    internal sealed class UserService : BaseService<Users>, IUserService
     {
         private readonly ILogger<UserService> _logger;
         private readonly OptionsSetting _optionsSetting;

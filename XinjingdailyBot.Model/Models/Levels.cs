@@ -9,6 +9,9 @@ namespace XinjingdailyBot.Model.Models
     [SugarTable("level", TableDescription = "等级组")]
     public sealed record Levels : BaseModel
     {
+        /// <summary>
+        /// 主键
+        /// </summary>
         [SugarColumn(IsPrimaryKey = true)]
         public int Id { get; set; }
         /// <summary>

@@ -4,6 +4,9 @@ using Telegram.Bot.Types.Enums;
 
 namespace XinjingdailyBot.Infrastructure.Extensions
 {
+    /// <summary>
+    /// Logger扩展
+    /// </summary>
     public static class LoggerExtensions
     {
         /// <summary>

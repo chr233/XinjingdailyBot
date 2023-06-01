@@ -3,6 +3,9 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Bot.Handler
 {
+    /// <summary>
+    /// 频道消息处理器
+    /// </summary>
     public interface IChannelPostHandler
     {
         /// <summary>

@@ -12,8 +12,9 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Helper
 {
+    /// <inheritdoc cref="ITextHelperService"/>
     [AppService(typeof(ITextHelperService), LifeTime.Transient)]
-    public sealed class TextHelperService : ITextHelperService
+    internal sealed class TextHelperService : ITextHelperService
     {
         private readonly IChannelService _channelService;
         private readonly TagRepository _tagRepository;
@@ -171,14 +172,14 @@ namespace XinjingdailyBot.Service.Helper
 
             if (post.IsFromChannel && !string.IsNullOrEmpty(channel?.ChannelName))
             {
-                var link = HtmlMessageLink(post.ChannelMsgId, channel.ChannelTitle, channel.ChannelName);
+                var link = HtmlMessageLink(post.ChannelMsgId, channel.ChannelName, channel.ChannelTitle);
                 if (post.Anonymous)
                 {
-                    return $"<i>from</i> {channel}";
+                    return $"<i>from</i> {link}";
                 }
                 else
                 {
-                    return $"<i>from</i> {channel} <i>via</i> {user}";
+                    return $"<i>from</i> {link} <i>via</i> {user}";
                 }
             }
             else

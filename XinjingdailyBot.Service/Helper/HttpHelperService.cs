@@ -7,8 +7,9 @@ using XinjingdailyBot.Interface.Helper;
 
 namespace XinjingdailyBot.Service.Helper
 {
+    /// <inheritdoc cref="IHttpHelperService"/>
     [AppService(typeof(IHttpHelperService), LifeTime.Transient)]
-    public sealed class HttpHelperService : IHttpHelperService
+    internal sealed class HttpHelperService : IHttpHelperService
     {
         private readonly ILogger<HttpHelperService> _logger;
         private readonly IHttpClientFactory _httpClientFactory;

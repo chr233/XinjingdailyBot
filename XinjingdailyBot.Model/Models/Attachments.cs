@@ -4,10 +4,16 @@ using XinjingdailyBot.Model.Base;
 
 namespace XinjingdailyBot.Model.Models
 {
+    /// <summary>
+    /// 投稿附件
+    /// </summary>
     [SugarTable("attachment", TableDescription = "投稿附件")]
     [SugarIndex("index_post_id", nameof(PostID), OrderByType.Asc)]
     public sealed record Attachments : BaseModel
     {
+        /// <summary>
+        /// 主键
+        /// </summary>
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
         /// <summary>

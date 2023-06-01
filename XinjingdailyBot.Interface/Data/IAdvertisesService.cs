@@ -3,6 +3,9 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Data
 {
+    /// <summary>
+    /// 广告服务
+    /// </summary>
     public interface IAdvertisesService : IBaseService<Advertises>
     {
         /// <summary>

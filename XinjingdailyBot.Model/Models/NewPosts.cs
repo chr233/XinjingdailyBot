@@ -6,6 +6,9 @@ using XinjingdailyBot.Model.Columns;
 
 namespace XinjingdailyBot.Model.Models
 {
+    /// <summary>
+    /// 新的稿件表
+    /// </summary>
     [SugarTable("new_post", TableDescription = "投稿记录")]
     [SugarIndex("index_origin", nameof(OriginChatID), OrderByType.Asc, nameof(OriginMsgID), OrderByType.Asc)]
     [SugarIndex("index_originaction", nameof(OriginActionChatID), OrderByType.Asc, nameof(OriginActionMsgID), OrderByType.Asc)]
@@ -19,6 +22,9 @@ namespace XinjingdailyBot.Model.Models
     [SugarIndex("index_status_modifyat", nameof(Status), OrderByType.Asc, nameof(ModifyAt), OrderByType.Asc)]
     public sealed record NewPosts : BaseModel, IModifyAt, ICreateAt
     {
+        /// <summary>
+        /// 主键
+        /// </summary>
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
         /// <summary>
