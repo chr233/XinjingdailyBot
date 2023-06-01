@@ -19,7 +19,7 @@
 ## 心惊报投稿机器人 Telegram 投稿机器人
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/67ca08867b7a4afda91db3b70bcd303c)](https://www.codacy.com/gh/chr233/XinjingdailyBot/dashboard)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/chr233/XinjingdailyBot/autobuild.yml?logo=github)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/chr233/XinjingdailyBot/publish.yml?logo=github)
 [![License](https://img.shields.io/github/license/chr233/XinjingdailyBot?logo=apache)](https://github.com/chr233/XinjingdailyBot/blob/master/license)
 
 [![GitHub Release](https://img.shields.io/github/v/release/chr233/XinjingdailyBot?logo=github)](https://github.com/chr233/XinjingdailyBot/releases)
