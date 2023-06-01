@@ -20,8 +20,11 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Command
 {
+    /// <summary>
+    /// 管理员命令
+    /// </summary>
     [AppService(LifeTime.Scoped)]
-    public class AdminCommand
+    internal class AdminCommand
     {
         private readonly ILogger<AdminCommand> _logger;
         private readonly ITelegramBotClient _botClient;
@@ -555,6 +558,7 @@ namespace XinjingdailyBot.Command
         /// <summary>
         /// 回复用户
         /// </summary>
+        /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
@@ -652,6 +656,7 @@ namespace XinjingdailyBot.Command
         /// <summary>
         /// 搜索用户翻页
         /// </summary>
+        /// <param name="dbUser"></param>
         /// <param name="callbackQuery"></param>
         /// <param name="args"></param>
         /// <returns></returns>
@@ -1020,6 +1025,7 @@ namespace XinjingdailyBot.Command
         /// 设置用户组
         /// </summary>
         /// <param name="dbUser"></param>
+        /// <param name="callbackQuery"></param>
         /// <param name="args"></param>
         /// <returns></returns>
         [QueryCmd("SETUSERGROUP", EUserRights.AdminCmd)]
@@ -1135,6 +1141,7 @@ namespace XinjingdailyBot.Command
         /// <summary>
         /// 联BAN用户
         /// </summary>
+        /// <param name="dbUser"></param>
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
@@ -1208,7 +1215,7 @@ namespace XinjingdailyBot.Command
         /// 联BAN用户
         /// </summary>
         /// <param name="dbUser"></param>
-        /// <param name="message"></param>
+        /// <param name="callbackQuery"></param>
         /// <param name="args"></param>
         /// <returns></returns>
         [QueryCmd("NUKE", EUserRights.AdminCmd, Description = "联BAN用户")]
@@ -1322,8 +1329,8 @@ namespace XinjingdailyBot.Command
         /// <summary>
         /// 获取WebAPI密钥
         /// </summary>
+        /// <param name="dbUser"></param>
         /// <param name="message"></param>
-        /// <param name="args"></param>
         /// <returns></returns>
         [TextCmd("TOKEN", EUserRights.AdminCmd, Description = "获取WebAPI密钥")]
         public async Task ResponseToken(Users dbUser, Message message)

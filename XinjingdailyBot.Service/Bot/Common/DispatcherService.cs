@@ -11,6 +11,7 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Bot.Common
 {
+    /// <inheritdoc cref="IDispatcherService"/>
     [AppService(typeof(IDispatcherService), LifeTime.Scoped)]
     internal class DispatcherService : IDispatcherService
     {

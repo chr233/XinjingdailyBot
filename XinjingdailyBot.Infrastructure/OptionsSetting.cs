@@ -2,6 +2,9 @@
 
 namespace XinjingdailyBot.Infrastructure
 {
+    /// <summary>
+    /// 机器人配置
+    /// </summary>
     public sealed record OptionsSetting
     {
         /// <summary>

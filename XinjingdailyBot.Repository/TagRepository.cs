@@ -6,11 +6,18 @@ using XinjingdailyBot.Repository.Base;
 
 namespace XinjingdailyBot.Repository
 {
+    /// <summary>
+    /// 标签仓储类
+    /// </summary>
     [AppService(LifeTime.Singleton)]
     public class TagRepository : BaseRepository<Tags>
     {
         private readonly ILogger<GroupRepository> _logger;
 
+        /// <summary>
+        /// 标签仓储类
+        /// </summary>
+        /// <param name="logger"></param>
         public TagRepository(ILogger<GroupRepository> logger)
         {
             _logger = logger;
@@ -305,9 +312,20 @@ namespace XinjingdailyBot.Repository
     /// </summary>
     public sealed record TagPayload
     {
+        /// <summary>
+        /// 显示名称
+        /// </summary>
         public string DisplayName { get; set; } = "";
+        /// <summary>
+        /// Payload
+        /// </summary>
         public string Payload { get; set; } = "";
 
+        /// <summary>
+        /// Tag结构体
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="payload"></param>
         public TagPayload(string name, string payload)
         {
             DisplayName = name;

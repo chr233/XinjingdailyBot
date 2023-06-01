@@ -3,6 +3,9 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Bot.Handler
 {
+    /// <summary>
+    /// 申请加群处理器
+    /// </summary>
     public interface IJoinRequestHandler
     {
         /// <summary>

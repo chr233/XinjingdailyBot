@@ -11,7 +11,7 @@ namespace XinjingdailyBot.Service.Bot.Common
 {
     [AppService(typeof(IChannelService), LifeTime.Singleton)]
 
-    public class ChannelService : IChannelService
+    internal class ChannelService : IChannelService
     {
         private readonly ITelegramBotClient _botClient;
         private readonly OptionsSetting _optionsSetting;

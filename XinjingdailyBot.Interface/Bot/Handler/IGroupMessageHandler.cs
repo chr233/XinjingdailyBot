@@ -3,6 +3,9 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Bot.Handler
 {
+    /// <summary>
+    /// 群组消息处理器
+    /// </summary>
     public interface IGroupMessageHandler
     {
         /// <summary>

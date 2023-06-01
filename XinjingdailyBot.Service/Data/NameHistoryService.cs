@@ -5,8 +5,9 @@ using XinjingdailyBot.Service.Data.Base;
 
 namespace XinjingdailyBot.Service.Data
 {
+    /// <inheritdoc cref="INameHistoryService"/>
     [AppService(typeof(INameHistoryService), LifeTime.Singleton)]
-    public sealed class NameHistoryService : BaseService<NameHistory>, INameHistoryService
+    internal sealed class NameHistoryService : BaseService<NameHistory>, INameHistoryService
     {
         public async Task CreateNameHistory(Users dbUser)
         {

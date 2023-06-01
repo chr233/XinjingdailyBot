@@ -7,8 +7,9 @@ using XinjingdailyBot.Service.Data.Base;
 
 namespace XinjingdailyBot.Service.Data
 {
+    /// <inheritdoc cref="IMediaGroupService"/>
     [AppService(typeof(IMediaGroupService), LifeTime.Singleton)]
-    public sealed class MediaGroupService : BaseService<MediaGroups>, IMediaGroupService
+    internal sealed class MediaGroupService : BaseService<MediaGroups>, IMediaGroupService
     {
         public async Task AddPostMediaGroup(Message message)
         {

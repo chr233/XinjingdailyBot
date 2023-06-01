@@ -13,8 +13,11 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Command
 {
+    /// <summary>
+    /// 审核命令
+    /// </summary>
     [AppService(LifeTime.Scoped)]
-    public class ReviewCommand
+    internal class ReviewCommand
     {
         private readonly ITelegramBotClient _botClient;
         private readonly IUserService _userService;

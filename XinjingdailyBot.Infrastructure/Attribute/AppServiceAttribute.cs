@@ -22,17 +22,32 @@
         /// </summary>
         public bool InterfaceServiceType { get; set; }
 
+        /// <summary>
+        /// 标记服务
+        /// </summary>
+        /// <param name="serviceLifetime"></param>
         public AppServiceAttribute(LifeTime serviceLifetime)
         {
             ServiceLifetime = serviceLifetime;
         }
 
+        /// <summary>
+        /// 标记服务
+        /// </summary>
+        /// <param name="serviceType"></param>
+        /// <param name="serviceLifetime"></param>
         public AppServiceAttribute(Type? serviceType, LifeTime serviceLifetime)
         {
             ServiceLifetime = serviceLifetime;
             ServiceType = serviceType;
         }
 
+        /// <summary>
+        /// 标记服务
+        /// </summary>
+        /// <param name="serviceType"></param>
+        /// <param name="serviceLifetime"></param>
+        /// <param name="interfaceServiceType"></param>
         public AppServiceAttribute(Type? serviceType, LifeTime serviceLifetime, bool interfaceServiceType)
         {
             ServiceLifetime = serviceLifetime;
@@ -41,6 +56,9 @@
         }
     }
 
+    /// <summary>
+    /// 生命周期
+    /// </summary>
     public enum LifeTime
     {
         /// <summary>

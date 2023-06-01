@@ -18,8 +18,9 @@ using XinjingdailyBot.Service.Data.Base;
 
 namespace XinjingdailyBot.Service.Data
 {
+    /// <inheritdoc cref="IPostService"/>
     [AppService(typeof(IPostService), LifeTime.Singleton)]
-    public sealed class PostService : BaseService<NewPosts>, IPostService
+    internal sealed class PostService : BaseService<NewPosts>, IPostService
     {
         private readonly ILogger<PostService> _logger;
         private readonly IAttachmentService _attachmentService;
@@ -636,7 +637,11 @@ namespace XinjingdailyBot.Service.Data
                 poster.PostCount++;
             }
 
-            var channel = await _channelOptionService.FetchChannelByChannelId(post.ChannelID);
+            ChannelOptions? channel = null;
+            if (post.IsFromChannel)
+            {
+                channel = await _channelOptionService.FetchChannelByChannelId(post.ChannelID);
+            }
             string postText = _textHelperService.MakePostText(post, poster, channel);
 
             bool hasSpoiler = post.HasSpoiler;

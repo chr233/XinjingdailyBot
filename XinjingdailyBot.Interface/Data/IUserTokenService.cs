@@ -3,6 +3,9 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Data
 {
+    /// <summary>
+    /// 用户Token仓储服务
+    /// </summary>
     public interface IUserTokenService : IBaseService<UserTokens>
     {
         /// <summary>
@@ -15,7 +18,7 @@ namespace XinjingdailyBot.Interface.Data
         /// </summary>
         /// <param name="dbUser"></param>
         /// <returns></returns>
-        Task<UserTokens?> GenerateNewUserToken(Users dbUser);
+        Task<UserTokens> GenerateNewUserToken(Users dbUser);
         /// <summary>
         /// 获取已有的Token
         /// </summary>

@@ -3,6 +3,9 @@ using XinjingdailyBot.Infrastructure.Model;
 
 namespace XinjingdailyBot.Interface.Helper
 {
+    /// <summary>
+    /// Http请求服务
+    /// </summary>
     public interface IHttpHelperService
     {
         /// <summary>

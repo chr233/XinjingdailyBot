@@ -5,6 +5,9 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace XinjingdailyBot.Infrastructure.Extensions
 {
+    /// <summary>
+    /// BotClient扩展
+    /// </summary>
     public static class BotClientExtension
     {
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
@@ -15,6 +18,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         /// <param name="botClient"></param>
         /// <param name="text"></param>
         /// <param name="message"></param>
+        /// <param name="parsemode"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public static async Task<Message> AutoReplyAsync(
@@ -33,6 +37,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         /// <param name="botClient"></param>
         /// <param name="text"></param>
         /// <param name="query"></param>
+        /// <param name="showAlert"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public static async Task AutoReplyAsync(
@@ -85,6 +90,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         /// <param name="text"></param>
         /// <param name="replyMarkup"></param>
         /// <param name="parseMode"></param>
+        /// <param name="disableWebPagePreview"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public static async Task<Message> EditMessageTextAsync(
@@ -108,6 +114,7 @@ namespace XinjingdailyBot.Infrastructure.Extensions
         /// <param name="message"></param>
         /// <param name="autoDelete">私聊始终不删除消息, 群聊中默认删除消息, 但可以指定不删除</param>
         /// <param name="parsemode"></param>
+        /// <param name="replyMarkup"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public static async Task<Message> SendCommandReply(

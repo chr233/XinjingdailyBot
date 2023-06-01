@@ -14,8 +14,11 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Command
 {
+    /// <summary>
+    /// 通用命令
+    /// </summary>
     [AppService(LifeTime.Scoped)]
-    public class NormalCommand
+    internal class NormalCommand
     {
         private readonly ITelegramBotClient _botClient;
         private readonly IUserService _userService;
@@ -299,7 +302,6 @@ namespace XinjingdailyBot.Command
         /// </summary>
         /// <param name="dbUser"></param>
         /// <param name="callbackQuery"></param>
-        /// <param name="args"></param>
         /// <returns></returns>
         [QueryCmd("BACKRANDOMPOST", EUserRights.NormalCmd)]
         public async Task QResponseBackRandomPost(Users dbUser, CallbackQuery callbackQuery)

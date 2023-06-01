@@ -2,7 +2,7 @@
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
 
-namespace XinjingdailyBot.WebAPI.Controllers
+namespace XinjingdailyBot.WebAPI.IPC.Controllers
 {
     /// <summary>
     /// 主页控制器

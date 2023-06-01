@@ -10,7 +10,7 @@ namespace XinjingdailyBot.Tasks
     /// 拒稿存档频道置顶
     /// </summary>
     [Job("0 0 0 * * ?")]
-    public class RejectChannelTask : IJob
+    internal class RejectChannelTask : IJob
     {
         private readonly ILogger<RejectChannelTask> _logger;
         private readonly IChannelService _channelService;

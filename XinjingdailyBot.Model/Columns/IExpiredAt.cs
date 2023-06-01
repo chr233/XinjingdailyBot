@@ -6,7 +6,7 @@
 public interface IExpiredAt
 {
     /// <summary>
-    /// 修改时间
+    /// 过期时间
     /// </summary>
     DateTime ExpiredAt { get; set; }
 }

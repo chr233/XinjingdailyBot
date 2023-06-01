@@ -5,11 +5,18 @@ using XinjingdailyBot.Repository.Base;
 
 namespace XinjingdailyBot.Repository
 {
+    /// <summary>
+    /// 用户等级仓储类
+    /// </summary>
     [AppService(LifeTime.Singleton)]
     public class LevelRepository : BaseRepository<Levels>
     {
         private readonly ILogger<LevelRepository> _logger;
 
+        /// <summary>
+        /// 用户等级仓储类
+        /// </summary>
+        /// <param name="logger"></param>
         public LevelRepository(ILogger<LevelRepository> logger)
         {
             _logger = logger;
@@ -70,6 +77,11 @@ namespace XinjingdailyBot.Repository
             await Storageable(levels).ExecuteCommandAsync();
         }
 
+        /// <summary>
+        /// 根据ID获取等级
+        /// </summary>
+        /// <param name="levelId"></param>
+        /// <returns></returns>
         public Levels? GetLevelById(int levelId)
         {
             if (_levelCache.TryGetValue(levelId, out var level))
@@ -79,6 +91,10 @@ namespace XinjingdailyBot.Repository
             return null;
         }
 
+        /// <summary>
+        /// 获取最大的等级ID
+        /// </summary>
+        /// <returns></returns>
         public int GetMaxLevelId()
         {
             if (_levelCache.Count > 0)
@@ -88,17 +104,31 @@ namespace XinjingdailyBot.Repository
             return 0;
         }
 
+        /// <summary>
+        /// 是否有ID对应等级
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
         public bool HasLevelId(int groupId)
         {
             var group = GetLevelById(groupId);
             return group != null;
         }
 
+        /// <summary>
+        /// 获取默认等级
+        /// </summary>
+        /// <returns></returns>
         public Levels? GetDefaultLevel()
         {
             return GetLevelById(1);
         }
 
+        /// <summary>
+        /// 获取等级名称
+        /// </summary>
+        /// <param name="levelId"></param>
+        /// <returns></returns>
         public string GetLevelName(int levelId)
         {
             var level = GetLevelById(levelId);

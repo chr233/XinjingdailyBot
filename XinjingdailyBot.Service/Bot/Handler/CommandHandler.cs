@@ -23,7 +23,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
     /// 命令处理器
     /// </summary>
     [AppService(typeof(ICommandHandler), LifeTime.Singleton)]
-    public class CommandHandler : ICommandHandler
+    internal class CommandHandler : ICommandHandler
     {
         private readonly ILogger<CommandHandler> _logger;
         private readonly IChannelService _channelService;
@@ -370,6 +370,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
         /// <param name="query"></param>
         /// <param name="type"></param>
         /// <param name="assemblyMethod"></param>
+        /// <param name="args"></param>
         /// <returns></returns>
         private async Task CallQueryCommandAsync(Users dbUser, CallbackQuery query, Type type, AssemblyMethod assemblyMethod, string[] args)
         {

@@ -17,7 +17,7 @@ namespace XinjingdailyBot.Interface.Data
         /// <summary>
         /// 添加媒体组消息
         /// </summary>
-        /// <param name="messages"></param>
+        /// <param name="message"></param>
         /// <returns></returns>
         Task AddPostMediaGroup(Message message);
         /// <summary>

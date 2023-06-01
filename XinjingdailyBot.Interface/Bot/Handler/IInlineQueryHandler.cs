@@ -3,6 +3,9 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Bot.Handler
 {
+    /// <summary>
+    /// InlineQuery查询处理器
+    /// </summary>
     public interface IInlineQueryHandler
     {
         /// <summary>

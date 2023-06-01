@@ -7,8 +7,9 @@ using XinjingdailyBot.Service.Data.Base;
 
 namespace XinjingdailyBot.Service.Data
 {
+    /// <inheritdoc cref="IChannelOptionService"/>
     [AppService(typeof(IChannelOptionService), LifeTime.Transient)]
-    public sealed class ChannelOptionService : BaseService<ChannelOptions>, IChannelOptionService
+    internal sealed class ChannelOptionService : BaseService<ChannelOptions>, IChannelOptionService
     {
         public async Task<EChannelOption> FetchChannelOption(Chat channelChat)
         {
@@ -59,10 +60,6 @@ namespace XinjingdailyBot.Service.Data
 
         public async Task<ChannelOptions?> FetchChannelByChannelId(long channelId)
         {
-            if (channelId <= 0)
-            {
-                return null;
-            }
             var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync();
             return channel;
         }

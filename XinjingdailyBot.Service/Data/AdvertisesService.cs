@@ -5,8 +5,9 @@ using XinjingdailyBot.Service.Data.Base;
 
 namespace XinjingdailyBot.Service.Data
 {
+    /// <inheritdoc cref="IAdvertisesService"/>
     [AppService(typeof(IAdvertisesService), LifeTime.Transient)]
-    public sealed class AdvertisesService : BaseService<Advertises>, IAdvertisesService
+    internal sealed class AdvertisesService : BaseService<Advertises>, IAdvertisesService
     {
         public async Task<Advertises?> GetPostableAdvertise()
         {

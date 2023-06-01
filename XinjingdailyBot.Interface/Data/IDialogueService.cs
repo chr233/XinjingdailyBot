@@ -4,6 +4,9 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Data
 {
+    /// <summary>
+    /// 消息记录仓储服务
+    /// </summary>
     public interface IDialogueService : IBaseService<Dialogue>
     {
         /// <summary>

@@ -14,7 +14,7 @@ using XinjingdailyBot.Repository;
 namespace XinjingdailyBot.Service.Bot.Handler
 {
     [AppService(typeof(IChannelPostHandler), LifeTime.Singleton)]
-    public class ChannelPostHandler : IChannelPostHandler
+    internal class ChannelPostHandler : IChannelPostHandler
     {
         private readonly ILogger<ChannelPostHandler> _logger;
         private readonly IPostService _postService;

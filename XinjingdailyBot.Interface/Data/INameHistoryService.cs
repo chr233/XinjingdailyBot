@@ -2,6 +2,9 @@
 
 namespace XinjingdailyBot.Interface.Data
 {
+    /// <summary>
+    /// 曾用名历史记录服务
+    /// </summary>
     public interface INameHistoryService
     {
         /// <summary>

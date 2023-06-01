@@ -17,9 +17,21 @@
         /// 警告
         /// </summary>
         Warning,
+        /// <summary>
+        /// 全局禁言
+        /// </summary>
         GlobalMute,
+        /// <summary>
+        /// 全局封禁
+        /// </summary>
         GlobalBan,
+        /// <summary>
+        /// 全局解除禁言
+        /// </summary>
         GlobalUnMute,
+        /// <summary>
+        /// 全局解除封禁
+        /// </summary>
         GlobalUnBan,
     }
 }

@@ -15,6 +15,9 @@ namespace XinjingdailyBot.Model.Models
 
     public sealed record BanRecords : BaseModel
     {
+        /// <summary>
+        /// 主键
+        /// </summary>
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
         /// <summary>

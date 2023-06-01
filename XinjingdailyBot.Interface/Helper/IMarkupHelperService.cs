@@ -3,6 +3,9 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Helper
 {
+    /// <summary>
+    /// 消息装饰器工具类服务
+    /// </summary>
     public interface IMarkupHelperService
     {
         /// <summary>
@@ -27,7 +30,7 @@ namespace XinjingdailyBot.Interface.Helper
         /// <summary>
         /// 跳转链接键盘
         /// </summary>
-        /// <param name="link"></param>
+        /// <param name="messageId"></param>
         /// <returns></returns>
         InlineKeyboardMarkup? LinkToOriginPostKeyboard(long messageId);
         /// <summary>
@@ -35,6 +38,7 @@ namespace XinjingdailyBot.Interface.Helper
         /// </summary>
         /// <param name="dbUser"></param>
         /// <param name="targetUser"></param>
+        /// <param name="reason"></param>
         /// <returns></returns>
         InlineKeyboardMarkup NukeMenuKeyboard(Users dbUser, Users targetUser, string reason);
 
@@ -81,7 +85,8 @@ namespace XinjingdailyBot.Interface.Helper
         /// <summary>
         /// 频道选项键盘
         /// </summary>
-        /// <param name="channelOption"></param>
+        /// <param name="dbUser"></param>
+        /// <param name="channelId"></param>
         /// <returns></returns>
         InlineKeyboardMarkup? SetChannelOptionKeyboard(Users dbUser, long channelId);
         /// <summary>
@@ -95,6 +100,7 @@ namespace XinjingdailyBot.Interface.Helper
         /// 生成用户列表键盘
         /// </summary>
         /// <param name="dbUser"></param>
+        /// <param name="query">参数</param>
         /// <param name="current">当前页码</param>
         /// <param name="total">总页码</param>
         /// <returns></returns>

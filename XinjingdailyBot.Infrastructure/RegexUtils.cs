@@ -2,6 +2,9 @@
 
 namespace XinjingdailyBot.Infrastructure
 {
+    /// <summary>
+    /// 正则工具类
+    /// </summary>
     public static partial class RegexUtils
     {
         /// <summary>

@@ -5,6 +5,9 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Data
 {
+    /// <summary>
+    /// 用户仓储服务
+    /// </summary>
     public interface IUserService : IBaseService<Users>
     {
         /// <summary>
@@ -22,7 +25,7 @@ namespace XinjingdailyBot.Interface.Data
         /// <summary>
         /// 根据UserName获取用户
         /// </summary>
-        /// <param name="userID"></param>
+        /// <param name="userName"></param>
         /// <returns></returns>
         Task<Users?> FetchUserByUserName(string? userName);
         /// <summary>
@@ -58,6 +61,7 @@ namespace XinjingdailyBot.Interface.Data
         /// <summary>
         /// 查找用户
         /// </summary>
+        /// <param name="dbUser"></param>
         /// <param name="query"></param>
         /// <param name="page"></param>
         /// <returns></returns>

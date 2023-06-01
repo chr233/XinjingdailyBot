@@ -13,6 +13,9 @@ namespace XinjingdailyBot.Model.Models
     [SugarIndex("index_uid", nameof(UserID), OrderByType.Asc)]
     public sealed record CmdRecords : BaseModel, IExecuteAt
     {
+        /// <summary>
+        /// 主键
+        /// </summary>
         [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
         public int Id { get; set; }
         /// <summary>

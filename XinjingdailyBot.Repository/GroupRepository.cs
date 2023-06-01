@@ -6,11 +6,18 @@ using XinjingdailyBot.Repository.Base;
 
 namespace XinjingdailyBot.Repository
 {
+    /// <summary>
+    /// 用户组仓储类
+    /// </summary>
     [AppService(LifeTime.Singleton)]
     public class GroupRepository : BaseRepository<Groups>
     {
         private readonly ILogger<GroupRepository> _logger;
 
+        /// <summary>
+        /// 用户组仓储类
+        /// </summary>
+        /// <param name="logger"></param>
         public GroupRepository(ILogger<GroupRepository> logger)
         {
             _logger = logger;

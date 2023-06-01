@@ -11,7 +11,7 @@ using XinjingdailyBot.Interface.Data;
 namespace XinjingdailyBot.Service.Bot.Common
 {
     [AppService(typeof(IUpdateService), LifeTime.Scoped)]
-    public class UpdateService : IUpdateService
+    internal class UpdateService : IUpdateService
     {
         private readonly ILogger<UpdateService> _logger;
         private readonly IUserService _userService;

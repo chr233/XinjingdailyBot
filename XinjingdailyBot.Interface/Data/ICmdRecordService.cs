@@ -4,6 +4,9 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Data
 {
+    /// <summary>
+    /// 命令调用记录服务
+    /// </summary>
     public interface ICmdRecordService : IBaseService<CmdRecords>
     {
         /// <summary>

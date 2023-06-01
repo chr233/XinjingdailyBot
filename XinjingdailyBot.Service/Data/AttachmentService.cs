@@ -7,8 +7,9 @@ using XinjingdailyBot.Service.Data.Base;
 
 namespace XinjingdailyBot.Service.Data
 {
+    /// <inheritdoc cref="IAttachmentService"/>
     [AppService(typeof(IAttachmentService), LifeTime.Transient)]
-    public sealed class AttachmentService : BaseService<Attachments>, IAttachmentService
+    internal sealed class AttachmentService : BaseService<Attachments>, IAttachmentService
     {
         public Attachments? GenerateAttachment(Message message, long postID)
         {

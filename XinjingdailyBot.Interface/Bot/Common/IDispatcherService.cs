@@ -3,6 +3,9 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Bot.Common
 {
+    /// <summary>
+    /// 消息分发处理器
+    /// </summary>
     public interface IDispatcherService
     {
         /// <summary>

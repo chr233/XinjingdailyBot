@@ -5,8 +5,9 @@ using XinjingdailyBot.Service.Data.Base;
 
 namespace XinjingdailyBot.Service.Data
 {
+    /// <inheritdoc cref="IBanRecordService"/>
     [AppService(typeof(IBanRecordService), LifeTime.Transient)]
-    public sealed class BanRecordService : BaseService<BanRecords>, IBanRecordService
+    internal sealed class BanRecordService : BaseService<BanRecords>, IBanRecordService
     {
     }
 }

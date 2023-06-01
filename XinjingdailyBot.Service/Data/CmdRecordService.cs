@@ -6,8 +6,9 @@ using XinjingdailyBot.Service.Data.Base;
 
 namespace XinjingdailyBot.Service.Data
 {
+    /// <inheritdoc cref="ICmdRecordService"/>
     [AppService(typeof(ICmdRecordService), LifeTime.Transient)]
-    public sealed class CmdRecordService : BaseService<CmdRecords>, ICmdRecordService
+    internal sealed class CmdRecordService : BaseService<CmdRecords>, ICmdRecordService
     {
         public async Task AddCmdRecord(Message message, Users dbUser, bool handled, bool isQuery, string? exception)
         {

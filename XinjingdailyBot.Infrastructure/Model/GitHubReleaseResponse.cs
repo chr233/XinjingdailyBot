@@ -1,7 +1,12 @@
 ﻿using System.Text.Json.Serialization;
 
+
+
 namespace XinjingdailyBot.Infrastructure.Model
 {
+    /// <summary>
+    /// GitHubRelease响应实体
+    /// </summary>
     public sealed record GitHubReleaseResponse
     {
         [JsonPropertyName("html_url")]
