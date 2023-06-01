@@ -5,94 +5,96 @@ using XinjingdailyBot.Model.Base;
 
 #pragma warning disable CS1591 // 缺少对公共可见类型或成员的 XML 注释
 
-namespace XinjingdailyBot.Repository.Base;
-
-/// <summary>
-/// 仓储处基类接口
-/// </summary>
-/// <typeparam name="T"></typeparam>
-public interface IBaseRepository<T> : ISimpleClient<T> where T : BaseModel, new()
+namespace XinjingdailyBot.Repository.Base
 {
-    #region add
-    int Add(T t);
-
-    int Insert(List<T> t);
-    int Insert(T parm, Expression<Func<T, object>>? iClumns = null, bool ignoreNull = true);
-
-    IInsertable<T> Insertable(T t);
-    #endregion add
-
-    #region update
-    IUpdateable<T> Updateable(T entity);
-    int Update(T entity, bool ignoreNullColumns = false);
 
     /// <summary>
-    /// 只更新表达式的值
+    /// 仓储处基类接口
     /// </summary>
-    /// <param name="entity"></param>
-    /// <param name="expression"></param>
-    /// <param name="ignoreAllNull"></param>
-    /// <returns></returns>
-    int Update(T entity, Expression<Func<T, object>> expression, bool ignoreAllNull = false);
+    /// <typeparam name="T"></typeparam>
+    public interface IBaseRepository<T> : ISimpleClient<T> where T : BaseModel, new()
+    {
+        #region add
+        int Add(T t);
 
-    int Update(T entity, Expression<Func<T, object>> expression, Expression<Func<T, bool>> where);
+        int Insert(List<T> t);
+        int Insert(T parm, Expression<Func<T, object>>? iClumns = null, bool ignoreNull = true);
 
-    int Update(SqlSugarClient client, T entity, Expression<Func<T, object>> expression, Expression<Func<T, bool>> where);
+        IInsertable<T> Insertable(T t);
+        #endregion add
 
-    int Update(Expression<Func<T, bool>> where, Expression<Func<T, T>> columns);
+        #region update
+        IUpdateable<T> Updateable(T entity);
+        int Update(T entity, bool ignoreNullColumns = false);
 
-    #endregion update
-    IStorageable<T> Storageable(T t);
-    IStorageable<T> Storageable(List<T> t);
-    DbResult<bool> UseTran(Action action);
+        /// <summary>
+        /// 只更新表达式的值
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="expression"></param>
+        /// <param name="ignoreAllNull"></param>
+        /// <returns></returns>
+        int Update(T entity, Expression<Func<T, object>> expression, bool ignoreAllNull = false);
 
-    DbResult<bool> UseTran(SqlSugarClient client, Action action);
+        int Update(T entity, Expression<Func<T, object>> expression, Expression<Func<T, bool>> where);
 
-    bool UseTran2(Action action);
+        int Update(SqlSugarClient client, T entity, Expression<Func<T, object>> expression, Expression<Func<T, bool>> where);
 
-    #region delete
-    IDeleteable<T> Deleteable();
-    int Delete(object[] obj);
-    int Delete(object id);
-    int DeleteTable();
-    bool Truncate();
+        int Update(Expression<Func<T, bool>> where, Expression<Func<T, T>> columns);
 
-    #endregion delete
+        #endregion update
+        IStorageable<T> Storageable(T t);
+        IStorageable<T> Storageable(List<T> t);
+        DbResult<bool> UseTran(Action action);
 
-    #region query
-    /// <summary>
-    /// 根据条件查询分页数据
-    /// </summary>
-    /// <param name="where"></param>
-    /// <param name="parm"></param>
-    /// <returns></returns>
-    PagedInfo<T> GetPages(Expression<Func<T, bool>> where, PagerInfo parm);
+        DbResult<bool> UseTran(SqlSugarClient client, Action action);
 
-    PagedInfo<T> GetPages(Expression<Func<T, bool>> where, PagerInfo parm, Expression<Func<T, object>> order, OrderByType orderEnum = OrderByType.Asc);
-    PagedInfo<T> GetPages(Expression<Func<T, bool>> where, PagerInfo parm, Expression<Func<T, object>> order, string orderByType);
+        bool UseTran2(Action action);
 
-    bool Any(Expression<Func<T, bool>> expression);
+        #region delete
+        IDeleteable<T> Deleteable();
+        int Delete(object[] obj);
+        int Delete(object id);
+        int DeleteTable();
+        bool Truncate();
 
-    ISugarQueryable<T> Queryable();
-    List<T> GetAll(bool useCache = false, int cacheSecond = 3600);
+        #endregion delete
 
-    (List<T>, int) QueryableToPage(Expression<Func<T, bool>> expression, int pageIndex = 0, int pageSize = 10);
+        #region query
+        /// <summary>
+        /// 根据条件查询分页数据
+        /// </summary>
+        /// <param name="where"></param>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        PagedInfo<T> GetPages(Expression<Func<T, bool>> where, PagerInfo parm);
 
-    (List<T>, int) QueryableToPage(Expression<Func<T, bool>> expression, string order, int pageIndex = 0, int pageSize = 10);
+        PagedInfo<T> GetPages(Expression<Func<T, bool>> where, PagerInfo parm, Expression<Func<T, object>> order, OrderByType orderEnum = OrderByType.Asc);
+        PagedInfo<T> GetPages(Expression<Func<T, bool>> where, PagerInfo parm, Expression<Func<T, object>> order, string orderByType);
 
-    (List<T>, int) QueryableToPage(Expression<Func<T, bool>> expression, Expression<Func<T, object>> orderFiled, string orderBy, int pageIndex = 0, int pageSize = 10);
+        bool Any(Expression<Func<T, bool>> expression);
 
-    List<T> SqlQueryToList(string sql, object? obj);
+        ISugarQueryable<T> Queryable();
+        List<T> GetAll(bool useCache = false, int cacheSecond = 3600);
 
-    T GetId(object pkValue);
+        (List<T>, int) QueryableToPage(Expression<Func<T, bool>> expression, int pageIndex = 0, int pageSize = 10);
 
-    #endregion query
+        (List<T>, int) QueryableToPage(Expression<Func<T, bool>> expression, string order, int pageIndex = 0, int pageSize = 10);
 
-    #region Procedure
+        (List<T>, int) QueryableToPage(Expression<Func<T, bool>> expression, Expression<Func<T, object>> orderFiled, string orderBy, int pageIndex = 0, int pageSize = 10);
 
-    DataTable UseStoredProcedureToDataTable(string procedureName, List<SugarParameter> parameters);
+        List<T> SqlQueryToList(string sql, object? obj);
 
-    (DataTable, List<SugarParameter>) UseStoredProcedureToTuple(string procedureName, List<SugarParameter> parameters);
+        T GetId(object pkValue);
 
-    #endregion Procedure
+        #endregion query
+
+        #region Procedure
+
+        DataTable UseStoredProcedureToDataTable(string procedureName, List<SugarParameter> parameters);
+
+        (DataTable, List<SugarParameter>) UseStoredProcedureToTuple(string procedureName, List<SugarParameter> parameters);
+
+        #endregion Procedure
+    }
 }
