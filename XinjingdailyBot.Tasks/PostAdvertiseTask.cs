@@ -68,10 +68,12 @@ namespace XinjingdailyBot.Tasks
                     {
                         var msgId = await _botClient.CopyMessageAsync(chatId, ad.ChatID, (int)ad.MessageID, disableNotification: true);
                         ad.ShowCount++;
+                        ad.LastPostAt = DateTime.Now;
                         if (ad.PinMessage)
                         {
                             await _botClient.PinChatMessageAsync(chatId, msgId.Id, true);
                         }
+                        await _advertisesService.Updateable(ad).UpdateColumns(x => new { x.ShowCount, x.LastPostAt }).ExecuteCommandAsync();
                     }
                     catch (Exception ex)
                     {
@@ -82,7 +84,6 @@ namespace XinjingdailyBot.Tasks
                         await Task.Delay(500);
                     }
                 }
-                await _advertisesService.UpdateAsync(ad);
             }
         }
     }
