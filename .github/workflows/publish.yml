@@ -192,7 +192,17 @@ jobs:
           tag_name: ${{ github.ref_name }}
           release_name: ${{ env.PROJECT_NAME }} ${{ github.ref_name }}
           prerelease: true
-          body_path: .github/RELEASE_TEMPLATE.md
+          body: |
+            # 更新说明
+            ![XinjingdailyBot Release](https://img.shields.io/badge/XinjingdailyBot-${{ github.ref_name }}-brightgreen) ![Downloads](https://img.shields.io/github/downloads/chr233/XinjingdailyBot/${{ github.ref_name }}/total?label=Downloads)
+            
+            release created bt github actions
+            
+            ---
+            
+            > 带 `fde` 表示可执行文件内置 .net 框架, 可以脱离框架运行, 但是体积比较大
+            > 如果电脑上已经安装过 .net 框架, 可以下载不带 `fde` 的版本, 节约硬盘空间
+          
 
       - name: Upload ${{ env.PROJECT_NAME }}-win-x64-fde
         uses: actions/upload-release-asset@v1.0.2
