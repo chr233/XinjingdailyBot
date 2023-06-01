@@ -15,7 +15,7 @@ namespace XinjingdailyBot.Repository.Base
     /// <typeparam name="T"></typeparam>
     public abstract class BaseRepository<T> : SimpleClient<T>, IBaseRepository<T> where T : BaseModel, new()
     {
-        protected BaseRepository() : base()
+        protected BaseRepository()
         {
             Context = DbScoped.SugarScope.GetConnectionScope(0);//默认db0
         }
