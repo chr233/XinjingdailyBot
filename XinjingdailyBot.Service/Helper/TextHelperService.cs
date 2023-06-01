@@ -268,7 +268,6 @@ namespace XinjingdailyBot.Service.Helper
 
             int count = entities.Length;
 
-
             for (int i = 0; i < count; i++)
             {
                 var entity = entities[i];
