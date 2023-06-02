@@ -157,5 +157,14 @@ namespace XinjingdailyBot.Service.Bot.Common
         {
             return chat.Id == _subGroup.Id || chat.Id == _commentGroup.Id;
         }
+
+        public bool IsReviewMessage(long chatId)
+        {
+            return chatId == _reviewGroup.Id;
+        }
+        public bool IsReviewMessage(Chat chat)
+        {
+            return chat.Id == _reviewGroup.Id;
+        }
     }
 }

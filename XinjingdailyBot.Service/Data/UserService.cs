@@ -124,16 +124,13 @@ namespace XinjingdailyBot.Service.Data
             {
                 case ChatType.Group:
                 case ChatType.Supergroup:
-                    if (msgChat.Id != _channelService.SubGroup.Id &&
-                        msgChat.Id != _channelService.CommentGroup.Id &&
-                        msgChat.Id != _channelService.ReviewGroup.Id)
+                    if (!_channelService.IsGroupMessage(msgChat) && !_channelService.IsReviewMessage(msgChat))
                     {
                         autoLeave = true;
                     }
                     break;
                 case ChatType.Channel:
-                    if (msgChat.Id != _channelService.AcceptChannel.Id &&
-                        msgChat.Id != _channelService.RejectChannel.Id)
+                    if (!_channelService.IsChannelMessage(msgChat))
                     {
                         autoLeave = true;
                     }

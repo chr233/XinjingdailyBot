@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -1013,8 +1014,9 @@ namespace XinjingdailyBot.Command
                 }
 
                 var keyboard = await _markupHelperService.SetUserGroupKeyboard(dbUser, targetUser);
+                var groupName = _groupRepository.GetGroupById(targetUser.GroupID)?.Name ?? "未知";
 
-                return (keyboard != null ? "请选择新的用户组" : "获取可用用户组失败", keyboard);
+                return (keyboard != null ? $"请选择 {targetUser.EscapedFullName()} 的新用户组, 当前用户组 {groupName}" : "获取可用用户组失败", keyboard);
             }
 
             (var text, var kbd) = await exec();
