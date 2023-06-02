@@ -109,7 +109,7 @@ namespace XinjingdailyBot.Service.Helper
             foreach (var tag in tags)
             {
                 line.Add(InlineKeyboardButton.WithCallbackData(tag.DisplayName, $"review tag {tag.Payload}"));
-                lineChars += tag.DisplayName.Length -1;
+                lineChars += tag.DisplayName.Length - 1;
                 if (lineChars >= IMarkupHelperService.MaxLineChars)
                 {
                     lineChars = 0;
@@ -183,27 +183,17 @@ namespace XinjingdailyBot.Service.Helper
             }
             else
             {
-                int lineCount = groups.Count <= 4 ? 2 : 3;
-
                 var btns = new List<IEnumerable<InlineKeyboardButton>>();
-                var line = new List<InlineKeyboardButton>();
 
                 foreach (var group in groups)
                 {
-                    var name = targetUser.GroupID == group.Id ? $"当前用户组: [ {group.Id}. {group.Name} ]" : $"{group.Id}. {group.Name}";
+                    var name = targetUser.GroupID == group.Id ? $"[ {group.Id}. {group.Name} ]" : $"{group.Id}. {group.Name}";
                     var data = $"cmd {dbUser.UserID} setusergroup {targetUser.UserID} {group.Id}";
 
-                    line.Add(InlineKeyboardButton.WithCallbackData(name, data));
-                    if (line.Count >= lineCount)
+                    btns.Add(new[]
                     {
-                        btns.Add(line);
-                        line = new();
-                    }
-                }
-
-                if (line.Any())
-                {
-                    btns.Add(line);
+                        InlineKeyboardButton.WithCallbackData(name, data),
+                    });
                 }
 
                 btns.Add(new[]
@@ -211,7 +201,7 @@ namespace XinjingdailyBot.Service.Helper
                     InlineKeyboardButton.WithCallbackData("取消操作", $"cmd {dbUser.UserID} cancel"),
                 });
 
-                InlineKeyboardMarkup keyboard = new(btns);
+                var keyboard = new InlineKeyboardMarkup(btns);
 
                 return keyboard;
             }

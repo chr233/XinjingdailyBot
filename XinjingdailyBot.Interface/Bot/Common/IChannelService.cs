@@ -65,5 +65,17 @@ namespace XinjingdailyBot.Interface.Bot.Common
         /// <param name="chat"></param>
         /// <returns></returns>
         bool IsGroupMessage(Chat chat);
+        /// <summary>
+        /// 判断是否是审核群组的信息
+        /// </summary>
+        /// <param name="chatId"></param>
+        /// <returns></returns>
+        bool IsReviewMessage(long chatId);
+        /// <summary>
+        /// 判断是否是审核群组的信息
+        /// </summary>
+        /// <param name="chat"></param>
+        /// <returns></returns>
+        bool IsReviewMessage(Chat chat);
     }
 }

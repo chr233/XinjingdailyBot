@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using Microsoft.Extensions.Logging;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
@@ -16,13 +17,16 @@ namespace XinjingdailyBot.Service.Bot.Handler
     {
         private readonly IChannelService _channelService;
         private readonly ITelegramBotClient _botClient;
+        private readonly ILogger<GroupMessageHandler> _logger;
 
         public GroupMessageHandler(
             ITelegramBotClient botClient,
-            IChannelService channelService)
+            IChannelService channelService,
+            ILogger<GroupMessageHandler> logger)
         {
             _botClient = botClient;
             _channelService = channelService;
+            _logger = logger;
         }
 
         public async Task OnGroupTextMessageReceived(Users dbUser, Message message)
@@ -43,20 +47,29 @@ namespace XinjingdailyBot.Service.Bot.Handler
                         }
                         else
                         {
-                            int seconds = rand.Next(60, 300);
-                            DateTime banTime = DateTime.Now + TimeSpan.FromSeconds(seconds);
+                            int seconds = rand.Next(45, 315);
+                            DateTime banTime = DateTime.Now.AddSeconds(seconds);
 
                             var chatId = message.Chat.Id;
-
-                            var sendMsg = await _botClient.AutoReplyAsync($"学我说话很好玩{Emojis.Horse}? 劳资反手就是禁言 <code>{seconds}</code> 秒.", message, ParseMode.Html);
                             try
                             {
-                                ChatPermissions permission = new() { CanSendMessages = false, };
+                                var permission = new ChatPermissions {
+                                    CanSendMessages = false,
+                                    CanSendAudios = false,
+                                    CanSendDocuments = false,
+                                    CanSendPhotos = false,
+                                    CanSendVideos = false,
+                                    CanSendVideoNotes = false,
+                                    CanSendVoiceNotes = false,
+                                    CanSendPolls = false,
+                                    CanSendOtherMessages = false,
+                                };
                                 await _botClient.RestrictChatMemberAsync(chatId, dbUser.UserID, permission, untilDate: banTime);
+                                var sendMsg = await _botClient.AutoReplyAsync($"学我说话很好玩{Emojis.Horse}? 劳资反手就是禁言 <code>{seconds}</code> 秒.", message, ParseMode.Html);
                             }
-                            catch
+                            catch (Exception ex)
                             {
-                                await _botClient.DeleteMessageAsync(chatId, sendMsg.MessageId);
+                                _logger.LogError(ex, "禁言失败");
                                 await _botClient.AutoReplyAsync("原来是狗管理, 惹不起惹不起...", message);
                             }
                         }
