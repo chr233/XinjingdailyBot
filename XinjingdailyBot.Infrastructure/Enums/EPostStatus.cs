@@ -37,5 +37,9 @@
         /// 已过审并发布
         /// </summary>
         Accepted,
+        /// <summary>
+        /// 已计划发布
+        /// </summary>
+        Planed,
     }
 }

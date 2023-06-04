@@ -209,7 +209,7 @@ namespace XinjingdailyBot.Service.Helper
 
             if (!string.IsNullOrEmpty(post.Text))
             {
-                var text = post.Text.EscapeHtml().ReEscapeHtml();
+                var text = post.Text;
                 sb.AppendLine(text);
             }
 
