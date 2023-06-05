@@ -29,12 +29,12 @@
 		<RuntimeIdentifiers>linux-arm;linux-arm64;linux-x64;osx-arm64;osx-x64;win-arm64;win-x64</RuntimeIdentifiers>
 		<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
 		<TargetFramework>net7.0</TargetFramework>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<OpenApiGenerateDocuments>true</OpenApiGenerateDocuments>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<DebugType>portable</DebugType>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<OpenApiGenerateDocuments>true</OpenApiGenerateDocuments>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
