@@ -96,7 +96,7 @@ namespace XinjingdailyBot.Service.Data
                     return null;
             }
 
-            Attachments result = new() {
+            var result = new Attachments {
                 PostID = postID,
                 FileID = fileID,
                 FileName = fileName,

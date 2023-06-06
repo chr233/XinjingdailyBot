@@ -96,7 +96,7 @@ namespace XinjingdailyBot.Service.Helper
 
         public async Task<GitHubReleaseResponse?> GetLatestRelease()
         {
-            HttpRequestMessage request = new(HttpMethod.Get, "/XinjingdailyBot/releases/latest");
+            var  request = new HttpRequestMessage(HttpMethod.Get, "/XinjingdailyBot/releases/latest");
             using var rawResponse = await SendRequestToStream("GitHub", request);
             if (rawResponse == null)
             {
@@ -108,14 +108,14 @@ namespace XinjingdailyBot.Service.Helper
 
         public async Task<Stream?> DownloadRelease(string? downloadUrl)
         {
-            HttpRequestMessage request = new(HttpMethod.Get, downloadUrl);
+            var request = new HttpRequestMessage(HttpMethod.Get, downloadUrl);
             using var rawResponse = await SendRequestToStream("GitHub", request);
             return rawResponse;
         }
 
         public async Task<IpInfoResponse?> GetIpInformation(IPAddress ip)
         {
-            HttpRequestMessage request = new(HttpMethod.Get, $"/{ip}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/{ip}");
             using var rawResponse = await SendRequestToStream("IpInfo", request);
             if (rawResponse == null)
             {

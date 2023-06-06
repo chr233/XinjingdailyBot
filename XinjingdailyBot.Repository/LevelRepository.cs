@@ -63,15 +63,15 @@ namespace XinjingdailyBot.Repository
             //请不要修改ID为0和1的字段
             var levels = new List<Levels>()
             {
-                new() { Id = 0, Name = "Lv-" },
-                new() { Id = 1, Name = "Lv0", MinExp = 0, MaxExp = 10 },
-                new() { Id = 2, Name = "Lv1", MinExp = 11, MaxExp = 100 },
-                new() { Id = 3, Name = "Lv2", MinExp = 101, MaxExp = 500 },
-                new() { Id = 4, Name = "Lv3", MinExp = 501, MaxExp = 1000 },
-                new() { Id = 5, Name = "Lv4", MinExp = 1001, MaxExp = 2000 },
-                new() { Id = 6, Name = "Lv5", MinExp = 2001, MaxExp = 5000 },
-                new() { Id = 7, Name = "Lv6", MinExp = 5001, MaxExp = 10000 },
-                new() { Id = 8, Name = "Lv6+", MinExp = 10001 },
+                new Levels{ Id = 0, Name = "Lv-" },
+                new Levels{ Id = 1, Name = "Lv0", MinExp = 0, MaxExp = 10 },
+                new Levels{ Id = 2, Name = "Lv1", MinExp = 11, MaxExp = 100 },
+                new Levels{ Id = 3, Name = "Lv2", MinExp = 101, MaxExp = 500 },
+                new Levels{ Id = 4, Name = "Lv3", MinExp = 501, MaxExp = 1000 },
+                new Levels{ Id = 5, Name = "Lv4", MinExp = 1001, MaxExp = 2000 },
+                new Levels{ Id = 6, Name = "Lv5", MinExp = 2001, MaxExp = 5000 },
+                new Levels{ Id = 7, Name = "Lv6", MinExp = 5001, MaxExp = 10000 },
+                new Levels{ Id = 8, Name = "Lv6+", MinExp = 10001 },
             };
 
             await Storageable(levels).ExecuteCommandAsync();

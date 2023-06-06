@@ -100,7 +100,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                     var alias = textAttribute.Alias?.ToUpperInvariant();
                     var description = textAttribute.Description;
                     var rights = textAttribute.Rights;
-                    commands.Add(command, new(method, description, rights));
+                    commands.Add(command, new AssemblyMethod(method, description, rights));
 
                     //添加别名
                     if (!string.IsNullOrEmpty(alias))
@@ -122,7 +122,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                     var alias = queryAttribute.Alias?.ToUpperInvariant();
                     var description = queryAttribute.Description;
                     var rights = queryAttribute.Rights;
-                    queryCommands.Add(command, new(method, description, rights));
+                    queryCommands.Add(command, new AssemblyMethod(method, description, rights));
 
                     //添加别名
                     if (!string.IsNullOrEmpty(alias))

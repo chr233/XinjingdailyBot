@@ -640,7 +640,7 @@ namespace XinjingdailyBot.Command
                 {
                     await using (bs.ConfigureAwait(false))
                     {
-                        using ZipArchive zipArchive = new(bs);
+                        using var zipArchive = new ZipArchive(bs);
 
                         string currentPath = Utils.ExeFullPath;
                         string backupPath = Utils.BackupFullPath;
@@ -660,7 +660,7 @@ namespace XinjingdailyBot.Command
 
                         if (count > 0)
                         {
-                            StringBuilder sb = new();
+                            var sb = new StringBuilder();
                             sb.AppendLine(string.Format("自动更新成功, 更新了{0}个文件", count));
                             sb.AppendLine(string.Format("版本变动: {0} -> {1}", Utils.Version, releaseResponse.TagName));
                             sb.AppendLine();

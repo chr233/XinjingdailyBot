@@ -34,7 +34,7 @@ namespace XinjingdailyBot.Service.Helper
         public InlineKeyboardMarkup PostKeyboard(bool anymouse)
 
         {
-            InlineKeyboardMarkup keyboard = new(new[]
+            var keyboard = new InlineKeyboardMarkup(new[]
             {
                 new []
                 {
@@ -65,7 +65,7 @@ namespace XinjingdailyBot.Service.Helper
                 {
                     lineChars = 0;
                     btns.Add(line);
-                    line = new();
+                    line = new List<InlineKeyboardButton>();
                 }
             }
 
@@ -95,7 +95,7 @@ namespace XinjingdailyBot.Service.Helper
                 InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
             });
 
-            return new(btns);
+            return new InlineKeyboardMarkup(btns);
         }
 
         public InlineKeyboardMarkup ReviewKeyboardA(int tagNum, bool? hasSpoiler)
@@ -214,7 +214,7 @@ namespace XinjingdailyBot.Service.Helper
 
             if (total == 1)
             {
-                InlineKeyboardMarkup keyboard = new(new[]
+                var keyboard = new InlineKeyboardMarkup(new[]
                 {
                     new[]
                     {
@@ -235,7 +235,7 @@ namespace XinjingdailyBot.Service.Helper
                     InlineKeyboardButton.WithCallbackData("下一页", $"cmd {dbUser.UserID} searchuser {query} {current + 1}") :
                     InlineKeyboardButton.WithCallbackData("到头了", $"cmd {dbUser.UserID} say 到头了");
 
-                InlineKeyboardMarkup keyboard = new(new[]
+                var keyboard = new InlineKeyboardMarkup(new[]
                 {
                     new[]
                     {
@@ -253,7 +253,7 @@ namespace XinjingdailyBot.Service.Helper
 
         public InlineKeyboardMarkup? SetChannelOptionKeyboard(Users dbUser, long channelId)
         {
-            InlineKeyboardMarkup keyboard = new(new[]
+            var keyboard = new InlineKeyboardMarkup(new[]
             {
                 new []
                 {
@@ -281,7 +281,7 @@ namespace XinjingdailyBot.Service.Helper
             var channel = _channelService.AcceptChannel;
             string link = channel.GetMessageLink(post.PublicMsgID);
 
-            InlineKeyboardMarkup keyboard = new(new[]
+            var keyboard = new InlineKeyboardMarkup(new[]
              {
                 new []
                 {
@@ -296,8 +296,8 @@ namespace XinjingdailyBot.Service.Helper
             var channel = _channelService.AcceptChannel;
             string link = channel.GetMessageLink(messageId);
 
-            InlineKeyboardMarkup keyboard = new(new[]
-             {
+            var keyboard = new InlineKeyboardMarkup(new[]
+            {
                 new []
                 {
                     InlineKeyboardButton.WithUrl($"在{channel.Title}中查看", link),
@@ -329,7 +329,7 @@ namespace XinjingdailyBot.Service.Helper
                 {
                     lineChars = 0;
                     btns.Add(line);
-                    line = new();
+                    line = new List<InlineKeyboardButton>();
                 }
             }
 
@@ -343,12 +343,12 @@ namespace XinjingdailyBot.Service.Helper
                 InlineKeyboardButton.WithCallbackData("取消", $"cmd {dbUser.UserID} cancel"),
             });
 
-            return new(btns);
+            return new InlineKeyboardMarkup(btns);
         }
 
         public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, int tagNum)
         {
-            InlineKeyboardMarkup keyboard = new(new[]
+            var keyboard = new InlineKeyboardMarkup(new[]
             {
                 new []
                 {
@@ -380,7 +380,7 @@ namespace XinjingdailyBot.Service.Helper
             var channel = _channelService.AcceptChannel;
             string link = channel.GetMessageLink(post.PublicMsgID);
 
-            InlineKeyboardMarkup keyboard = new(new[]
+            var keyboard = new InlineKeyboardMarkup(new[]
             {
                 new []
                 {
@@ -398,7 +398,7 @@ namespace XinjingdailyBot.Service.Helper
 
             if (post.Status == EPostStatus.Accepted)
             {
-                keyboard = new(new[]
+                keyboard = new InlineKeyboardMarkup(new[]
                 {
                     new []
                     {
@@ -412,7 +412,7 @@ namespace XinjingdailyBot.Service.Helper
             }
             else
             {
-                keyboard = new(new[]
+                keyboard = new InlineKeyboardMarkup(new[]
                 {
                     new []
                     {
@@ -430,7 +430,7 @@ namespace XinjingdailyBot.Service.Helper
 
         public InlineKeyboardMarkup NukeMenuKeyboard(Users dbUser, Users targetUser, string reason)
         {
-            InlineKeyboardMarkup keyboard = new(new[]
+            var keyboard = new InlineKeyboardMarkup(new[]
             {
                 new []
                 {

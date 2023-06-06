@@ -49,7 +49,7 @@ namespace XinjingdailyBot.Command
         [TextCmd("HELP", EUserRights.None, Description = "显示命令帮助")]
         public async Task ResponseHelp(Users dbUser, Message message)
         {
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
 
             if (!dbUser.IsBan)
             {
@@ -74,7 +74,7 @@ namespace XinjingdailyBot.Command
         [TextCmd("START", EUserRights.None, Description = "首次欢迎语")]
         public async Task ResponseStart(Users dbUser, Message message)
         {
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
 
             string? msg = _optionsSetting.Message.Start;
             if (!string.IsNullOrEmpty(msg))
@@ -103,7 +103,7 @@ namespace XinjingdailyBot.Command
         [TextCmd("ABOUT", EUserRights.None, Description = "关于机器人")]
         public async Task ResponseAbout(Message message)
         {
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
             string? msg = _optionsSetting.Message.About;
             if (!string.IsNullOrEmpty(msg))
             {
@@ -121,7 +121,7 @@ namespace XinjingdailyBot.Command
         [TextCmd("VERSION", EUserRights.None, Description = "查看机器人版本")]
         public async Task ResponseVersion(Message message)
         {
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
             string version = Utils.Version;
             string variant = BuildInfo.Variant;
             sb.AppendLine($"程序版本: <code>{version}</code>");
@@ -143,7 +143,7 @@ namespace XinjingdailyBot.Command
             var records = await _banRecordService.Queryable().Where(x => x.UserID == dbUser.UserID)
                 .OrderByDescending(x => new { x.BanTime }).ToListAsync();
 
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
 
             string status = dbUser.IsBan ? "已封禁" : "正常";
             sb.AppendLine($"用户名: <code>{dbUser.EscapedFullName()}</code>");

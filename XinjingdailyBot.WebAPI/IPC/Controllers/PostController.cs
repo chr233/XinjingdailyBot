@@ -28,6 +28,13 @@ namespace XinjingdailyBot.WebAPI.IPC.Controllers
             _userTokenService = userTokenService;
         }
 
+        public sealed record Test
+        {
+            public IFormFileCollection? Media { get; set; }
+            public string? Text { get; set; }
+            public string? From { get; set; }
+        }
+
         /// <summary>
         /// 测试
         /// </summary>
@@ -35,7 +42,7 @@ namespace XinjingdailyBot.WebAPI.IPC.Controllers
         /// <param name="files"></param>
         /// <returns></returns>
         [HttpPost("[action]")]
-        public async Task<ActionResult<Users>> TestToken(Guid token, IFormFileCollection files)
+        public async Task<ActionResult<Users>> TestToken(Guid token, [FromForm] Test test)
         {
             var user = await _userTokenService.VerifyToken(token);
 

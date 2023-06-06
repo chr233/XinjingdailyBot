@@ -102,7 +102,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                             string postMode = post.IsDirectPost ? "直接发布" : (post.Anonymous ? "匿名投稿" : "保留来源");
                             string posterLink = poster.HtmlUserLink();
 
-                            StringBuilder sb = new();
+                            var sb = new StringBuilder();
                             sb.AppendLine($"投稿人: {posterLink}");
                             sb.AppendLine($"模式: {postMode}");
                             sb.AppendLine($"状态: {postStatus}");
