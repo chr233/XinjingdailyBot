@@ -39,7 +39,7 @@ namespace XinjingdailyBot.Service.Data
             foreach (var ad in validAds)
             {
                 sum += ad.Weight;
-                weightList.Add(new(sum, ad));
+                weightList.Add((sum, ad));
             }
 
             int randInt = new Random().Next(0, sum);

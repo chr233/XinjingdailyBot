@@ -132,12 +132,12 @@ namespace XinjingdailyBot.Repository
         /// <returns></returns>
         private async Task InsertBuildInTags()
         {
-            List<Tags> tags = new()
+            var tags = new List<Tags>()
             {
-                new() { Id = 1, Name = "NSFW", Payload = "nsfw", KeyWords = "NSFW", WarnText = Langs.NSFWWarning },
-                new() { Id = 2, Name = "我有一个朋友", Payload = "friend", KeyWords = "朋友|英雄" },
-                new() { Id = 3, Name = "晚安", Payload = "wanan", KeyWords = "晚安" },
-                new() { Id = 4, Name = "AI怪图", Payload = "ai", KeyWords = "#AI" },
+                new Tags{ Id = 1, Name = "NSFW", Payload = "nsfw", KeyWords = "NSFW", WarnText = Langs.NSFWWarning },
+                new Tags{ Id = 2, Name = "我有一个朋友", Payload = "friend", KeyWords = "朋友|英雄" },
+                new Tags{ Id = 3, Name = "晚安", Payload = "wanan", KeyWords = "晚安" },
+                new Tags{ Id = 4, Name = "AI怪图", Payload = "ai", KeyWords = "#AI" },
             };
 
             await Storageable(tags).ExecuteCommandAsync();
@@ -213,7 +213,7 @@ namespace XinjingdailyBot.Repository
         /// <returns></returns>
         public IEnumerable<Tags> GetActiviedTags(int tagNum)
         {
-            List<Tags> tags = new();
+            var tags = new List<Tags>();
             foreach (var tag in TagCache.Values)
             {
                 if ((tag.Seg & tagNum) > 0)
@@ -276,7 +276,7 @@ namespace XinjingdailyBot.Repository
         /// <returns></returns>
         public IEnumerable<TagPayload> GetTagsPayload(int tagNum)
         {
-            List<TagPayload> tags = new();
+            var tags = new List<TagPayload>();
             foreach (var tag in TagCache.Values)
             {
                 bool status = (tag.Seg & tagNum) > 0;

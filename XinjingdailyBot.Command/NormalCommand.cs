@@ -122,7 +122,7 @@ namespace XinjingdailyBot.Command
         [TextCmd("MYINFO", EUserRights.NormalCmd, Description = "获取自己的信息")]
         public async Task ResponseMyInfo(Users dbUser, Message message)
         {
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
 
             sb.AppendLine("-- 基础信息 --");
             sb.AppendLine(_userService.GetUserBasicInfo(dbUser));
@@ -155,19 +155,19 @@ namespace XinjingdailyBot.Command
 
             string group = _groupRepository.GetGroupName(dbUser.GroupID);
 
-            List<string> functions = new();
+            var functions = new List<string>();
             if (sendPost) { functions.Add("投递稿件"); }
             if (reviewPost) { functions.Add("审核稿件"); }
             if (directPost) { functions.Add("直接发布稿件"); }
             if (functions.Count == 0) { functions.Add("无"); }
 
-            List<string> commands = new();
+            var commands = new List<string>();
             if (superCmd) { commands.Add("所有命令"); }
             if (adminCmd) { commands.Add("管理员命令"); }
             if (normalCmd) { commands.Add("普通命令"); }
             if (functions.Count == 0) { commands.Add("无"); }
 
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
             sb.AppendLine($"用户名: <code>{userNick}</code>");
             sb.AppendLine($"用户组: <code>{group}</code>");
             sb.AppendLine($"功能: <code>{string.Join(", ", functions)}</code>");
@@ -184,7 +184,7 @@ namespace XinjingdailyBot.Command
         [TextCmd("ADMIN", EUserRights.NormalCmd, Description = "艾特群管理")]
         public async Task ResponseCallAdmins(Message message)
         {
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
 
             if (message.Chat.Type != ChatType.Group && message.Chat.Type != ChatType.Supergroup)
             {
@@ -422,7 +422,7 @@ namespace XinjingdailyBot.Command
         [TextCmd("IP", EUserRights.NormalCmd, Alias = "IPINFO", Description = "查询IP信息")]
         public async Task GetIpInfo(Message message, string[] args)
         {
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
             if (args.Length < 1)
             {
                 sb.AppendLine("参数错误, 请指定要查询的IP");

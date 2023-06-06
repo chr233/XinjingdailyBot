@@ -186,7 +186,7 @@ namespace XinjingdailyBot.Service.Data
                     return null;
                 }
 
-                dbUser = new() {
+                dbUser = new Users {
                     UserID = msgUser.Id,
                     UserName = msgUser.Username ?? "",
                     FirstName = msgUser.FirstName,
@@ -622,7 +622,7 @@ namespace XinjingdailyBot.Service.Data
 
             var userList = await Queryable().Where(exp.ToExpression()).ToPageListAsync(page, pageSize);
 
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
 
             var start = 1 + (page - 1) * pageSize;
             var index = 0;
@@ -665,7 +665,7 @@ namespace XinjingdailyBot.Service.Data
             int totalPost = dbUser.PostCount - dbUser.ExpiredPostCount;
             double passPercent = 1.0 * dbUser.AcceptCount / totalPost;
 
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
 
             sb.AppendLine($"用户名: <code>{userNick}</code>");
             sb.AppendLine($"用户ID: <code>{dbUser.UserID}</code>");
@@ -691,7 +691,7 @@ namespace XinjingdailyBot.Service.Data
             var now = DateTime.Now;
             var prev30Days = now.AddDays(-30).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
 
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
 
 
             if (dbUser.GroupID == 1)

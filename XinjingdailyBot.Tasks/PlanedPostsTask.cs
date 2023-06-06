@@ -105,7 +105,7 @@ namespace XinjingdailyBot.Tasks
                     //3.启用通知
                     if (!user.IsBan && user.PrivateChatID > 0 && user.Notification)
                     {
-                        StringBuilder sb = new();
+                        var sb = new StringBuilder();
 
                         if (cTmout > 0)
                         {

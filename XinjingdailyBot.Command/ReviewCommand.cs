@@ -203,6 +203,9 @@ namespace XinjingdailyBot.Command
                     await _postService.AcceptPost(post, dbUser, callbackQuery);
                     break;
 
+                //case "review inplan":
+                    
+
                 case "review anymouse":
                     await SetAnymouse(post, callbackQuery);
                     break;

@@ -36,7 +36,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
             {
                 if (replyMessage.From?.Id == _channelService.BotUser.Id)
                 {
-                    Random rand = new();
+                    var rand = new Random();
 
                     //制裁复读机
                     if (message.Text == replyMessage.Text)

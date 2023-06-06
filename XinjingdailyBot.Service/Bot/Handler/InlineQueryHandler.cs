@@ -36,7 +36,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
         {
             if (dbUser.Right.HasFlag(EUserRights.AdminCmd))
             {
-                List<InlineQueryResult> results = new();
+                var results = new List<InlineQueryResult>();
 
                 for (int i = 0; i < 10; i++)
                 {

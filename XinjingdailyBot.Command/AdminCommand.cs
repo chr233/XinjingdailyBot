@@ -85,7 +85,7 @@ namespace XinjingdailyBot.Command
         {
             var chat = message.Chat;
 
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
 
             if (chat.Type != ChatType.Group && chat.Type != ChatType.Supergroup)
             {
@@ -119,7 +119,7 @@ namespace XinjingdailyBot.Command
         [TextCmd("USERINFO", EUserRights.AdminCmd, Alias = "UINFO", Description = "获取用户信息")]
         public async Task ResponseUserInfo(Message message, string[] args)
         {
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
 
             var targetUser = await _userService.FetchTargetUser(message);
 
@@ -230,7 +230,7 @@ namespace XinjingdailyBot.Command
                         _logger.LogError(ex, "发送私聊消息失败");
                     }
 
-                    StringBuilder sb = new();
+                    var sb = new StringBuilder();
                     sb.AppendLine($"成功封禁 {targetUser.HtmlUserLink()}");
                     sb.AppendLine($"操作员 {dbUser.HtmlUserLink()}");
                     sb.AppendLine($"封禁理由 <code>{reason}</code>");
@@ -324,7 +324,7 @@ namespace XinjingdailyBot.Command
                         _logger.LogError(ex, "发送私聊消息失败");
                     }
 
-                    StringBuilder sb = new();
+                    var sb = new StringBuilder();
                     sb.AppendLine($"成功解封 {targetUser.HtmlUserLink()}");
                     sb.AppendLine($"操作员 {dbUser.HtmlUserLink()}");
                     sb.AppendLine($"解封理由 <code>{reason}</code>");
@@ -412,7 +412,7 @@ namespace XinjingdailyBot.Command
 
                     warnCount++;
 
-                    StringBuilder sb = new();
+                    var sb = new StringBuilder();
                     sb.AppendLine($"成功警告 {targetUser.HtmlUserLink()}");
                     sb.AppendLine($"操作员 {dbUser.HtmlUserLink()}");
                     sb.AppendLine($"警告理由 <code>{reason}</code>");
@@ -441,7 +441,7 @@ namespace XinjingdailyBot.Command
                     {
                         if (targetUser.PrivateChatID > 0)
                         {
-                            StringBuilder s = new();
+                            var s = new StringBuilder();
                             s.AppendLine(string.Format(Langs.WarnUserTips, reason));
                             s.AppendLine(string.Format(Langs.WarnUserTips2, warnCount, WarningLimit));
                             string msg = s.ToString();
@@ -482,7 +482,7 @@ namespace XinjingdailyBot.Command
         [TextCmd("QUERYBAN", EUserRights.AdminCmd, Alias = "QBAN", Description = "查询封禁记录")]
         public async Task ResponseQueryBan(Message message, string[] args)
         {
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
 
             var targetUser = await _userService.FetchTargetUser(message);
 
@@ -778,7 +778,7 @@ namespace XinjingdailyBot.Command
             var monthStart = now.AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
             var yearStart = now.AddMonths(1 - now.Month).AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
 
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
 
             var todayPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status > EPostStatus.Cancel).CountAsync();
             var todayAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status == EPostStatus.Accepted).CountAsync();
@@ -868,7 +868,7 @@ namespace XinjingdailyBot.Command
         [TextCmd("SYSREPORT", EUserRights.AdminCmd, Alias = "SYSSTATUS", Description = "生成系统报表")]
         public async Task ResponseSystemReport(Message message)
         {
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
 
             var version = Assembly.Load("XinjingdailyBot.WebAPI").GetName().Version;
 
@@ -953,7 +953,7 @@ namespace XinjingdailyBot.Command
             {
                 var inviteLink = await _botClient.CreateChatInviteLinkAsync(_channelService.ReviewGroup.Id, $"{dbUser} 创建的邀请链接", DateTime.Now.AddHours(1), 1, false);
 
-                StringBuilder sb = new();
+                var sb = new StringBuilder();
 
                 sb.AppendLine($"创建 {_channelService.ReviewGroup.Title} 的邀请链接成功, 一小时内有效, 仅限1人使用");
 
@@ -982,7 +982,7 @@ namespace XinjingdailyBot.Command
             const int topCount = 8;
             const int miniumPost = 10;
 
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
 
             sb.AppendLine("-- 用户投稿数量排名 --");
             var userAcceptCountRank = await _userService.Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
@@ -1165,7 +1165,7 @@ namespace XinjingdailyBot.Command
         {
             var msg = message.ReplyToMessage ?? message;
 
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
 
             sb.AppendLine("消息详情");
 
@@ -1264,7 +1264,7 @@ namespace XinjingdailyBot.Command
                     warnCount = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && x.Type == EBanType.Warning && x.BanTime >= lastUnbaned.BanTime).CountAsync();
                 }
 
-                StringBuilder sb = new();
+                var sb = new StringBuilder();
                 sb.AppendLine($"用户名: {targetUser.HtmlUserLink()}");
                 sb.AppendLine($"用户ID: <code>{targetUser.UserID}</code>");
                 var status = targetUser.IsBan ? "已封禁" : "正常";
@@ -1304,14 +1304,24 @@ namespace XinjingdailyBot.Command
                 }
                 else
                 {
-                    StringBuilder sb = new();
+                    var sb = new StringBuilder();
                     sb.AppendLine("");
 
                     switch (args[1])
                     {
                         case "mute":
                             {
-                                ChatPermissions permission = new() { CanSendMessages = false, };
+                                var permission = new ChatPermissions {
+                                    CanSendMessages = false,
+                                    CanSendAudios = false,
+                                    CanSendDocuments = false,
+                                    CanSendPhotos = false,
+                                    CanSendVideos = false,
+                                    CanSendVideoNotes = false,
+                                    CanSendVoiceNotes = false,
+                                    CanSendPolls = false,
+                                    CanSendOtherMessages = false,
+                                };
                                 try
                                 {
                                     await _botClient.RestrictChatMemberAsync(_channelService.SubGroup, targetUser.UserID, permission);
@@ -1329,7 +1339,17 @@ namespace XinjingdailyBot.Command
                             break;
                         case "unmute":
                             {
-                                ChatPermissions permission = new() { CanSendMessages = true, };
+                                var permission = new ChatPermissions {
+                                    CanSendMessages = true,
+                                    CanSendAudios = true,
+                                    CanSendDocuments = true,
+                                    CanSendPhotos = true,
+                                    CanSendVideos = true,
+                                    CanSendVideoNotes = true,
+                                    CanSendVoiceNotes = true,
+                                    CanSendPolls = false,
+                                    CanSendOtherMessages = false, 
+                                };
                                 await _botClient.RestrictChatMemberAsync(_channelService.SubGroup, targetUser.UserID, permission);
                                 await _botClient.RestrictChatMemberAsync(_channelService.SubGroup, targetUser.UserID, permission);
                             }

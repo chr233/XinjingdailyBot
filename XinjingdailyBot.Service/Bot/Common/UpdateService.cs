@@ -61,7 +61,7 @@ namespace XinjingdailyBot.Service.Bot.Common
                 _ => exception.ToString()
             };
 
-            _logger.LogInformation("处理轮询出错: {ErrorMessage}", ErrorMessage);
+            _logger.LogError(exception, "处理轮询出错");
 
             if (exception is RequestException)
             {

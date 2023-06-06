@@ -200,7 +200,7 @@ namespace XinjingdailyBot.Service.Helper
         {
             var tag = _tagRepository.GetActiviedHashTags(post.Tags);
 
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
 
             if (!string.IsNullOrEmpty(tag))
             {
@@ -313,7 +313,7 @@ namespace XinjingdailyBot.Service.Helper
 
                 if (!tagMap.ContainsKey(start))
                 {
-                    tagMap.Add(start, new(head));
+                    tagMap.Add(start, new TagObjct(head));
                 }
                 else
                 {
@@ -322,7 +322,7 @@ namespace XinjingdailyBot.Service.Helper
 
                 if (!tagMap.ContainsKey(end))
                 {
-                    tagMap.Add(end, new(tail));
+                    tagMap.Add(end, new TagObjct(tail));
                 }
                 else
                 {
