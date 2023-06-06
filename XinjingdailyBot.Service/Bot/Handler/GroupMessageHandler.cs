@@ -65,7 +65,7 @@ namespace XinjingdailyBot.Service.Bot.Handler
                                     CanSendOtherMessages = false,
                                 };
                                 await _botClient.RestrictChatMemberAsync(chatId, dbUser.UserID, permission, untilDate: banTime);
-                                var sendMsg = await _botClient.AutoReplyAsync($"学我说话很好玩{Emojis.Horse}? 劳资反手就是禁言 <code>{seconds}</code> 秒.", message, ParseMode.Html);
+                                await _botClient.AutoReplyAsync($"学我说话很好玩{Emojis.Horse}? 劳资反手就是禁言 <code>{seconds}</code> 秒.", message, ParseMode.Html);
                             }
                             catch (Exception ex)
                             {

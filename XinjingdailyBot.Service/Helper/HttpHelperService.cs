@@ -109,7 +109,7 @@ namespace XinjingdailyBot.Service.Helper
         public async Task<Stream?> DownloadRelease(string? downloadUrl)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, downloadUrl);
-            using var rawResponse = await SendRequestToStream("GitHub", request);
+            var rawResponse = await SendRequestToStream("GitHub", request);
             return rawResponse;
         }
 
