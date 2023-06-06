@@ -61,7 +61,7 @@ namespace XinjingdailyBot.Service.Helper
             {
                 line.Add(InlineKeyboardButton.WithCallbackData(tag.DisplayName, $"review tag {tag.Payload}"));
                 lineChars += tag.DisplayName.Length;
-                if (lineChars >= IMarkupHelperService.MaxLineChars)
+                if (lineChars >= IMarkupHelperService.MaxLineCharsTag)
                 {
                     lineChars = 0;
                     btns.Add(line);
@@ -110,7 +110,7 @@ namespace XinjingdailyBot.Service.Helper
             {
                 line.Add(InlineKeyboardButton.WithCallbackData(tag.DisplayName, $"review tag {tag.Payload}"));
                 lineChars += tag.DisplayName.Length - 1;
-                if (lineChars >= IMarkupHelperService.MaxLineChars)
+                if (lineChars >= IMarkupHelperService.MaxLineCharsTag)
                 {
                     lineChars = 0;
                     btns.Add(line);
@@ -153,7 +153,7 @@ namespace XinjingdailyBot.Service.Helper
             {
                 line.Add(InlineKeyboardButton.WithCallbackData(reason.Name, $"reject {reason.Payload}"));
                 lineChars += reason.Name.Length;
-                if (lineChars >= IMarkupHelperService.MaxLineChars)
+                if (lineChars >= IMarkupHelperService.MaxLineCharsReason)
                 {
                     lineChars = 0;
                     btns.Add(line);
@@ -325,7 +325,7 @@ namespace XinjingdailyBot.Service.Helper
             {
                 line.Add(InlineKeyboardButton.WithCallbackData($"{tag.OnText}", $"cmd {dbUser.UserID} setrandompost {tag.Payload}"));
                 lineChars += tag.Name.Length;
-                if (lineChars >= IMarkupHelperService.MaxLineChars)
+                if (lineChars >= IMarkupHelperService.MaxLineCharsTag)
                 {
                     lineChars = 0;
                     btns.Add(line);

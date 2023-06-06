@@ -92,14 +92,14 @@ namespace XinjingdailyBot.Repository
         {
             var levels = new List<RejectReasons>()
             {
-                new RejectReasons{ Id = 1, Name = "模糊", Payload = "fuzzy", FullText = "图片模糊/看不清", IsCount = false },
-                new RejectReasons{ Id = 2, Name = "重复", Payload = "duplicate", FullText = "重复的稿件", IsCount = false },
+                new RejectReasons { Id = 1, Name = "模糊", Payload = "fuzzy", FullText = "图片模糊/看不清", IsCount = false },
+                new RejectReasons { Id = 2, Name = "重复", Payload = "duplicate", FullText = "重复的稿件", IsCount = false },
                 new RejectReasons { Id = 3, Name = "无趣", Payload = "boring", FullText = "内容不够有趣" },
                 new RejectReasons { Id = 4, Name = "没懂", Payload = "confusing", FullText = "审核没看懂,建议配文说明" },
                 new RejectReasons { Id = 5, Name = "不合适", Payload = "deny", FullText = "不合适发布的内容" },
                 new RejectReasons { Id = 6, Name = "广告水印", Payload = "qrcode", FullText = "稿件包含二维码水印" },
                 new RejectReasons { Id = 7, Name = "其他原因", Payload = "other", FullText = "其他原因" },
-                new RejectReasons{ Id = 8, Name = "太多了", Payload = "toomuch", FullText = "今天此类型的稿件的数量太多了" },
+                new RejectReasons { Id = 8, Name = "太多了", Payload = "toomuch", FullText = "今天此类型的稿件的数量太多了" },
             };
 
             await Storageable(levels).ExecuteCommandAsync();
