@@ -11,7 +11,11 @@ namespace XinjingdailyBot.Interface.Helper
         /// <summary>
         /// 一行显示的字数
         /// </summary>
-        public const int MaxLineChars = 8;
+        public static readonly int MaxLineCharsTag = 8;
+        /// <summary>
+        /// 一行显示的字数
+        /// </summary>
+        public static readonly int MaxLineCharsReason = 10;
 
         /// <summary>
         /// 直接发布投稿键盘
