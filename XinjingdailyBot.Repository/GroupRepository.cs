@@ -39,7 +39,7 @@ namespace XinjingdailyBot.Repository
             }
 
             var groups = await GetListAsync();
-            if (groups?.Count > 0)
+            if (groups.Any())
             {
                 _groupCache.Clear();
                 foreach (var group in groups)

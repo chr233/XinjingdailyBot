@@ -45,7 +45,7 @@ namespace XinjingdailyBot.Repository
             }
 
             var reasons = await GetListAsync();
-            if (reasons?.Count > 0)
+            if (reasons.Any())
             {
                 RejectReasonCache.Clear();
                 RejectReasonPayloadCache.Clear();
