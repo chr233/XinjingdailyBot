@@ -38,7 +38,7 @@ namespace XinjingdailyBot.Repository
             }
 
             var levels = await GetListAsync();
-            if (levels?.Count > 0)
+            if (levels.Any())
             {
                 _levelCache.Clear();
                 foreach (var level in levels)

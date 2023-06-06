@@ -54,7 +54,7 @@ namespace XinjingdailyBot.Repository
             }
 
             var tags = await GetListAsync(x => x.Id > 0 && x.Id < 32);
-            if (tags?.Count > 0)
+            if (tags.Any())
             {
                 TagCache.Clear();
                 TagPayloadCache.Clear();
