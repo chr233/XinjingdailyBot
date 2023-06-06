@@ -62,7 +62,7 @@ namespace XinjingdailyBot.Repository
         private async Task InsertBuildInGroups()
         {
             //请不要修改ID为0和1的字段
-            var groups = new List<Groups>()
+            var groups = new List<Groups>
             {
                 new Groups{ Id = 0, Name = "封禁用户", DefaultRight = EUserRights.None },
                 new Groups{ Id = 1, Name = "普通用户", DefaultRight = EUserRights.SendPost | EUserRights.NormalCmd },

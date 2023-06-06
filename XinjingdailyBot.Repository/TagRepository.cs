@@ -132,7 +132,7 @@ namespace XinjingdailyBot.Repository
         /// <returns></returns>
         private async Task InsertBuildInTags()
         {
-            var tags = new List<Tags>()
+            var tags = new List<Tags>
             {
                 new Tags{ Id = 1, Name = "NSFW", Payload = "nsfw", KeyWords = "NSFW", WarnText = Langs.NSFWWarning },
                 new Tags{ Id = 2, Name = "我有一个朋友", Payload = "friend", KeyWords = "朋友|英雄" },
