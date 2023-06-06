@@ -1,6 +1,7 @@
 ﻿using Quartz;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 
 namespace XinjingdailyBot.WebAPI.Extensions
@@ -16,9 +17,13 @@ namespace XinjingdailyBot.WebAPI.Extensions
         /// 注册定时任务
         /// </summary>
         /// <param name="services"></param>
+        /// <param name="configuration"></param>
         [RequiresUnreferencedCode("不兼容剪裁")]
-        public static void AddTasks(this IServiceCollection services)
+        public static void AddTasks(this IServiceCollection services, IConfiguration configuration)
         {
+            var scheduleConfig = configuration.GetSection("Schedule").Get<OptionsSetting.ScheduleOption>();
+            var cron = scheduleConfig?.Cron ?? new Dictionary<string, string>();
+            
             var tasks = Assembly.Load("XinjingdailyBot.Tasks").GetTypes();
             if (tasks == null)
             {
@@ -38,14 +43,17 @@ namespace XinjingdailyBot.WebAPI.Extensions
                         var group = jobAttribute.Group ?? "DEFAULT";
                         var jobKey = new JobKey(jobType.Name, group);
                         var tiggerKey = new TriggerKey(jobType.Name + "-Tigger", group);
+                        
+                        var schedule = cron.GetValueOrDefault(jobType.Name, jobAttribute.Schedule);
+
                         qz.AddJob(jobType, jobKey, opts => opts.WithIdentity(jobKey));
                         qz.AddTrigger(opts => opts
                             .ForJob(jobKey)
                             .WithIdentity(tiggerKey)
-                            .WithCronSchedule(jobAttribute.Schedule)
+                            .WithCronSchedule(schedule)
                         );
 
-                        _logger.Debug($"[{jobAttribute.Schedule}] - {jobType}");
+                        _logger.Debug($"[{schedule}] - {jobType}");
                         count++;
                     }
                 }

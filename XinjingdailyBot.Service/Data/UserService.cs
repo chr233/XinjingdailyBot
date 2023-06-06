@@ -494,24 +494,116 @@ namespace XinjingdailyBot.Service.Data
             //每页数量
             const int pageSize = 30;
 
+            var date = DateTime.Now.AddDays(-90);
+
             //SQL表达式
             var exp = Expressionable.Create<Users>();
 
-            //根据userID查找用户
-            if (long.TryParse(query, out var userID))
+            //查找全部
+            if (query == "*")
             {
-                exp.Or(x => x.UserID == userID);
+                exp.And(x => x.ModifyAt > date);
+            }
+            else
+            {
+                //根据userID查找用户
+                if (long.TryParse(query, out var userID))
+                {
+                    exp.Or(x => x.UserID == userID && x.ModifyAt > date);
+                }
+
+                //根据用户名查找用户
+                exp.Or(x => (x.FirstName.Contains(query) || x.LastName.Contains(query)) && x.ModifyAt > date);
+
+                //根据UserName查找用户
+                if (query.StartsWith('@'))
+                {
+                    query = query[1..];
+                }
+                exp.Or(x => x.UserName.Contains(query) && x.ModifyAt > date);
             }
 
-            //根据用户名查找用户
-            exp.Or(x => x.FirstName.Contains(query) || x.LastName.Contains(query));
+            var userListCount = await Queryable().Where(exp.ToExpression()).CountAsync();
 
-            //根据UserName查找用户
-            if (query.StartsWith('@'))
+            if (userListCount == 0)
             {
-                query = query[1..];
+                return ("找不到符合条件的用户, 如需查找全部用户, 请使用 /queryalluser", null);
             }
-            exp.Or(x => x.UserName.Contains(query));
+
+            var totalPages = userListCount / pageSize;
+            if (userListCount % pageSize > 0)
+            {
+                totalPages++;
+            }
+
+            page = Math.Max(1, Math.Min(page, totalPages));
+
+            var userList = await Queryable().Where(exp.ToExpression()).ToPageListAsync(page, pageSize);
+
+            var sb = new StringBuilder();
+
+            var start = 1 + (page - 1) * pageSize;
+            var index = 0;
+            foreach (var user in userList)
+            {
+                var url = user.HtmlUserLink();
+
+                sb.Append($"{start + index++}. <code>{user.UserID}</code> {url}");
+
+                if (!string.IsNullOrEmpty(user.UserName))
+                {
+                    sb.Append($" <code>@{user.UserName}</code>");
+                }
+                if (user.IsBan)
+                {
+                    sb.Append(" 已封禁");
+                }
+                if (user.IsBot)
+                {
+                    sb.Append(" 机器人");
+                }
+                sb.AppendLine();
+            }
+
+            sb.AppendLine();
+            sb.AppendLine($"共 {userListCount} 条, 当前显示 {start}~{start + userList.Count - 1} 条, 仅查找90天内活跃的用户");
+
+            var keyboard = _markupHelperService.UserListPageKeyboard(dbUser, query, page, totalPages);
+
+            return (sb.ToString(), keyboard);
+        }
+
+        public async Task<(string, InlineKeyboardMarkup?)> QueryAllUserList(Users dbUser, string query, int page)
+        {
+            //每页数量
+            const int pageSize = 30;
+
+            //SQL表达式
+            var exp = Expressionable.Create<Users>();
+
+            //查找全部
+            if (query == "*")
+            {
+                exp.And(x => true);
+            }
+            else
+            {
+                //根据userID查找用户
+                if (long.TryParse(query, out var userID))
+                {
+                    exp.Or(x => x.UserID == userID);
+                }
+
+                //根据用户名查找用户
+                exp.Or(x => x.FirstName.Contains(query) || x.LastName.Contains(query));
+
+                //根据UserName查找用户
+                if (query.StartsWith('@'))
+                {
+                    query = query[1..];
+                }
+                exp.Or(x => x.UserName.Contains(query));
+            }
 
             var userListCount = await Queryable().Where(exp.ToExpression()).CountAsync();
 

@@ -13,6 +13,7 @@
 		<PackageReference Include="MySql.Data" />
 		<PackageReference Include="NLog" />
 		<PackageReference Include="NLog.Extensions.Logging" />
+		<PackageReference Include="NLog.Web.AspNetCore" />
 		<PackageReference Include="Quartz" />
 		<PackageReference Include="Quartz.AspNetCore" />
 		<PackageReference Include="SqlSugar.IOC" />
@@ -35,6 +36,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Include="..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Content Include="..\LICENSE.txt">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
@@ -48,6 +53,12 @@
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 			<Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
 		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="nlog.config">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
 </Project>

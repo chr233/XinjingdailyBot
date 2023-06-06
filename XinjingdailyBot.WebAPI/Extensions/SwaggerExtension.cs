@@ -18,15 +18,14 @@ namespace XinjingdailyBot.WebAPI.Extensions
                 options.SwaggerDoc("v1", new OpenApiInfo {
                     Version = "v1",
                     Title = "XinjingdailyBot API",
-                    Description = "An ASP.NET Core Web API for managing ToDo items",
-                    TermsOfService = new Uri("https://example.com/terms"),
+                    Description = "",
                     Contact = new OpenApiContact {
-                        Name = "Example Contact",
-                        Url = new Uri("https://example.com/contact")
+                        Name = "心惊报",
+                        Url = new Uri("https://t.me/xinjingdaily")
                     },
                     License = new OpenApiLicense {
-                        Name = "Example License",
-                        Url = new Uri("https://example.com/license")
+                        Name = "AGPL 3.0",
+                        Url = new Uri("https://github.com/chr233/XinjingdailyBot/blob/main/LICENSE.txt")
                     },
                 });
             });

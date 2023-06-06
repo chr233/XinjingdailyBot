@@ -1,6 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Net;
 using System.Text.Json;
+using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Model;
 using XinjingdailyBot.Interface.Helper;
@@ -16,11 +19,37 @@ namespace XinjingdailyBot.Service.Helper
 
         public HttpHelperService(
             ILogger<HttpHelperService> logger,
-            IHttpClientFactory httpClientFactory)
+            IHttpClientFactory httpClientFactory,
+            IOptions<OptionsSetting> options)
         {
             _logger = logger;
             _httpClientFactory = httpClientFactory;
+
+            //统计
+            if (options.Value.Statistic)
+            {
+                var client = _httpClientFactory.CreateClient("Statistic");
+
+                StatisticTimer = new Timer(
+                    async (_) => {
+                        try
+                        {
+                            await client.GetAsync("/XinjingdailyBot");
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "统计信息出错");
+                        }
+                    },
+                    null,
+                    TimeSpan.FromSeconds(30),
+                    TimeSpan.FromHours(24)
+                );
+            }
+
         }
+
+        private Timer? StatisticTimer { get; init; }
 
         /// <summary>
         /// 发送网络请求
@@ -95,5 +124,7 @@ namespace XinjingdailyBot.Service.Helper
             var response = await StreamToObject<IpInfoResponse>(rawResponse);
             return response;
         }
+
+        public HttpClient CreateClient(string name) => _httpClientFactory.CreateClient(name);
     }
 }

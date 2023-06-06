@@ -11,6 +11,10 @@ namespace XinjingdailyBot.Infrastructure
         /// 调试模式
         /// </summary>
         public bool Debug { get; set; }
+        /// <summary>
+        /// 统计
+        /// </summary>
+        public bool Statistic { get; set; } = true;
         /// <inheritdoc cref="BotOption"/>
         public BotOption Bot { get; set; } = new();
         /// <inheritdoc cref="ChannelOption"/>
@@ -25,7 +29,9 @@ namespace XinjingdailyBot.Infrastructure
         public GitHubOption GitHub { get; set; } = new();
         /// <inheritdoc cref="IpInfoOption"/>
         public IpInfoOption IpInfo { get; set; } = new();
-
+        /// <inheritdoc cref="ScheduleOption"/>
+        public ScheduleOption Schedule { get; set; } = new();
+        
         /// <summary>
         /// 机器人选项
         /// </summary>
@@ -224,6 +230,17 @@ namespace XinjingdailyBot.Infrastructure
             /// Token
             /// </summary>
             public string? Token { get; set; }
+        }
+
+        /// <summary>
+        /// 任务计划
+        /// </summary>
+        public sealed record ScheduleOption
+        {
+            /// <summary>
+            /// 任务计划
+            /// </summary>
+            public Dictionary<string, string> Cron { get; set; } = new();
         }
     }
 }
