@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Service.Bot.Common;
 
 namespace XinjingdailyBot.WebAPI.Extensions
@@ -18,8 +19,8 @@ namespace XinjingdailyBot.WebAPI.Extensions
         public static void AddTelegramBotClient(this IServiceCollection services)
         {
             services.AddSingleton<ITelegramBotClient>(serviceProvider => {
-                var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
-                var httpClient = httpClientFactory.CreateClient("Telegram");
+                var httpHelperService = serviceProvider.GetRequiredService<IHttpHelperService>();
+                var httpClient = httpHelperService.CreateClient("Telegram");
 
                 var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
                 string? token = config.Bot.BotToken;
@@ -34,7 +35,7 @@ namespace XinjingdailyBot.WebAPI.Extensions
 
                 string? baseUrl = config.Bot.BaseUrl;
 
-                TelegramBotClientOptions options = new(token, baseUrl, false);
+                var options = new TelegramBotClientOptions(token, baseUrl, false);
                 return new TelegramBotClient(options, httpClient);
             });
 

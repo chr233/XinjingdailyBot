@@ -59,6 +59,14 @@ namespace XinjingdailyBot.Interface.Data
         /// <returns></returns>
         Task<Users?> QueryUserByUserId(long UserId);
         /// <summary>
+        /// 查找全部用户
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="query"></param>
+        /// <param name="page"></param>
+        /// <returns></returns>
+        Task<(string, InlineKeyboardMarkup?)> QueryAllUserList(Users dbUser, string query, int page);
+        /// <summary>
         /// 查找用户
         /// </summary>
         /// <param name="dbUser"></param>

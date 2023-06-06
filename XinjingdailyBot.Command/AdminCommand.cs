@@ -625,12 +625,12 @@ namespace XinjingdailyBot.Command
         /// <param name="message"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [TextCmd("SEARCHUSER", EUserRights.AdminCmd, Alias = "QUSER", Description = "搜索用户")]
-        public async Task ResponseSearchUser(Users dbUser, Message message, string[] args)
+        [TextCmd("QUERYUSER", EUserRights.AdminCmd, Alias = "SEARCHUSER,QUSER", Description = "搜索用户")]
+        public async Task ResponseQueryUser(Users dbUser, Message message, string[] args)
         {
             if (!args.Any())
             {
-                await _botClient.SendCommandReply("请指定 用户昵称/用户名/用户ID 作为查询参数", message, true);
+                await _botClient.SendCommandReply("请指定 用户昵称/用户名/用户ID 作为查询参数, 或者使用通配符 * 查找全部用户", message, true);
                 return;
             }
 
@@ -661,8 +661,8 @@ namespace XinjingdailyBot.Command
         /// <param name="callbackQuery"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        [QueryCmd("SEARCHUSER", EUserRights.AdminCmd, Alias = "QUERYUSER")]
-        public async Task QResponseSearchUser(Users dbUser, CallbackQuery callbackQuery, string[] args)
+        [QueryCmd("QUERYUSER", EUserRights.AdminCmd, Alias = "SEARCHUSER")]
+        public async Task QResponseQueryUser(Users dbUser, CallbackQuery callbackQuery, string[] args)
         {
             async Task<(string, InlineKeyboardMarkup?)> exec()
             {
@@ -679,6 +679,72 @@ namespace XinjingdailyBot.Command
                 }
 
                 return await _userService.QueryUserList(dbUser, query, page);
+            }
+            (string text, var kbd) = await exec();
+            await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, ParseMode.Html, true, kbd);
+        }
+
+        /// <summary>
+        /// 搜索用户
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="message"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        [TextCmd("QUERYALLUSER", EUserRights.AdminCmd, Alias = "SEARALLCHUSER,QAUSER", Description = "搜索用户")]
+        public async Task ResponseQueryAllUser(Users dbUser, Message message, string[] args)
+        {
+            if (!args.Any())
+            {
+                await _botClient.SendCommandReply("请指定 用户昵称/用户名/用户ID 作为查询参数, 或者使用通配符 * 查找全部用户", message, true);
+                return;
+            }
+
+            var query = args.First();
+
+            int page;
+            if (args.Length >= 2)
+            {
+                if (!int.TryParse(args[1], out page))
+                {
+                    page = 1;
+                }
+            }
+            else
+            {
+                page = 1;
+            }
+
+            (var text, var keyboard) = await _userService.QueryAllUserList(dbUser, query, page);
+
+            await _botClient.SendCommandReply(text, message, false, ParseMode.Html, keyboard);
+        }
+
+        /// <summary>
+        /// 搜索用户翻页
+        /// </summary>
+        /// <param name="dbUser"></param>
+        /// <param name="callbackQuery"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        [QueryCmd("QUERYALLUSER", EUserRights.AdminCmd, Alias = "SEARCHALLUSER")]
+        public async Task QResponseQueryAllUser(Users dbUser, CallbackQuery callbackQuery, string[] args)
+        {
+            async Task<(string, InlineKeyboardMarkup?)> exec()
+            {
+                if (args.Length < 3)
+                {
+                    return ("参数有误", null);
+                }
+
+                string query = args[1];
+
+                if (!int.TryParse(args[2], out int page))
+                {
+                    page = 1;
+                }
+
+                return await _userService.QueryAllUserList(dbUser, query, page);
             }
             (string text, var kbd) = await exec();
             await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, ParseMode.Html, true, kbd);
@@ -1339,7 +1405,7 @@ namespace XinjingdailyBot.Command
         {
             var token = await _userTokenService.GenerateNewUserToken(dbUser);
 
-            await _botClient.SendCommandReply(token.APIToken.ToString("N"), message, false);
+            await _botClient.SendCommandReply(token.APIToken.ToString(), message, false);
         }
 
         /// <summary>

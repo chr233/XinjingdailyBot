@@ -9,6 +9,13 @@ namespace XinjingdailyBot.Interface.Helper
     public interface IHttpHelperService
     {
         /// <summary>
+        /// 创建Http客户端
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        HttpClient CreateClient(string name);
+
+        /// <summary>
         /// 下载发行版
         /// </summary>
         /// <param name="downloadUrl"></param>

@@ -259,6 +259,15 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
+        ///   查找类似 ⏲️延时 的本地化字符串。
+        /// </summary>
+        public static string ReviewPlan {
+            get {
+                return ResourceManager.GetString("ReviewPlan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 ❌拒绝 的本地化字符串。
         /// </summary>
         public static string ReviewReject {

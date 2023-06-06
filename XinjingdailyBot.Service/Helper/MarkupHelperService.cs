@@ -134,6 +134,7 @@ namespace XinjingdailyBot.Service.Helper
             btns.Add(new[]
             {
                 InlineKeyboardButton.WithCallbackData(Langs.ReviewReject, "review reject"),
+                InlineKeyboardButton.WithCallbackData(Langs.ReviewPlan, "review plan"),
                 InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
             });
 

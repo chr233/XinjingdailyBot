@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
 
@@ -7,10 +8,11 @@ namespace XinjingdailyBot.WebAPI.IPC.Controllers
     /// <summary>
     /// 主页控制器
     /// </summary>
+    [ApiController]
     [Route("Api/[controller]")]
-    public class IndexController : XjbController
+    public class PostController : XjbController
     {
-        private readonly ILogger<IndexController> _logger;
+        private readonly ILogger<PostController> _logger;
         private readonly IUserTokenService _userTokenService;
 
         /// <summary>
@@ -18,8 +20,8 @@ namespace XinjingdailyBot.WebAPI.IPC.Controllers
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="userTokenService"></param>
-        public IndexController(
-            ILogger<IndexController> logger,
+        public PostController(
+            ILogger<PostController> logger,
             IUserTokenService userTokenService)
         {
             _logger = logger;
@@ -27,24 +29,20 @@ namespace XinjingdailyBot.WebAPI.IPC.Controllers
         }
 
         /// <summary>
-        /// Root
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("[action]")]
-        public IActionResult Get()
-        {
-            return Ok("启动完成");
-        }
-
-        /// <summary>
         /// 测试
         /// </summary>
         /// <param name="token"></param>
+        /// <param name="files"></param>
         /// <returns></returns>
         [HttpPost("[action]")]
-        public async Task<ActionResult<Users>> TestToken([FromBody] Guid token)
+        public async Task<ActionResult<Users>> TestToken(Guid token, IFormFileCollection files)
         {
             var user = await _userTokenService.VerifyToken(token);
+
+            if (false)
+            {
+
+            }
 
             if (user != null)
             {
