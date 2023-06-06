@@ -8,7 +8,7 @@ namespace XinjingdailyBot.WebAPI.IPC.Controllers
     /// 主页控制器
     /// </summary>
     [Route("Api/[controller]")]
-    public class IndexController : XjbController
+    public sealed class IndexController : XjbController
     {
         private readonly ILogger<IndexController> _logger;
         private readonly IUserTokenService _userTokenService;

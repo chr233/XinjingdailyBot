@@ -127,7 +127,7 @@ namespace XinjingdailyBot.Service.Bot.Common
             catch
             {
                 _logger.LogError("未找到指定的闲聊群组, 可以使用 /groupinfo 命令获取群组信息");
-                _subGroup = new() { Id = -1 };
+                _subGroup = new Chat { Id = -1 };
             }
 
             if (_subGroup.Id == -1 && _commentGroup.Id != -1)
