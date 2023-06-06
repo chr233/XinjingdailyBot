@@ -90,7 +90,7 @@ namespace XinjingdailyBot.Repository
         /// <returns></returns>
         private async Task InsertBuildInRejectReasons()
         {
-            var levels = new List<RejectReasons>()
+            var levels = new List<RejectReasons>
             {
                 new RejectReasons { Id = 1, Name = "模糊", Payload = "fuzzy", FullText = "图片模糊/看不清", IsCount = false },
                 new RejectReasons { Id = 2, Name = "重复", Payload = "duplicate", FullText = "重复的稿件", IsCount = false },

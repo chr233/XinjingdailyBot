@@ -61,7 +61,7 @@ namespace XinjingdailyBot.Repository
         private async Task InsertBuildInLevels()
         {
             //请不要修改ID为0和1的字段
-            var levels = new List<Levels>()
+            var levels = new List<Levels>
             {
                 new Levels{ Id = 0, Name = "Lv-" },
                 new Levels{ Id = 1, Name = "Lv0", MinExp = 0, MaxExp = 10 },
