@@ -11,22 +11,20 @@ namespace XinjingdailyBot.Service.Data;
 internal sealed class UserTokenService : BaseService<UserTokens>, IUserTokenService
 {
     private readonly ILogger<UserTokenService> _logger;
-    private readonly IUserService _userService;
 
     public UserTokenService(
-        ILogger<UserTokenService> logger,
-        IUserService userService)
+        ILogger<UserTokenService> logger)
     {
         _logger = logger;
-        _userService = userService;
     }
 
     public async Task<UserTokens> GenerateNewUserToken(Users dbUser)
     {
-        var token = await Queryable().Where(x => x.UserID == dbUser.UserID).FirstAsync();
+        var token = await Queryable().Where(x => x.UID == dbUser.Id).FirstAsync();
         if (token == null)
         {
             token = new UserTokens {
+                UID = dbUser.Id,
                 UserID = dbUser.UserID,
                 APIToken = Guid.NewGuid(),
                 ExpiredAt = IUserTokenService.MaxExpiredValue,
@@ -46,7 +44,7 @@ internal sealed class UserTokenService : BaseService<UserTokens>, IUserTokenServ
 
     public async Task<UserTokens?> FetchUserToken(Users dbUser)
     {
-        var token = await Queryable().Where(x => x.UserID == dbUser.UserID).FirstAsync();
+        var token = await Queryable().Where(x => x.UID == dbUser.Id).FirstAsync();
         if (token == null || token.ExpiredAt < DateTime.Now)
         {
             return null;
@@ -56,13 +54,15 @@ internal sealed class UserTokenService : BaseService<UserTokens>, IUserTokenServ
 
     public async Task<Users?> VerifyToken(Guid token)
     {
-        var userToken = await Queryable().Where(x => x.APIToken == token).FirstAsync();
-        if (userToken == null || userToken.ExpiredAt < DateTime.Now)
+        var userToken = await Queryable()
+            .Includes(static x => x.User)
+            .FirstAsync(x => x.APIToken == token);
+
+        if (userToken?.User != null && userToken.ExpiredAt > DateTime.Now)
         {
-            return null;
+            return userToken.User;
         }
 
-        var user = await _userService.FetchUserByUserID(userToken.UserID);
-        return user;
+        return null;
     }
 }

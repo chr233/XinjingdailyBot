@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.HttpOverrides;
 using XinjingdailyBot.WebAPI.IPC.Middlewares;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
@@ -32,6 +31,9 @@ public static class WebAPIExtension
 
         // 控制器
         services.AddControllers();
+
+        // 注册服务
+        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
     }
 
     /// <summary>
@@ -69,8 +71,11 @@ public static class WebAPIExtension
 
         app.UseStatusCodePages();
 
-        // 身份验证中间件
-        app.UseMiddleware<ApiAuthenticationMiddleware>();
+        // 身份验证中间件, 仅在 /Api 路径下启用
+        app.UseWhen(static context =>
+            context.Request.Path.StartsWithSegments("/Api", StringComparison.OrdinalIgnoreCase),
+            static appBuilder => appBuilder.UseMiddleware<ApiAuthenticationMiddleware>()
+        );
 
         // 控制器
         app.MapControllers();
