@@ -1,51 +1,85 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
-#pragma warning disable CS1591 // 缺少对公共可见类型或成员的 XML 注释
+namespace XinjingdailyBot.Infrastructure.Model;
 
-namespace XinjingdailyBot.Infrastructure.Model
+/// <summary>
+/// GitHubRelease响应实体
+/// </summary>
+public sealed record GitHubReleaseResponse
 {
     /// <summary>
-    /// GitHubRelease响应实体
+    /// html_url
     /// </summary>
-    public sealed record GitHubReleaseResponse
-    {
-        [JsonPropertyName("html_url")]
-        public string Url { get; set; } = "";
+    [JsonPropertyName("html_url")]
+    public string Url { get; set; } = "";
 
+    /// <summary>
+    /// name
+    /// </summary>
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = "";
+
+    /// <summary>
+    /// body
+    /// </summary>
+    [JsonPropertyName("body")]
+    public string Body { get; set; } = "";
+
+    /// <summary>
+    /// tag_name
+    /// </summary>
+    [JsonPropertyName("tag_name")]
+    public string TagName { get; set; } = "";
+
+    /// <summary>
+    /// created_at
+    /// </summary>
+    [JsonPropertyName("created_at")]
+    public string CreatedAt { get; set; } = "";
+
+    /// <summary>
+    /// published_at
+    /// </summary>
+    [JsonPropertyName("published_at")]
+    public string PublicAt { get; set; } = "";
+
+    /// <inheritdoc cref="GitHubAssetsData"/>
+    [JsonPropertyName("assets")]
+    public HashSet<GitHubAssetsData> Assets { get; set; } = new();
+
+    /// <summary>
+    /// Asset数据
+    /// </summary>
+    public sealed record GitHubAssetsData
+    {
+        /// <summary>
+        /// name
+        /// </summary>
         [JsonPropertyName("name")]
         public string Name { get; set; } = "";
 
-        [JsonPropertyName("body")]
-        public string Body { get; set; } = "";
+        /// <summary>
+        /// size
+        /// </summary>
+        [JsonPropertyName("size")]
+        public uint Size { get; set; }
 
-        [JsonPropertyName("tag_name")]
-        public string TagName { get; set; } = "";
-
+        /// <summary>
+        /// created_at
+        /// </summary>
         [JsonPropertyName("created_at")]
         public string CreatedAt { get; set; } = "";
 
-        [JsonPropertyName("published_at")]
-        public string PublicAt { get; set; } = "";
+        /// <summary>
+        /// updated_at
+        /// </summary>
+        [JsonPropertyName("updated_at")]
+        public string UpdatedAt { get; set; } = "";
 
-        [JsonPropertyName("assets")]
-        public HashSet<GitHubAssetsData> Assets { get; set; } = new();
-
-        public sealed record GitHubAssetsData
-        {
-            [JsonPropertyName("name")]
-            public string Name { get; set; } = "";
-
-            [JsonPropertyName("size")]
-            public uint Size { get; set; }
-
-            [JsonPropertyName("created_at")]
-            public string CreatedAt { get; set; } = "";
-
-            [JsonPropertyName("updated_at")]
-            public string UpdatedAt { get; set; } = "";
-
-            [JsonPropertyName("browser_download_url")]
-            public string DownloadUrl { get; set; } = "";
-        }
+        /// <summary>
+        /// browser_download_url
+        /// </summary>
+        [JsonPropertyName("browser_download_url")]
+        public string DownloadUrl { get; set; } = "";
     }
 }

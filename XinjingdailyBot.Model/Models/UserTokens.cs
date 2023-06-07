@@ -1,4 +1,4 @@
-﻿using SqlSugar;
+using SqlSugar;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
 
@@ -22,12 +22,8 @@ public sealed record UserTokens : BaseModel, ICreateAt, IExpiredAt
     /// </summary>
     public Guid APIToken { get; set; }
 
-    /// <summary>
-    /// 创建时间
-    /// </summary>
+    /// <inheritdoc cref=" ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;
-    /// <summary>
-    /// 修改时间
-    /// </summary>
+    /// <inheritdoc cref=" IExpiredAt"/>
     public DateTime ExpiredAt { get; set; } = DateTime.MaxValue;
 }

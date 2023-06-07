@@ -19,6 +19,7 @@
 		<PackageReference Include="SqlSugar.IOC" />
 		<PackageReference Include="SqlSugarCore" />
 		<PackageReference Include="Swashbuckle.AspNetCore" />
+		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
 		<PackageReference Include="Telegram.Bot" />
 	</ItemGroup>
 
@@ -57,7 +58,7 @@
 
 	<ItemGroup>
 	  <Content Update="nlog.config">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	</ItemGroup>
 

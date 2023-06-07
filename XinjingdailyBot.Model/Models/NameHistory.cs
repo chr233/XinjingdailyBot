@@ -1,5 +1,6 @@
-﻿using SqlSugar;
+using SqlSugar;
 using XinjingdailyBot.Model.Base;
+using XinjingdailyBot.Model.Columns;
 
 namespace XinjingdailyBot.Model.Models;
 
@@ -7,7 +8,7 @@ namespace XinjingdailyBot.Model.Models;
 /// 用户曾用名记录
 /// </summary>
 [SugarTable("name_history", TableDescription = "等级组")]
-public sealed record NameHistory : BaseModel
+public sealed record NameHistory : BaseModel, ICreateAt
 {
     /// <summary>
     /// 主键
@@ -26,8 +27,6 @@ public sealed record NameHistory : BaseModel
     /// 用户昵称 名
     /// </summary>
     public string LastName { get; set; } = "";
-    /// <summary>
-    /// 添加日期
-    /// </summary>
+    /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; }
 }

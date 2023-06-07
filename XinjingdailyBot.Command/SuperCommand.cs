@@ -462,7 +462,7 @@ namespace XinjingdailyBot.Command
                         Text = oldPost.Text,
                         RawText = oldPost.RawText,
                         ChannelID = channelId,
-                        ChannelMsgId = channelMsgId,
+                        ChannelMsgID = channelMsgId,
                         Status = oldPost.Status,
                         PostType = oldPost.PostType,
                         OriginMediaGroupID = "",
