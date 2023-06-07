@@ -34,7 +34,7 @@ internal sealed class AdvertisesService : BaseService<Advertises>, IAdvertisesSe
 
         //随机抽取广告
         int sum = 0;
-        var weightList = new List<(int, Advertises)>();
+        var weightList = new List<(int weight, Advertises ad)>();
 
         foreach (var ad in validAds)
         {
@@ -44,7 +44,7 @@ internal sealed class AdvertisesService : BaseService<Advertises>, IAdvertisesSe
 
         int randInt = new Random().Next(0, sum);
 
-        var randomAd = weightList.First(kv => kv.Item1 > randInt).Item2;
+        var randomAd = weightList.First(kv => kv.weight > randInt).ad;
 
         return randomAd;
     }

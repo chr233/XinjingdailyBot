@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -435,7 +436,12 @@ internal class CommandHandler : ICommandHandler
 
         if (cmds.Count > 0)
         {
-            return string.Join('\n', cmds.OrderBy(x => x.Key).Select(static x => $"/{x.Key} - {x.Value}"));
+            var sb = new StringBuilder();
+            foreach (var cmd in cmds.OrderBy(static x => x.Key))
+            {
+                sb.AppendLine($"/{cmd.Key} - {cmd.Value}");
+            }
+            return sb.ToString();
         }
         else
         {

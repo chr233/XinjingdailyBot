@@ -18,7 +18,13 @@ public static class AppServiceExtensions
     [RequiresUnreferencedCode("不兼容剪裁")]
     public static void AddAppService(this IServiceCollection services)
     {
-        string[] cls = new[] { "XinjingdailyBot.Repository", "XinjingdailyBot.Service", "XinjingdailyBot.Command" };
+        var cls = new string[] {
+            "XinjingdailyBot.Repository",
+            "XinjingdailyBot.Service",
+            "XinjingdailyBot.Command",
+            "XinjingdailyBot.WebAPI",
+        };
+
         foreach (var item in cls)
         {
             var assembly = Assembly.Load(item);

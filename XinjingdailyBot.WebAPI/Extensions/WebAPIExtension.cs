@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.HttpOverrides;
+using XinjingdailyBot.WebAPI.IPC.Middlewares;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
@@ -19,6 +20,7 @@ public static class WebAPIExtension
 
         // 响应缓存
         services.AddResponseCaching();
+
         // 响应压缩
         services.AddResponseCompression(static options => options.EnableForHttps = true);
 
@@ -64,6 +66,11 @@ public static class WebAPIExtension
         {
             app.UseSwaggerEx();
         }
+
+        app.UseStatusCodePages();
+
+        // 身份验证中间件
+        app.UseMiddleware<ApiAuthenticationMiddleware>();
 
         // 控制器
         app.MapControllers();

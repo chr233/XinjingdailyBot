@@ -11,7 +11,7 @@ namespace XinjingdailyBot.Service.Helper;
 
 /// <inheritdoc cref="IHttpHelperService"/>
 [AppService(typeof(IHttpHelperService), LifeTime.Transient)]
-internal sealed class HttpHelperService : IHttpHelperService
+internal sealed class HttpHelperService : IHttpHelperService, IDisposable
 {
     private readonly ILogger<HttpHelperService> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
@@ -48,6 +48,9 @@ internal sealed class HttpHelperService : IHttpHelperService
 
     }
 
+    /// <summary>
+    /// 统计Timer
+    /// </summary>
     private Timer? StatisticTimer { get; init; }
 
     /// <summary>
@@ -125,4 +128,6 @@ internal sealed class HttpHelperService : IHttpHelperService
     }
 
     public HttpClient CreateClient(string name) => _httpClientFactory.CreateClient(name);
+    
+    public void Dispose() => StatisticTimer?.Dispose();
 }
