@@ -30,66 +30,44 @@ public static class Program
 
         Thread.Sleep(2000);
 
+        CleanOldFiles();
+
         var builder = WebApplication.CreateBuilder(args);
+        var services = builder.Services;
 
-        //配置类支持
-        builder.Services.AddOptions().Configure<OptionsSetting>(builder.Configuration);
+        // 配置类支持
+        services.AddOptions();
+        services.Configure<OptionsSetting>(builder.Configuration);
 
-        //NLog
-        builder.Services.AddLogging(loggingBuilder => {
+        // NLog
+        services.AddLogging(loggingBuilder => {
             loggingBuilder.ClearProviders();
             loggingBuilder.SetMinimumLevel(LogLevel.Debug);
             loggingBuilder.AddNLog();
         });
 
-        //SqlSugar
-        builder.Services.AddSqlSugar(builder.Configuration);
+        // SqlSugar
+        services.AddSqlSugar(builder.Configuration);
 
-        //添加服务
-        builder.Services.AddAppService();
+        // 添加服务
+        services.AddAppService();
 
-        //注册HttpClient
-        builder.Services.AddHttpClients();
+        // 注册HttpClient
+        services.AddHttpClients();
 
-        //Telegram
-        builder.Services.AddTelegramBotClient();
+        // Telegram
+        services.AddTelegramBotClient();
 
-        //定时任务
-        builder.Services.AddTasks(builder.Configuration);
+        // 定时任务
+        services.AddTasks(builder.Configuration);
 
-        //Web API
-        builder.Services.AddControllers();
-
-        //Swagger
-        builder.Services.AddSwagger();
-
-        //设置最大文件上传尺寸
-        builder.WebHost.UseKestrel(options => options.Limits.MaxRequestBodySize = 1073741824);
+        // Web API
+        services.AddWebAPI(builder.WebHost);
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseDeveloperExceptionPage();
-            app.UseSwagger();
-            app.UseSwaggerUI(options => {
-                options.DisplayRequestDuration();
-                options.EnableDeepLinking();
-                options.ShowExtensions();
-            });
-        }
-        else
-        {
-            app.UseExceptionHandler("/Error");
-        }
-
-        app.UseAuthorization();
-
-        app.MapControllers();
-
-
-        CleanOldFiles();
+        // Web API
+        app.UseWebAPI();
 
         app.Run();
     }

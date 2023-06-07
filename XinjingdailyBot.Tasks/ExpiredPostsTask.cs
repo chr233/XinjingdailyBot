@@ -86,7 +86,7 @@ internal class ExpiredPostsTask : IJob
                 }
                 post.ModifyAt = DateTime.Now;
 
-                await _postService.Updateable(post).UpdateColumns(x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
+                await _postService.Updateable(post).UpdateColumns(static x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
             }
 
             var user = await _userService.Queryable().FirstAsync(x => x.UserID == userID);
@@ -134,7 +134,7 @@ internal class ExpiredPostsTask : IJob
                 user.ModifyAt = DateTime.Now;
 
                 //更新用户表
-                await _userService.Updateable(user).UpdateColumns(x => new {
+                await _userService.Updateable(user).UpdateColumns(static x => new {
                     x.PrivateChatID,
                     x.ExpiredPostCount,
                     x.ModifyAt

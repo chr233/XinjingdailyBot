@@ -18,20 +18,20 @@ internal class ChannelService : IChannelService
     private readonly ILogger<ChannelService> _logger;
 
     private Chat _reviewGroup = new();
-    private Chat _reviewLogChannel = new();
+    private readonly Chat _reviewLogChannel = new();
     private Chat _commentGroup = new();
     private Chat _subGroup = new();
     private Chat _acceptChannel = new();
     private Chat _rejectChannel = new();
     private User _botUser = new();
 
-    public Chat ReviewGroup { get => _reviewGroup; }
-    public Chat ReviewLogChannel { get => _reviewLogChannel; }
-    public Chat CommentGroup { get => _commentGroup; }
-    public Chat SubGroup { get => _subGroup; }
-    public Chat AcceptChannel { get => _acceptChannel; }
-    public Chat RejectChannel { get => _rejectChannel; }
-    public User BotUser { get => _botUser; }
+    public Chat ReviewGroup => _reviewGroup;
+    public Chat ReviewLogChannel => _reviewLogChannel;
+    public Chat CommentGroup => _commentGroup;
+    public Chat SubGroup => _subGroup;
+    public Chat AcceptChannel => _acceptChannel;
+    public Chat RejectChannel => _rejectChannel;
+    public User BotUser => _botUser;
 
     public ChannelService(
         ILogger<ChannelService> logger,

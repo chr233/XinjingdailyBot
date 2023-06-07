@@ -55,9 +55,7 @@ public static class DatabaseExtension
                     _logger.Debug("{sql}，{param}", sql, param);
                 };
 
-                db.Aop.OnError = (e) => {
-                    _logger.Error("执行SQL出错：", e);
-                };
+                db.Aop.OnError = static (e) => _logger.Error("执行SQL出错：", e);
             }
 
             if (dbConfig.Generate && IsFirstLoad)

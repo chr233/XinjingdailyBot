@@ -7,7 +7,7 @@ namespace XinjingdailyBot.WebAPI.IPC.Data;
 /// <summary>
 /// 投稿数据
 /// </summary>
-public sealed record NewPostData
+public sealed record CreatePostData
 {
     /// <summary>
     /// 文字描述

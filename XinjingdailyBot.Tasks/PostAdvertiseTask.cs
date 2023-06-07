@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -73,7 +73,7 @@ internal class PostAdvertiseTask : IJob
                     {
                         await _botClient.PinChatMessageAsync(chatId, msgId.Id, true);
                     }
-                    await _advertisesService.Updateable(ad).UpdateColumns(x => new { x.ShowCount, x.LastPostAt }).ExecuteCommandAsync();
+                    await _advertisesService.Updateable(ad).UpdateColumns(static x => new { x.ShowCount, x.LastPostAt }).ExecuteCommandAsync();
                 }
                 catch (Exception ex)
                 {

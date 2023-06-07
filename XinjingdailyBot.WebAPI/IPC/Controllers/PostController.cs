@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.WebAPI.IPC.Data;
@@ -9,6 +10,7 @@ namespace XinjingdailyBot.WebAPI.IPC.Controllers;
 /// 主页控制器
 /// </summary>
 [Route("Api/[controller]", Name = "投稿")]
+[Authorize]
 public sealed class PostController : XjbController
 {
     private readonly ILogger<PostController> _logger;
@@ -31,16 +33,16 @@ public sealed class PostController : XjbController
     /// 创建稿件
     /// </summary>
     /// <param name="token"></param>
-    /// <param name="newPost"></param>
+    /// <param name="post"></param>
     /// <returns></returns>
     [HttpPost("[action]")]
-    public async Task<ActionResult<Users>> NewPost(Guid token, [FromForm] NewPostData newPost)
+    public async Task<ActionResult<Users>> CreatePost(Guid token, [FromForm] CreatePostData post)
     {
         var user = await _userTokenService.VerifyToken(token);
 
-        if (false)
+        if (true)
         {
-
+            _logger.LogInformation("{post}", post);
         }
 
         if (user != null)

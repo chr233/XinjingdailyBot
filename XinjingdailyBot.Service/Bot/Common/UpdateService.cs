@@ -56,10 +56,10 @@ internal class UpdateService : IUpdateService
 
     public async Task HandlePollingErrorAsync(ITelegramBotClient _, Exception exception, CancellationToken cancellationToken)
     {
-        var ErrorMessage = exception switch {
-            ApiRequestException apiRequestException => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
-            _ => exception.ToString()
-        };
+        //var ErrorMessage = exception switch {
+        //    ApiRequestException apiRequestException => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
+        //    _ => exception.ToString()
+        //};
 
         _logger.LogError(exception, "处理轮询出错");
 

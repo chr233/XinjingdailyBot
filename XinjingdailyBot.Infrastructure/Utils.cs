@@ -17,6 +17,10 @@ public static class Utils
     /// </summary>
     public static string ExeFileName => IsWindows ? "XinjingdailyBot.WebAPI.exe" : "XinjingdailyBot.WebAPI";
     /// <summary>
+    /// XML注释文件名
+    /// </summary>
+    public static string XmlFileName => "XinjingdailyBot.WebAPI.xml";
+    /// <summary>
     /// 可执行文件目录
     /// </summary>
     public static string ExeDirname => AppContext.BaseDirectory;
@@ -24,6 +28,10 @@ public static class Utils
     /// 可执行文件路径
     /// </summary>
     public static string ExeFullPath => Path.Combine(ExeDirname, ExeFileName);
+    /// <summary>
+    /// XML文件路径
+    /// </summary>
+    public static string XmlFullPath => Path.Combine(ExeDirname, XmlFileName);
     /// <summary>
     /// 备份文件路径
     /// </summary>

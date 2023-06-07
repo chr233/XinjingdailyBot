@@ -99,12 +99,11 @@ internal class ReviewCommand
     /// <summary>
     /// 修改稿件文字说明
     /// </summary>
-    /// <param name="dbUser"></param>
     /// <param name="message"></param>
     /// <param name="args"></param>
     /// <returns></returns>
     [TextCmd("EDIT", EUserRights.ReviewPost, Description = "修改稿件文字说明")]
-    public async Task ResponseEditPost(Users dbUser, Message message, string[] args)
+    public async Task ResponseEditPost(Message message, string[] args)
     {
         async Task<string> exec()
         {
@@ -136,7 +135,7 @@ internal class ReviewCommand
             }
 
             post.Text = string.Join(' ', args).Trim();
-            await _postService.Updateable(post).UpdateColumns(x => new { x.Text }).ExecuteCommandAsync();
+            await _postService.Updateable(post).UpdateColumns(static x => new { x.Text }).ExecuteCommandAsync();
 
             return "稿件描述已更新";
         }
@@ -250,7 +249,7 @@ internal class ReviewCommand
         bool anonymous = !post.Anonymous;
         post.Anonymous = anonymous;
         post.ModifyAt = DateTime.Now;
-        await _postService.Updateable(post).UpdateColumns(x => new { x.Anonymous, x.ModifyAt }).ExecuteCommandAsync();
+        await _postService.Updateable(post).UpdateColumns(static x => new { x.Anonymous, x.ModifyAt }).ExecuteCommandAsync();
 
         bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
 
@@ -274,7 +273,7 @@ internal class ReviewCommand
 
         post.HasSpoiler = !post.HasSpoiler;
         post.ModifyAt = DateTime.Now;
-        await _postService.Updateable(post).UpdateColumns(x => new { x.HasSpoiler, x.ModifyAt }).ExecuteCommandAsync();
+        await _postService.Updateable(post).UpdateColumns(static x => new { x.HasSpoiler, x.ModifyAt }).ExecuteCommandAsync();
 
         await _botClient.AutoReplyAsync(post.HasSpoiler ? "启用遮罩" : "禁用遮罩", query);
 
@@ -294,7 +293,7 @@ internal class ReviewCommand
     {
         post.Status = EPostStatus.Cancel;
         post.ModifyAt = DateTime.Now;
-        await _postService.Updateable(post).UpdateColumns(x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
+        await _postService.Updateable(post).UpdateColumns(static x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
 
         await _botClient.EditMessageTextAsync(query.Message!, Langs.PostCanceled, replyMarkup: null);
 

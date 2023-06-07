@@ -107,7 +107,7 @@ internal class ChannelPostHandler : IChannelPostHandler
         //增加通过数量
         dbUser.AcceptCount++;
         dbUser.ModifyAt = DateTime.Now;
-        await _userService.Updateable(dbUser).UpdateColumns(x => new { x.AcceptCount, x.ModifyAt }).ExecuteCommandAsync();
+        await _userService.Updateable(dbUser).UpdateColumns(static x => new { x.AcceptCount, x.ModifyAt }).ExecuteCommandAsync();
     }
 
     public async Task OnMediaChannelPostReceived(Users dbUser, Message message)
@@ -166,7 +166,7 @@ internal class ChannelPostHandler : IChannelPostHandler
         //增加通过数量
         dbUser.AcceptCount++;
         dbUser.ModifyAt = DateTime.Now;
-        await _userService.Updateable(dbUser).UpdateColumns(x => new { x.AcceptCount, x.ModifyAt }).ExecuteCommandAsync();
+        await _userService.Updateable(dbUser).UpdateColumns(static x => new { x.AcceptCount, x.ModifyAt }).ExecuteCommandAsync();
     }
 
     /// <summary>
@@ -240,10 +240,7 @@ internal class ChannelPostHandler : IChannelPostHandler
                     //增加通过数量
                     dbUser.AcceptCount++;
                     dbUser.ModifyAt = DateTime.Now;
-                    await _userService.Updateable(dbUser).UpdateColumns(x => new {
-                        x.AcceptCount,
-                        x.ModifyAt
-                    }).ExecuteCommandAsync();
+                    await _userService.Updateable(dbUser).UpdateColumns(static x => new { x.AcceptCount, x.ModifyAt }).ExecuteCommandAsync();
                 });
             }
         }
