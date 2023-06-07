@@ -21,7 +21,7 @@ public static class AppServiceExtensions
         string[] cls = new[] { "XinjingdailyBot.Repository", "XinjingdailyBot.Service", "XinjingdailyBot.Command" };
         foreach (var item in cls)
         {
-            Assembly assembly = Assembly.Load(item);
+            var assembly = Assembly.Load(item);
             Register(services, assembly);
         }
     }

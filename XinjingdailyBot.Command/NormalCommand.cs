@@ -81,7 +81,7 @@ internal class NormalCommand
         bool anymouse = !dbUser.PreferAnonymous;
         dbUser.PreferAnonymous = anymouse;
         dbUser.ModifyAt = DateTime.Now;
-        await _userService.Updateable(dbUser).UpdateColumns(x => new { x.PreferAnonymous, x.ModifyAt }).ExecuteCommandAsync();
+        await _userService.Updateable(dbUser).UpdateColumns(static x => new { x.PreferAnonymous, x.ModifyAt }).ExecuteCommandAsync();
 
         var mode = anymouse ? "匿名投稿" : "保留来源";
         var text = $"后续投稿将默认使用【{mode}】";
@@ -106,7 +106,7 @@ internal class NormalCommand
         bool notificationg = !dbUser.Notification;
         dbUser.Notification = notificationg;
         dbUser.ModifyAt = DateTime.Now;
-        await _userService.Updateable(dbUser).UpdateColumns(x => new { x.Notification, x.ModifyAt }).ExecuteCommandAsync();
+        await _userService.Updateable(dbUser).UpdateColumns(static x => new { x.Notification, x.ModifyAt }).ExecuteCommandAsync();
 
         var mode = notificationg ? "接收通知" : "静默模式";
         var text = $"稿件被审核或者过期时将会尝试通知用户\n当前通知设置: {mode}";
@@ -339,11 +339,11 @@ internal class NormalCommand
         var tag = tagId != 0 ? _tagRepository.GetTagById(tagId) : null;
 
         var randomPost = await _postService.Queryable()
-                    .Where(x => x.Status == EPostStatus.Accepted)
-                    .WhereIF(postType == null, x => x.PostType != MessageType.Text)
+                    .Where(static x => x.Status == EPostStatus.Accepted)
+                    .WhereIF(postType == null, static x => x.PostType != MessageType.Text)
                     .WhereIF(postType != null, x => x.PostType == postType)
                     .WhereIF(tag != null, x => (x.Tags & tag!.Seg) > 0)
-                    .OrderBy(x => SqlFunc.GetRandom()).FirstAsync();
+                    .OrderBy(static x => SqlFunc.GetRandom()).FirstAsync();
 
         if (randomPost != null)
         {

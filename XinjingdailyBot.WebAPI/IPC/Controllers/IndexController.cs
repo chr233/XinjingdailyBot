@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using XinjingdailyBot.Interface.Data;
 
 namespace XinjingdailyBot.WebAPI.IPC.Controllers;
@@ -30,7 +29,6 @@ public sealed class IndexController : XjbController
     /// <param name="token"></param>
     /// <returns></returns>
     [HttpPost("[action]")]
-    [SwaggerOperation("12", "233")]
     public async Task<ActionResult<bool>> TestToken(Guid token)
     {
         var user = await _userTokenService.VerifyToken(token);

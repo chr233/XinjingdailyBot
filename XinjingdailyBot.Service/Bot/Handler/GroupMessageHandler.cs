@@ -48,7 +48,7 @@ internal class GroupMessageHandler : IGroupMessageHandler
                     else
                     {
                         int seconds = rand.Next(45, 315);
-                        DateTime banTime = DateTime.Now.AddSeconds(seconds);
+                        var banTime = DateTime.Now.AddSeconds(seconds);
 
                         var chatId = message.Chat.Id;
                         try

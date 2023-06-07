@@ -282,7 +282,7 @@ internal class CommandHandler : ICommandHandler
 
     public async Task OnQueryCommandReceived(Users dbUser, CallbackQuery query)
     {
-        Message? message = query.Message;
+        var message = query.Message;
         if (message == null)
         {
             await _botClient.AutoReplyAsync("消息不存在", query, true);
@@ -435,7 +435,7 @@ internal class CommandHandler : ICommandHandler
 
         if (cmds.Count > 0)
         {
-            return string.Join('\n', cmds.OrderBy(x => x.Key).Select(x => $"/{x.Key} - {x.Value}"));
+            return string.Join('\n', cmds.OrderBy(x => x.Key).Select(static x => $"/{x.Key} - {x.Value}"));
         }
         else
         {

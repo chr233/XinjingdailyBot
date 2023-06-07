@@ -199,7 +199,7 @@ internal class AdminCommand
             {
                 targetUser.IsBan = true;
                 targetUser.ModifyAt = DateTime.Now;
-                await _userService.Updateable(targetUser).UpdateColumns(x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
+                await _userService.Updateable(targetUser).UpdateColumns(static x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
 
                 var record = new BanRecords {
                     UserID = targetUser.UserID,
@@ -293,7 +293,7 @@ internal class AdminCommand
             {
                 targetUser.IsBan = false;
                 targetUser.ModifyAt = DateTime.Now;
-                await _userService.Updateable(targetUser).UpdateColumns(x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
+                await _userService.Updateable(targetUser).UpdateColumns(static x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
 
                 var record = new BanRecords {
                     UserID = targetUser.UserID,
@@ -386,17 +386,20 @@ internal class AdminCommand
             else
             {
                 //获取最近一条解封记录
-                var lastUnbaned = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && (x.Type == EBanType.UnBan || x.Type == EBanType.Ban))
-                    .OrderByDescending(x => x.BanTime).FirstAsync();
+                var lastUnbaned = await _banRecordService.Queryable()
+                    .Where(x => x.UserID == targetUser.UserID && (x.Type == EBanType.UnBan || x.Type == EBanType.Ban))
+                    .OrderByDescending(static x => x.BanTime).FirstAsync();
 
                 int warnCount;
                 if (lastUnbaned == null)
                 {
-                    warnCount = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && x.Type == EBanType.Warning).CountAsync();
+                    warnCount = await _banRecordService.Queryable()
+                        .Where(x => x.UserID == targetUser.UserID && x.Type == EBanType.Warning).CountAsync();
                 }
                 else
                 {
-                    warnCount = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && x.Type == EBanType.Warning && x.BanTime >= lastUnbaned.BanTime).CountAsync();
+                    warnCount = await _banRecordService.Queryable()
+                        .Where(x => x.UserID == targetUser.UserID && x.Type == EBanType.Warning && x.BanTime >= lastUnbaned.BanTime).CountAsync();
                 }
 
                 var record = new BanRecords {
@@ -431,7 +434,7 @@ internal class AdminCommand
 
                     targetUser.IsBan = true;
                     targetUser.ModifyAt = DateTime.Now;
-                    await _userService.Updateable(targetUser).UpdateColumns(x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
+                    await _userService.Updateable(targetUser).UpdateColumns(static x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
 
                     sb.AppendLine($"受到警告过多, 系统自动封禁该用户");
                 }
@@ -499,8 +502,9 @@ internal class AdminCommand
         }
         else
         {
-            var records = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID)
-                .OrderByDescending(x => new { x.BanTime }).ToListAsync();
+            var records = await _banRecordService.Queryable()
+                .Where(x => x.UserID == targetUser.UserID)
+                .OrderByDescending(static x => new { x.BanTime }).ToListAsync();
 
             var status = targetUser.IsBan ? "已封禁" : "正常";
             sb.AppendLine($"用户名: {targetUser.HtmlUserLink()}");
@@ -518,9 +522,10 @@ internal class AdminCommand
             }
             else
             {
-                var operators = records.Select(x => x.OperatorUID).Distinct();
+                var operators = records.Select(static x => x.OperatorUID).Distinct();
 
-                var users = await _userService.Queryable().Where(x => operators.Contains(x.UserID)).Distinct().ToListAsync();
+                var users = await _userService.Queryable()
+                    .Where(x => operators.Contains(x.UserID)).Distinct().ToListAsync();
 
                 foreach (var record in records)
                 {
@@ -826,10 +831,10 @@ internal class AdminCommand
         sb.AppendLine($"过期投稿: <code>{yearExpiredPost}</code>");
         sb.AppendLine($"累计投稿: <code>{yearPost}</code>");
 
-        var totalPost = await _postService.Queryable().Where(x => x.Status > EPostStatus.Cancel).CountAsync();
-        var totalAcceptPost = await _postService.Queryable().Where(x => x.Status == EPostStatus.Accepted).CountAsync();
-        var totalRejectPost = await _postService.Queryable().Where(x => x.Status == EPostStatus.Rejected).CountAsync();
-        var totalExpiredPost = await _postService.Queryable().Where(x => x.Status < 0).CountAsync();
+        var totalPost = await _postService.Queryable().Where(static x => x.Status > EPostStatus.Cancel).CountAsync();
+        var totalAcceptPost = await _postService.Queryable().Where(static x => x.Status == EPostStatus.Accepted).CountAsync();
+        var totalRejectPost = await _postService.Queryable().Where(static x => x.Status == EPostStatus.Rejected).CountAsync();
+        var totalExpiredPost = await _postService.Queryable().Where(static x => x.Status < 0).CountAsync();
         var totalChannel = await _channelOptionService.Queryable().CountAsync();
         var totalAttachment = await _attachmentService.Queryable().CountAsync();
 
@@ -843,10 +848,10 @@ internal class AdminCommand
         sb.AppendLine($"附件总数: <code>{totalAttachment}</code>");
 
         var totalUser = await _userService.Queryable().CountAsync();
-        var banedUser = await _userService.Queryable().Where(x => x.IsBan).CountAsync();
+        var banedUser = await _userService.Queryable().Where(static x => x.IsBan).CountAsync();
         var weekActiveUser = await _userService.Queryable().Where(x => x.ModifyAt >= prev7Days).CountAsync();
         var MonthActiveUser = await _userService.Queryable().Where(x => x.ModifyAt >= prev30Days).CountAsync();
-        var postedUser = await _userService.Queryable().Where(x => x.PostCount > 0).CountAsync();
+        var postedUser = await _userService.Queryable().Where(static x => x.PostCount > 0).CountAsync();
 
         sb.AppendLine();
         sb.AppendLine("-- 用户统计 --");
@@ -984,8 +989,9 @@ internal class AdminCommand
         var sb = new StringBuilder();
 
         sb.AppendLine("-- 用户投稿数量排名 --");
-        var userAcceptCountRank = await _userService.Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
-            .OrderByDescending(x => x.AcceptCount).Take(topCount).ToListAsync();
+        var userAcceptCountRank = await _userService.Queryable()
+            .Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
+            .OrderByDescending(static x => x.AcceptCount).Take(topCount).ToListAsync();
         if (userAcceptCountRank?.Count > 0)
         {
             var count = 1;
@@ -1001,8 +1007,9 @@ internal class AdminCommand
 
         sb.AppendLine();
         sb.AppendLine("-- 管理员投稿数量排名 --");
-        var adminAcceptCountRank = await _userService.Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
-            .OrderByDescending(x => x.AcceptCount).Take(topCount).ToListAsync();
+        var adminAcceptCountRank = await _userService.Queryable()
+            .Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
+            .OrderByDescending(static x => x.AcceptCount).Take(topCount).ToListAsync();
         if (adminAcceptCountRank?.Count > 0)
         {
             var count = 1;
@@ -1019,7 +1026,7 @@ internal class AdminCommand
         sb.AppendLine();
         sb.AppendLine("-- 管理员审核数量排名 --");
         var adminReviewCountRank = await _userService.Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.ReviewCount > miniumPost && x.ModifyAt >= prev30Days)
-            .OrderByDescending(x => x.ReviewCount).Take(topCount).ToListAsync();
+            .OrderByDescending(static x => x.ReviewCount).Take(topCount).ToListAsync();
         if (adminReviewCountRank?.Count > 0)
         {
             var count = 1;
@@ -1129,7 +1136,7 @@ internal class AdminCommand
                 {
                     targetUser.GroupID = groupID;
                     targetUser.ModifyAt = DateTime.Now;
-                    await _userService.Updateable(targetUser).UpdateColumns(x => new { x.GroupID, x.ModifyAt }).ExecuteCommandAsync();
+                    await _userService.Updateable(targetUser).UpdateColumns(static x => new { x.GroupID, x.ModifyAt }).ExecuteCommandAsync();
 
                     if (targetUser.PrivateChatID != -1)
                     {
@@ -1250,8 +1257,9 @@ internal class AdminCommand
             }
 
             //获取最近一条解封记录
-            var lastUnbaned = await _banRecordService.Queryable().Where(x => x.UserID == targetUser.UserID && (x.Type == EBanType.UnBan || x.Type == EBanType.Ban))
-                .OrderByDescending(x => x.BanTime).FirstAsync();
+            var lastUnbaned = await _banRecordService.Queryable()
+                .Where(x => x.UserID == targetUser.UserID && (x.Type == EBanType.UnBan || x.Type == EBanType.Ban))
+                .OrderByDescending(static x => x.BanTime).FirstAsync();
 
             int warnCount;
             if (lastUnbaned == null)

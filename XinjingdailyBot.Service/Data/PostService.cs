@@ -499,7 +499,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         string tagName = _tagRepository.GetActiviedTagsName(post.Tags);
 
         post.ModifyAt = DateTime.Now;
-        await Updateable(post).UpdateColumns(x => new { x.Tags, x.ModifyAt }).ExecuteCommandAsync();
+        await Updateable(post).UpdateColumns(static x => new { x.Tags, x.ModifyAt }).ExecuteCommandAsync();
 
         await _botClient.AutoReplyAsync($"当前标签: {tagName}", callbackQuery);
 
@@ -528,7 +528,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         post.ReviewerUID = dbUser.UserID;
         post.Status = EPostStatus.Rejected;
         post.ModifyAt = DateTime.Now;
-        await Updateable(post).UpdateColumns(x => new {
+        await Updateable(post).UpdateColumns(static x => new {
             x.RejectReason,
             x.CountReject,
             x.ReviewerUID,
@@ -594,7 +594,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
                 post.PublishMediaGroupID = postMessage.MediaGroupId ?? "";
                 post.ModifyAt = DateTime.Now;
 
-                await Updateable(post).UpdateColumns(x => new {
+                await Updateable(post).UpdateColumns(static x => new {
                     x.PublicMsgID,
                     x.PublishMediaGroupID,
                     x.ModifyAt
@@ -618,13 +618,13 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
 
         poster.RejectCount++;
         poster.ModifyAt = DateTime.Now;
-        await _userService.Updateable(poster).UpdateColumns(x => new { x.RejectCount, x.ModifyAt }).ExecuteCommandAsync();
+        await _userService.Updateable(poster).UpdateColumns(static x => new { x.RejectCount, x.ModifyAt }).ExecuteCommandAsync();
 
         if (poster.UserID != dbUser.UserID) //非同一个人才增加审核数量
         {
             dbUser.ReviewCount++;
             dbUser.ModifyAt = DateTime.Now;
-            await _userService.Updateable(dbUser).UpdateColumns(x => new { x.ReviewCount, x.ModifyAt }).ExecuteCommandAsync();
+            await _userService.Updateable(dbUser).UpdateColumns(static x => new { x.ReviewCount, x.ModifyAt }).ExecuteCommandAsync();
         }
     }
 
@@ -738,7 +738,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
             post.ReviewMsgID = msg.MessageId;
         }
 
-        await Updateable(post).UpdateColumns(x => new {
+        await Updateable(post).UpdateColumns(static x => new {
             x.ReviewMsgID,
             x.PublicMsgID,
             x.PublishMediaGroupID,
@@ -764,7 +764,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         //增加通过数量
         poster.AcceptCount++;
         poster.ModifyAt = DateTime.Now;
-        await _userService.Updateable(poster).UpdateColumns(x => new { x.AcceptCount, x.ModifyAt }).ExecuteCommandAsync();
+        await _userService.Updateable(poster).UpdateColumns(static x => new { x.AcceptCount, x.ModifyAt }).ExecuteCommandAsync();
 
         if (!post.IsDirectPost) //增加审核数量
         {
@@ -772,14 +772,14 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
             {
                 dbUser.ReviewCount++;
                 dbUser.ModifyAt = DateTime.Now;
-                await _userService.Updateable(dbUser).UpdateColumns(x => new { x.ReviewCount, x.ModifyAt }).ExecuteCommandAsync();
+                await _userService.Updateable(dbUser).UpdateColumns(static x => new { x.ReviewCount, x.ModifyAt }).ExecuteCommandAsync();
             }
         }
         else
         {
             poster.PostCount++;
             poster.ModifyAt = DateTime.Now;
-            await _userService.Updateable(poster).UpdateColumns(x => new { x.PostCount, x.ModifyAt }).ExecuteCommandAsync();
+            await _userService.Updateable(poster).UpdateColumns(static x => new { x.PostCount, x.ModifyAt }).ExecuteCommandAsync();
         }
     }
 

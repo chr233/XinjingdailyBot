@@ -41,8 +41,8 @@ internal class InlineQueryHandler : IInlineQueryHandler
             for (int i = 0; i < 10; i++)
             {
                 var randomPost = await _postService.Queryable()
-                    .Where(x => x.Status == EPostStatus.Accepted && x.PostType == MessageType.Photo)
-                    .OrderBy(x => SqlFunc.GetRandom()).Take(1).FirstAsync();
+                    .Where(static x => x.Status == EPostStatus.Accepted && x.PostType == MessageType.Photo)
+                    .OrderBy(static x => SqlFunc.GetRandom()).Take(1).FirstAsync();
 
                 if (randomPost == null)
                 {

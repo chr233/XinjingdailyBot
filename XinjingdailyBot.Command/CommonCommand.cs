@@ -140,8 +140,9 @@ internal class CommonCommand
     [TextCmd("MYBAN", EUserRights.None, Description = "查询自己是否被封禁")]
     public async Task ResponseMyBan(Users dbUser, Message message)
     {
-        var records = await _banRecordService.Queryable().Where(x => x.UserID == dbUser.UserID)
-            .OrderByDescending(x => new { x.BanTime }).ToListAsync();
+        var records = await _banRecordService.Queryable()
+            .Where(x => x.UserID == dbUser.UserID)
+            .OrderByDescending(static x => new { x.BanTime }).ToListAsync();
 
         var sb = new StringBuilder();
 

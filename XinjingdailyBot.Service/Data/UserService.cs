@@ -269,7 +269,7 @@ internal sealed class UserService : BaseService<Users>, IUserService
                 try
                 {
                     dbUser.ModifyAt = DateTime.Now;
-                    await Updateable(dbUser).UpdateColumns(x => new {
+                    await Updateable(dbUser).UpdateColumns(static x => new {
                         x.UserName,
                         x.FirstName,
                         x.LastName,

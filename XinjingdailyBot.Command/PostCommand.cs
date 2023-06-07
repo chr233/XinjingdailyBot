@@ -108,7 +108,7 @@ internal class PostCommand
         bool anonymous = !post.Anonymous;
         post.Anonymous = anonymous;
         post.ModifyAt = DateTime.Now;
-        await _postService.Updateable(post).UpdateColumns(x => new { x.Anonymous, x.ModifyAt }).ExecuteCommandAsync();
+        await _postService.Updateable(post).UpdateColumns(static x => new { x.Anonymous, x.ModifyAt }).ExecuteCommandAsync();
 
         var keyboard = _markupHelperService.PostKeyboard(anonymous);
         await _botClient.EditMessageReplyMarkupAsync(query.Message!, keyboard);
@@ -124,7 +124,8 @@ internal class PostCommand
     {
         post.Status = EPostStatus.Cancel;
         post.ModifyAt = DateTime.Now;
-        await _postService.Updateable(post).UpdateColumns(x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
+
+        await _postService.Updateable(post).UpdateColumns(static x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
 
         await _botClient.EditMessageTextAsync(query.Message!, Langs.PostCanceled, replyMarkup: null);
 
@@ -163,10 +164,22 @@ internal class PostCommand
                 }
 
                 group[i] = attachmentType switch {
-                    MessageType.Photo => new InputMediaPhoto(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
-                    MessageType.Audio => new InputMediaAudio(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
-                    MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? post.Text : null, ParseMode = ParseMode.Html },
-                    MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)) { Caption = i == attachments.Count - 1 ? post.Text : null, ParseMode = ParseMode.Html },
+                    MessageType.Photo => new InputMediaPhoto(new InputFileId(attachments[i].FileID)) {
+                        Caption = i == 0 ? post.Text : null,
+                        ParseMode = ParseMode.Html
+                    },
+                    MessageType.Audio => new InputMediaAudio(new InputFileId(attachments[i].FileID)) {
+                        Caption = i == 0 ? post.Text : null,
+                        ParseMode = ParseMode.Html
+                    },
+                    MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)) {
+                        Caption = i == 0 ? post.Text : null,
+                        ParseMode = ParseMode.Html
+                    },
+                    MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)) {
+                        Caption = i == attachments.Count - 1 ? post.Text : null,
+                        ParseMode = ParseMode.Html
+                    },
                     _ => throw new Exception(),
                 };
             }
@@ -191,7 +204,7 @@ internal class PostCommand
         post.ReviewActionMsgID = manageMsg.MessageId;
         post.Status = EPostStatus.Reviewing;
         post.ModifyAt = DateTime.Now;
-        await _postService.Updateable(post).UpdateColumns(x => new {
+        await _postService.Updateable(post).UpdateColumns(static x => new {
             x.ReviewChatID,
             x.ReviewMsgID,
             x.ReviewActionChatID,
@@ -206,6 +219,6 @@ internal class PostCommand
 
         dbUser.PostCount++;
         dbUser.ModifyAt = DateTime.Now;
-        await _userService.Updateable(dbUser).UpdateColumns(x => new { x.PostCount, x.ModifyAt }).ExecuteCommandAsync();
+        await _userService.Updateable(dbUser).UpdateColumns(static x => new { x.PostCount, x.ModifyAt }).ExecuteCommandAsync();
     }
 }
