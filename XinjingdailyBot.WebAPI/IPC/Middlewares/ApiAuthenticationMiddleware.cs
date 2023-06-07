@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
 using System.Net;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Data;
@@ -25,22 +23,26 @@ public sealed class ApiAuthenticationMiddleware : IMiddleware
     /// <summary>
     /// 显示名称
     /// </summary>
-    public static string FieldName => "User Token";
+    public static string FieldName => "UserToken";
 
     private readonly ILogger<ApiAuthenticationMiddleware> _logger;
     private readonly IUserService _userService;
+    private readonly IUserTokenService _userTokenService;
 
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="logger"></param>
     /// <param name="userService"></param>
+    /// <param name="userTokenService"></param>
     public ApiAuthenticationMiddleware(
         ILogger<ApiAuthenticationMiddleware> logger,
-        IUserService userService)
+        IUserService userService,
+        IUserTokenService userTokenService)
     {
         _logger = logger;
         _userService = userService;
+        _userTokenService = userTokenService;
     }
 
     /// <summary>
@@ -84,20 +86,18 @@ public sealed class ApiAuthenticationMiddleware : IMiddleware
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        if (!context.Request.Headers.TryGetValue(HeaderName, out var token) && !context.Request.Query.TryGetValue(QueryName, out token))
+        if ((!context.Request.Headers.TryGetValue(HeaderName, out var token) && !context.Request.Query.TryGetValue(QueryName, out token)) || !Guid.TryParse(token, out var guid))
         {
             return null;
         }
 
-        var user = await _userService.Queryable()
-            .Includes(static x => x.Token)
-            .FirstAsync(x => x.Token!.APIToken == token);
+        var user = await _userTokenService.VerifyToken(guid);
 
-        if (user != null)
+        if (user != null && !user.IsBan)
         {
             context.Items.Add("Users", user);
         }
 
-        return user; ;
+        return user;
     }
 }

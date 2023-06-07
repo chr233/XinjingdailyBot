@@ -128,6 +128,6 @@ internal sealed class HttpHelperService : IHttpHelperService, IDisposable
     }
 
     public HttpClient CreateClient(string name) => _httpClientFactory.CreateClient(name);
-    
+
     public void Dispose() => StatisticTimer?.Dispose();
 }

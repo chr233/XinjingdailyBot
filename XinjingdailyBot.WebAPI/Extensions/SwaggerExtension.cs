@@ -46,7 +46,7 @@ public static class SwaggerExtension
                     {
                         new OpenApiSecurityScheme {
                             Reference = new OpenApiReference {
-                                Id = scheme.Name,
+                                Id = ApiAuthenticationMiddleware.FieldName,
                                 Type = ReferenceType.SecurityScheme
                             }
                         },
