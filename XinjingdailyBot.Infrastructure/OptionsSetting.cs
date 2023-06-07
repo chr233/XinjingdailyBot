@@ -31,7 +31,7 @@ namespace XinjingdailyBot.Infrastructure
         public IpInfoOption IpInfo { get; set; } = new();
         /// <inheritdoc cref="ScheduleOption"/>
         public ScheduleOption Schedule { get; set; } = new();
-        
+
         /// <summary>
         /// 机器人选项
         /// </summary>

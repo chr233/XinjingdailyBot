@@ -62,7 +62,7 @@ namespace XinjingdailyBot.Repository
         {
             //请不要修改ID为0和1的字段
             var levels = new List<Levels>
-            {              
+            {
                 new Levels { Id = 0, Name = "Lv-" },
                 new Levels { Id = 1, Name = "Lv0", MinExp = 0, MaxExp = 10 },
                 new Levels { Id = 2, Name = "Lv1", MinExp = 11, MaxExp = 100 },

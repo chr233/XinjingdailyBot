@@ -1,158 +1,154 @@
-﻿using SqlSugar;
+using SqlSugar;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Model.Base;
+using XinjingdailyBot.Model.Columns;
 
-namespace XinjingdailyBot.Model.Models
+namespace XinjingdailyBot.Model.Models;
+
+/// <summary>
+/// 旧的稿件表
+/// </summary>
+[Obsolete("弃用表")]
+[SugarTable("post", TableDescription = "投稿记录")]
+[SugarIndex("index_origin_cid", nameof(OriginChatID), OrderByType.Asc)]
+[SugarIndex("index_origin_mid", nameof(OriginMsgID), OrderByType.Asc)]
+[SugarIndex("index_action_mid", nameof(ActionMsgID), OrderByType.Asc)]
+[SugarIndex("index_review_mid", nameof(ReviewMsgID), OrderByType.Asc)]
+[SugarIndex("index_manage_mid", nameof(ManageMsgID), OrderByType.Asc)]
+[SugarIndex("index_review_mid_manage_mid", nameof(ReviewMsgID), OrderByType.Asc, nameof(ManageMsgID), OrderByType.Asc)]
+[SugarIndex("index_media_group_id", nameof(MediaGroupID), OrderByType.Asc)]
+[SugarIndex("index_posterid", nameof(PosterUID), OrderByType.Asc)]
+[SugarIndex("index_reviewerid", nameof(ReviewerUID), OrderByType.Asc)]
+[SugarIndex("index_status_modifyat", nameof(Status), OrderByType.Asc, nameof(ModifyAt), OrderByType.Asc)]
+public sealed record OldPosts : BaseModel, ICreateAt, IModifyAt
 {
     /// <summary>
-    /// 旧的稿件表
+    /// 主键
     /// </summary>
-    [Obsolete("弃用表")]
-    [SugarTable("post", TableDescription = "投稿记录")]
-    [SugarIndex("index_origin_cid", nameof(OriginChatID), OrderByType.Asc)]
-    [SugarIndex("index_origin_mid", nameof(OriginMsgID), OrderByType.Asc)]
-    [SugarIndex("index_action_mid", nameof(ActionMsgID), OrderByType.Asc)]
-    [SugarIndex("index_review_mid", nameof(ReviewMsgID), OrderByType.Asc)]
-    [SugarIndex("index_manage_mid", nameof(ManageMsgID), OrderByType.Asc)]
-    [SugarIndex("index_review_mid_manage_mid", nameof(ReviewMsgID), OrderByType.Asc, nameof(ManageMsgID), OrderByType.Asc)]
-    [SugarIndex("index_media_group_id", nameof(MediaGroupID), OrderByType.Asc)]
-    [SugarIndex("index_posterid", nameof(PosterUID), OrderByType.Asc)]
-    [SugarIndex("index_reviewerid", nameof(ReviewerUID), OrderByType.Asc)]
-    [SugarIndex("index_status_modifyat", nameof(Status), OrderByType.Asc, nameof(ModifyAt), OrderByType.Asc)]
-    public sealed record OldPosts : BaseModel
-    {
-        /// <summary>
-        /// 主键
-        /// </summary>
-        [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
-        public int Id { get; set; }
-        /// <summary>
-        /// 原始消息会话ID
-        /// </summary>
-        public long OriginChatID { get; set; } = -1;
-        /// <summary>
-        /// 原始消息ID
-        /// </summary>
-        public long OriginMsgID { get; set; } = -1;
-        /// <summary>
-        /// 投稿控制消息ID
-        /// </summary>
-        public long ActionMsgID { get; set; } = -1;
-        /// <summary>
-        /// 审核群消息ID
-        /// </summary>
-        public long ReviewMsgID { get; set; } = -1;
-        /// <summary>
-        /// 审核群控制消息ID
-        /// </summary>
-        public long ManageMsgID { get; set; } = -1;
-        /// <summary>
-        /// 发布的消息Id
-        /// </summary>
-        public long PublicMsgID { get; set; } = -1;
+    [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
+    public int Id { get; set; }
+    /// <summary>
+    /// 原始消息会话ID
+    /// </summary>
+    public long OriginChatID { get; set; } = -1;
+    /// <summary>
+    /// 原始消息ID
+    /// </summary>
+    public long OriginMsgID { get; set; } = -1;
+    /// <summary>
+    /// 投稿控制消息ID
+    /// </summary>
+    public long ActionMsgID { get; set; } = -1;
+    /// <summary>
+    /// 审核群消息ID
+    /// </summary>
+    public long ReviewMsgID { get; set; } = -1;
+    /// <summary>
+    /// 审核群控制消息ID
+    /// </summary>
+    public long ManageMsgID { get; set; } = -1;
+    /// <summary>
+    /// 发布的消息Id
+    /// </summary>
+    public long PublicMsgID { get; set; } = -1;
 
-        /// <summary>
-        /// 是否为直接投稿
-        /// </summary>
-        [SugarColumn(IsIgnore = true)]
-        public bool IsDirectPost => ManageMsgID == ActionMsgID;
+    /// <summary>
+    /// 是否为直接投稿
+    /// </summary>
+    [SugarColumn(IsIgnore = true)]
+    public bool IsDirectPost => ManageMsgID == ActionMsgID;
 
-        /// <summary>
-        /// 匿名投稿
-        /// </summary>
-        [SugarColumn(OldColumnName = "Anymouse")]
-        public bool Anonymous { get; set; }
+    /// <summary>
+    /// 匿名投稿
+    /// </summary>
+    [SugarColumn(OldColumnName = "Anymouse")]
+    public bool Anonymous { get; set; }
 
-        /// <summary>
-        /// 投稿描述(过滤#标签和链接)
-        /// </summary>
-        [SugarColumn(Length = 2000)]
-        public string Text { get; set; } = "";
-        /// <summary>
-        /// 投稿原始描述
-        /// </summary>
-        [SugarColumn(Length = 2000)]
-        public string RawText { get; set; } = "";
+    /// <summary>
+    /// 投稿描述(过滤#标签和链接)
+    /// </summary>
+    [SugarColumn(Length = 2000)]
+    public string Text { get; set; } = "";
+    /// <summary>
+    /// 投稿原始描述
+    /// </summary>
+    [SugarColumn(Length = 2000)]
+    public string RawText { get; set; } = "";
 
-        /// <summary>
-        /// 是否为频道转发
-        /// </summary>
-        [SugarColumn(IsIgnore = true)]
-        public bool IsFromChannel => !string.IsNullOrEmpty(ChannelName) && !ChannelName.EndsWith('~');
+    /// <summary>
+    /// 是否为频道转发
+    /// </summary>
+    [SugarColumn(IsIgnore = true)]
+    public bool IsFromChannel => !string.IsNullOrEmpty(ChannelName) && !ChannelName.EndsWith('~');
 
-        /// <summary>
-        /// 来源频道ID
-        /// </summary>
-        public string ChannelName { get; set; } = "";
-        /// <summary>
-        /// 来源频道名称
-        /// </summary>
-        public string ChannelTitle { get; set; } = "";
-        /// <summary>
-        /// 投稿状态
-        /// </summary>
-        public EPostStatus Status { get; set; } = EPostStatus.Unknown;
-        /// <summary>
-        /// 是否有附件
-        /// </summary>
-        [SugarColumn(IsIgnore = true)]
-        public bool HasAttachments => PostType != MessageType.Text;
-        /// <summary>
-        /// 消息类型
-        /// </summary>
-        public MessageType PostType { get; set; } = MessageType.Unknown;
-        /// <summary>
-        /// 是否为媒体组消息
-        /// </summary>
-        [SugarColumn(IsIgnore = true)]
-        public bool IsMediaGroup => !string.IsNullOrEmpty(MediaGroupID);
-        /// <summary>
-        /// 媒体组ID
-        /// </summary>
-        public string MediaGroupID { get; set; } = "";
-        /// <summary>
-        /// 标签
-        /// </summary>
-        [Obsolete("过时的属性")]
-        public EBuildInTags Tags { get; set; }
-        /// <summary>
-        /// 稿件标签
-        /// </summary>
-        public int NewTags { get; set; }
-        /// <summary>
-        /// 是否启用遮罩
-        /// </summary>
-        public bool HasSpoiler { get; set; }
-        /// <summary>
-        /// 是否允许遮罩
-        /// </summary>
-        [SugarColumn(IsIgnore = true)]
-        public bool CanSpoiler => PostType == MessageType.Photo || PostType == MessageType.Video;
-        /// <summary>
-        /// 拒绝原因(如果拒绝)
-        /// </summary>
-        public ERejectReason Reason { get; set; } = ERejectReason.NotReject;
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreateAt { get; set; } = DateTime.Now;
-        /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime ModifyAt { get; set; } = DateTime.Now;
-        /// <summary>
-        /// 投稿人用户ID
-        /// </summary>
-        public long PosterUID { get; set; } = -1;
-        /// <summary>
-        /// 审核人用户ID
-        /// </summary>
-        public long ReviewerUID { get; set; } = -1;
+    /// <summary>
+    /// 来源频道ID
+    /// </summary>
+    public string ChannelName { get; set; } = "";
+    /// <summary>
+    /// 来源频道名称
+    /// </summary>
+    public string ChannelTitle { get; set; } = "";
+    /// <summary>
+    /// 投稿状态
+    /// </summary>
+    public EPostStatus Status { get; set; } = EPostStatus.Unknown;
+    /// <summary>
+    /// 是否有附件
+    /// </summary>
+    [SugarColumn(IsIgnore = true)]
+    public bool HasAttachments => PostType != MessageType.Text;
+    /// <summary>
+    /// 消息类型
+    /// </summary>
+    public MessageType PostType { get; set; } = MessageType.Unknown;
+    /// <summary>
+    /// 是否为媒体组消息
+    /// </summary>
+    [SugarColumn(IsIgnore = true)]
+    public bool IsMediaGroup => !string.IsNullOrEmpty(MediaGroupID);
+    /// <summary>
+    /// 媒体组ID
+    /// </summary>
+    public string MediaGroupID { get; set; } = "";
+    /// <summary>
+    /// 标签
+    /// </summary>
+    [Obsolete("过时的属性")]
+    public EBuildInTags Tags { get; set; }
+    /// <summary>
+    /// 稿件标签
+    /// </summary>
+    public int NewTags { get; set; }
+    /// <summary>
+    /// 是否启用遮罩
+    /// </summary>
+    public bool HasSpoiler { get; set; }
+    /// <summary>
+    /// 是否允许遮罩
+    /// </summary>
+    [SugarColumn(IsIgnore = true)]
+    public bool CanSpoiler => PostType == MessageType.Photo || PostType == MessageType.Video;
+    /// <summary>
+    /// 拒绝原因(如果拒绝)
+    /// </summary>
+    public ERejectReason Reason { get; set; } = ERejectReason.NotReject;
+    /// <inheritdoc cref="ICreateAt"/>
+    public DateTime CreateAt { get; set; } = DateTime.Now;
+    /// <inheritdoc cref="IModifyAt"/>
+    public DateTime ModifyAt { get; set; } = DateTime.Now;
+    /// <summary>
+    /// 投稿人用户ID
+    /// </summary>
+    public long PosterUID { get; set; } = -1;
+    /// <summary>
+    /// 审核人用户ID
+    /// </summary>
+    public long ReviewerUID { get; set; } = -1;
 
-        /// <summary>
-        /// 是否已完成迁移
-        /// </summary>
-        public bool Merged { get; set; }
-    }
+    /// <summary>
+    /// 是否已完成迁移
+    /// </summary>
+    public bool Merged { get; set; }
 }

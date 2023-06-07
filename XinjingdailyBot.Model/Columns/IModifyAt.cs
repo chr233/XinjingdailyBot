@@ -1,12 +1,10 @@
-﻿namespace XinjingdailyBot.Model.Columns;
+namespace XinjingdailyBot.Model.Columns;
 
 /// <summary>
 /// 修改时间
 /// </summary>
 public interface IModifyAt
 {
-    /// <summary>
-    /// 修改时间
-    /// </summary>
+    /// <inheritdoc cref="IModifyAt"/>
     DateTime ModifyAt { get; set; }
 }

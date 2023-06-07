@@ -1,59 +1,46 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using XinjingdailyBot.Interface.Data;
-using XinjingdailyBot.Model.Models;
 
-namespace XinjingdailyBot.WebAPI.IPC.Controllers
+namespace XinjingdailyBot.WebAPI.IPC.Controllers;
+
+/// <summary>
+/// 主页控制器
+/// </summary>
+[AllowAnonymous]
+[Route("Api", Name = "首页")]
+public sealed class IndexController : XjbController
 {
+    private readonly IUserTokenService _userTokenService;
+
     /// <summary>
-    /// 主页控制器
+    /// 构造函数
     /// </summary>
-    [Route("Api/[controller]")]
-    public sealed class IndexController : XjbController
+    /// <param name="userTokenService"></param>
+    public IndexController(
+        IUserTokenService userTokenService)
     {
-        private readonly ILogger<IndexController> _logger;
-        private readonly IUserTokenService _userTokenService;
+        _userTokenService = userTokenService;
+    }
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="logger"></param>
-        /// <param name="userTokenService"></param>
-        public IndexController(
-            ILogger<IndexController> logger,
-            IUserTokenService userTokenService)
+    /// <summary>
+    /// 测试Token有效
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    [HttpPost("[action]")]
+    [SwaggerOperation("12", "233")]
+    public async Task<ActionResult<bool>> TestToken(Guid token)
+    {
+        var user = await _userTokenService.VerifyToken(token);
+        if (user != null)
         {
-            _logger = logger;
-            _userTokenService = userTokenService;
+            return Ok(true);
         }
-
-        /// <summary>
-        /// Root
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("[action]")]
-        public IActionResult Get()
+        else
         {
-            return Ok("启动完成");
-        }
-
-        /// <summary>
-        /// 测试
-        /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        [HttpPost("[action]")]
-        public async Task<ActionResult<Users>> TestToken([FromBody] Guid token)
-        {
-            var user = await _userTokenService.VerifyToken(token);
-
-            if (user != null)
-            {
-                return Ok(user);
-            }
-            else
-            {
-                return NotFound();
-            }
+            return Ok(false);
         }
     }
 }

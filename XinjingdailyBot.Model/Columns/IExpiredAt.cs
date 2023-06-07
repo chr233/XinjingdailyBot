@@ -1,12 +1,10 @@
-﻿namespace XinjingdailyBot.Model.Columns;
+namespace XinjingdailyBot.Model.Columns;
 
 /// <summary>
 /// 过期时间
 /// </summary>
 public interface IExpiredAt
 {
-    /// <summary>
-    /// 过期时间
-    /// </summary>
+    /// <inheritdoc cref="IExpiredAt"/>
     DateTime ExpiredAt { get; set; }
 }
