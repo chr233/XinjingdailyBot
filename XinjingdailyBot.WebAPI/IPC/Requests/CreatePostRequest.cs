@@ -2,12 +2,12 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Telegram.Bot.Types.Enums;
 
-namespace XinjingdailyBot.WebAPI.IPC.Data;
+namespace XinjingdailyBot.WebAPI.IPC.Requests;
 
 /// <summary>
 /// 投稿数据
 /// </summary>
-public sealed record CreatePostData
+public sealed record CreatePostRequest
 {
     /// <summary>
     /// 文字描述

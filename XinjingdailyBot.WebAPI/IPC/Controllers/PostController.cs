@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using XinjingdailyBot.Interface.Data;
+using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Model.Models;
-using XinjingdailyBot.WebAPI.IPC.Data;
+using XinjingdailyBot.WebAPI.IPC.Requests;
 
 namespace XinjingdailyBot.WebAPI.IPC.Controllers;
 
@@ -14,31 +14,32 @@ namespace XinjingdailyBot.WebAPI.IPC.Controllers;
 public sealed class PostController : XjbController
 {
     private readonly ILogger<PostController> _logger;
-    private readonly IUserTokenService _userTokenService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="logger"></param>
-    /// <param name="userTokenService"></param>
+    /// <param name="httpContextAccessor"></param>
     public PostController(
         ILogger<PostController> logger,
-        IUserTokenService userTokenService)
+        IHttpContextAccessor httpContextAccessor)
     {
         _logger = logger;
-        _userTokenService = userTokenService;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     /// <summary>
     /// 创建稿件
     /// </summary>
-    /// <param name="token"></param>
     /// <param name="post"></param>
     /// <returns></returns>
     [HttpPost("[action]")]
-    public async Task<ActionResult<Users>> CreatePost(Guid token, [FromForm] CreatePostData post)
+    public async Task<ActionResult<Users>> CreatePost([FromForm] CreatePostRequest post)
     {
-        var user = await _userTokenService.VerifyToken(token);
+        var user = _httpContextAccessor.GetUser();
+
+        await Task.Delay(200);
 
         if (true)
         {

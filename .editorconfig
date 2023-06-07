@@ -271,7 +271,7 @@ dotnet_diagnostic.IDE0010.severity = none
 dotnet_diagnostic.IDE0011.severity = none
 
 # IDE0040: 添加可访问性修饰符
-dotnet_diagnostic.IDE0040.severity = none
+dotnet_diagnostic.IDE0040.severity = suggestion
 
 # IDE0130: 命名空间与文件夹结构不匹配
 dotnet_style_namespace_match_folder = false
@@ -280,7 +280,7 @@ dotnet_style_namespace_match_folder = false
 dotnet_diagnostic.IDE0130.severity = none
 
 # IDE0055: 修正格式
-dotnet_diagnostic.IDE0055.severity = error
+dotnet_diagnostic.IDE0055.severity = suggestion
 
 # IDE1006: 命名样式
 dotnet_diagnostic.IDE1006.severity = error

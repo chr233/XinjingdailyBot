@@ -111,6 +111,12 @@ public sealed record Users : BaseModel, IModifyAt, ICreateAt
     public DateTime ModifyAt { get; set; } = DateTime.Now;
 
     /// <summary>
+    /// API Token
+    /// </summary>
+    [Navigate(NavigateType.OneToOne, nameof(UserTokens))]//一对一 SchoolId是StudentA类里面的
+    public UserTokens? Token { get; set; } //不能赋值只能是null
+
+    /// <summary>
     /// 文本显示
     /// </summary>
     /// <returns></returns>

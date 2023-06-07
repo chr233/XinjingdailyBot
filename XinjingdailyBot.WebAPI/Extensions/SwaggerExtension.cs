@@ -1,5 +1,6 @@
 using Microsoft.OpenApi.Models;
 using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.WebAPI.IPC.Middlewares;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
@@ -32,34 +33,31 @@ public static class SwaggerExtension
                     },
                 });
 
+            var scheme = new OpenApiSecurityScheme {
+                Type = SecuritySchemeType.ApiKey,
+                Description = "用户登录 Token, 使用命令 /token 获取",
+                Name = ApiAuthenticationMiddleware.HeaderName,
+                In = ParameterLocation.Header,
+            };
+
+            options.AddSecurityDefinition(ApiAuthenticationMiddleware.FieldName, scheme);
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement {
+                    {
+                        new OpenApiSecurityScheme {
+                            Reference = new OpenApiReference {
+                                Id = scheme.Name,
+                                Type = ReferenceType.SecurityScheme
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                }
+            );
+
             options.CustomSchemaIds(static type => type.ToString());
 
-
             options.EnableAnnotations(true, true);
-
-            //options.AddSecurityDefinition(
-            //    "UserToken", new OpenApiSecurityScheme {
-            //        Description ="authentication using request headers.",
-            //        In = ParameterLocation.Header,
-            //        Name = ApiAuthenticationMiddleware.HeadersField,
-            //        Type = SecuritySchemeType.ApiKey
-            //    }
-            //);
-
-            //options.AddSecurityRequirement(
-            //    new OpenApiSecurityRequirement {
-            //        {
-            //            new OpenApiSecurityScheme {
-            //                Reference = new OpenApiReference {
-            //                    Id = nameof(GlobalConfig.IPCPassword),
-            //                    Type = ReferenceType.SecurityScheme
-            //                }
-            //            },
-
-            //            Array.Empty<string>()
-            //        }
-            //    }
-            //);
 
             // 文档注释
             var path = Utils.XmlFullPath;
