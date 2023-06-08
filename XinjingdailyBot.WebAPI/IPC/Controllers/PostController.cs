@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using XinjingdailyBot.Infrastructure.Extensions;
-using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.WebAPI.IPC.Requests;
 using XinjingdailyBot.WebAPI.IPC.Responses;
 
@@ -29,6 +28,30 @@ public sealed class PostController : XjbController
     }
 
     /// <summary>
+    /// 连接测试
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("[action]")]
+    [HttpPost("[action]")]
+    public ActionResult<GenericResponse<TestTokenResponse>> TestToken()
+    {
+        var user = _httpContextAccessor.GetUser();
+
+        var response = new GenericResponse<TestTokenResponse> {
+            Code = 0,
+            Message = "成功",
+            Result = new TestTokenResponse {
+                UID = user.Id,
+                UserID = user.UserID,
+                UserName = user.UserName,
+                NickName = user.FullName,
+            }
+        };
+
+        return Ok(response);
+    }
+
+    /// <summary>
     /// 创建稿件
     /// </summary>
     /// <param name="post"></param>
@@ -51,6 +74,6 @@ public sealed class PostController : XjbController
             }
         };
 
-        return response;
+        return Ok(response);
     }
 }
