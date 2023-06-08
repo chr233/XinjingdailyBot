@@ -40,5 +40,5 @@ public enum EPostStatus : int
     /// <summary>
     /// 已计划发布
     /// </summary>
-    Planed,
+    InPlan,
 }

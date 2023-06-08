@@ -198,12 +198,13 @@ internal class ReviewCommand
                 await SetSpoiler(post, callbackQuery);
                 break;
 
-            case "review accept":
-                await _postService.AcceptPost(post, dbUser, callbackQuery);
+            case "review inplan":
+                await _postService.AcceptPost(post, dbUser, true, callbackQuery);
                 break;
 
-            //case "review inplan":
-
+            case "review accept":
+                await _postService.AcceptPost(post, dbUser, false, callbackQuery);
+                break;
 
             case "review anymouse":
                 await SetAnymouse(post, callbackQuery);

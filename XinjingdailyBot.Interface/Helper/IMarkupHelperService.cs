@@ -15,7 +15,7 @@ public interface IMarkupHelperService
     /// <summary>
     /// 一行显示的字数
     /// </summary>
-    public static readonly int MaxLineCharsReason = 10;
+    public static readonly int MaxLineCharsReason = 8;
 
     /// <summary>
     /// 直接发布投稿键盘

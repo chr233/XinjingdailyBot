@@ -1,4 +1,4 @@
-﻿using Telegram.Bot.Types.ReplyMarkups;
+using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
@@ -36,11 +36,11 @@ internal sealed class MarkupHelperService : IMarkupHelperService
     {
         var keyboard = new InlineKeyboardMarkup(new[]
         {
-            new []
+            new[]
             {
                 InlineKeyboardButton.WithCallbackData(anymouse? Langs.AnymouseOn: Langs.AnymouseOff, "post anymouse"),
             },
-            new []
+            new[]
             {
                 InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "post cancel"),
                 InlineKeyboardButton.WithCallbackData(Langs.PostConfirm, "post confirm"),
@@ -92,6 +92,7 @@ internal sealed class MarkupHelperService : IMarkupHelperService
         btns.Add(new[]
         {
             InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "review cancel"),
+            InlineKeyboardButton.WithCallbackData(Langs.ReviewPlan, "review inplan"),
             InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
         });
 
@@ -134,7 +135,7 @@ internal sealed class MarkupHelperService : IMarkupHelperService
         btns.Add(new[]
         {
             InlineKeyboardButton.WithCallbackData(Langs.ReviewReject, "review reject"),
-            InlineKeyboardButton.WithCallbackData(Langs.ReviewPlan, "review plan"),
+            InlineKeyboardButton.WithCallbackData(Langs.ReviewPlan, "review inplan"),
             InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
         });
 
@@ -151,7 +152,6 @@ internal sealed class MarkupHelperService : IMarkupHelperService
         int lineChars = 0;
         foreach (var reason in reasons)
         {
-            line.Add(InlineKeyboardButton.WithCallbackData(reason.Name, $"reject {reason.Payload}"));
             lineChars += reason.Name.Length;
             if (lineChars >= IMarkupHelperService.MaxLineCharsReason)
             {
@@ -159,6 +159,8 @@ internal sealed class MarkupHelperService : IMarkupHelperService
                 btns.Add(line);
                 line = new List<InlineKeyboardButton>();
             }
+            
+            line.Add(InlineKeyboardButton.WithCallbackData(reason.Name, $"reject {reason.Payload}"));
         }
 
         if (line.Any())
@@ -255,19 +257,19 @@ internal sealed class MarkupHelperService : IMarkupHelperService
     {
         var keyboard = new InlineKeyboardMarkup(new[]
         {
-            new []
+            new[]
             {
                 InlineKeyboardButton.WithCallbackData( "1. 不做特殊处理", $"cmd {dbUser.UserID} channeloption {channelId} normal"),
             },
-            new []
+            new[]
             {
                 InlineKeyboardButton.WithCallbackData( "2. 抹除频道来源", $"cmd {dbUser.UserID} channeloption {channelId} purgeorigin"),
             },
-            new []
+            new[]
             {
                 InlineKeyboardButton.WithCallbackData( "3. 拒绝此频道的投稿", $"cmd {dbUser.UserID} channeloption {channelId} autoreject"),
             },
-            new []
+            new[]
             {
                 InlineKeyboardButton.WithCallbackData( "取消操作", $"cmd {dbUser.UserID} cancel"),
             }
@@ -283,7 +285,7 @@ internal sealed class MarkupHelperService : IMarkupHelperService
 
         var keyboard = new InlineKeyboardMarkup(new[]
          {
-            new []
+            new[]
             {
                 InlineKeyboardButton.WithUrl($"在{channel.Title}中查看", link),
             },
@@ -298,7 +300,7 @@ internal sealed class MarkupHelperService : IMarkupHelperService
 
         var keyboard = new InlineKeyboardMarkup(new[]
         {
-            new []
+            new[]
             {
                 InlineKeyboardButton.WithUrl($"在{channel.Title}中查看", link),
             },
@@ -350,22 +352,22 @@ internal sealed class MarkupHelperService : IMarkupHelperService
     {
         var keyboard = new InlineKeyboardMarkup(new[]
         {
-            new []
+            new[]
             {
                 InlineKeyboardButton.WithCallbackData( "不限类型的随机稿件", $"cmd {dbUser.UserID} randompost {tagNum} all"),
             },
-            new []
+            new[]
             {
                 InlineKeyboardButton.WithCallbackData( "随机图片", $"cmd {dbUser.UserID} randompost {tagNum} photo"),
                 InlineKeyboardButton.WithCallbackData( "随机视频", $"cmd {dbUser.UserID} randompost {tagNum} video"),
             },
-            new []
+            new[]
             {
                 InlineKeyboardButton.WithCallbackData( "随机音频", $"cmd {dbUser.UserID} randompost {tagNum} audio"),
                 InlineKeyboardButton.WithCallbackData( "随机GIF", $"cmd {dbUser.UserID} randompost {tagNum} animation"),
                 InlineKeyboardButton.WithCallbackData( "随机文件", $"cmd {dbUser.UserID} randompost {tagNum} document"),
             },
-            new []
+            new[]
             {
                 InlineKeyboardButton.WithCallbackData( "返回", $"cmd {dbUser.UserID} backrandompost"),
                 InlineKeyboardButton.WithCallbackData( "取消", $"cmd {dbUser.UserID} cancel"),
@@ -382,7 +384,7 @@ internal sealed class MarkupHelperService : IMarkupHelperService
 
         var keyboard = new InlineKeyboardMarkup(new[]
         {
-            new []
+            new[]
             {
                 InlineKeyboardButton.WithUrl($"在{channel.Title}中查看", link),
                 InlineKeyboardButton.WithCallbackData("再来一张",$"cmd {dbUser.UserID} randompost {tagId} {postType} {post.PublicMsgID}"),
@@ -400,11 +402,11 @@ internal sealed class MarkupHelperService : IMarkupHelperService
         {
             keyboard = new InlineKeyboardMarkup(new[]
             {
-                new []
+                new[]
                 {
                     InlineKeyboardButton.WithCallbackData("撤回稿件",$"cmd {dbUser.UserID} deletepost {post.Id}"),
                 },
-                new []
+                new[]
                 {
                     InlineKeyboardButton.WithCallbackData("查询投稿人成分",$"cmd {dbUser.UserID} queryposter {post.PosterUID}"),
                 },
@@ -414,11 +416,11 @@ internal sealed class MarkupHelperService : IMarkupHelperService
         {
             keyboard = new InlineKeyboardMarkup(new[]
             {
-                new []
+                new[]
                 {
                     InlineKeyboardButton.WithCallbackData("补发稿件",$"cmd {dbUser.UserID} repost {post.Id}"),
                 },
-                new []
+                new[]
                 {
                     InlineKeyboardButton.WithCallbackData("查询投稿人成分",$"cmd {dbUser.UserID} queryposter {post.PosterUID}"),
                 },
@@ -432,23 +434,23 @@ internal sealed class MarkupHelperService : IMarkupHelperService
     {
         var keyboard = new InlineKeyboardMarkup(new[]
         {
-            new []
+            new[]
             {
                 InlineKeyboardButton.WithCallbackData("全局禁言", $"cmd {dbUser.UserID} nuke mute {targetUser.UserID} {reason}"),
             },
-            new []
+            new[]
             {
                 InlineKeyboardButton.WithCallbackData("全局封禁",$"cmd {dbUser.UserID} nuke ban {targetUser.UserID} {reason}"),
             },
-            new []
+            new[]
             {
                 InlineKeyboardButton.WithCallbackData("撤销全局禁言",$"cmd {dbUser.UserID} nuke unmute {targetUser.UserID} {reason}"),
             },
-            new []
+            new[]
             {
                 InlineKeyboardButton.WithCallbackData("撤销全局封禁",$"cmd {dbUser.UserID} nuke unban {targetUser.UserID} {reason}"),
             },
-            new []
+            new[]
             {
                 InlineKeyboardButton.WithCallbackData( "取消操作", $"cmd {dbUser.UserID} cancel"),
             }
