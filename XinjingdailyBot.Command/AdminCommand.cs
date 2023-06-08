@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using SqlSugar;
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -1430,9 +1431,15 @@ internal class AdminCommand
     [TextCmd("TOKEN", EUserRights.AdminCmd, Description = "获取WebAPI密钥")]
     public async Task ResponseToken(Users dbUser, Message message)
     {
-        var token = await _userTokenService.GenerateNewUserToken(dbUser);
-
-        await _botClient.SendCommandReply(token.APIToken.ToString(), message, false);
+        if (message.Chat.Type != ChatType.Private)
+        {
+            await _botClient.SendCommandReply("该命令仅限私聊使用", message, false);
+        }
+        else
+        {
+            var token = await _userTokenService.GenerateNewUserToken(dbUser);
+            await _botClient.SendCommandReply(token.APIToken.ToString(), message, false);
+        }
     }
 
     /// <summary>
