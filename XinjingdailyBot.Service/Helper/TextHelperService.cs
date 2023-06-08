@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using System.Text;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -154,11 +154,18 @@ internal sealed class TextHelperService : ITextHelperService
         return msg;
     }
 
-    public string MakeNotification(bool isDirect, long messageID)
+    public string MakeNotification(bool isDirect, bool inPlan, long messageID)
     {
         var msgLink = HtmlMessageLink(messageID, _channelService.AcceptChannel.Username ?? _channelService.AcceptChannel.Id.ToString(), "消息直链");
 
-        return isDirect ? $"稿件已发布, {msgLink}" : $"稿件已通过, 感谢您的支持 {msgLink}";
+        if (!inPlan)
+        {
+            return isDirect ? $"稿件已发布, {msgLink}" : $"稿件已通过, 感谢您的支持 {msgLink}";
+        }
+        else
+        {
+            return isDirect ? $"稿件将按设定频率定期发布, {msgLink}" : $"稿件已通过, 将设定频率定期发布, 感谢您的支持 {msgLink}";
+        }
     }
 
     public string MakeNotification(string reason)

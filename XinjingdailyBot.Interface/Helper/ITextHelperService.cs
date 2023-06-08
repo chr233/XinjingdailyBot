@@ -47,9 +47,10 @@ public interface ITextHelperService
     /// 生成通知消息(审核通过）
     /// </summary>
     /// <param name="isDirect"></param>
+    /// <param name="inPlan"></param>
     /// <param name="messageID"></param>
     /// <returns></returns>
-    string MakeNotification(bool isDirect, long messageID);
+    string MakeNotification(bool isDirect, bool inPlan, long messageID);
     /// <summary>
     /// 生成通知消息(审核未通过）
     /// </summary>

@@ -2,6 +2,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
+using Telegram.Bot;
+using Telegram.Bot.Exceptions;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Repository;
@@ -21,6 +23,7 @@ public class PollingService : BackgroundService
     private readonly LevelRepository _levelRepository;
     private readonly TagRepository _tagRepository;
     private readonly RejectReasonRepository _rejectReasonRepository;
+    private readonly ITelegramBotClient _botClient;
 
     /// <summary>
     /// 消息接收服务
@@ -33,6 +36,7 @@ public class PollingService : BackgroundService
     /// <param name="levelRepository"></param>
     /// <param name="tagRepository"></param>
     /// <param name="rejectReasonRepository"></param>
+    /// <param name="botClient"></param>
     public PollingService(
         IServiceProvider serviceProvider,
         ILogger<PollingService> logger,
@@ -41,7 +45,8 @@ public class PollingService : BackgroundService
         GroupRepository groupRepository,
         LevelRepository levelRepository,
         TagRepository tagRepository,
-        RejectReasonRepository rejectReasonRepository)
+        RejectReasonRepository rejectReasonRepository,
+        ITelegramBotClient botClient)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
@@ -51,6 +56,7 @@ public class PollingService : BackgroundService
         _levelRepository = levelRepository;
         _tagRepository = tagRepository;
         _rejectReasonRepository = rejectReasonRepository;
+        _botClient = botClient;
     }
 
     /// <summary>
@@ -86,7 +92,14 @@ public class PollingService : BackgroundService
                 using var scope = _serviceProvider.CreateScope();
                 var receiver = scope.ServiceProvider.GetRequiredService<IReceiverService>();
 
-                await receiver.ReceiveAsync(stoppingToken);
+                try
+                {
+                    await receiver.ReceiveAsync(stoppingToken);
+                }
+                catch (ApiRequestException ex)
+                {
+                    _logger.LogError(ex, "接收服务运行出错");
+                }
             }
 
             catch (Exception ex)
