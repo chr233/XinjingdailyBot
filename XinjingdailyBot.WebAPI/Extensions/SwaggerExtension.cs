@@ -59,6 +59,8 @@ public static class SwaggerExtension
 
             options.EnableAnnotations(true, true);
 
+            options.SchemaFilter<EnumSchemaFilter>();
+
             // 文档注释
             var path = Utils.XmlFullPath;
             if (File.Exists(path))

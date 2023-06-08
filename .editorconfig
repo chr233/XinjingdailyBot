@@ -58,47 +58,47 @@ indent_size = 2
 [*.{xaml,axaml,xml,resx,resw,csproj,wapproj,appxmanifest,props}]
 indent_style = tab
 
-# c# ÎÄ¼ş
+# c# æ–‡ä»¶
 [*.cs]
 
-#### Core EditorConfig Ñ¡Ïî ####
+#### Core EditorConfig é€‰é¡¹ ####
 
-# Ëõ½øºÍ¼ä¾à
+# ç¼©è¿›å’Œé—´è·
 indent_size = 4
 indent_style = space
 tab_width = 4
 
-# ĞÂĞĞÊ×Ñ¡Ïî
+# æ–°è¡Œé¦–é€‰é¡¹
 end_of_line = crlf
 insert_final_newline = false
 
-#### .NET ±àÂëÔ¼¶¨ ####
+#### .NET ç¼–ç çº¦å®š ####
 
-# ×éÖ¯ Using
+# ç»„ç»‡ Using
 dotnet_separate_import_directive_groups = false
 dotnet_sort_system_directives_first = false
 file_header_template = unset
 
-# this. ºÍ Me. Ê×Ñ¡Ïî
+# this. å’Œ Me. é¦–é€‰é¡¹
 dotnet_style_qualification_for_event = false:suggestion
 dotnet_style_qualification_for_field = false
 dotnet_style_qualification_for_method = false:suggestion
 dotnet_style_qualification_for_property = false:suggestion
 
-# ÓïÑÔ¹Ø¼ü×ÖÓë bcl ÀàĞÍÊ×Ñ¡Ïî
+# è¯­è¨€å…³é”®å­—ä¸ bcl ç±»å‹é¦–é€‰é¡¹
 dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
 dotnet_style_predefined_type_for_member_access = true:suggestion
 
-# À¨ºÅÊ×Ñ¡Ïî
+# æ‹¬å·é¦–é€‰é¡¹
 dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity
 dotnet_style_parentheses_in_other_binary_operators = always_for_clarity
 dotnet_style_parentheses_in_other_operators = never_if_unnecessary
 dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity
 
-# ĞŞÊÎ·ûÊ×Ñ¡Ïî
+# ä¿®é¥°ç¬¦é¦–é€‰é¡¹
 dotnet_style_require_accessibility_modifiers = never
 
-# ±í´ïÊ½¼¶Ê×Ñ¡Ïî
+# è¡¨è¾¾å¼çº§é¦–é€‰é¡¹
 dotnet_style_coalesce_expression = true
 dotnet_style_collection_initializer = true
 dotnet_style_explicit_tuple_names = true
@@ -115,23 +115,23 @@ dotnet_style_prefer_is_null_check_over_reference_equality_method = true
 dotnet_style_prefer_simplified_boolean_expressions = true
 dotnet_style_prefer_simplified_interpolation = true
 
-# ×Ö¶ÎÊ×Ñ¡Ïî
+# å­—æ®µé¦–é€‰é¡¹
 dotnet_style_readonly_field = true
 
-# ²ÎÊıÊ×Ñ¡Ïî
+# å‚æ•°é¦–é€‰é¡¹
 dotnet_code_quality_unused_parameters = all
 
-# ½ûÖ¹ÏÔÊ¾Ê×Ñ¡Ïî
+# ç¦æ­¢æ˜¾ç¤ºé¦–é€‰é¡¹
 dotnet_remove_unnecessary_suppression_exclusions = none
 
-#### c# ±àÂëÔ¼¶¨ ####
+#### c# ç¼–ç çº¦å®š ####
 
-# var Ê×Ñ¡Ïî
+# var é¦–é€‰é¡¹
 csharp_style_var_elsewhere = true:warning
 csharp_style_var_for_built_in_types = true:silent
 csharp_style_var_when_type_is_apparent = true:warning
 
-# Expression-bodied ³ÉÔ±
+# Expression-bodied æˆå‘˜
 csharp_style_expression_bodied_accessors = true:warning
 csharp_style_expression_bodied_constructors = true:silent
 csharp_style_expression_bodied_indexers = true:warning
@@ -141,26 +141,26 @@ csharp_style_expression_bodied_methods = true:silent
 csharp_style_expression_bodied_operators = true:warning
 csharp_style_expression_bodied_properties = true:warning
 
-# Ä£Ê½Æ¥ÅäÊ×Ñ¡Ïî
+# æ¨¡å¼åŒ¹é…é¦–é€‰é¡¹
 csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
 csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
 csharp_style_prefer_not_pattern = true:suggestion
 csharp_style_prefer_pattern_matching = true:silent
 csharp_style_prefer_switch_expression = true:suggestion
 
-# Null ¼ì²éÊ×Ñ¡Ïî
+# Null æ£€æŸ¥é¦–é€‰é¡¹
 csharp_style_conditional_delegate_call = true:warning
 
-# ĞŞÊÎ·ûÊ×Ñ¡Ïî
+# ä¿®é¥°ç¬¦é¦–é€‰é¡¹
 csharp_prefer_static_local_function = true:warning
 csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async
 
-# ´úÂë¿éÊ×Ñ¡Ïî
+# ä»£ç å—é¦–é€‰é¡¹
 csharp_style_namespace_declarations= file_scoped:warning
 csharp_prefer_braces = true:warning
 csharp_prefer_simple_using_statement = true:warning
 
-# ±í´ïÊ½¼¶Ê×Ñ¡Ïî
+# è¡¨è¾¾å¼çº§é¦–é€‰é¡¹
 csharp_prefer_simple_default_expression = true:suggestion
 csharp_style_deconstructed_variable_declaration = true:suggestion
 csharp_style_implicit_object_creation_when_type_is_apparent = false:suggestion
@@ -172,12 +172,12 @@ csharp_style_throw_expression = true:suggestion
 csharp_style_unused_value_assignment_preference = discard_variable:suggestion
 csharp_style_unused_value_expression_statement_preference = discard_variable:silent
 
-# "using" Ö¸ÁîÊ×Ñ¡Ïî
+# "using" æŒ‡ä»¤é¦–é€‰é¡¹
 csharp_using_directive_placement = outside_namespace:silent
 
-#### C# ¸ñÊ½¹æÔò ####
+#### C# æ ¼å¼è§„åˆ™ ####
 
-# ĞÂĞĞÊ×Ñ¡Ïî
+# æ–°è¡Œé¦–é€‰é¡¹
 csharp_new_line_before_catch = true
 csharp_new_line_before_else = true
 csharp_new_line_before_finally = true
@@ -186,7 +186,7 @@ csharp_new_line_before_members_in_object_initializers = true
 csharp_new_line_before_open_brace = types,methods,control_blocks
 csharp_new_line_between_query_expression_clauses = false
 
-# Ëõ½øÊ×Ñ¡Ïî
+# ç¼©è¿›é¦–é€‰é¡¹
 csharp_indent_block_contents = true
 csharp_indent_braces = false
 csharp_indent_case_contents = true
@@ -194,7 +194,7 @@ csharp_indent_case_contents_when_block = true
 csharp_indent_labels = one_less_than_current
 csharp_indent_switch_labels = true
 
-# ¿Õ¸ñ¼üÊ×Ñ¡Ïî
+# ç©ºæ ¼é”®é¦–é€‰é¡¹
 csharp_space_after_cast = false
 csharp_space_after_colon_in_inheritance_clause = true
 csharp_space_after_comma = true
@@ -218,71 +218,71 @@ csharp_space_between_method_declaration_parameter_list_parentheses = false
 csharp_space_between_parentheses = false
 csharp_space_between_square_brackets = false
 
-# °ü×°Ê×Ñ¡Ïî
+# åŒ…è£…é¦–é€‰é¡¹
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = true
 
-#### ÃüÃûÑùÊ½ ####
+#### å‘½åæ ·å¼ ####
 
-# ÃüÃû¹æÔò
+# å‘½åè§„åˆ™
 
-dotnet_naming_rule.interface_should_be_ÒÔ_i_¿ªÊ¼.severity = suggestion
-dotnet_naming_rule.interface_should_be_ÒÔ_i_¿ªÊ¼.symbols = interface
-dotnet_naming_rule.interface_should_be_ÒÔ_i_¿ªÊ¼.style = ÒÔ_i_¿ªÊ¼
+dotnet_naming_rule.interface_should_be_ä»¥_i_å¼€å§‹.severity = suggestion
+dotnet_naming_rule.interface_should_be_ä»¥_i_å¼€å§‹.symbols = interface
+dotnet_naming_rule.interface_should_be_ä»¥_i_å¼€å§‹.style = ä»¥_i_å¼€å§‹
 
-dotnet_naming_rule.ÀàĞÍ_should_be_ÅÁË¹¿¨Æ´Ğ´·¨.severity = suggestion
-dotnet_naming_rule.ÀàĞÍ_should_be_ÅÁË¹¿¨Æ´Ğ´·¨.symbols = ÀàĞÍ
-dotnet_naming_rule.ÀàĞÍ_should_be_ÅÁË¹¿¨Æ´Ğ´·¨.style = ÅÁË¹¿¨Æ´Ğ´·¨
+dotnet_naming_rule.ç±»å‹_should_be_å¸•æ–¯å¡æ‹¼å†™æ³•.severity = suggestion
+dotnet_naming_rule.ç±»å‹_should_be_å¸•æ–¯å¡æ‹¼å†™æ³•.symbols = ç±»å‹
+dotnet_naming_rule.ç±»å‹_should_be_å¸•æ–¯å¡æ‹¼å†™æ³•.style = å¸•æ–¯å¡æ‹¼å†™æ³•
 
-dotnet_naming_rule.·Ç×Ö¶Î³ÉÔ±_should_be_ÅÁË¹¿¨Æ´Ğ´·¨.severity = suggestion
-dotnet_naming_rule.·Ç×Ö¶Î³ÉÔ±_should_be_ÅÁË¹¿¨Æ´Ğ´·¨.symbols = ·Ç×Ö¶Î³ÉÔ±
-dotnet_naming_rule.·Ç×Ö¶Î³ÉÔ±_should_be_ÅÁË¹¿¨Æ´Ğ´·¨.style = ÅÁË¹¿¨Æ´Ğ´·¨
+dotnet_naming_rule.éå­—æ®µæˆå‘˜_should_be_å¸•æ–¯å¡æ‹¼å†™æ³•.severity = suggestion
+dotnet_naming_rule.éå­—æ®µæˆå‘˜_should_be_å¸•æ–¯å¡æ‹¼å†™æ³•.symbols = éå­—æ®µæˆå‘˜
+dotnet_naming_rule.éå­—æ®µæˆå‘˜_should_be_å¸•æ–¯å¡æ‹¼å†™æ³•.style = å¸•æ–¯å¡æ‹¼å†™æ³•
 
-# ·ûºÅ¹æ·¶
+# ç¬¦å·è§„èŒƒ
 
 dotnet_naming_symbols.interface.applicable_kinds = interface
 dotnet_naming_symbols.interface.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
 dotnet_naming_symbols.interface.required_modifiers =
 
-dotnet_naming_symbols.ÀàĞÍ.applicable_kinds = class, struct, interface, enum
-dotnet_naming_symbols.ÀàĞÍ.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
-dotnet_naming_symbols.ÀàĞÍ.required_modifiers =
+dotnet_naming_symbols.ç±»å‹.applicable_kinds = class, struct, interface, enum
+dotnet_naming_symbols.ç±»å‹.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
+dotnet_naming_symbols.ç±»å‹.required_modifiers =
 
-dotnet_naming_symbols.·Ç×Ö¶Î³ÉÔ±.applicable_kinds = property, event, method
-dotnet_naming_symbols.·Ç×Ö¶Î³ÉÔ±.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
-dotnet_naming_symbols.·Ç×Ö¶Î³ÉÔ±.required_modifiers =
+dotnet_naming_symbols.éå­—æ®µæˆå‘˜.applicable_kinds = property, event, method
+dotnet_naming_symbols.éå­—æ®µæˆå‘˜.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
+dotnet_naming_symbols.éå­—æ®µæˆå‘˜.required_modifiers =
 
-# ÃüÃûÑùÊ½
+# å‘½åæ ·å¼
 
-dotnet_naming_style.ÅÁË¹¿¨Æ´Ğ´·¨.required_prefix =
-dotnet_naming_style.ÅÁË¹¿¨Æ´Ğ´·¨.required_suffix =
-dotnet_naming_style.ÅÁË¹¿¨Æ´Ğ´·¨.word_separator =
-dotnet_naming_style.ÅÁË¹¿¨Æ´Ğ´·¨.capitalization = pascal_case
+dotnet_naming_style.å¸•æ–¯å¡æ‹¼å†™æ³•.required_prefix =
+dotnet_naming_style.å¸•æ–¯å¡æ‹¼å†™æ³•.required_suffix =
+dotnet_naming_style.å¸•æ–¯å¡æ‹¼å†™æ³•.word_separator =
+dotnet_naming_style.å¸•æ–¯å¡æ‹¼å†™æ³•.capitalization = pascal_case
 
-dotnet_naming_style.ÒÔ_i_¿ªÊ¼.required_prefix = I
-dotnet_naming_style.ÒÔ_i_¿ªÊ¼.required_suffix =
-dotnet_naming_style.ÒÔ_i_¿ªÊ¼.word_separator =
-dotnet_naming_style.ÒÔ_i_¿ªÊ¼.capitalization = pascal_case
+dotnet_naming_style.ä»¥_i_å¼€å§‹.required_prefix = I
+dotnet_naming_style.ä»¥_i_å¼€å§‹.required_suffix =
+dotnet_naming_style.ä»¥_i_å¼€å§‹.word_separator =
+dotnet_naming_style.ä»¥_i_å¼€å§‹.capitalization = pascal_case
 
-# IDE0010: Ìí¼ÓÈ±Ê§µÄÊÂÀı
+# IDE0010: æ·»åŠ ç¼ºå¤±çš„äº‹ä¾‹
 dotnet_diagnostic.IDE0010.severity = none
 
-# IDE0011: Ìí¼Ó´óÀ¨ºÅ
+# IDE0011: æ·»åŠ å¤§æ‹¬å·
 dotnet_diagnostic.IDE0011.severity = none
 
-# IDE0040: Ìí¼Ó¿É·ÃÎÊĞÔĞŞÊÎ·û
+# IDE0040: æ·»åŠ å¯è®¿é—®æ€§ä¿®é¥°ç¬¦
 dotnet_diagnostic.IDE0040.severity = suggestion
 
-# IDE0130: ÃüÃû¿Õ¼äÓëÎÄ¼ş¼Ğ½á¹¹²»Æ¥Åä
+# IDE0130: å‘½åç©ºé—´ä¸æ–‡ä»¶å¤¹ç»“æ„ä¸åŒ¹é…
 dotnet_style_namespace_match_folder = false
 
-# IDE0130: ÃüÃû¿Õ¼äÓëÎÄ¼ş¼Ğ½á¹¹²»Æ¥Åä
+# IDE0130: å‘½åç©ºé—´ä¸æ–‡ä»¶å¤¹ç»“æ„ä¸åŒ¹é…
 dotnet_diagnostic.IDE0130.severity = none
 
-# IDE0055: ĞŞÕı¸ñÊ½
+# IDE0055: ä¿®æ­£æ ¼å¼
 dotnet_diagnostic.IDE0055.severity = suggestion
 
-# IDE1006: ÃüÃûÑùÊ½
+# IDE1006: å‘½åæ ·å¼
 dotnet_diagnostic.IDE1006.severity = error
 
 # SA1600: Elements should be documented
@@ -498,7 +498,7 @@ dotnet_diagnostic.SA1316.severity = silent
 # SA1405: Debug.Assert should provide message text
 dotnet_diagnostic.SA1405.severity = silent
 
-# CS1572: XML ×¢ÊÍÖĞÓĞ param ±ê¼Ç£¬µ«ÊÇÃ»ÓĞ¸ÃÃû³ÆµÄ²ÎÊı
+# CS1572: XML æ³¨é‡Šä¸­æœ‰ param æ ‡è®°ï¼Œä½†æ˜¯æ²¡æœ‰è¯¥åç§°çš„å‚æ•°
 dotnet_diagnostic.CS1572.severity = silent
 
 # SA1112: Closing parenthesis should be on line of opening parenthesis
@@ -521,8 +521,8 @@ csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimenta
 csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimental = true:silent
 csharp_style_allow_embedded_statements_on_same_line_experimental = true:silent
 
-# IDE0021: Ê¹ÓÃ±í´ïÊ½Ö÷ÌåÀ´±íÊ¾¹¹Ôìº¯Êı
+# IDE0021: ä½¿ç”¨è¡¨è¾¾å¼ä¸»ä½“æ¥è¡¨ç¤ºæ„é€ å‡½æ•°
 dotnet_diagnostic.IDE0021.severity = silent
 
-# IDE0022: Ê¹ÓÃ±í´ïÊ½Ö÷ÌåÀ´±íÊ¾·½·¨
+# IDE0022: ä½¿ç”¨è¡¨è¾¾å¼ä¸»ä½“æ¥è¡¨ç¤ºæ–¹æ³•
 dotnet_diagnostic.IDE0022.severity = silent
