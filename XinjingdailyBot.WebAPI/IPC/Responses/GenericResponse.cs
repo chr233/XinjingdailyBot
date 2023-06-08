@@ -11,7 +11,7 @@ public sealed record GenericResponse<T> : GenericResponse where T : notnull
     /// <summary>
     /// 结果
     /// </summary>
-    public T? Result { get; private set; }
+    public T? Result { get; set; }
 }
 
 /// <summary>

@@ -34,7 +34,7 @@ public sealed class PostController : XjbController
     /// <param name="post"></param>
     /// <returns></returns>
     [HttpPost("[action]")]
-    public async Task<ActionResult<GenericResponse<NewPosts>>> CreatePost([FromForm] CreatePostRequest post)
+    public async Task<ActionResult<GenericResponse<CreatePostResponse>>> CreatePost([FromForm] CreatePostRequest post)
     {
         var user = _httpContextAccessor.GetUser();
 
@@ -42,13 +42,15 @@ public sealed class PostController : XjbController
 
         _logger.LogInformation("{post}", post);
 
-        if (user != null)
-        {
-            return Ok(user);
-        }
-        else
-        {
-            return NotFound();
-        }
+        var response = new GenericResponse<CreatePostResponse> {
+            Code = 0,
+            Message = "成功",
+            Result = new CreatePostResponse {
+                PostType = post.PostType,
+                MediaCount = post.Media?.Count ?? 0
+            }
+        };
+
+        return response;
     }
 }

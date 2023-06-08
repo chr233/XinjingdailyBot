@@ -27,11 +27,12 @@ public sealed record CreatePostRequest
     /// <summary>
     /// 转发频道来源
     /// </summary>
+    [AllowNull]
     public FromData? From { get; set; }
     /// <summary>
     /// 消息类型
     /// </summary>
-    [DefaultValue(MessageType.Unknown)]
+    [DefaultValue(0)]
     public MessageType PostType { get; set; } = MessageType.Unknown;
     /// <summary>
     /// 是否启用遮罩

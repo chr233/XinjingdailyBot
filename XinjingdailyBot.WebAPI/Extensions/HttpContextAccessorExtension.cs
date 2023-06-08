@@ -16,9 +16,12 @@ public static class HttpContextAccessorExtension
     {
         Users? user = null;
 
-        if ((httpContextAccessor.HttpContext?.Items.TryGetValue("Users", out var obj) ?? false) && user != null)
+        if (httpContextAccessor.HttpContext?.Items.TryGetValue("Users", out var obj) ?? false)
         {
-            user = obj as Users;
+            if (obj != null)
+            {
+                user = obj as Users;
+            }
         }
 
         ArgumentNullException.ThrowIfNull(user);
