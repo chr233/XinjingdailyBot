@@ -37,6 +37,15 @@ public interface IChannelOptionService : IBaseService<ChannelOptions>
     /// <returns></returns>
     Task<EChannelOption> FetchChannelOption(Chat channelChat);
     /// <summary>
+    /// 获取频道设定
+    /// </summary>
+    /// <param name="chatId"></param>
+    /// <param name="chatTitle"></param>
+    /// <param name="chatUserName"></param>
+    /// <returns></returns>
+    Task<EChannelOption> FetchChannelOption(long chatId, string chatTitle, string chatUserName);
+
+    /// <summary>
     /// 更新频道设定
     /// </summary>
     /// <param name="channelId"></param>

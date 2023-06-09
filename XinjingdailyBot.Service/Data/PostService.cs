@@ -450,6 +450,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
                     newPost.ReviewMsgID = newPost.OriginMsgID;
                     newPost.ReviewActionChatID = newPost.OriginActionChatID;
                     newPost.ReviewActionMsgID = newPost.OriginActionMsgID;
+                    newPost.ReviewMediaGroupID = mediaGroupId;
                 }
 
                 postID = await Insertable(newPost).ExecuteReturnIdentityAsync();
@@ -466,15 +467,17 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
             }
         }
 
-        //更新附件
         if (postID > 0)
         {
+            //更新附件
             var attachment = _attachmentService.GenerateAttachment(message, postID);
-
             if (attachment != null)
             {
                 await _attachmentService.Insertable(attachment).ExecuteCommandAsync();
             }
+
+            //记录媒体组
+            await _mediaGroupService.AddPostMediaGroup(message);
         }
     }
 
@@ -548,13 +551,14 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
             {
                 var attachment = await _attachmentService.Queryable().Where(x => x.PostID == post.Id).FirstAsync();
 
+                var inputFile = new InputFileId(attachment.FileID);
                 var handler = post.PostType switch {
-                    MessageType.Photo => _botClient.SendPhotoAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
-                    MessageType.Audio => _botClient.SendAudioAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
-                    MessageType.Video => _botClient.SendVideoAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
-                    MessageType.Voice => _botClient.SendVoiceAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
-                    MessageType.Document => _botClient.SendDocumentAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
-                    MessageType.Animation => _botClient.SendAnimationAsync(_channelService.RejectChannel.Id, new InputFileId(attachment.FileID)),
+                    MessageType.Photo => _botClient.SendPhotoAsync(_channelService.RejectChannel.Id, inputFile),
+                    MessageType.Audio => _botClient.SendAudioAsync(_channelService.RejectChannel.Id, inputFile),
+                    MessageType.Video => _botClient.SendVideoAsync(_channelService.RejectChannel.Id, inputFile),
+                    MessageType.Voice => _botClient.SendVoiceAsync(_channelService.RejectChannel.Id, inputFile),
+                    MessageType.Document => _botClient.SendDocumentAsync(_channelService.RejectChannel.Id, inputFile),
+                    MessageType.Animation => _botClient.SendAnimationAsync(_channelService.RejectChannel.Id, inputFile),
                     _ => throw new Exception("未知的稿件类型"),
                 };
 
@@ -575,16 +579,17 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
                 {
                     attachmentType = post.PostType;
                 }
+                var inputFile = new InputFileId(attachments[i].FileID);
                 group[i] = attachmentType switch {
-                    MessageType.Photo => new InputMediaPhoto(new InputFileId(attachments[i].FileID)),
-                    MessageType.Audio => new InputMediaAudio(new InputFileId(attachments[i].FileID)),
-                    MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)),
-                    MessageType.Voice => new InputMediaAudio(new InputFileId(attachments[i].FileID)),
-                    MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)),
+                    MessageType.Photo => new InputMediaPhoto(inputFile),
+                    MessageType.Audio => new InputMediaAudio(inputFile),
+                    MessageType.Video => new InputMediaVideo(inputFile),
+                    MessageType.Voice => new InputMediaAudio(inputFile),
+                    MessageType.Document => new InputMediaDocument(inputFile),
                     _ => throw new Exception("未知的稿件类型"),
                 };
             }
-            var postMessages = await _botClient.SendMediaGroupAsync(_channelService.RejectChannel.Id, group);
+            var postMessages = await _botClient.SendMediaGroupAsync(_channelService.RejectChannel, group);
 
             var postMessage = postMessages.FirstOrDefault();
             if (postMessage != null)
@@ -631,11 +636,6 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
     {
         var poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
 
-        if (post.IsDirectPost)
-        {
-            poster.PostCount++;
-        }
-
         ChannelOptions? channel = null;
         if (post.IsFromChannel)
         {
@@ -665,13 +665,14 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
                 {
                     var attachment = await _attachmentService.Queryable().FirstAsync(x => x.PostID == post.Id);
 
+                    var inputFile = new InputFileId(attachment.FileID);
                     var handler = post.PostType switch {
-                        MessageType.Photo => _botClient.SendPhotoAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
-                        MessageType.Audio => _botClient.SendAudioAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html, title: attachment.FileName),
-                        MessageType.Video => _botClient.SendVideoAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
-                        MessageType.Voice => _botClient.SendVoiceAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html),
-                        MessageType.Document => _botClient.SendDocumentAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html),
-                        MessageType.Animation => _botClient.SendDocumentAsync(_channelService.AcceptChannel.Id, new InputFileId(attachment.FileID), caption: postText, parseMode: ParseMode.Html),
+                        MessageType.Photo => _botClient.SendPhotoAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Audio => _botClient.SendAudioAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, title: attachment.FileName),
+                        MessageType.Video => _botClient.SendVideoAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Voice => _botClient.SendVoiceAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html),
+                        MessageType.Document => _botClient.SendDocumentAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html),
+                        MessageType.Animation => _botClient.SendAnimationAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
                         _ => null,
                     };
 
@@ -696,13 +697,15 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
                     {
                         attachmentType = post.PostType;
                     }
+
+                    var inputFile = new InputFileId(attachments[i].FileID);
                     group[i] = attachmentType switch {
-                        MessageType.Photo => new InputMediaPhoto(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html, HasSpoiler = hasSpoiler },
-                        MessageType.Audio => new InputMediaAudio(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
-                        MessageType.Video => new InputMediaVideo(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html, HasSpoiler = hasSpoiler },
-                        MessageType.Voice => new InputMediaVideo(new InputFileId(attachments[i].FileID)) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
-                        MessageType.Document => new InputMediaDocument(new InputFileId(attachments[i].FileID)) { Caption = i == attachments.Count - 1 ? postText : null, ParseMode = ParseMode.Html },
-                        _ => throw new Exception(),
+                        MessageType.Photo => new InputMediaPhoto(inputFile) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html, HasSpoiler = hasSpoiler },
+                        MessageType.Audio => new InputMediaAudio(inputFile) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
+                        MessageType.Video => new InputMediaVideo(inputFile) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html, HasSpoiler = hasSpoiler },
+                        MessageType.Voice => new InputMediaVideo(inputFile) { Caption = i == 0 ? postText : null, ParseMode = ParseMode.Html },
+                        MessageType.Document => new InputMediaDocument(inputFile) { Caption = i == attachments.Count - 1 ? postText : null, ParseMode = ParseMode.Html },
+                        _ => throw new Exception("未知的稿件类型"),
                     };
                 }
 
@@ -738,7 +741,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
             string reviewMsg = _textHelperService.MakeReviewMessage(poster, dbUser, post.Anonymous);
             await _botClient.EditMessageTextAsync(callbackQuery.Message!, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
         }
-        else //直接投稿, 在审核群留档
+        else // 直接投稿, 在审核群留档
         {
             string reviewMsg = _textHelperService.MakeReviewMessage(poster, post.PublicMsgID, post.Anonymous);
             var msg = await _botClient.SendTextMessageAsync(_channelService.ReviewGroup.Id, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
@@ -756,7 +759,6 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
 
         //通知投稿人
         string posterMsg = _textHelperService.MakeNotification(post.IsDirectPost, inPlan, post.PublicMsgID);
-
         if (poster.Notification && poster.UserID != dbUser.UserID)//启用通知并且审核与投稿不是同一个人
         {
             //单独发送通知消息

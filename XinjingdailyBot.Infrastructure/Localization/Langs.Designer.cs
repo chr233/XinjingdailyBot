@@ -61,7 +61,7 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
-        ///   查找类似 🤔保留来源 的本地化字符串。
+        ///   查找类似 当前：🤔保留来源 的本地化字符串。
         /// </summary>
         public static string AnymouseOff {
             get {
@@ -70,7 +70,7 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
-        ///   查找类似 👻匿名投稿 的本地化字符串。
+        ///   查找类似 当前：👻匿名投稿 的本地化字符串。
         /// </summary>
         public static string AnymouseOn {
             get {
@@ -331,7 +331,7 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
-        ///   查找类似 🖼️禁用遮罩 的本地化字符串。
+        ///   查找类似 当前：🖼️禁用遮罩 的本地化字符串。
         /// </summary>
         public static string TagSpoilerOff {
             get {
@@ -340,7 +340,7 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
-        ///   查找类似 ⚠️开启遮罩 的本地化字符串。
+        ///   查找类似 当前：⚠️开启遮罩 的本地化字符串。
         /// </summary>
         public static string TagSpoilerOn {
             get {

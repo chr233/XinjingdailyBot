@@ -88,6 +88,7 @@ internal class ChannelService : IChannelService
         catch
         {
             _logger.LogError("未找到指定的审核群组, 可以使用 /groupinfo 命令获取群组信息");
+            _reviewGroup = new Chat { Id = -1 };
         }
 
         if (channelOption.UseReviewLogMode)

@@ -187,7 +187,7 @@
     <value>#AI怪图</value>
   </data>
   <data name="TagSpoilerOn" xml:space="preserve">
-    <value>⚠️开启遮罩</value>
+    <value>当前：⚠️开启遮罩</value>
   </data>
   <data name="TagNSFWOff" xml:space="preserve">
     <value>#N___</value>
@@ -202,7 +202,7 @@
     <value>#A___</value>
   </data>
   <data name="TagSpoilerOff" xml:space="preserve">
-    <value>🖼️禁用遮罩</value>
+    <value>当前：🖼️禁用遮罩</value>
   </data>
   <data name="ReviewReject" xml:space="preserve">
     <value>❌拒绝</value>
@@ -211,10 +211,10 @@
     <value>✅采用</value>
   </data>
   <data name="AnymouseOn" xml:space="preserve">
-    <value>👻匿名投稿</value>
+    <value>当前：👻匿名投稿</value>
   </data>
   <data name="AnymouseOff" xml:space="preserve">
-    <value>🤔保留来源</value>
+    <value>当前：🤔保留来源</value>
   </data>
   <data name="PostCancel" xml:space="preserve">
     <value>❌取消</value>

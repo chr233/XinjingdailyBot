@@ -46,6 +46,37 @@ internal sealed class ChannelOptionService : BaseService<ChannelOptions>, IChann
         return channel.Option;
     }
 
+    public async Task<EChannelOption> FetchChannelOption(long chatId,string chatTitle,string chatUserName)
+    {
+        var channel = await Queryable().Where(x => x.ChannelID == chatId).FirstAsync();
+        if (channel == null)
+        {
+            channel = new ChannelOptions {
+                ChannelID = chatId,
+                ChannelName = chatUserName ?? "",
+                ChannelTitle = chatTitle ?? "",
+                Option = EChannelOption.Normal,
+                Count = 1,
+                CreateAt = DateTime.Now,
+                ModifyAt = DateTime.Now,
+            };
+            await Insertable(channel).ExecuteCommandAsync();
+        }
+        else
+        {
+            if (channel.ChannelName != chatUserName || channel.ChannelTitle != chatTitle)
+            {
+                channel.ChannelTitle = chatTitle ?? "";
+                channel.ChannelName = chatUserName ?? "";
+                channel.ModifyAt = DateTime.Now;
+            }
+            channel.Count++;
+            await Updateable(channel).ExecuteCommandAsync();
+        }
+
+        return channel.Option;
+    }
+
     public async Task<ChannelOptions?> FetchChannelByTitle(string channelTitle)
     {
         var channel = await Queryable().Where(x => x.ChannelTitle == channelTitle).FirstAsync();

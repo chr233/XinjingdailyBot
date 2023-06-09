@@ -388,7 +388,7 @@ internal class NormalCommand
                     MessageType.Video => _botClient.SendVideoAsync(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard, hasSpoiler: hasSpoiler),
                     MessageType.Voice => _botClient.SendVoiceAsync(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard),
                     MessageType.Document => _botClient.SendDocumentAsync(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard),
-                    MessageType.Animation => _botClient.SendDocumentAsync(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard),
+                    MessageType.Animation => _botClient.SendAnimationAsync(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard),
                     _ => null,
                 };
 

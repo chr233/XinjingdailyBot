@@ -11,7 +11,7 @@ public interface IMarkupHelperService
     /// <summary>
     /// 一行显示的字数
     /// </summary>
-    public static readonly int MaxLineCharsTag = 8;
+    public static readonly int MaxLineCharsTag = 10;
     /// <summary>
     /// 一行显示的字数
     /// </summary>
