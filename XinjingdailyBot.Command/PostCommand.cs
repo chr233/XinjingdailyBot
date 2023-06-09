@@ -180,10 +180,10 @@ internal class PostCommand
                         Caption = i == attachments.Count - 1 ? post.Text : null,
                         ParseMode = ParseMode.Html
                     },
-                    _ => throw new Exception(),
+                    _ => throw new Exception("未知的稿件类型"),
                 };
             }
-            var messages = await _botClient.SendMediaGroupAsync(_channelService.ReviewGroup.Id, group);
+            var messages = await _botClient.SendMediaGroupAsync(_channelService.ReviewGroup, group);
             reviewMsg = messages.First();
             post.ReviewMediaGroupID = reviewMsg.MediaGroupId ?? "";
 
@@ -196,7 +196,7 @@ internal class PostCommand
         bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
         var keyboard = _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
 
-        var manageMsg = await _botClient.SendTextMessageAsync(_channelService.ReviewGroup.Id, msg, parseMode: ParseMode.Html, disableWebPagePreview: true, replyToMessageId: reviewMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+        var manageMsg = await _botClient.SendTextMessageAsync(_channelService.ReviewGroup, msg, parseMode: ParseMode.Html, disableWebPagePreview: true, replyToMessageId: reviewMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
         post.ReviewChatID = reviewMsg.Chat.Id;
         post.ReviewMsgID = reviewMsg.MessageId;

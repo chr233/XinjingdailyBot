@@ -16,14 +16,13 @@ public sealed record CreatePostRequest
     [DefaultValue("")]
     public string? Text { get; set; }
     /// <summary>
-    /// 匿名投稿
-    /// </summary>
-    [DefaultValue(false)]
-    public bool Anonymous { get; set; }
-    /// <summary>
     /// 多媒体文件
     /// </summary>
     public IFormFileCollection? Media { get; set; }
+    /// <summary>
+    /// 多媒体文件名
+    /// </summary>
+    public IList<string>? MediaNames { get; set; }
     /// <summary>
     /// 消息类型
     /// </summary>
@@ -34,12 +33,11 @@ public sealed record CreatePostRequest
     /// </summary>
     [DefaultValue(false)]
     public bool HasSpoiler { get; set; }
-
     /// <summary>
     /// 频道ID
     /// </summary>
-    [DefaultValue(-1)]
-    public long ChannelID { get; set; } = -1;
+    [DefaultValue(0)]
+    public long ChannelID { get; set; } = 0;
     /// <summary>
     /// 频道ID @
     /// </summary>
@@ -53,8 +51,8 @@ public sealed record CreatePostRequest
     /// <summary>
     /// 转发消息ID
     /// </summary>
-    [DefaultValue(-1)]
-    public long ChannelMsgID { get; set; } = -1;
+    [DefaultValue(0)]
+    public long ChannelMsgID { get; set; } = 0;
 }
 
 

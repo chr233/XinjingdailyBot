@@ -148,7 +148,7 @@ public sealed record NewPosts : BaseModel, IModifyAt, ICreateAt
     /// 是否允许遮罩
     /// </summary>
     [SugarColumn(IsIgnore = true)]
-    public bool CanSpoiler => PostType == MessageType.Photo || PostType == MessageType.Video;
+    public bool CanSpoiler => PostType == MessageType.Photo || PostType == MessageType.Video || PostType == MessageType.Animation;
 
     /// <summary>
     /// 拒绝原因(如果拒绝)

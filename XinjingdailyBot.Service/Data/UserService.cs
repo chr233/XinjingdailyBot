@@ -294,8 +294,7 @@ internal sealed class UserService : BaseService<Users>, IUserService
         //如果是配置文件中指定的管理员就覆盖用户组权限
         if (_optionsSetting.Bot.SuperAdmins?.Contains(dbUser.UserID) ?? false)
         {
-            var maxGroupID = _groupRepository.GetMaxGroupId();
-            dbUser.GroupID = maxGroupID;
+            dbUser.GroupID = _groupRepository.GetMaxGroupId();
         }
 
         //根据GroupID设置用户权限信息 (封禁用户区别对待)

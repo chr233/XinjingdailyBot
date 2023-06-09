@@ -1,4 +1,5 @@
 using Telegram.Bot.Types.Enums;
+using XinjingdailyBot.Infrastructure.Enums;
 
 namespace XinjingdailyBot.WebAPI.IPC.Responses;
 
@@ -11,4 +12,6 @@ public sealed record TestTokenResponse
     public long UserID { get; set; }
     public int UID { get; set; }
     public string NickName { get; set; }
+    public EUserRights UserRight { get; set; }
+    public int GroupId { get; set; }
 }
