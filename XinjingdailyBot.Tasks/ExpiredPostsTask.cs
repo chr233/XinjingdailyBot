@@ -20,6 +20,10 @@ internal class ExpiredPostsTask : IJob
     private readonly IPostService _postService;
     private readonly IUserService _userService;
     private readonly ITelegramBotClient _botClient;
+    /// <summary>
+    /// 稿件过期时间
+    /// </summary>
+    private readonly TimeSpan PostExpiredTime;
 
     public ExpiredPostsTask(
         ILogger<ExpiredPostsTask> logger,
@@ -34,11 +38,6 @@ internal class ExpiredPostsTask : IJob
         _botClient = botClient;
         PostExpiredTime = TimeSpan.FromDays(options.Value.Post.PostExpiredTime);
     }
-
-    /// <summary>
-    /// 稿件过期时间
-    /// </summary>
-    private TimeSpan PostExpiredTime { get; init; }
 
     public async Task Execute(IJobExecutionContext context)
     {

@@ -15,6 +15,6 @@ public static class MessageExtension
     /// <returns></returns>
     public static bool CanSpoiler(this Message message)
     {
-        return message.Type == MessageType.Photo || message.Type == MessageType.Video;
+        return message.Type == MessageType.Photo || message.Type == MessageType.Video || message.Type == MessageType.Animation;
     }
 }
