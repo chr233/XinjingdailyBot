@@ -1,9 +1,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Diagnostics.CodeAnalysis;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
+using Telegram.Bot.Polling;
+using Telegram.Bot.Types.Enums;
+using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Repository;
@@ -24,6 +28,7 @@ public class PollingService : BackgroundService
     private readonly TagRepository _tagRepository;
     private readonly RejectReasonRepository _rejectReasonRepository;
     private readonly ITelegramBotClient _botClient;
+    private readonly bool _throwPendingUpdates;
 
     /// <summary>
     /// 消息接收服务
@@ -37,6 +42,7 @@ public class PollingService : BackgroundService
     /// <param name="tagRepository"></param>
     /// <param name="rejectReasonRepository"></param>
     /// <param name="botClient"></param>
+    /// <param name="options"></param>
     public PollingService(
         IServiceProvider serviceProvider,
         ILogger<PollingService> logger,
@@ -46,7 +52,8 @@ public class PollingService : BackgroundService
         LevelRepository levelRepository,
         TagRepository tagRepository,
         RejectReasonRepository rejectReasonRepository,
-        ITelegramBotClient botClient)
+        ITelegramBotClient botClient,
+        IOptions<OptionsSetting> options)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
@@ -57,6 +64,7 @@ public class PollingService : BackgroundService
         _tagRepository = tagRepository;
         _rejectReasonRepository = rejectReasonRepository;
         _botClient = botClient;
+        _throwPendingUpdates = options.Value.Bot.ThrowPendingUpdates;
     }
 
     /// <summary>
@@ -85,23 +93,39 @@ public class PollingService : BackgroundService
 
     private async Task DoWork(CancellationToken stoppingToken)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var updateService = scope.ServiceProvider.GetRequiredService<IUpdateService>();
+
+        bool skip = false;
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                using var scope = _serviceProvider.CreateScope();
-                var receiver = scope.ServiceProvider.GetRequiredService<IReceiverService>();
+                var receiverOptions = new ReceiverOptions {
+                    AllowedUpdates = Array.Empty<UpdateType>(),
+                    ThrowPendingUpdates = _throwPendingUpdates,
+                    Offset = _throwPendingUpdates ? 0 : (skip ? 1 : 0),
+                    Limit = 20,
+                };
 
-                try
+                skip = false;
+
+                _logger.LogInformation("接收服务运行中...");
+
+                await _botClient.ReceiveAsync(
+                    updateHandler: updateService.HandleUpdateAsync,
+                    pollingErrorHandler: updateService.HandlePollingErrorAsync,
+                    receiverOptions: receiverOptions,
+                    cancellationToken: stoppingToken);
+            }
+            catch (ApiRequestException ex)
+            {
+                _logger.LogError(ex, "Telegram API 调用出错");
+                if (ex.Message == "Bad Request: query is too old and response timeout expired or query ID is invalid")
                 {
-                    await receiver.ReceiveAsync(stoppingToken);
-                }
-                catch (ApiRequestException ex)
-                {
-                    _logger.LogError(ex, "接收服务运行出错");
+                    skip = true;
                 }
             }
-
             catch (Exception ex)
             {
                 _logger.LogError(ex, "接收服务运行出错");
