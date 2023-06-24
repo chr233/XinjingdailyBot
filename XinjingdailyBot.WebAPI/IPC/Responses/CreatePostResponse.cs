@@ -7,7 +7,7 @@ namespace XinjingdailyBot.WebAPI.IPC.Responses;
 /// </summary>
 public sealed record CreatePostResponse
 {
-   public MessageType PostType { get; set; }
-    
+    public MessageType PostType { get; set; }
+
     public int MediaCount { get; set; }
 }

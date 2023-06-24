@@ -38,7 +38,7 @@ internal sealed class EnumSchemaFilter : ISchemaFilter
             {
                 // Fallback
                 enumName = enumValue.ToString();
-                
+
                 if (string.IsNullOrEmpty(enumName))
                 {
                     throw new InvalidOperationException(nameof(enumName));

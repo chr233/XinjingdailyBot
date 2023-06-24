@@ -159,7 +159,7 @@ internal sealed class MarkupHelperService : IMarkupHelperService
                 btns.Add(line);
                 line = new List<InlineKeyboardButton>();
             }
-            
+
             line.Add(InlineKeyboardButton.WithCallbackData(reason.Name, $"reject {reason.Payload}"));
         }
 

@@ -60,8 +60,7 @@ public static class HttpClientExtension
 
         services.AddHttpClient("Statistic", (serviceProvider, httpClient) => {
             var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
-            string? baseUrl = config.GitHub.BaseUrl;
-            httpClient.BaseAddress = new Uri(baseUrl ?? "https://asfe.chrxw.com/");
+            httpClient.BaseAddress = new Uri("https://asfe.chrxw.com/");
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, Utils.Version));
         });

@@ -66,6 +66,13 @@ public interface IPostService : IBaseService<NewPosts>
     /// <returns></returns>
     Task HandleTextPosts(Users dbUser, Message message);
     /// <summary>
+    /// 发布延时稿件
+    /// </summary>
+    /// <param name="post"></param>
+    /// <returns></returns>
+    Task<bool> PublicInPlanPost(NewPosts post);
+
+    /// <summary>
     /// 拒绝投稿
     /// </summary>
     /// <param name="post"></param>
