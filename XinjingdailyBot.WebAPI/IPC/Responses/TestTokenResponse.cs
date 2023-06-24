@@ -1,4 +1,3 @@
-using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Enums;
 
 namespace XinjingdailyBot.WebAPI.IPC.Responses;

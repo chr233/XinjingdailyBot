@@ -50,6 +50,7 @@
 		<TieredPGO>true</TieredPGO>
 		<TrimMode>partial</TrimMode>
 		<SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
+		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(XJBVariant)' != ''">

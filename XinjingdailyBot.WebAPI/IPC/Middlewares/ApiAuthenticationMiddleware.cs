@@ -1,7 +1,5 @@
 using Microsoft.Extensions.Options;
-using System.Configuration;
 using System.Net;
-using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Data;

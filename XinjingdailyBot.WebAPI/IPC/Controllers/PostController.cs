@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using System.Net.Mail;
-using System.Threading.Channels;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -14,7 +12,6 @@ using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
 using XinjingdailyBot.WebAPI.IPC.Requests;
 using XinjingdailyBot.WebAPI.IPC.Responses;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace XinjingdailyBot.WebAPI.IPC.Controllers;
 

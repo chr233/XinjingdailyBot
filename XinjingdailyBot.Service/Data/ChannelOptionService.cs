@@ -46,7 +46,7 @@ internal sealed class ChannelOptionService : BaseService<ChannelOptions>, IChann
         return channel.Option;
     }
 
-    public async Task<EChannelOption> FetchChannelOption(long chatId,string chatTitle,string chatUserName)
+    public async Task<EChannelOption> FetchChannelOption(long chatId, string chatTitle, string chatUserName)
     {
         var channel = await Queryable().Where(x => x.ChannelID == chatId).FirstAsync();
         if (channel == null)
