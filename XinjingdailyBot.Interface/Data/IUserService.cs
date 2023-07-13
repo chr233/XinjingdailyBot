@@ -74,4 +74,11 @@ public interface IUserService : IBaseService<Users>
     /// <param name="page"></param>
     /// <returns></returns>
     Task<(string, InlineKeyboardMarkup?)> QueryUserList(Users dbUser, string query, int page);
+    /// <summary>
+    /// 查找用户
+    /// </summary>
+    /// <param name="chatId"></param>
+    /// <param name="msgId"></param>
+    /// <returns></returns>
+    Task<Users?> FetchTargetUser(long chatId, int msgId);
 }
