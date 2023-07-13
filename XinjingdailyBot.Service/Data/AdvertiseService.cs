@@ -9,6 +9,14 @@ namespace XinjingdailyBot.Service.Data;
 [AppService(typeof(IAdvertiseService), LifeTime.Transient)]
 internal sealed class AdvertiseService : BaseService<Advertises>, IAdvertiseService
 {
+    private readonly IAdvertisePostService _advertisePostService;
+
+    public AdvertiseService(
+        IAdvertisePostService advertisePostService)
+    {
+        _advertisePostService = advertisePostService;
+    }
+
     public async Task<Advertises?> GetPostableAdvertise()
     {
         var ads = await Queryable().Where(static x => x.Enable).ToListAsync();
@@ -18,11 +26,11 @@ internal sealed class AdvertiseService : BaseService<Advertises>, IAdvertiseServ
         foreach (var ad in ads)
         {
             if ((ad.MaxShowCount > 0 && ad.ShowCount >= ad.MaxShowCount) ||
-                now >= ad.ExpireAt ||
-                ad.Weight == 0)
+                now >= ad.ExpireAt || ad.Weight == 0)
             {
                 ad.Enable = false;
                 await UpdateAsync(ad);
+                await _advertisePostService.DeleteOldAdPosts(ad, false);
             }
         }
         var validAds = ads.Where(static x => x.Enable);
