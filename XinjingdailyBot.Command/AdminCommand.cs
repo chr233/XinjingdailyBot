@@ -599,7 +599,7 @@ internal class AdminCommand
                 return "该用户尚未私聊过机器人, 无法发送消息";
             }
 
-            var msg = string.Join(' ', args).Trim();
+            var msg = string.Join('\n', args).Trim();
 
             if (string.IsNullOrEmpty(msg))
             {
@@ -609,7 +609,7 @@ internal class AdminCommand
             autoDelete = false;
             try
             {
-                await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"来自管理员的消息:\n<code>{msg.EscapeHtml()}</code>", parseMode: ParseMode.Html);
+                await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"来自管理员的消息:\n{msg}", parseMode: ParseMode.Html);
                 return $"消息成功发送给 {targetUser.EscapedFullName()}";
             }
             catch (Exception ex)
