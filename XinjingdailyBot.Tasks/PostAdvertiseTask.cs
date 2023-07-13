@@ -1,11 +1,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
+using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Tasks;
 
@@ -56,27 +58,49 @@ internal class PostAdvertiseTask : IJob
 
         var operates = new List<(EAdMode, ChatId)>
         {
-           new (EAdMode.AcceptChannel, channelService.AcceptChannel.Id),
-           new (EAdMode.RejectChannel, channelService.RejectChannel.Id),
-           new (EAdMode.ReviewGroup, channelService.ReviewGroup.Id),
-           new (EAdMode.CommentGroup, channelService.CommentGroup.Id),
-           new (EAdMode.SubGroup, channelService.SubGroup.Id),
+           new (EAdMode.AcceptChannel, channelService.AcceptChannel),
+           new (EAdMode.RejectChannel, channelService.RejectChannel),
+           new (EAdMode.ReviewGroup, channelService.ReviewGroup),
+           new (EAdMode.CommentGroup, channelService.CommentGroup),
+           new (EAdMode.SubGroup, channelService.SubGroup),
         };
 
-        foreach (var (mode, chatId) in operates)
+        foreach (var (mode, chat) in operates)
         {
-            if (ad.Mode.HasFlag(mode) && chatId.Identifier != 0)
+            if (ad.Mode.HasFlag(mode) && chat.Identifier != null)
             {
+                var chatId = chat.Identifier.Value;
                 try
                 {
+                    var isFirst = await _advertisePostService.IsFirstAdPost(ad);
+
                     var msgId = await _botClient.CopyMessageAsync(chatId, ad.ChatID, (int)ad.MessageID, disableNotification: true);
+
+                    //删除旧的广告
+                    await _advertisePostService.DeleteOldAdPosts(ad, chatId, true);
+
+                    var adpost = new AdvertisePosts {
+                        AdId = ad.Id,
+                        ChatID = chatId,
+                        MessageID = msgId.Id,
+                        Pined = ad.PinMessage && isFirst,
+                        CreateAt = DateTime.Now,
+                        ModifyAt = DateTime.Now,
+                    };
+
+                    await _advertisePostService.Insertable(adpost).ExecuteCommandAsync();
+
                     ad.ShowCount++;
                     ad.LastPostAt = DateTime.Now;
-                    if (ad.PinMessage)
+
+                    if (adpost.Pined)
                     {
                         await _botClient.PinChatMessageAsync(chatId, msgId.Id, true);
                     }
-                    await _advertisesService.Updateable(ad).UpdateColumns(static x => new { x.ShowCount, x.LastPostAt }).ExecuteCommandAsync();
+
+                    await _advertisesService.Updateable(ad).UpdateColumns(static x => new {
+                        x.ShowCount, x.LastPostAt
+                    }).ExecuteCommandAsync();
                 }
                 catch (Exception ex)
                 {
@@ -88,7 +112,5 @@ internal class PostAdvertiseTask : IJob
                 }
             }
         }
-
-        await _advertisePostService.DeleteOldAdPosts(ad, false);
     }
 }

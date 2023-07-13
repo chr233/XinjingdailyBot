@@ -8,7 +8,7 @@ using XinjingdailyBot.Service.Data.Base;
 namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IAdvertisePostService"/>
-[AppService(typeof(AdvertisePostsService), LifeTime.Transient)]
+[AppService(typeof(IAdvertisePostService), LifeTime.Transient)]
 internal sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdvertisePostService
 {
     private readonly ILogger<AdvertisePostsService> _logger;
@@ -25,7 +25,7 @@ internal sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdve
     public async Task DeleteOldAdPosts(Advertises advertises, bool excludePin)
     {
         var oldPosts = await Queryable()
-            .Where(x => x.AdId == advertises.Id)
+            .Where(x => x.AdId == advertises.Id && !x.Deleted)
             .WhereIF(excludePin, static x => !x.Pined)
             .ToListAsync();
 
@@ -33,19 +33,56 @@ internal sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdve
         {
             try
             {
+                oldPost.Deleted = true;
+                oldPost.ModifyAt = DateTime.Now;
+                await Updateable(oldPost).ExecuteCommandAsync();
+
                 await _botClient.DeleteMessageAsync(oldPost.ChatID, (int)oldPost.MessageID);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "删除消息失败");
+                await Task.Delay(500);
             }
             finally
+            {
+                await Updateable(oldPost).ExecuteCommandAsync();
+            }
+        }
+    }
+
+    public async Task DeleteOldAdPosts(Advertises advertises, long chatId, bool excludePin)
+    {
+        var oldPosts = await Queryable()
+            .Where(x => x.AdId == advertises.Id && x.ChatID == chatId && !x.Deleted)
+            .WhereIF(excludePin, static x => !x.Pined)
+            .ToListAsync();
+
+        foreach (var oldPost in oldPosts)
+        {
+            try
             {
                 oldPost.Deleted = true;
                 oldPost.ModifyAt = DateTime.Now;
                 await Updateable(oldPost).ExecuteCommandAsync();
-                await Task.Delay(1000);
+
+                await _botClient.DeleteMessageAsync(oldPost.ChatID, (int)oldPost.MessageID);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "删除消息失败");
+                await Task.Delay(500);
+            }
+            finally
+            {
+                await Updateable(oldPost).ExecuteCommandAsync();
             }
         }
+    }
+
+    public async Task<bool> IsFirstAdPost(Advertises advertises)
+    {
+        var post = await Queryable().Where(x => x.AdId == advertises.Id).FirstAsync();
+        return post == null;
     }
 }
