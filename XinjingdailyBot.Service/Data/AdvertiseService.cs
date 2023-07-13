@@ -5,13 +5,13 @@ using XinjingdailyBot.Service.Data.Base;
 
 namespace XinjingdailyBot.Service.Data;
 
-/// <inheritdoc cref="IAdvertisesService"/>
-[AppService(typeof(IAdvertisesService), LifeTime.Transient)]
-internal sealed class AdvertisesService : BaseService<Advertises>, IAdvertisesService
+/// <inheritdoc cref="IAdvertiseService"/>
+[AppService(typeof(IAdvertiseService), LifeTime.Transient)]
+internal sealed class AdvertiseService : BaseService<Advertises>, IAdvertiseService
 {
     public async Task<Advertises?> GetPostableAdvertise()
     {
-        var ads = await Queryable().Where(x => x.Enable).ToListAsync();
+        var ads = await Queryable().Where(static x => x.Enable).ToListAsync();
 
         var now = DateTime.Now;
         //检查是否过期
@@ -25,7 +25,7 @@ internal sealed class AdvertisesService : BaseService<Advertises>, IAdvertisesSe
                 await UpdateAsync(ad);
             }
         }
-        var validAds = ads.Where(x => x.Enable);
+        var validAds = ads.Where(static x => x.Enable);
 
         if (!validAds.Any())
         {

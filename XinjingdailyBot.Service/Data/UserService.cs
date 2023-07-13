@@ -465,6 +465,45 @@ internal sealed class UserService : BaseService<Users>, IUserService
         return await FetchUserByUserID(replyToMsg.From.Id);
     }
 
+    public async Task<Users?> FetchTargetUser(long chatId, int msgId)
+    {
+        //在审核群内
+        if (chatId == _channelService.ReviewGroup.Id)
+        {
+            NewPosts? post;
+
+            var mediaGroup = await _mediaGroupService.QueryMediaGroup(chatId, msgId);
+            if (mediaGroup == null)//单条稿件
+            {
+                post = await _postRepository.Queryable().FirstAsync(x =>
+                    (x.ReviewChatID == chatId && x.ReviewMsgID == msgId) || (x.ReviewActionChatID == chatId && x.ReviewActionMsgID == msgId)
+                );
+            }
+            else //媒体组稿件
+            {
+                post = await _postRepository.Queryable().FirstAsync(x => x.ReviewChatID == chatId && x.ReviewMediaGroupID == mediaGroup.MediaGroupID);
+            }
+
+            //判断是不是审核相关消息
+            if (post != null)
+            {
+                //通过稿件读取用户信息
+                return await FetchUserByUserID(post.PosterUID);
+            }
+
+            return null;
+        }
+
+        //在CMD回调表里查看
+        var cmdAction = await _cmdRecordService.Queryable().FirstAsync(x => x.MessageID == msgId);
+        if (cmdAction != null)
+        {
+            return await FetchUserByUserID(cmdAction.UserID);
+        }
+
+        return null;
+    }
+
     public async Task<Users?> FetchUserByUserNameOrUserID(string? target)
     {
         if (string.IsNullOrEmpty(target))

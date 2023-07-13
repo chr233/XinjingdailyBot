@@ -18,18 +18,21 @@ internal class PostAdvertiseTask : IJob
     private readonly ILogger<PostAdvertiseTask> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly ITelegramBotClient _botClient;
-    private readonly IAdvertisesService _advertisesService;
+    private readonly IAdvertiseService _advertisesService;
+    private readonly IAdvertisePostService _advertisePostService;
 
     public PostAdvertiseTask(
         ILogger<PostAdvertiseTask> logger,
         IServiceProvider serviceProvider,
         ITelegramBotClient botClient,
-        IAdvertisesService advertisesService)
+        IAdvertiseService advertisesService,
+        IAdvertisePostService advertisePostService)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
         _botClient = botClient;
         _advertisesService = advertisesService;
+        _advertisePostService = advertisePostService;
     }
 
     public async Task Execute(IJobExecutionContext context)
@@ -85,5 +88,7 @@ internal class PostAdvertiseTask : IJob
                 }
             }
         }
+
+        await _advertisePostService.DeleteOldAdPosts(ad, false);
     }
 }
