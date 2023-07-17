@@ -181,6 +181,11 @@ internal class AdminCommand
                 return "找不到指定用户";
             }
 
+            if (targetUser.Id == _channelService.BotUser.Id)
+            {
+                return "你有事?";
+            }
+
             if (targetUser.Id == dbUser.Id)
             {
                 return "无法对自己进行操作";
@@ -277,6 +282,11 @@ internal class AdminCommand
             {
                 return "找不到指定用户";
             }
+            
+            if (targetUser.Id == _channelService.BotUser.Id)
+            {
+                return "你有事?";
+            }
 
             if (targetUser.Id == dbUser.Id)
             {
@@ -370,6 +380,11 @@ internal class AdminCommand
             if (targetUser == null)
             {
                 return "找不到指定用户";
+            }
+
+            if (targetUser.Id == _channelService.BotUser.Id)
+            {
+                return "你有事?";
             }
 
             if (targetUser.Id == dbUser.Id)
@@ -596,6 +611,11 @@ internal class AdminCommand
             if (targetUser == null)
             {
                 return "找不到指定用户";
+            }
+
+            if (targetUser.Id == _channelService.BotUser.Id)
+            {
+                return "你有事?";
             }
 
             if (targetUser.UserID == dbUser.UserID)
@@ -1084,6 +1104,11 @@ internal class AdminCommand
                 return ("该用户已被封禁, 无法执行此操作", null);
             }
 
+            if (targetUser.Id == _channelService.BotUser.Id)
+            {
+                return ("你有事?", null);
+            }
+
             if (targetUser.Id == dbUser.Id)
             {
                 return ("无法对自己进行操作", null);
@@ -1126,6 +1151,11 @@ internal class AdminCommand
             if (targetUser == null)
             {
                 return "找不到指定用户";
+            }
+
+            if (targetUser.Id == _channelService.BotUser.Id)
+            {
+                return "你有事?";
             }
 
             if (targetUser.Id == dbUser.Id)
