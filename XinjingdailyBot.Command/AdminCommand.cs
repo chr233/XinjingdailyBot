@@ -147,15 +147,21 @@ internal class AdminCommand
         await _botClient.SendCommandReply(sb.ToString(), message, false, parsemode: ParseMode.Html);
     }
 
+    [TextCmd("BAN", EUserRights.AdminCmd, Description = "封禁用户")]
+    public Task ResponseBan(Users dbUser, Message message, string[] args) => ResponseBan(dbUser, message, args, false);
+
+    [TextCmd("MBAN", EUserRights.AdminCmd, Description = "静默封禁用户")]
+    public Task ResponseMBan(Users dbUser, Message message, string[] args) => ResponseBan(dbUser, message, args, true);
+
     /// <summary>
     /// 封禁用户
     /// </summary>
     /// <param name="dbUser"></param>
     /// <param name="message"></param>
     /// <param name="args"></param>
+    /// <param name="mute">静默模式</param>
     /// <returns></returns>
-    [TextCmd("BAN", EUserRights.AdminCmd, Description = "封禁用户")]
-    public async Task ResponseBan(Users dbUser, Message message, string[] args)
+    private async Task ResponseBan(Users dbUser, Message message, string[] args, bool mute)
     {
         async Task<string> exec()
         {
@@ -213,15 +219,18 @@ internal class AdminCommand
 
                 try
                 {
-                    if (targetUser.PrivateChatID > 0)
+                    if (!mute)
                     {
-                        var msg = string.Format(Langs.BanedUserTips, "管理员", reason);
-                        await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg);
-                        await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, Langs.QueryBanDescribe);
-                    }
-                    else
-                    {
-                        _logger.LogInformation("用户未私聊过机器人, 无法发送消息");
+                        if (targetUser.PrivateChatID > 0)
+                        {
+                            var msg = string.Format(Langs.BanedUserTips, "管理员", reason);
+                            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg);
+                            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, Langs.QueryBanDescribe);
+                        }
+                        else
+                        {
+                            _logger.LogInformation("用户未私聊过机器人, 无法发送消息");
+                        }
                     }
                 }
                 catch (Exception ex)
