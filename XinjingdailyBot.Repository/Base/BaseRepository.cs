@@ -15,14 +15,9 @@ namespace XinjingdailyBot.Repository.Base;
 /// <typeparam name="T"></typeparam>
 public abstract class BaseRepository<T> : SimpleClient<T>, IBaseRepository<T> where T : BaseModel, new()
 {
-    protected BaseRepository()
+    protected BaseRepository(ISqlSugarClient context) : base(context)
     {
-        Context = DbScoped.SugarScope.GetConnectionScope(0);//默认db0
-    }
-
-    protected BaseRepository(ISqlSugarClient? context) : base(context)
-    {
-        Context = context ?? DbScoped.SugarScope.GetConnectionScope(0);//没有默认db0
+        Context = context;
     }
 
     #region add

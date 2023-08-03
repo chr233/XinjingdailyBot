@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using SqlSugar;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Model.Models;
@@ -18,7 +19,9 @@ public class TagRepository : BaseRepository<Tags>
     /// 标签仓储类
     /// </summary>
     /// <param name="logger"></param>
-    public TagRepository(ILogger<GroupRepository> logger)
+    public TagRepository(
+        ILogger<GroupRepository> logger,
+        ISqlSugarClient context) : base(context)
     {
         _logger = logger;
     }

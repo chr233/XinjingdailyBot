@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using SqlSugar;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Model.Models;
@@ -18,7 +19,9 @@ public class GroupRepository : BaseRepository<Groups>
     /// 用户组仓储类
     /// </summary>
     /// <param name="logger"></param>
-    public GroupRepository(ILogger<GroupRepository> logger)
+    public GroupRepository(
+        ILogger<GroupRepository> logger,
+        ISqlSugarClient context) : base(context)
     {
         _logger = logger;
     }

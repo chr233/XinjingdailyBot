@@ -1,3 +1,4 @@
+using SqlSugar;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
@@ -9,6 +10,10 @@ namespace XinjingdailyBot.Service.Data;
 [AppService(typeof(INameHistoryService), LifeTime.Singleton)]
 internal sealed class NameHistoryService : BaseService<NameHistory>, INameHistoryService
 {
+    public NameHistoryService(ISqlSugarClient context) : base(context)
+    {
+    }
+
     public async Task CreateNameHistory(Users dbUser)
     {
         var history = new NameHistory {

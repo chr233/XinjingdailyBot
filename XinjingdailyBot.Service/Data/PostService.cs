@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SqlSugar;
 using System.Collections.Concurrent;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -45,7 +46,8 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         IUserService userService,
         IOptions<OptionsSetting> options,
         TagRepository tagRepository,
-        IMediaGroupService mediaGroupService)
+        IMediaGroupService mediaGroupService,
+        ISqlSugarClient context) : base(context)
     {
         _logger = logger;
         _attachmentService = attachmentService;

@@ -1,3 +1,4 @@
+using SqlSugar;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository.Base;
@@ -11,4 +12,7 @@ namespace XinjingdailyBot.Repository;
 [Obsolete("废弃的仓储类")]
 public class OldPostRepository : BaseRepository<OldPosts>
 {
+    public OldPostRepository(ISqlSugarClient context) : base(context)
+    {
+    }
 }

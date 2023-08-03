@@ -1,3 +1,4 @@
+using SqlSugar;
 using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Data;
@@ -10,6 +11,10 @@ namespace XinjingdailyBot.Service.Data;
 [AppService(typeof(ICmdRecordService), LifeTime.Transient)]
 internal sealed class CmdRecordService : BaseService<CmdRecords>, ICmdRecordService
 {
+    public CmdRecordService(ISqlSugarClient context) : base(context)
+    {
+    }
+
     public async Task AddCmdRecord(Message message, Users dbUser, bool handled, bool isQuery, string? exception)
     {
         bool error = !string.IsNullOrEmpty(exception);

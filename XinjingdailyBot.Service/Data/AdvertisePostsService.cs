@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using SqlSugar;
 using Telegram.Bot;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Data;
@@ -16,7 +17,8 @@ internal sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdve
 
     public AdvertisePostsService(
         ILogger<AdvertisePostsService> logger,
-        ITelegramBotClient botClient)
+        ITelegramBotClient botClient,
+        ISqlSugarClient context) : base(context)
     {
         _logger = logger;
         _botClient = botClient;

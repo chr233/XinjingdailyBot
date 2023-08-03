@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using SqlSugar;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository.Base;
@@ -17,7 +18,9 @@ public class RejectReasonRepository : BaseRepository<RejectReasons>
     /// 拒绝理由仓储类
     /// </summary>
     /// <param name="logger"></param>
-    public RejectReasonRepository(ILogger<RejectReasonRepository> logger)
+    public RejectReasonRepository(
+        ILogger<RejectReasonRepository> logger,
+        ISqlSugarClient context) : base(context)
     {
         _logger = logger;
     }
