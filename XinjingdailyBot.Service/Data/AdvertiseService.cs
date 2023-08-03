@@ -1,3 +1,4 @@
+using SqlSugar;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
@@ -12,7 +13,8 @@ internal sealed class AdvertiseService : BaseService<Advertises>, IAdvertiseServ
     private readonly IAdvertisePostService _advertisePostService;
 
     public AdvertiseService(
-        IAdvertisePostService advertisePostService)
+        IAdvertisePostService advertisePostService,
+        ISqlSugarClient context) : base(context)
     {
         _advertisePostService = advertisePostService;
     }

@@ -11,6 +11,10 @@ namespace XinjingdailyBot.Service.Data;
 [AppService(typeof(IMediaGroupService), LifeTime.Singleton)]
 internal sealed class MediaGroupService : BaseService<MediaGroups>, IMediaGroupService
 {
+    public MediaGroupService(ISqlSugarClient context) : base(context)
+    {
+    }
+
     public async Task AddPostMediaGroup(Message message)
     {
         if (string.IsNullOrEmpty(message.MediaGroupId))

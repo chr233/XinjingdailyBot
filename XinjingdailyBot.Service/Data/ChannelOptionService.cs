@@ -1,3 +1,4 @@
+using SqlSugar;
 using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
@@ -11,6 +12,10 @@ namespace XinjingdailyBot.Service.Data;
 [AppService(typeof(IChannelOptionService), LifeTime.Transient)]
 internal sealed class ChannelOptionService : BaseService<ChannelOptions>, IChannelOptionService
 {
+    public ChannelOptionService(ISqlSugarClient context) : base(context)
+    {
+    }
+
     public async Task<EChannelOption> FetchChannelOption(Chat channelChat)
     {
         var chatId = channelChat.Id;

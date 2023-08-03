@@ -1,8 +1,11 @@
+using NLog.Fluent;
 using SqlSugar;
 using SqlSugar.IOC;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.Service.Bot.Common;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
@@ -24,9 +27,9 @@ public static class DatabaseExtension
     [RequiresUnreferencedCode("不兼容剪裁")]
     public static void AddSqlSugar(this IServiceCollection services, IConfiguration configuration)
     {
-        var dbConfig = configuration.GetSection("Database").Get<OptionsSetting.DatabaseOption>();
+        var config = configuration.GetSection("Database").Get<OptionsSetting.DatabaseOption>();
 
-        if (dbConfig == null)
+        if (config == null)
         {
             _logger.Error("数据库配置不能为空");
             _logger.Error("按任意键退出...");
@@ -34,53 +37,48 @@ public static class DatabaseExtension
             Environment.Exit(1);
         }
 
-        _logger.Info("数据库驱动: {0}", dbConfig.UseMySQL ? "MySQL" : "SQLite");
+        _logger.Info("数据库驱动: {0}", config.UseMySQL ? "MySQL" : "SQLite");
 
-        string connStr = dbConfig.UseMySQL ?
-            $"Host={dbConfig.DbHost};Port={dbConfig.DbPort};Database={dbConfig.DbName};UserID={dbConfig.DbUser};Password={dbConfig.DbPassword};CharSet=utf8mb4;AllowZeroDateTime=true" :
-            $"DataSource={dbConfig.DbName}.db";
+        string connStr = config.UseMySQL ?
+            $"Host={config.DbHost};Port={config.DbPort};Database={config.DbName};UserID={config.DbUser};Password={config.DbPassword};CharSet=utf8mb4;AllowZeroDateTime=true" :
+            $"DataSource={config.DbName}.db";
 
-        services.AddSqlSugar(new IocConfig {
-            ConfigId = 0,
-            ConnectionString = connStr,
-            DbType = dbConfig.UseMySQL ? IocDbType.MySql : IocDbType.Sqlite,
-            IsAutoCloseConnection = true//自动释放
+        services.AddSingleton<ISqlSugarClient>(s => {
+            var sqlSugar = new SqlSugarScope(new ConnectionConfig {
+                ConnectionString = connStr,
+                DbType = config.UseMySQL ? DbType.MySql : DbType.Sqlite,
+                IsAutoCloseConnection = true,
+            },
+            db => {
+                if (config.LogSQL)
+                {
+                    db.Aop.OnLogExecuting = (sql, pars) => {
+                        //var param = db.GetConnectionScope(0).Utilities.SerializeObject(pars.ToDictionary(it => it.ParameterName, it => it.Value));
+                        _logger.Debug("执行时间: {time} ms | {sql}", db.Ado.SqlExecutionTime.TotalMilliseconds, sql);
+                    };
+
+                    //执行时间超过1秒
+                    //if (db.Ado.SqlExecutionTime.TotalSeconds > 1)
+                    //{
+                    //    //代码CS文件名
+                    //    var fileName = db.Ado.SqlStackTrace.FirstFileName;
+                    //    //代码行数
+                    //    var fileLine = db.Ado.SqlStackTrace.FirstLine;
+                    //    //方法名
+                    //    var FirstMethodName = db.Ado.SqlStackTrace.FirstMethodName;
+                    //    //db.Ado.SqlStackTrace.MyStackTraceList[1].xxx 获取上层方法的信息
+                    //}
+
+                    db.Aop.OnError = (e) => _logger.Error("执行SQL出错：", e);
+                }
+            });
+
+            return sqlSugar;
         });
 
-        SugarIocServices.ConfigurationSugar(db => {
-            if (dbConfig.LogSQL)
-            {
-                db.Aop.OnLogExecuting = (sql, pars) => {
-                    var param = db.GetConnectionScope(0).Utilities.SerializeObject(pars.ToDictionary(it => it.ParameterName, it => it.Value));
-                    _logger.Debug("{sql}，{param}", sql, param);
-                };
-
-                db.Aop.OnError = static (e) => _logger.Error("执行SQL出错：", e);
-            }
-
-            if (dbConfig.Generate && IsFirstLoad)
-            {
-                _logger.Info("开始生成数据库结构");
-                //创建数据库
-                if (!dbConfig.UseMySQL)
-                {
-                    db.DbMaintenance.CreateDatabase(dbConfig.DbName);
-                }
-
-                //创建数据表
-                var assembly = Assembly.Load("XinjingdailyBot.Model");
-                var types = assembly.GetTypes()
-                    .Where(x => x.GetCustomAttribute<SugarTable>() != null);
-
-                foreach (var type in types)
-                {
-                    _logger.Info("开始创建 {type} 表", type);
-                    db.CodeFirst.InitTables(type);
-                }
-                _logger.Warn("数据库结构生成完毕, 建议禁用 Database.Generate 来加快启动速度");
-            }
-
-            IsFirstLoad = false;
-        });
+        if (config.Generate)
+        {
+            services.AddHostedService<DbInitService>();
+        }
     }
 }

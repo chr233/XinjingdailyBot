@@ -1,3 +1,4 @@
+using SqlSugar;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
@@ -11,6 +12,10 @@ namespace XinjingdailyBot.Service.Data;
 [AppService(typeof(IDialogueService), LifeTime.Transient)]
 internal sealed class DialogueService : BaseService<Dialogue>, IDialogueService
 {
+    public DialogueService(ISqlSugarClient context) : base(context)
+    {
+    }
+
     public async Task RecordMessage(Message message)
     {
         string? content = message.Type switch {

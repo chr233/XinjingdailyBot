@@ -45,7 +45,8 @@ internal sealed class UserService : BaseService<Users>, IUserService
         ITelegramBotClient botClient,
         LevelRepository levelRepository,
         INameHistoryService nameHistoryService,
-        IMediaGroupService mediaGroupService)
+        IMediaGroupService mediaGroupService,
+        ISqlSugarClient context) : base(context)
     {
         _logger = logger;
         _optionsSetting = configuration.Value;

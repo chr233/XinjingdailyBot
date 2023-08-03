@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using SqlSugar;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
@@ -13,8 +14,9 @@ internal sealed class UserTokenService : BaseService<UserTokens>, IUserTokenServ
     private readonly ILogger<UserTokenService> _logger;
 
     public UserTokenService(
-        ILogger<UserTokenService> logger)
-    {
+        ILogger<UserTokenService> logger,
+        ISqlSugarClient context) : base(context)
+    { 
         _logger = logger;
     }
 

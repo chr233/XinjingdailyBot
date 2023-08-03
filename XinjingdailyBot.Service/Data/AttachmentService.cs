@@ -1,3 +1,4 @@
+using SqlSugar;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
@@ -11,6 +12,10 @@ namespace XinjingdailyBot.Service.Data;
 [AppService(typeof(IAttachmentService), LifeTime.Transient)]
 internal sealed class AttachmentService : BaseService<Attachments>, IAttachmentService
 {
+    public AttachmentService(ISqlSugarClient context) : base(context)
+    {
+    }
+
     public Attachments? GenerateAttachment(Message message, long postID)
     {
         string? fileID, fileName, fileUid, mimeType;

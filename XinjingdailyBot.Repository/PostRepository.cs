@@ -1,3 +1,4 @@
+using SqlSugar;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository.Base;
@@ -10,4 +11,7 @@ namespace XinjingdailyBot.Repository;
 [AppService(LifeTime.Transient)]
 public class PostRepository : BaseRepository<NewPosts>
 {
+    public PostRepository(ISqlSugarClient context) : base(context)
+    {
+    }
 }
