@@ -104,8 +104,8 @@ public class PollingService : BackgroundService
                 var receiverOptions = new ReceiverOptions {
                     AllowedUpdates = Array.Empty<UpdateType>(),
                     ThrowPendingUpdates = _throwPendingUpdates,
-                    Offset = _throwPendingUpdates ? 0 : (skip ? 1 : 0),
-                    Limit = 20,
+                    Offset = skip ? 1 : 0,
+                    Limit = 10,
                 };
 
                 skip = false;

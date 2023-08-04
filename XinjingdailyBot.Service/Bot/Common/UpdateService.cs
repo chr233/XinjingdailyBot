@@ -67,7 +67,5 @@ internal class UpdateService : IUpdateService
         {
             await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
         }
-
-
     }
 }

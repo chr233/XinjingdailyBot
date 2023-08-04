@@ -47,7 +47,7 @@ public static class Program
         });
 
         // SqlSugar
-        services.AddSqlSugar(builder.Configuration);
+        services.AddSqlSugarSetup(builder.Configuration);
 
         // 添加服务
         services.AddAppService();

@@ -25,7 +25,7 @@ public static class DatabaseExtension
     /// <param name="services"></param>
     /// <param name="configuration"></param>
     [RequiresUnreferencedCode("不兼容剪裁")]
-    public static void AddSqlSugar(this IServiceCollection services, IConfiguration configuration)
+    public static void AddSqlSugarSetup(this IServiceCollection services, IConfiguration configuration)
     {
         var config = configuration.GetSection("Database").Get<OptionsSetting.DatabaseOption>();
 
