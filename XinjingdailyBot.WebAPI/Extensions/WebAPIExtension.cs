@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using XinjingdailyBot.WebAPI.IPC.Middlewares;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
@@ -34,6 +35,14 @@ public static class WebAPIExtension
 
         // 注册服务
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+        //获取客户端 IP
+        services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            options.KnownNetworks.Clear();
+            options.KnownProxies.Clear();
+        });
     }
 
     /// <summary>
