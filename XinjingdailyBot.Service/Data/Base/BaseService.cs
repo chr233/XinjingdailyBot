@@ -10,6 +10,10 @@ namespace XinjingdailyBot.Service.Data.Base;
 /// <typeparam name="T"></typeparam>
 public abstract class BaseService<T> : BaseRepository<T> where T : BaseModel, new()
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="context"></param>
     protected BaseService(ISqlSugarClient context) : base(context)
     {
     }

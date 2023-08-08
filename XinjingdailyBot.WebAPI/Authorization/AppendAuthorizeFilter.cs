@@ -5,25 +5,25 @@ using System.Linq;
 
 namespace XinjingdailyBot.WebAPI.Authorization;
 
-public class AppendAuthorizeFilter : IOperationFilter
-{
-    public void Apply(OpenApiOperation operation, OperationFilterContext context)
-    {
-        var filterPipeline = context.ApiDescription.ActionDescriptor.FilterDescriptors;
-        var isAuthorized = filterPipeline.Select(filterInfo => filterInfo.Filter).Any(filter => filter is AuthorizationAttribute);
+//public class AppendAuthorizeFilter : IOperationFilter
+//{
+//    public void Apply(OpenApiOperation operation, OperationFilterContext context)
+//    {
+//        var filterPipeline = context.ApiDescription.ActionDescriptor.FilterDescriptors;
+//        var isAuthorized = filterPipeline.Select(filterInfo => filterInfo.Filter).Any(filter => filter is AuthorizationAttribute);
 
-        if (isAuthorized)
-        {
-            if (operation.Parameters == null)
-                operation.Parameters = new List<OpenApiParameter>();
+//        if (isAuthorized)
+//        {
+//            if (operation.Parameters == null)
+//                operation.Parameters = new List<OpenApiParameter>();
 
-            operation.Parameters.Add(new OpenApiParameter
-            {
-                Name = "SYSTOKEN",
-                In = ParameterLocation.Header,
-                Description = "身份验证",
-                Required = false
-            });
-        }
-    }
-}
+//            operation.Parameters.Add(new OpenApiParameter
+//            {
+//                Name = "SYSTOKEN",
+//                In = ParameterLocation.Header,
+//                Description = "身份验证",
+//                Required = false
+//            });
+//        }
+//    }
+//}

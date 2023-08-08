@@ -17,8 +17,6 @@ public static class DatabaseExtension
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
-    private static bool IsFirstLoad = true;
-
     /// <summary>
     /// 注册数据库
     /// </summary>
@@ -54,6 +52,10 @@ public static class DatabaseExtension
                 {
                     db.Aop.OnLogExecuting = (sql, pars) => {
                         //var param = db.GetConnectionScope(0).Utilities.SerializeObject(pars.ToDictionary(it => it.ParameterName, it => it.Value));
+                        foreach (var par in pars)
+                        {
+                            sql = sql.Replace(par.ParameterName, par.Value.ToString());
+                        }
                         _logger.Debug("执行时间: {time} ms | {sql}", db.Ado.SqlExecutionTime.TotalMilliseconds, sql);
                     };
 

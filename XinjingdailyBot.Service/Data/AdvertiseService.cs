@@ -28,14 +28,16 @@ internal sealed class AdvertiseService : BaseService<Advertises>, IAdvertiseServ
         foreach (var ad in ads)
         {
             if ((ad.MaxShowCount > 0 && ad.ShowCount >= ad.MaxShowCount) ||
-                now >= ad.ExpireAt || ad.Weight == 0)
+                now >= ad.ExpiredAt || ad.Weight == 0)
             {
                 ad.Enable = false;
                 await UpdateAsync(ad);
                 await _advertisePostService.DeleteOldAdPosts(ad, false);
             }
         }
-        var validAds = ads.Where(static x => x.Enable);
+
+        now = now.AddSeconds(-now.Second).AddMinutes(-now.Minute).AddHours(-now.Hour);
+        var validAds = ads.Where(x => x.Enable && x.LastPostAt < now);
 
         if (!validAds.Any())
         {

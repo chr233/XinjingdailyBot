@@ -59,7 +59,7 @@ public static class Program
         services.AddTelegramBotClient();
 
         // 定时任务
-        services.AddTasks(builder.Configuration);
+        services.AddQuartzSetup(builder.Configuration);
 
         // Web API
         services.AddWebAPI(builder.WebHost);

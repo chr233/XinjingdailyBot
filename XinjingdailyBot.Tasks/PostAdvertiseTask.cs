@@ -48,13 +48,7 @@ internal class PostAdvertiseTask : IJob
             return;
         }
 
-        var channelService = _serviceProvider.GetService<IChannelService>();
-
-        if (channelService == null)
-        {
-            _logger.LogError("获取服务 {type} 失败", nameof(IChannelService));
-            return;
-        }
+        var channelService = _serviceProvider.GetRequiredService<IChannelService>();
 
         var operates = new List<(EAdMode, ChatId)>
         {

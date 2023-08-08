@@ -1,4 +1,5 @@
 using Quartz;
+using Quartz.AspNetCore;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using XinjingdailyBot.Infrastructure;
@@ -19,7 +20,7 @@ public static class TaskExtension
     /// <param name="services"></param>
     /// <param name="configuration"></param>
     [RequiresUnreferencedCode("不兼容剪裁")]
-    public static void AddTasks(this IServiceCollection services, IConfiguration configuration)
+    public static void AddQuartzSetup(this IServiceCollection services, IConfiguration configuration)
     {
         var scheduleConfig = configuration.GetSection("Schedule").Get<OptionsSetting.ScheduleOption>();
         var cron = scheduleConfig?.Cron ?? new Dictionary<string, string>();
@@ -30,8 +31,13 @@ public static class TaskExtension
             return;
         }
 
+        services.Configure<QuartzOptions>(options => {
+            options.Scheduling.IgnoreDuplicates = true;
+            options.Scheduling.OverWriteExistingData = true;
+        });
+
         services.AddQuartz(qz => {
-            qz.UseMicrosoftDependencyInjectionJobFactory();
+            //qz.UseMicrosoftDependencyInjectionJobFactory();
 
             _logger.Debug($"===== 注册定时任务 =====");
             uint count = 0;

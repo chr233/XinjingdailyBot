@@ -18,6 +18,7 @@ public class RejectReasonRepository : BaseRepository<RejectReasons>
     /// 拒绝理由仓储类
     /// </summary>
     /// <param name="logger"></param>
+    /// <param name="context"></param>
     public RejectReasonRepository(
         ILogger<RejectReasonRepository> logger,
         ISqlSugarClient context) : base(context)

@@ -91,7 +91,7 @@ public sealed class PostController : XjbController
             Message = "成功",
             Result = new TestTokenResponse {
                 UID = dbUser.Id,
-                UserID = dbUser.UserID,
+                UserId = dbUser.UserID,
                 UserName = dbUser.UserName,
                 NickName = dbUser.FullName,
                 UserRight = dbUser.Right,

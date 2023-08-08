@@ -9,7 +9,7 @@ namespace XinjingdailyBot.Model.Models;
 /// 广告投放
 /// </summary>
 [SugarTable("ad", TableDescription = "广告投放")]
-public sealed record Advertises : BaseModel, ICreateAt
+public sealed record Advertises : BaseModel, ICreateAt, IExpiredAt
 {
     /// <summary>
     /// 主键
@@ -59,11 +59,11 @@ public sealed record Advertises : BaseModel, ICreateAt
     /// </summary>
     public uint MaxShowCount { get; set; }
 
-    /// <summary>
-    /// 过期时间, 系统时间大于过期时间自动禁用
-    /// </summary>
-    public DateTime ExpireAt { get; set; } = DateTime.MaxValue;
 
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;
+
+    /// <inheritdoc cref="IExpiredAt"/>
+    [SugarColumn(OldColumnName = "ExpireAt")]
+    public DateTime ExpiredAt { get; set; } = DateTime.MaxValue;
 }

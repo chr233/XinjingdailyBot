@@ -12,6 +12,10 @@ namespace XinjingdailyBot.Repository;
 [Obsolete("废弃的仓储类")]
 public class OldPostRepository : BaseRepository<OldPosts>
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="context"></param>
     public OldPostRepository(ISqlSugarClient context) : base(context)
     {
     }

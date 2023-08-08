@@ -50,7 +50,14 @@ internal class UpdateService : IUpdateService
 
         if (handler != null)
         {
-            await handler;
+            try
+            {
+                await handler;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "处理轮询出错 {0}", update);
+            }
         }
     }
 

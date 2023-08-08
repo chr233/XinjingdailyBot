@@ -96,7 +96,7 @@ public class PollingService : BackgroundService
         using var scope = _serviceProvider.CreateScope();
         var updateService = scope.ServiceProvider.GetRequiredService<IUpdateService>();
 
-        bool skip = false;
+        //bool skip = false;
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -104,11 +104,11 @@ public class PollingService : BackgroundService
                 var receiverOptions = new ReceiverOptions {
                     AllowedUpdates = Array.Empty<UpdateType>(),
                     ThrowPendingUpdates = _throwPendingUpdates,
-                    Offset = skip ? 1 : 0,
-                    Limit = 10,
+                    //Offset = skip ? -1 : 0,
+                    Limit = 100,
                 };
 
-                skip = false;
+                //skip = false;
 
                 _logger.LogInformation("接收服务运行中...");
 
@@ -123,7 +123,7 @@ public class PollingService : BackgroundService
                 _logger.LogError(ex, "Telegram API 调用出错");
                 if (ex.Message == "Bad Request: query is too old and response timeout expired or query ID is invalid")
                 {
-                    skip = true;
+                    //skip = true;
                 }
             }
             catch (Exception ex)

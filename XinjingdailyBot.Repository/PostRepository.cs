@@ -11,6 +11,10 @@ namespace XinjingdailyBot.Repository;
 [AppService(LifeTime.Transient)]
 public class PostRepository : BaseRepository<NewPosts>
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="context"></param>
     public PostRepository(ISqlSugarClient context) : base(context)
     {
     }
