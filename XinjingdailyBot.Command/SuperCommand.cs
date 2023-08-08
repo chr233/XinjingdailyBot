@@ -37,6 +37,7 @@ internal class SuperCommand
     private readonly IUserService _userService;
     private readonly IHttpHelperService _httpHelperService;
     private readonly ITextHelperService _textHelperService;
+    private readonly IAdvertiseService _advertiseService;
 
     [Obsolete("迁移使用")]
     public SuperCommand(
@@ -50,7 +51,8 @@ internal class SuperCommand
         ICommandHandler commandHandler,
         IUserService userService,
         IHttpHelperService httpHelperService,
-        ITextHelperService textHelperService)
+        ITextHelperService textHelperService,
+        IAdvertiseService advertiseService)
     {
         _logger = logger;
         _botClient = botClient;
@@ -63,6 +65,7 @@ internal class SuperCommand
         _userService = userService;
         _httpHelperService = httpHelperService;
         _textHelperService = textHelperService;
+        _advertiseService = advertiseService;
     }
 
     /// <summary>
@@ -682,5 +685,41 @@ internal class SuperCommand
 
         string text = await exec();
         await _botClient.SendCommandReply(text, message, false, ParseMode.Html);
+    }
+
+    /// <summary>
+    /// 新建广告
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="args"></param>
+    /// <returns></returns>
+    [TextCmd("CREATEAD", EUserRights.SuperCmd, Description = "新建广告")]
+    public async Task ResponseCreateAd(Message message)
+    {
+        var replyMsg = message.ReplyToMessage;
+
+        if (replyMsg == null)
+        {
+            await _botClient.SendCommandReply("请回复广告消息", message, false);
+            return;
+        }
+
+        var newAd = new Advertises {
+            ChatID = replyMsg.Chat.Id,
+            MessageID = replyMsg.MessageId,
+            Enable = false,
+            PinMessage = false,
+            Mode = EAdMode.All,
+            Weight = 100,
+            LastPostAt = DateTime.MinValue,
+            ShowCount = 0,
+            MaxShowCount = 0,
+            CreateAt = DateTime.Now,
+            ExpiredAt = DateTime.Now.AddDays(90),
+        };
+
+        await _advertiseService.Insertable(newAd).ExecuteCommandAsync();
+
+        await _botClient.SendCommandReply("创建广告成功, 请在数据库中修改广告配置并启用该广告", message, false, parsemode: ParseMode.Html);
     }
 }

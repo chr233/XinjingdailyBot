@@ -19,6 +19,7 @@ public class TagRepository : BaseRepository<Tags>
     /// 标签仓储类
     /// </summary>
     /// <param name="logger"></param>
+    /// <param name="context"></param>
     public TagRepository(
         ILogger<GroupRepository> logger,
         ISqlSugarClient context) : base(context)

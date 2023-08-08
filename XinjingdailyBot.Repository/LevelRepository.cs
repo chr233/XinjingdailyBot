@@ -18,6 +18,7 @@ public class LevelRepository : BaseRepository<Levels>
     /// 用户等级仓储类
     /// </summary>
     /// <param name="logger"></param>
+    /// <param name="context"></param>
     public LevelRepository(
         ILogger<LevelRepository> logger,
         ISqlSugarClient context) : base(context)

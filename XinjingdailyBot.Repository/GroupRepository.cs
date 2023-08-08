@@ -19,6 +19,7 @@ public class GroupRepository : BaseRepository<Groups>
     /// 用户组仓储类
     /// </summary>
     /// <param name="logger"></param>
+    /// <param name="context"></param>
     public GroupRepository(
         ILogger<GroupRepository> logger,
         ISqlSugarClient context) : base(context)
