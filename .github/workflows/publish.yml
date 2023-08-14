@@ -63,6 +63,7 @@ jobs:
         shell: pwsh
         run: |
           Remove-Item './tmp/${{ env.PROJECT_NAME }}-fde/*.xml' 
+          Remove-Item './tmp/${{ env.PROJECT_NAME }}/*.xml' 
 
       - name: Zip files
         run: |
