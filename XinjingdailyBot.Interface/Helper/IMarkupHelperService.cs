@@ -17,6 +17,8 @@ public interface IMarkupHelperService
     /// </summary>
     public static readonly int MaxLineCharsReason = 8;
 
+    InlineKeyboardMarkup? AdvertiseExternalLinkButton(string? externalLink, string? extrnalLinkName);
+
     /// <summary>
     /// 直接发布投稿键盘
     /// </summary>
