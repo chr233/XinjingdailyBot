@@ -458,4 +458,27 @@ internal sealed class MarkupHelperService : IMarkupHelperService
 
         return keyboard;
     }
+
+    public InlineKeyboardMarkup? AdvertiseExternalLinkButton(string? externalLink, string? extrnalLinkName)
+    {
+        if (string.IsNullOrEmpty(externalLink))
+        {
+            return null;
+        }
+
+        var line = new List<InlineKeyboardButton>();
+
+        var links = externalLink.Split('|');
+        var names = extrnalLinkName?.Split('|') ?? Array.Empty<string>();
+
+        int index = 0;
+        foreach (var link in links)
+        {
+            var name = index < names.Length ? names[index] : link[..16];
+            line.Add(InlineKeyboardButton.WithUrl(name, link));
+            index++;
+        }
+
+        return line.Any() ? new InlineKeyboardMarkup(new[] { line }) : null;
+    }
 }

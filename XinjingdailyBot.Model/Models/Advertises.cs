@@ -59,6 +59,14 @@ public sealed record Advertises : BaseModel, ICreateAt, IExpiredAt
     /// </summary>
     public uint MaxShowCount { get; set; }
 
+    /// <summary>
+    /// 外部链接
+    /// </summary>
+    public string? ExternalLink { get; set; }
+    /// <summary>
+    /// 外部链接名称
+    /// </summary>
+    public string? ExternalLinkName { get; set; }
 
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;

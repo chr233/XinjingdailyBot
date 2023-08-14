@@ -59,6 +59,11 @@ jobs:
           dotnet publish ${{ env.PROJECT_NAME }} -c "$env:CONFIGURATION" -o "./tmp/${{ env.PROJECT_NAME }}-fde" --self-contained=true -p:XJBVariant="$variant" -p:ContinuousIntegrationBuild=true --no-restore --nologo $commonArgs $buildArgs
           dotnet publish ${{ env.PROJECT_NAME }} -c "$env:CONFIGURATION" -o "./tmp/${{ env.PROJECT_NAME }}" --self-contained=false -p:XJBVariant="$variant" -p:ContinuousIntegrationBuild=true --no-restore --nologo $commonArgs $buildArgs
 
+      - name: Clean Xmls
+        shell: pwsh
+        run: |
+          Remove-Item './tmp/${{ env.PROJECT_NAME }}-fde/*.xml' 
+
       - name: Zip files
         run: |
           7z a -bd -slp -tzip -mm=Deflate -mx=5 -mfb=150 -mpass=10 "./dist/${{ matrix.arch }}-fde.zip" "./tmp/${{ env.PROJECT_NAME }}-fde/*"
