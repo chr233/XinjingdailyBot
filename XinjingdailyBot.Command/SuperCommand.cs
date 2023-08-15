@@ -693,7 +693,7 @@ internal class SuperCommand
     /// <param name="message"></param>
     /// <param name="args"></param>
     /// <returns></returns>
-    [TextCmd("CREATEAD", Alias = "NEWAD", EUserRights.SuperCmd, Description = "新建广告")]
+    [TextCmd("CREATEAD", EUserRights.SuperCmd, Alias = "NEWAD", Description = "新建广告")]
     public async Task ResponseCreateAd(Message message)
     {
         var replyMsg = message.ReplyToMessage;
