@@ -693,7 +693,7 @@ internal class SuperCommand
     /// <param name="message"></param>
     /// <param name="args"></param>
     /// <returns></returns>
-    [TextCmd("CREATEAD", EUserRights.SuperCmd, Description = "新建广告")]
+    [TextCmd("CREATEAD", Alias = "NEWAD", EUserRights.SuperCmd, Description = "新建广告")]
     public async Task ResponseCreateAd(Message message)
     {
         var replyMsg = message.ReplyToMessage;
@@ -714,6 +714,8 @@ internal class SuperCommand
             LastPostAt = DateTime.MinValue,
             ShowCount = 0,
             MaxShowCount = 0,
+            ExternalLink = "",
+            ExternalLinkName = "",
             CreateAt = DateTime.Now,
             ExpiredAt = DateTime.Now.AddDays(90),
         };
