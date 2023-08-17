@@ -527,20 +527,28 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
 
     public async Task RejetPost(NewPosts post, Users dbUser, RejectReasons rejectReason)
     {
-        post.RejectReason = rejectReason.Name;
-        post.CountReject = rejectReason.IsCount;
-        post.ReviewerUID = dbUser.UserID;
-        post.Status = EPostStatus.Rejected;
-        post.ModifyAt = DateTime.Now;
-        await Updateable(post).UpdateColumns(static x => new {
-            x.RejectReason,
-            x.CountReject,
-            x.ReviewerUID,
-            x.Status,
-            x.ModifyAt
-        }).ExecuteCommandAsync();
-
         var poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
+
+        if (poster.IsBan)
+        {
+            await RejectIfBan(post, poster, dbUser, null);
+            return;
+        }
+        else
+        {
+            post.RejectReason = rejectReason.Name;
+            post.CountReject = rejectReason.IsCount;
+            post.ReviewerUID = dbUser.UserID;
+            post.Status = EPostStatus.Rejected;
+            post.ModifyAt = DateTime.Now;
+            await Updateable(post).UpdateColumns(static x => new {
+                x.RejectReason,
+                x.CountReject,
+                x.ReviewerUID,
+                x.Status,
+                x.ModifyAt
+            }).ExecuteCommandAsync();
+        }
 
         //修改审核群消息
         string reviewMsg = _textHelperService.MakeReviewMessage(poster, dbUser, post.Anonymous, rejectReason.FullText);
@@ -634,9 +642,47 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         }
     }
 
+    /// <summary>
+    /// 拒绝封禁用户的投稿
+    /// </summary>
+    /// <param name="post"></param>
+    /// <param name="poster"></param>
+    /// <param name="reviewer"></param>
+    /// <param name="callbackQuery"></param>
+    /// <returns></returns>
+    private async Task RejectIfBan(NewPosts post, Users poster, Users reviewer, CallbackQuery? callbackQuery)
+    {
+        post.RejectReason = "封禁自动拒绝";
+        post.CountReject = true;
+        post.ReviewerUID = reviewer.UserID;
+        post.Status = EPostStatus.Rejected;
+        post.ModifyAt = DateTime.Now;
+        await Updateable(post).UpdateColumns(static x => new {
+            x.RejectReason,
+            x.CountReject,
+            x.ReviewerUID,
+            x.Status,
+            x.ModifyAt
+        }).ExecuteCommandAsync();
+
+        if (callbackQuery != null)
+        {
+            await _botClient.AutoReplyAsync("此用户已被封禁，无法通过审核", callbackQuery);
+
+            string reviewMsg = _textHelperService.MakeReviewMessage(poster, reviewer, post.Anonymous, "此用户已被封禁");
+            await _botClient.EditMessageTextAsync(callbackQuery.Message!, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
+        }
+    }
+
     public async Task AcceptPost(NewPosts post, Users dbUser, bool inPlan, CallbackQuery callbackQuery)
     {
         var poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
+
+        if (poster.IsBan)
+        {
+            await RejectIfBan(post, poster, dbUser, callbackQuery);
+            return;
+        }
 
         ChannelOptions? channel = null;
         if (post.IsFromChannel)

@@ -19,7 +19,7 @@ public interface ICommandHandler
     /// 设置菜命令单
     /// </summary>
     /// <returns></returns>
-    Task<bool> GetCommandsMenu();
+    Task<bool> SetCommandsMenu();
     /// <summary>
     /// 注册命令
     /// </summary>
@@ -39,4 +39,5 @@ public interface ICommandHandler
     /// <param name="query"></param>
     /// <returns></returns>
     Task OnQueryCommandReceived(Users dbUser, CallbackQuery query);
+    Task<bool> ClearCommandsMenu();
 }

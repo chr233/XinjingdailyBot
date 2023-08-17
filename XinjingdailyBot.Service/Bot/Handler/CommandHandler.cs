@@ -449,7 +449,7 @@ internal class CommandHandler : ICommandHandler
         }
     }
 
-    public async Task<bool> GetCommandsMenu()
+    public async Task<bool> SetCommandsMenu()
     {
         var cmds = new List<BotCommand>();
 
@@ -474,6 +474,7 @@ internal class CommandHandler : ICommandHandler
 
         AddCommands(EUserRights.None);
         AddCommands(EUserRights.NormalCmd);
+        await _botClient.SetMyCommandsAsync(cmds, null);
         await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllPrivateChats());
         await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllGroupChats());
 
@@ -481,6 +482,18 @@ internal class CommandHandler : ICommandHandler
         await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllChatAdministrators());
 
         AddCommands(EUserRights.ReviewPost);
+        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeChatAdministrators { ChatId = _channelService.ReviewGroup.Id });
+        return true;
+    }
+
+    public async Task<bool> ClearCommandsMenu()
+    {
+        var cmds = new List<BotCommand>();
+
+        await _botClient.SetMyCommandsAsync(cmds);
+        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllPrivateChats());
+        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllGroupChats());
+        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllChatAdministrators());
         await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeChatAdministrators { ChatId = _channelService.ReviewGroup.Id });
         return true;
     }
