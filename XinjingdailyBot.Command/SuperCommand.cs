@@ -221,8 +221,15 @@ internal class SuperCommand
     [TextCmd("COMMAND", EUserRights.SuperCmd, Description = "设置命令菜单")]
     public async Task ResponseCommand(Message message)
     {
-        bool result = await _commandHandler.GetCommandsMenu();
+        bool result = await _commandHandler.SetCommandsMenu();
         await _botClient.SendCommandReply(result ? "设置菜单成功" : "设置菜单失败", message, autoDelete: false);
+    }
+
+    [TextCmd("CLEARCOMMAND", EUserRights.SuperCmd, Description = "设置命令菜单")]
+    public async Task ResponseClearCommand(Message message)
+    {
+        bool result = await _commandHandler.ClearCommandsMenu();
+        await _botClient.SendCommandReply(result ? "清除菜单成功" : "清除菜单失败", message, autoDelete: false);
     }
 
     /// <summary>
