@@ -28,6 +28,10 @@ public interface IChannelService
     /// </summary>
     Chat AcceptChannel { get; }
     /// <summary>
+    /// 第二频道
+    /// </summary>
+    Chat? SecondChannel { get; }
+    /// <summary>
     /// 拒绝频道
     /// </summary>
     Chat RejectChannel { get; }
@@ -35,6 +39,11 @@ public interface IChannelService
     /// 机器人用户
     /// </summary>
     User BotUser { get; }
+    /// <summary>
+    /// 是否设置第二频道
+    /// </summary>
+    bool HasSecondChannel { get; }
+
     /// <summary>
     /// 读取频道信息
     /// </summary>

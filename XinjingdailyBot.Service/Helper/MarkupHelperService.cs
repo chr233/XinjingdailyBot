@@ -43,6 +43,7 @@ internal sealed class MarkupHelperService : IMarkupHelperService
             new[]
             {
                 InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "post cancel"),
+                InlineKeyboardButton.WithCallbackData(Langs.PostConfirm, "post confirm second"),
                 InlineKeyboardButton.WithCallbackData(Langs.PostConfirm, "post confirm"),
             },
         });
@@ -89,13 +90,25 @@ internal sealed class MarkupHelperService : IMarkupHelperService
                  InlineKeyboardButton.WithCallbackData(anymouse? Langs.AnymouseOn: Langs.AnymouseOff, "review anymouse"),
             });
         }
-        btns.Add(new[]
-        {
-            InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "review cancel"),
-            InlineKeyboardButton.WithCallbackData(Langs.ReviewPlan, "review inplan"),
-            InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
-        });
 
+        if (_channelService.HasSecondChannel)
+        {
+            btns.Add(new[]
+            {
+                InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "review cancel"),
+                InlineKeyboardButton.WithCallbackData(Langs.ReviewPlan, "review accept second"),
+                InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
+            });
+        }
+        else
+        {
+            btns.Add(new[]
+           {
+                InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "review cancel"),
+                InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
+            });
+        }
+        
         return new InlineKeyboardMarkup(btns);
     }
 
@@ -132,12 +145,23 @@ internal sealed class MarkupHelperService : IMarkupHelperService
             });
         }
 
-        btns.Add(new[]
+        if (_channelService.HasSecondChannel)
         {
-            InlineKeyboardButton.WithCallbackData(Langs.ReviewReject, "review reject"),
-            InlineKeyboardButton.WithCallbackData(Langs.ReviewPlan, "review inplan"),
-            InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
-        });
+            btns.Add(new[]
+            {
+                InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "review cancel"),
+                InlineKeyboardButton.WithCallbackData(Langs.ReviewPlan, "review second second"),
+                InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
+            });
+        }
+        else
+        {
+            btns.Add(new[]
+           {
+                InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "review cancel"),
+                InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
+            });
+        }
 
         return new InlineKeyboardMarkup(btns);
     }

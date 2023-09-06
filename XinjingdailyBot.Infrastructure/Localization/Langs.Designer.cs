@@ -259,7 +259,7 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
-        ///   查找类似 ⏲️延时 的本地化字符串。
+        ///   查找类似 ✅二频道 的本地化字符串。
         /// </summary>
         public static string ReviewPlan {
             get {
@@ -385,7 +385,7 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
-        ///   查找类似 您已被{0}解封, 理由: {1}, 已恢复您的投稿和命令权限 的本地化字符串。
+        ///   查找类似 您已被 {0} 解封, 理由: {1}, 已恢复您的投稿和命令权限 的本地化字符串。
         /// </summary>
         public static string UnbanedUserTips {
             get {
@@ -412,7 +412,7 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
-        ///   查找类似 当前累计受到警告&lt;code&gt;{0}&lt;/code&gt;次, 达到&lt;code&gt;{1}&lt;/code&gt;次后将会被系统自动封禁 的本地化字符串。
+        ///   查找类似 当前累计受到警告&lt;code&gt;{0}&lt;/code&gt;次, 达到&lt;code&gt;{1}&lt;/code&gt;次后将会被系统自动封禁, 警告90天后自动消除 的本地化字符串。
         /// </summary>
         public static string WarnUserTips2 {
             get {
