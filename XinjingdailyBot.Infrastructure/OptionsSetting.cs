@@ -99,6 +99,10 @@ public sealed record OptionsSetting
         /// </summary>
         public string AcceptChannel { get; set; } = "";
         /// <summary>
+        /// 第二频道
+        /// </summary>
+        public string? SecondChannel { get; set; }
+        /// <summary>
         /// 拒稿频道
         /// </summary>
         public string RejectChannel { get; set; } = "";

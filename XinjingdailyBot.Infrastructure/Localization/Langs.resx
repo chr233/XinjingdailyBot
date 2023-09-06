@@ -124,7 +124,7 @@
     <value>封禁记录自助查询: /myban 如果对封禁记录有异议, 请联系频道管理员</value>
   </data>
   <data name="UnbanedUserTips" xml:space="preserve">
-    <value>您已被{0}解封, 理由: {1}, 已恢复您的投稿和命令权限</value>
+    <value>您已被 {0} 解封, 理由: {1}, 已恢复您的投稿和命令权限</value>
   </data>
   <data name="WarnUserTips" xml:space="preserve">
     <value>您受到了一次警告, 理由: {0}</value>
@@ -148,7 +148,7 @@
     <value>投稿已取消</value>
   </data>
   <data name="WarnUserTips2" xml:space="preserve">
-    <value>当前累计受到警告&lt;code&gt;{0}&lt;/code&gt;次, 达到&lt;code&gt;{1}&lt;/code&gt;次后将会被系统自动封禁</value>
+    <value>当前累计受到警告&lt;code&gt;{0}&lt;/code&gt;次, 达到&lt;code&gt;{1}&lt;/code&gt;次后将会被系统自动封禁, 警告90天后自动消除</value>
   </data>
   <data name="RejectFuzzy" xml:space="preserve">
     <value>模糊</value>
@@ -235,6 +235,6 @@
     <value>Version: {0} - {1}</value>
   </data>
   <data name="ReviewPlan" xml:space="preserve">
-    <value>⏲️延时</value>
+    <value>✅二频道</value>
   </data>
 </root>

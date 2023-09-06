@@ -17,21 +17,14 @@ internal class ChannelService : IChannelService
     private readonly OptionsSetting _optionsSetting;
     private readonly ILogger<ChannelService> _logger;
 
-    private Chat _reviewGroup = new();
-    private readonly Chat _reviewLogChannel = new();
-    private Chat _commentGroup = new();
-    private Chat _subGroup = new();
-    private Chat _acceptChannel = new();
-    private Chat _rejectChannel = new();
-    private User _botUser = new();
-
-    public Chat ReviewGroup => _reviewGroup;
-    public Chat ReviewLogChannel => _reviewLogChannel;
-    public Chat CommentGroup => _commentGroup;
-    public Chat SubGroup => _subGroup;
-    public Chat AcceptChannel => _acceptChannel;
-    public Chat RejectChannel => _rejectChannel;
-    public User BotUser => _botUser;
+    public Chat ReviewGroup { get; private set; } = new();
+    public Chat ReviewLogChannel { get; private set; } = new();
+    public Chat CommentGroup { get; private set; } = new();
+    public Chat SubGroup { get; private set; } = new();
+    public Chat AcceptChannel { get; private set; } = new();
+    public Chat? SecondChannel { get; private set; }
+    public Chat RejectChannel { get; private set; } = new();
+    public User BotUser { get; private set; } = new();
 
     public ChannelService(
         ILogger<ChannelService> logger,
@@ -45,16 +38,16 @@ internal class ChannelService : IChannelService
 
     public async Task InitChannelInfo()
     {
-        _botUser = await _botClient.GetMeAsync();
+        BotUser = await _botClient.GetMeAsync();
 
-        _logger.LogInformation("机器人信息: {Id} {nickName} @{userName}", _botUser.Id, _botUser.FullName(), _botUser.Username);
+        _logger.LogInformation("机器人信息: {Id} {nickName} @{userName}", BotUser.Id, BotUser.FullName(), BotUser.Username);
 
         var channelOption = _optionsSetting.Channel;
 
         try
         {
-            _acceptChannel = await _botClient.GetChatAsync(channelOption.AcceptChannel);
-            _logger.LogInformation("稿件发布频道: {chatProfile}", _acceptChannel.ChatProfile());
+            AcceptChannel = await _botClient.GetChatAsync(channelOption.AcceptChannel);
+            _logger.LogInformation("稿件发布频道: {chatProfile}", AcceptChannel.ChatProfile());
         }
         catch
         {
@@ -63,32 +56,43 @@ internal class ChannelService : IChannelService
         }
         try
         {
-
-            _rejectChannel = await _botClient.GetChatAsync(channelOption.RejectChannel);
-            _logger.LogInformation("拒稿存档频道: {chatProfile}", _rejectChannel.ChatProfile());
+            RejectChannel = await _botClient.GetChatAsync(channelOption.RejectChannel);
+            _logger.LogInformation("拒稿存档频道: {chatProfile}", RejectChannel.ChatProfile());
         }
         catch
         {
             _logger.LogError("未找到指定的拒稿存档频道, 请检查拼写是否正确");
             throw;
         }
+        if (!string.IsNullOrEmpty(channelOption.SecondChannel))
+        {
+            try
+            {
+                SecondChannel = await _botClient.GetChatAsync(channelOption.SecondChannel);
+                _logger.LogInformation("第二发布频道: {chatProfile}", SecondChannel.ChatProfile());
+            }
+            catch
+            {
+                _logger.LogError("未找到指定的稿件第二发布频道, 请检查拼写是否正确");
+            }
+        }
 
         try
         {
             if (long.TryParse(channelOption.ReviewGroup, out var groupId))
             {
-                _reviewGroup = await _botClient.GetChatAsync(groupId);
+                ReviewGroup = await _botClient.GetChatAsync(groupId);
             }
             else
             {
-                _reviewGroup = await _botClient.GetChatAsync(channelOption.ReviewGroup);
+                ReviewGroup = await _botClient.GetChatAsync(channelOption.ReviewGroup);
             }
-            _logger.LogInformation("审核群组: {chatProfile}", _reviewGroup.ChatProfile());
+            _logger.LogInformation("审核群组: {chatProfile}", ReviewGroup.ChatProfile());
         }
         catch
         {
             _logger.LogError("未找到指定的审核群组, 可以使用 /groupinfo 命令获取群组信息");
-            _reviewGroup = new Chat { Id = -1 };
+            ReviewGroup = new Chat { Id = -1 };
         }
 
         if (channelOption.UseReviewLogMode)
@@ -100,13 +104,13 @@ internal class ChannelService : IChannelService
         {
             if (long.TryParse(channelOption.CommentGroup, out var subGroupId))
             {
-                _commentGroup = await _botClient.GetChatAsync(subGroupId);
+                CommentGroup = await _botClient.GetChatAsync(subGroupId);
             }
             else
             {
-                _commentGroup = await _botClient.GetChatAsync(channelOption.CommentGroup);
+                CommentGroup = await _botClient.GetChatAsync(channelOption.CommentGroup);
             }
-            _logger.LogInformation("评论区群组: {chatProfile}", _commentGroup.ChatProfile());
+            _logger.LogInformation("评论区群组: {chatProfile}", CommentGroup.ChatProfile());
         }
         catch
         {
@@ -117,54 +121,55 @@ internal class ChannelService : IChannelService
         {
             if (long.TryParse(channelOption.SubGroup, out var subGroupId))
             {
-                _subGroup = await _botClient.GetChatAsync(subGroupId);
+                SubGroup = await _botClient.GetChatAsync(subGroupId);
             }
             else
             {
-                _subGroup = await _botClient.GetChatAsync(channelOption.SubGroup);
+                SubGroup = await _botClient.GetChatAsync(channelOption.SubGroup);
             }
-            _logger.LogInformation("频道子群组: {chatProfile}", _subGroup.ChatProfile());
+            _logger.LogInformation("频道子群组: {chatProfile}", SubGroup.ChatProfile());
         }
         catch
         {
             _logger.LogError("未找到指定的闲聊群组, 可以使用 /groupinfo 命令获取群组信息");
-            _subGroup = new Chat { Id = -1 };
+            SubGroup = new Chat { Id = -1 };
         }
 
-        if (_subGroup.Id == -1 && _commentGroup.Id != -1)
+        if (SubGroup.Id == -1 && CommentGroup.Id != -1)
         {
-            _subGroup = _commentGroup;
+            SubGroup = CommentGroup;
         }
-        else if (_commentGroup.Id == -1 && _subGroup.Id != -1)
+        else if (CommentGroup.Id == -1 && SubGroup.Id != -1)
         {
-            _commentGroup = _subGroup;
+            CommentGroup = SubGroup;
         }
     }
 
     public bool IsChannelMessage(long chatId)
     {
-        return chatId == _acceptChannel.Id || chatId == _rejectChannel.Id;
+        return chatId == AcceptChannel.Id || chatId == SecondChannel?.Id || chatId == RejectChannel.Id;
     }
     public bool IsChannelMessage(Chat chat)
     {
-        return chat.Id == _acceptChannel.Id || chat.Id == _rejectChannel.Id;
+        return IsChannelMessage(chat.Id);
     }
 
     public bool IsGroupMessage(long chatId)
     {
-        return chatId == _subGroup.Id || chatId == _commentGroup.Id;
+        return chatId == SubGroup.Id || chatId == CommentGroup.Id;
     }
     public bool IsGroupMessage(Chat chat)
     {
-        return chat.Id == _subGroup.Id || chat.Id == _commentGroup.Id;
+        return IsGroupMessage(chat.Id);
     }
 
     public bool IsReviewMessage(long chatId)
     {
-        return chatId == _reviewGroup.Id;
+        return chatId == ReviewGroup.Id;
     }
     public bool IsReviewMessage(Chat chat)
     {
-        return chat.Id == _reviewGroup.Id;
+        return chat.Id == ReviewGroup.Id;
     }
+    public bool HasSecondChannel => SecondChannel != null;
 }
