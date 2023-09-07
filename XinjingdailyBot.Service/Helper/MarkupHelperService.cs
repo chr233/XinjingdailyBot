@@ -455,7 +455,7 @@ internal sealed class MarkupHelperService : IMarkupHelperService
     {
         InlineKeyboardMarkup keyboard;
 
-        if (post.Status == EPostStatus.Accepted)
+        if (post.Status == EPostStatus.Accepted || post.Status == EPostStatus.AcceptedSecond)
         {
             keyboard = new InlineKeyboardMarkup(new[]
             {
