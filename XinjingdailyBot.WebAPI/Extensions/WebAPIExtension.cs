@@ -37,8 +37,7 @@ public static class WebAPIExtension
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
         //获取客户端 IP
-        services.Configure<ForwardedHeadersOptions>(options =>
-        {
+        services.Configure<ForwardedHeadersOptions>(options => {
             options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             options.KnownNetworks.Clear();
             options.KnownProxies.Clear();

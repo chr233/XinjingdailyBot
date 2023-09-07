@@ -45,5 +45,5 @@ public enum EPostStatus : int
     /// <summary>
     /// 已过审并发布在第二频道
     /// </summary>
-    AcceptSecond,
+    AcceptedSecond,
 }

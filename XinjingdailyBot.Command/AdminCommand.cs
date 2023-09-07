@@ -38,6 +38,7 @@ internal class AdminCommand
     private readonly IMarkupHelperService _markupHelperService;
     private readonly ICmdRecordService _cmdRecordService;
     private readonly IUserTokenService _userTokenService;
+    private readonly IMediaGroupService _mediaGroupService;
 
     public AdminCommand(
         ILogger<AdminCommand> logger,
@@ -51,7 +52,8 @@ internal class AdminCommand
         IChannelService channelService,
         IMarkupHelperService markupHelperService,
         ICmdRecordService cmdRecordService,
-        IUserTokenService userTokenService)
+        IUserTokenService userTokenService,
+        IMediaGroupService mediaGroupService)
     {
         _logger = logger;
         _botClient = botClient;
@@ -65,6 +67,7 @@ internal class AdminCommand
         _markupHelperService = markupHelperService;
         _cmdRecordService = cmdRecordService;
         _userTokenService = userTokenService;
+        _mediaGroupService = mediaGroupService;
     }
 
     /// <summary>
@@ -73,10 +76,10 @@ internal class AdminCommand
     private readonly DateTime StartAt = DateTime.Now;
 
     /// <inheritdoc cref="IBanRecordService.WarningLimit"/>
-    private static int WarningLimit = IBanRecordService.WarningLimit;
+    private readonly int WarningLimit = IBanRecordService.WarningLimit;
 
     /// <inheritdoc cref="IBanRecordService.WarnDuration"/>
-    private static int WarnDuration = IBanRecordService.WarnDuration;
+    private readonly int WarnDuration = IBanRecordService.WarnDuration;
 
     /// <summary>
     /// 获取群组信息
@@ -551,7 +554,7 @@ internal class AdminCommand
 
                 foreach (var record in records)
                 {
-                    var date = record.BanTime.ToString("d");
+                    var date = record.BanTime.ToString("yyyy-MM-dd HH:mm:ss");
                     var operate = record.Type switch {
                         EBanType.UnBan => "解封",
                         EBanType.Ban => "封禁",
@@ -809,6 +812,8 @@ internal class AdminCommand
         var monthStart = now.AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
         var yearStart = now.AddMonths(1 - now.Month).AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
 
+        var second = _channelService.HasSecondChannel;
+
         var sb = new StringBuilder();
 
         var todayPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status > EPostStatus.Cancel).CountAsync();
@@ -818,6 +823,11 @@ internal class AdminCommand
 
         sb.AppendLine("-- 24小时投稿统计 --");
         sb.AppendLine($"接受/拒绝: <code>{todayAcceptPost}</code> / <code>{todayRejectPost}</code>");
+        if (second)
+        {
+            var todayAcceptSecondPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status == EPostStatus.AcceptedSecond).CountAsync();
+            sb.AppendLine($"接受(二频): <code>{todayAcceptSecondPost}</code>");
+        }
         sb.AppendLine($"通过率: <code>{(todayPost > 0 ? (100 * todayAcceptPost / todayPost).ToString("f2") : "--")}%</code>");
         sb.AppendLine($"过期投稿: <code>{todayExpiredPost}</code>");
         sb.AppendLine($"累计投稿: <code>{todayPost + todayExpiredPost}</code>");
@@ -830,6 +840,11 @@ internal class AdminCommand
         sb.AppendLine();
         sb.AppendLine("-- 7日投稿统计 --");
         sb.AppendLine($"接受/拒绝: <code>{weekAcceptPost}</code> / <code>{weekRejectPost}</code>");
+        if (second)
+        {
+            var weekAcceptSecondPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status == EPostStatus.AcceptedSecond).CountAsync();
+            sb.AppendLine($"接受(二频): <code>{weekAcceptSecondPost}</code>");
+        }
         sb.AppendLine($"通过率: <code>{(weekPost > 0 ? (100 * weekAcceptPost / weekPost).ToString("f2") : "--")}%</code>");
         sb.AppendLine($"过期投稿: <code>{weekExpiredPost}</code>");
         sb.AppendLine($"累计投稿: <code>{weekPost + weekExpiredPost}</code>");
@@ -842,6 +857,11 @@ internal class AdminCommand
         sb.AppendLine();
         sb.AppendLine($"-- {monthStart.ToString("MM")}月投稿统计 --");
         sb.AppendLine($"接受/拒绝: <code>{monthAcceptPost}</code> / <code>{monthRejectPost}</code>");
+        if (second)
+        {
+            var monthAcceptSecondPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status == EPostStatus.AcceptedSecond).CountAsync();
+            sb.AppendLine($"接受(二频): <code>{monthAcceptSecondPost}</code>");
+        }
         sb.AppendLine($"通过率: <code>{(monthPost > 0 ? (100 * monthAcceptPost / monthPost).ToString("f2") : "--")}%</code>");
         sb.AppendLine($"过期投稿: <code>{monthExpiredPost}</code>");
         sb.AppendLine($"累计投稿: <code>{monthPost}</code>");
@@ -854,6 +874,11 @@ internal class AdminCommand
         sb.AppendLine();
         sb.AppendLine($"-- {yearStart.ToString("yyyy")}年投稿统计 --");
         sb.AppendLine($"接受/拒绝: <code>{yearAcceptPost}</code> / <code>{yearRejectPost}</code>");
+        if (second)
+        {
+            var yearAcceptSecondPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status == EPostStatus.AcceptedSecond).CountAsync();
+            sb.AppendLine($"接受(二频): <code>{yearAcceptSecondPost}</code>");
+        }
         sb.AppendLine($"通过率: <code>{(yearPost > 0 ? (100 * yearAcceptPost / yearPost).ToString("f2") : "--")}%</code>");
         sb.AppendLine($"过期投稿: <code>{yearExpiredPost}</code>");
         sb.AppendLine($"累计投稿: <code>{yearPost}</code>");
@@ -868,6 +893,11 @@ internal class AdminCommand
         sb.AppendLine();
         sb.AppendLine("-- 历史投稿统计 --");
         sb.AppendLine($"接受/拒绝: <code>{totalAcceptPost}</code> / <code>{totalRejectPost}</code>");
+        if (second)
+        {
+            var totalAcceptSecondPost = await _postService.Queryable().Where(static x => x.Status == EPostStatus.AcceptedSecond).CountAsync();
+            sb.AppendLine($"接受(二频): <code>{totalAcceptSecondPost}</code>");
+        }
         sb.AppendLine($"通过率: <code>{(totalPost > 0 ? (100 * totalAcceptPost / totalPost).ToString("f2") : "--")}%</code>");
         sb.AppendLine($"过期投稿: <code>{totalExpiredPost}</code>");
         sb.AppendLine($"累计投稿: <code>{totalPost}</code>");
@@ -922,8 +952,8 @@ internal class AdminCommand
 
         sb.AppendLine();
         sb.AppendLine("-- 调用统计 --");
-        sb.AppendLine($"文字命令: <code>{cmdCount}</code> 次");
-        sb.AppendLine($"查询调用: <code>{QueryCount}</code> 次");
+        sb.AppendLine($"Text命令: <code>{cmdCount}</code> 次");
+        sb.AppendLine($"Query命令: <code>{QueryCount}</code> 次");
         sb.AppendLine($"出错次数: <code>{errorCount}</code> 次");
 
         sb.AppendLine();
@@ -1479,16 +1509,135 @@ internal class AdminCommand
     }
 
     /// <summary>
+    /// 撤回稿件
+    /// </summary>
+    /// <param name="dbUser"></param>
+    /// <param name="callbackQuery"></param>
+    /// <param name="args"></param>
+    /// <returns></returns>
+    [QueryCmd("DELETEPOST", EUserRights.AdminCmd)]
+    public async Task QDeletePost(CallbackQuery callbackQuery, string[] args)
+    {
+        async Task<string> exec()
+        {
+            if (args.Length < 2)
+            {
+                return "参数有误";
+            }
+
+            NewPosts? post = null;
+
+            if (int.TryParse(args[1], out int postId))
+            {
+                post = await _postService.Queryable().FirstAsync(x => x.Id == postId);
+            }
+
+            if (post == null)
+            {
+                return "未找到稿件";
+            }
+
+            if (post.Status != EPostStatus.Accepted && post.Status != EPostStatus.AcceptedSecond)
+            {
+                return "稿件可能已被撤回";
+            }
+
+
+            if (post.IsMediaGroup)
+            {
+                var mediaGroups = await _mediaGroupService.QueryMediaGroup(post.PublishMediaGroupID);
+                int error = 0;
+                if (!mediaGroups.Any())
+                {
+                    return "找不到媒体组信息";
+                }
+                foreach (var group in mediaGroups)
+                {
+                    try
+                    {
+                        await _botClient.DeleteMessageAsync(group.ChatID, (int)group.MessageID);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "删除消息失败");
+                        error++;
+                    }
+                }
+
+                return $"媒体组稿件撤回完成, 成功删除 {mediaGroups.Count - error} 条消息";
+            }
+            else
+            {
+                var chat = post.Status == EPostStatus.Accepted ? _channelService.AcceptChannel : _channelService.SecondChannel;
+                if (chat == null)
+                {
+                    return "第二频道未设定";
+                }
+
+                try
+                {
+                    await _botClient.DeleteMessageAsync(chat, (int)post.PublicMsgID);
+                    return "删除消息成功";
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "删除消息失败");
+                    return "删除消息失败";
+                }
+            }
+        }
+        string text = await exec();
+        await _botClient.AutoReplyAsync(text, callbackQuery.Message!, ParseMode.Html);
+        await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, null);
+    }
+
+    [QueryCmd("QUERYPOSTER", EUserRights.AdminCmd)]
+    public async Task QQueryPoster(CallbackQuery callbackQuery, string[] args)
+    {
+        async Task<string> exec()
+        {
+            if (args.Length < 2)
+            {
+                return "参数有误";
+            }
+
+            Users? user = null;
+
+            if (int.TryParse(args[1], out int userId))
+            {
+                user = await _userService.Queryable().FirstAsync(x => x.UserID == userId);
+            }
+
+            if (user == null)
+            {
+                return "找不到用户";
+            }
+
+            var sb = new StringBuilder();
+
+            sb.AppendLine("-- 基础信息 --");
+            sb.AppendLine(_userService.GetUserBasicInfo(user));
+
+            sb.AppendLine();
+            sb.AppendLine("-- 用户排名 --");
+            sb.AppendLine(await _userService.GetUserRank(user));
+
+            return sb.ToString();
+        }
+        string text = await exec();
+        await _botClient.AutoReplyAsync(text, callbackQuery.Message!, ParseMode.Html);
+    }
+
+    /// <summary>
     /// 补发稿件
     /// </summary>
     /// <param name="dbUser"></param>
-    /// <param name="query"></param>
+    /// <param name="callbackQuery"></param>
     /// <returns></returns>
     [QueryCmd("REPOST", EUserRights.AdminCmd)]
-    public async Task QResponseRepost(Users dbUser, CallbackQuery query)
+    public async Task QResponseRepost(Users dbUser, CallbackQuery callbackQuery)
     {
         _logger.LogInformation("todo {user}", dbUser);
-        await _botClient.AutoReplyAsync("未实现", query, false);
+        await _botClient.AutoReplyAsync("未实现", callbackQuery, false);
     }
-
 }
