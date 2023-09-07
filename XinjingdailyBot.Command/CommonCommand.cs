@@ -40,11 +40,8 @@ internal class CommonCommand
         _commandHandler = commandHandler;
     }
 
-    /// <inheritdoc cref="IBanRecordService.WarningLimit"/>
-    private static int WarningLimit = IBanRecordService.WarningLimit;
-
     /// <inheritdoc cref="IBanRecordService.WarnDuration"/>
-    private static int WarnDuration = IBanRecordService.WarnDuration;
+    private readonly int WarnDuration = IBanRecordService.WarnDuration;
 
     /// <summary>
     /// 显示命令帮助
@@ -152,8 +149,6 @@ internal class CommonCommand
             .Where(x => x.UserID == dbUser.UserID && (x.Type != EBanType.Warning || x.BanTime > expireTime))
             .ToListAsync();
 
-        records = records.OrderByDescending(static x => x.BanTime.GetTimestamp()).ToList();
-
         var sb = new StringBuilder();
 
         string status = dbUser.IsBan ? "已封禁" : "正常";
@@ -179,9 +174,17 @@ internal class CommonCommand
                     EBanType.UnBan => "解封",
                     EBanType.Ban => "封禁",
                     EBanType.Warning => "警告",
+                    EBanType.GlobalMute => "全局禁言",
+                    EBanType.GlobalBan => "全局封禁",
+                    EBanType.GlobalUnMute => "撤销全局禁言",
+                    EBanType.GlobalUnBan => "撤销全局封禁",
                     _ => "其他",
                 };
-                sb.AppendLine($"在 <code>{date}</code> 因为 <code>{record.Reason}</code> 被 {operate}");
+                sb.AppendLine($"在 <code>{date}</code> 因为 <code>{record.Reason}</code> 被{operate}");
+                if (record.Type == EBanType.UnBan || record.Type == EBanType.Ban)
+                {
+                    sb.AppendLine();
+                }
             }
         }
         sb.AppendLine("\n仅显示90天内的警告记录");

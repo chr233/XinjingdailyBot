@@ -21,7 +21,6 @@ namespace XinjingdailyBot.WebAPI.IPC.Controllers;
 [Route("Api/[controller]", Name = "投稿")]
 public sealed class PostController : XjbController
 {
-    private readonly ILogger<PostController> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IPostService _postService;
     private readonly IChannelOptionService _channelOptionService;
@@ -37,7 +36,6 @@ public sealed class PostController : XjbController
     /// <summary>
     /// 构造函数
     /// </summary>
-    /// <param name="logger"></param>
     /// <param name="httpContextAccessor"></param>
     /// <param name="postService"></param>
     /// <param name="channelOptionService"></param>
@@ -50,7 +48,6 @@ public sealed class PostController : XjbController
     /// <param name="tagRepository"></param>
     /// <param name="mediaGroupService"></param>
     public PostController(
-        ILogger<PostController> logger,
         IHttpContextAccessor httpContextAccessor,
         IPostService postService,
         IChannelOptionService channelOptionService,
@@ -63,7 +60,6 @@ public sealed class PostController : XjbController
         TagRepository tagRepository,
         IMediaGroupService mediaGroupService)
     {
-        _logger = logger;
         _httpContextAccessor = httpContextAccessor;
         _postService = postService;
         _channelOptionService = channelOptionService;

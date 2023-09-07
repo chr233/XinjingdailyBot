@@ -693,7 +693,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
 
         bool hasSpoiler = post.HasSpoiler;
 
-        Message? publicMsg=null;
+        Message? publicMsg = null;
 
         if (!inPlan)
         {
@@ -785,7 +785,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
             }
 
             await _botClient.AutoReplyAsync("稿件已发布", callbackQuery);
-            post.Status = EPostStatus.Accepted;
+            post.Status = !second ? EPostStatus.Accepted : EPostStatus.AcceptedSecond;
         }
         else
         {
