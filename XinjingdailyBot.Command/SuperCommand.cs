@@ -121,7 +121,7 @@ internal class SuperCommand
 
             if (message.ReplyToMessage == null)
             {
-                return ("请回复审核消息并输入拒绝理由", null);
+                return ("请回复审核消息", null);
             }
 
             var post = await _postService.FetchPostFromReplyToMessage(message);
@@ -144,9 +144,9 @@ internal class SuperCommand
             }
 
             string option = channel.Option switch {
-                EChannelOption.Normal => "1. 不做特殊处理",
-                EChannelOption.PurgeOrigin => "2. 抹除频道来源",
-                EChannelOption.AutoReject => "3. 拒绝此频道的投稿",
+                EChannelOption.Normal => "不做特殊处理",
+                EChannelOption.PurgeOrigin => "抹除频道来源",
+                EChannelOption.AutoReject => "拒绝此频道的投稿",
                 _ => "未知的值",
             };
 

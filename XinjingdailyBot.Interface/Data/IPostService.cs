@@ -20,9 +20,10 @@ public interface IPostService : IBaseService<NewPosts>
     /// <param name="post"></param>
     /// <param name="dbUser"></param>
     /// <param name="inPlan"></param>
+    /// <param name="second"></param>
     /// <param name="callbackQuery"></param>
     /// <returns></returns>
-    Task AcceptPost(NewPosts post, Users dbUser, bool inPlan, CallbackQuery callbackQuery);
+    Task AcceptPost(NewPosts post, Users dbUser, bool inPlan, bool second, CallbackQuery callbackQuery);
     /// <summary>
     /// 检查用户是否达到每日投稿上限
     /// </summary>

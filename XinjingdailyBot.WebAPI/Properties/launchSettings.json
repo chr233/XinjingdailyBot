@@ -1,38 +1,37 @@
 {
   "profiles": {
     "IIS Express": {
-      "workingDirectory": "bin",
       "commandName": "IISExpress",
+      "workingDirectory": "bin",
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "externalUrlConfiguration": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "externalUrlConfiguration": true
     },
     "XinjingdailyBot.WebAPI": {
       "commandName": "Project",
       "workingDirectory": "bin",
-      "launchBrowser": true,
       "launchUrl": "swagger",
-      "externalUrlConfiguration": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
+      "externalUrlConfiguration": true,
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5136"
     },
     "WSL": {
       "commandName": "WSL2",
+      "workingDirectory": "{ProjectDir}/bin",
+      "launchBrowser": true,
       "launchUrl": "http://localhost:5136/swagger",
-      "externalUrlConfiguration": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_URLS": "http://localhost:5136"
       },
-      "distributionName": "",
-      "workingDirectory": "{ProjectDir}/bin",
-      "launchBrowser": true
+      "externalUrlConfiguration": true,
+      "distributionName": ""
     }
   },
   "$schema": "https://json.schemastore.org/launchsettings.json",

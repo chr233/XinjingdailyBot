@@ -48,9 +48,9 @@ public interface ITextHelperService
     /// </summary>
     /// <param name="isDirect"></param>
     /// <param name="inPlan"></param>
-    /// <param name="messageID"></param>
+    /// <param name="message"></param>
     /// <returns></returns>
-    string MakeNotification(bool isDirect, bool inPlan, long messageID);
+    string MakeNotification(bool isDirect, bool inPlan, Message? message);
     /// <summary>
     /// 生成通知消息(审核未通过）
     /// </summary>
@@ -84,18 +84,21 @@ public interface ITextHelperService
     /// 生成审核消息(审核通过, 直接发布)
     /// </summary>
     /// <param name="poster"></param>
-    /// <param name="messageID"></param>
     /// <param name="anymouse"></param>
+    /// <param name="second"></param>
+    /// <param name="message"></param>
     /// <returns></returns>
-    string MakeReviewMessage(Users poster, long messageID, bool anymouse);
+    string MakeReviewMessage(Users poster, bool anymouse, bool second, Message? message);
     /// <summary>
     /// 生成审核消息(审核通过)
     /// </summary>
     /// <param name="poster"></param>
     /// <param name="reviewer"></param>
     /// <param name="anymouse"></param>
+    /// <param name="second"></param>
+    /// <param name="message"></param>
     /// <returns></returns>
-    string MakeReviewMessage(Users poster, Users reviewer, bool anymouse);
+    string MakeReviewMessage(Users poster, Users reviewer, bool anymouse, bool second, Message? message);
     /// <summary>
     /// 生成审核消息(审核未通过)
     /// </summary>

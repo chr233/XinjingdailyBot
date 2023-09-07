@@ -199,15 +199,15 @@ internal class ReviewCommand
                 break;
 
             case "review inplan":
-                await _postService.AcceptPost(post, dbUser, true, callbackQuery);
-                break;
-
-            case "review accept second":
-                await _postService.AcceptPost(post, dbUser, false, callbackQuery);
+                await _postService.AcceptPost(post, dbUser, true, false, callbackQuery);
                 break;
 
             case "review accept":
-                await _postService.AcceptPost(post, dbUser, false, callbackQuery);
+                await _postService.AcceptPost(post, dbUser, false, false, callbackQuery);
+                break;
+
+            case "review accept second":
+                await _postService.AcceptPost(post, dbUser, false, true, callbackQuery);
                 break;
 
             case "review anymouse":

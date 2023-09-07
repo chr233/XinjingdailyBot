@@ -250,6 +250,24 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
+        ///   查找类似 ✅二频 的本地化字符串。
+        /// </summary>
+        public static string ReviewAcceptSecond {
+            get {
+                return ResourceManager.GetString("ReviewAcceptSecond", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 ✅第二频道采用 的本地化字符串。
+        /// </summary>
+        public static string ReviewAcceptSecondFull {
+            get {
+                return ResourceManager.GetString("ReviewAcceptSecondFull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 尚未设置审核群组, 无法接收投稿 的本地化字符串。
         /// </summary>
         public static string ReviewGroupNotSet {
@@ -259,7 +277,7 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
-        ///   查找类似 ✅二频道 的本地化字符串。
+        ///   查找类似 ⏳延时 的本地化字符串。
         /// </summary>
         public static string ReviewPlan {
             get {
