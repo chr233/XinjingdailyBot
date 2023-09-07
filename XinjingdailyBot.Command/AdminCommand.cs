@@ -1542,6 +1542,9 @@ internal class AdminCommand
                 return "稿件可能已被撤回";
             }
 
+            post.Status = EPostStatus.Revocation;
+            post.ModifyAt = DateTime.Now;
+            await _postService.Updateable(post).UpdateColumns(static x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
 
             if (post.IsMediaGroup)
             {

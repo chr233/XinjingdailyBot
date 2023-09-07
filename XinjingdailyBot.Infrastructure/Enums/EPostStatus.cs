@@ -46,4 +46,8 @@ public enum EPostStatus : int
     /// 已过审并发布在第二频道
     /// </summary>
     AcceptedSecond,
+    /// <summary>
+    /// 被撤回
+    /// </summary>
+    Revocation,
 }
