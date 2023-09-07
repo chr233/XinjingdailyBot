@@ -40,6 +40,12 @@ internal class CommonCommand
         _commandHandler = commandHandler;
     }
 
+    /// <inheritdoc cref="IBanRecordService.WarningLimit"/>
+    private static int WarningLimit = IBanRecordService.WarningLimit;
+
+    /// <inheritdoc cref="IBanRecordService.WarnDuration"/>
+    private static int WarnDuration = IBanRecordService.WarnDuration;
+
     /// <summary>
     /// 显示命令帮助
     /// </summary>
@@ -140,9 +146,13 @@ internal class CommonCommand
     [TextCmd("MYBAN", EUserRights.None, Description = "查询自己是否被封禁")]
     public async Task ResponseMyBan(Users dbUser, Message message)
     {
+        var expireTime = DateTime.Now.AddDays(-WarnDuration);
+
         var records = await _banRecordService.Queryable()
-            .Where(x => x.UserID == dbUser.UserID)
-            .OrderByDescending(static x => new { x.BanTime }).ToListAsync();
+            .Where(x => x.UserID == dbUser.UserID && (x.Type != EBanType.Warning || x.BanTime > expireTime))
+            .ToListAsync();
+
+        records = records.OrderByDescending(static x => x.BanTime.GetTimestamp()).ToList();
 
         var sb = new StringBuilder();
 
@@ -158,13 +168,13 @@ internal class CommonCommand
         }
         else if (!records.Any())
         {
-            sb.AppendLine("尚未查到封禁/解封记录");
+            sb.AppendLine("尚未查到封禁/解封/警告记录");
         }
         else
         {
             foreach (var record in records)
             {
-                string date = record.BanTime.ToString("d");
+                string date = record.BanTime.ToString("yyyy-MM-dd HH:mm:ss");
                 string operate = record.Type switch {
                     EBanType.UnBan => "解封",
                     EBanType.Ban => "封禁",
@@ -174,6 +184,7 @@ internal class CommonCommand
                 sb.AppendLine($"在 <code>{date}</code> 因为 <code>{record.Reason}</code> 被 {operate}");
             }
         }
+        sb.AppendLine("\n仅显示90天内的警告记录");
 
         await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
     }

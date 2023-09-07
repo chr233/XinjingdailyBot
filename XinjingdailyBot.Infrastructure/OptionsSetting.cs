@@ -19,20 +19,28 @@ public sealed record OptionsSetting
     /// 统计
     /// </summary>
     public bool Statistic { get; set; } = true;
+
     /// <inheritdoc cref="BotOption"/>
     public BotOption Bot { get; set; } = new();
+
     /// <inheritdoc cref="ChannelOption"/>
     public ChannelOption Channel { get; set; } = new();
+
     /// <inheritdoc cref="MessageOption"/>
     public MessageOption Message { get; set; } = new();
+
     /// <inheritdoc cref="DatabaseOption"/>
     public DatabaseOption Database { get; set; } = new();
+
     /// <inheritdoc cref="PostOption"/>
     public PostOption Post { get; set; } = new();
+
     /// <inheritdoc cref="GitHubOption"/>
     public GitHubOption GitHub { get; set; } = new();
+
     /// <inheritdoc cref="IpInfoOption"/>
     public IpInfoOption IpInfo { get; set; } = new();
+
     /// <inheritdoc cref="ScheduleOption"/>
     public ScheduleOption Schedule { get; set; } = new();
 
@@ -65,6 +73,15 @@ public sealed record OptionsSetting
         /// 超级管理员(覆盖数据库配置)
         /// </summary>
         public HashSet<long>? SuperAdmins { get; set; }
+
+        /// <summary>
+        /// 启用定时发布
+        /// </summary>
+        public bool EnablePlanPost { get; set; }
+        /// <summary>
+        /// 二级菜单
+        /// </summary>
+        public bool PostSecondMenu { get; set; }
     }
 
     /// <summary>

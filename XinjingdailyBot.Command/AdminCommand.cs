@@ -67,12 +67,16 @@ internal class AdminCommand
         _userTokenService = userTokenService;
     }
 
+    /// <summary>
+    /// 启动时间
+    /// </summary>
     private readonly DateTime StartAt = DateTime.Now;
 
-    /// <summary>
-    /// 被警告超过此值自动封禁
-    /// </summary>
-    private const int WarningLimit = 3;
+    /// <inheritdoc cref="IBanRecordService.WarningLimit"/>
+    private static int WarningLimit = IBanRecordService.WarningLimit;
+
+    /// <inheritdoc cref="IBanRecordService.WarnDuration"/>
+    private static int WarnDuration = IBanRecordService.WarnDuration;
 
     /// <summary>
     /// 获取群组信息
@@ -282,7 +286,7 @@ internal class AdminCommand
             {
                 return "找不到指定用户";
             }
-            
+
             if (targetUser.Id == _channelService.BotUser.Id)
             {
                 return "你有事?";
@@ -412,19 +416,13 @@ internal class AdminCommand
                 //获取最近一条解封记录
                 var lastUnbaned = await _banRecordService.Queryable()
                     .Where(x => x.UserID == targetUser.UserID && (x.Type == EBanType.UnBan || x.Type == EBanType.Ban))
-                    .OrderByDescending(static x => x.BanTime).FirstAsync();
+                    .OrderByDescending(static x => x.BanTime.GetTimestamp()).FirstAsync();
 
-                int warnCount;
-                if (lastUnbaned == null)
-                {
-                    warnCount = await _banRecordService.Queryable()
-                        .Where(x => x.UserID == targetUser.UserID && x.Type == EBanType.Warning).CountAsync();
-                }
-                else
-                {
-                    warnCount = await _banRecordService.Queryable()
-                        .Where(x => x.UserID == targetUser.UserID && x.Type == EBanType.Warning && x.BanTime >= lastUnbaned.BanTime).CountAsync();
-                }
+                var expireTime = DateTime.Now.AddDays(-WarnDuration);
+                int warnCount = await _banRecordService.Queryable()
+                        .Where(x => x.UserID == targetUser.UserID && x.Type == EBanType.Warning && x.BanTime > expireTime)
+                        .WhereIF(lastUnbaned != null, x => x.BanTime >= lastUnbaned!.BanTime)
+                        .CountAsync();
 
                 var record = new BanRecords {
                     UserID = targetUser.UserID,
@@ -451,7 +449,7 @@ internal class AdminCommand
                         OperatorUID = 0,
                         Type = EBanType.Ban,
                         BanTime = DateTime.Now,
-                        Reason = "受到警告过多, 自动封禁",
+                        Reason = "90天内受到警告过多, 自动封禁",
                     };
 
                     await _banRecordService.Insertable(record).ExecuteCommandAsync();
@@ -460,7 +458,7 @@ internal class AdminCommand
                     targetUser.ModifyAt = DateTime.Now;
                     await _userService.Updateable(targetUser).UpdateColumns(static x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
 
-                    sb.AppendLine($"受到警告过多, 系统自动封禁该用户");
+                    sb.AppendLine("90天内受到警告过多, 系统自动封禁该用户");
                 }
 
                 try

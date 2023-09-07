@@ -90,9 +90,6 @@ internal class PostCommand
             case "post confirm":
                 await ConfirmPost(post, dbUser, query);
                 break;
-            case "post confirm second":
-                await ConfirmPost(post, dbUser, query);
-                break;
             default:
                 break;
         }

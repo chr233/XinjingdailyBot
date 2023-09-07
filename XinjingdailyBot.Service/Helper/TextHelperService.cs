@@ -121,23 +121,24 @@ internal sealed class TextHelperService : ITextHelperService
         return msg;
     }
 
-    public string MakeReviewMessage(Users poster, Users reviewer, bool anymouse)
+    public string MakeReviewMessage(Users poster, Users reviewer, bool anymouse, bool second, Message? message)
     {
         var pUser = HtmlUserLink(poster);
         var rUser = HtmlUserLink(reviewer);
+        var msgLink = message != null ? HtmlLink(message.GetMessageLink(), "消息直链") : "无";
         var strAny = anymouse ? "匿名投稿" : "保留来源";
-        var status = "已发布";
+        var status = !second ? "已发布" : "已发布 (第二频道)";
 
-        var msg = string.Join('\n', $"投稿人: {pUser}", $"审核人: {rUser}", $"模式: {strAny}", $"状态: {status}");
+        var msg = string.Join('\n', $"投稿人: {pUser}", $"审核人: {rUser}", $"消息: {msgLink}", $"模式: {strAny}", $"状态: {status}");
         return msg;
     }
 
-    public string MakeReviewMessage(Users poster, long messageID, bool anymouse)
+    public string MakeReviewMessage(Users poster, bool anymouse, bool second, Message? message)
     {
         var pUser = HtmlUserLink(poster);
-        var msgLink = HtmlMessageLink(messageID, _channelService.AcceptChannel.Username ?? _channelService.AcceptChannel.Id.ToString(), "消息直链");
         var strAny = anymouse ? "匿名投稿" : "保留来源";
-        var status = "已发布";
+        var status = !second ? "已发布" : "已发布 (第二频道)";
+        var msgLink = message != null ? HtmlLink(message.GetMessageLink(), "消息直链") : "无";
 
         var msg = string.Join('\n', $"发布人: {pUser}", $"消息: {msgLink}", $"模式: {strAny}", $"状态: {status}");
         return msg;
@@ -154,9 +155,9 @@ internal sealed class TextHelperService : ITextHelperService
         return msg;
     }
 
-    public string MakeNotification(bool isDirect, bool inPlan, long messageID)
+    public string MakeNotification(bool isDirect, bool inPlan, Message? message)
     {
-        var msgLink = HtmlMessageLink(messageID, _channelService.AcceptChannel.Username ?? _channelService.AcceptChannel.Id.ToString(), "消息直链");
+        var msgLink = message != null ? HtmlLink(message.GetMessageLink(), "消息直链") : "无"; ;
 
         if (!inPlan)
         {

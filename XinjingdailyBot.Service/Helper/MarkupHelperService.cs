@@ -1,4 +1,6 @@
+using Microsoft.Extensions.Options;
 using Telegram.Bot.Types.ReplyMarkups;
+using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
@@ -18,21 +20,23 @@ internal sealed class MarkupHelperService : IMarkupHelperService
     private readonly IChannelService _channelService;
     private readonly TagRepository _tagRepository;
     private readonly RejectReasonRepository _rejectReasonRepository;
+    private readonly OptionsSetting.BotOption _botOption;
 
     public MarkupHelperService(
         GroupRepository groupRepository,
         IChannelService channelService,
         TagRepository tagRepository,
-        RejectReasonRepository rejectReasonRepository)
+        RejectReasonRepository rejectReasonRepository,
+        IOptions<OptionsSetting> options)
     {
         _groupRepository = groupRepository;
         _channelService = channelService;
         _tagRepository = tagRepository;
         _rejectReasonRepository = rejectReasonRepository;
+        _botOption = options.Value.Bot;
     }
 
     public InlineKeyboardMarkup PostKeyboard(bool anymouse)
-
     {
         var keyboard = new InlineKeyboardMarkup(new[]
         {
@@ -43,7 +47,6 @@ internal sealed class MarkupHelperService : IMarkupHelperService
             new[]
             {
                 InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "post cancel"),
-                InlineKeyboardButton.WithCallbackData(Langs.PostConfirm, "post confirm second"),
                 InlineKeyboardButton.WithCallbackData(Langs.PostConfirm, "post confirm"),
             },
         });
@@ -91,24 +94,23 @@ internal sealed class MarkupHelperService : IMarkupHelperService
             });
         }
 
+        var lastLine = new List<InlineKeyboardButton> {
+            InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "review cancel")
+        };
+
+        if (_botOption.EnablePlanPost)
+        {
+            lastLine.Add(InlineKeyboardButton.WithCallbackData(Langs.ReviewPlan, "review inplan"));
+        }
+
         if (_channelService.HasSecondChannel)
         {
-            btns.Add(new[]
-            {
-                InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "review cancel"),
-                InlineKeyboardButton.WithCallbackData(Langs.ReviewPlan, "review accept second"),
-                InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
-            });
+            lastLine.Add(InlineKeyboardButton.WithCallbackData(Langs.ReviewAcceptSecond, "review accept second"));
         }
-        else
-        {
-            btns.Add(new[]
-           {
-                InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "review cancel"),
-                InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
-            });
-        }
-        
+
+        lastLine.Add(InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"));
+        btns.Add(lastLine);
+
         return new InlineKeyboardMarkup(btns);
     }
 
@@ -145,20 +147,30 @@ internal sealed class MarkupHelperService : IMarkupHelperService
             });
         }
 
-        if (_channelService.HasSecondChannel)
+        if (!_botOption.PostSecondMenu)
         {
-            btns.Add(new[]
+            var lastLine = new List<InlineKeyboardButton> {
+                InlineKeyboardButton.WithCallbackData(Langs.ReviewReject, "review reject"),
+            };
+
+            if (_botOption.EnablePlanPost)
             {
-                InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "review cancel"),
-                InlineKeyboardButton.WithCallbackData(Langs.ReviewPlan, "review second second"),
-                InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
-            });
+                lastLine.Add(InlineKeyboardButton.WithCallbackData(Langs.ReviewPlan, "review inplan"));
+            }
+
+            if (_channelService.HasSecondChannel)
+            {
+                lastLine.Add(InlineKeyboardButton.WithCallbackData(Langs.ReviewAcceptSecond, "review accept second"));
+            }
+
+            lastLine.Add(InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"));
+            btns.Add(lastLine);
         }
         else
         {
             btns.Add(new[]
-           {
-                InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "review cancel"),
+            {
+                InlineKeyboardButton.WithCallbackData(Langs.ReviewReject, "review reject"),
                 InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
             });
         }
@@ -192,10 +204,31 @@ internal sealed class MarkupHelperService : IMarkupHelperService
             btns.Add(line);
         }
 
-        btns.Add(new[]
+        if (_botOption.PostSecondMenu)
         {
-            InlineKeyboardButton.WithCallbackData(Langs.RejectCancel, "review reject back"),
-        });
+            var lastLine = new List<InlineKeyboardButton> {
+                InlineKeyboardButton.WithCallbackData(Langs.RejectCancel, "review reject back"),
+            };
+
+            if (_botOption.EnablePlanPost)
+            {
+                lastLine.Add(InlineKeyboardButton.WithCallbackData(Langs.ReviewPlan, "review inplan"));
+            }
+
+            if (_channelService.HasSecondChannel)
+            {
+                lastLine.Add(InlineKeyboardButton.WithCallbackData(Langs.ReviewAcceptSecondFull, "review accept second"));
+            }
+
+            btns.Add(lastLine);
+        }
+        else
+        {
+            btns.Add(new[]
+            {
+                InlineKeyboardButton.WithCallbackData(Langs.RejectCancel, "review reject back"),
+            });
+        }
 
         return new InlineKeyboardMarkup(btns);
     }
@@ -283,15 +316,15 @@ internal sealed class MarkupHelperService : IMarkupHelperService
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData( "1. 不做特殊处理", $"cmd {dbUser.UserID} channeloption {channelId} normal"),
+                InlineKeyboardButton.WithCallbackData( "不做特殊处理", $"cmd {dbUser.UserID} channeloption {channelId} normal"),
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData( "2. 抹除频道来源", $"cmd {dbUser.UserID} channeloption {channelId} purgeorigin"),
+                InlineKeyboardButton.WithCallbackData( "抹除频道来源", $"cmd {dbUser.UserID} channeloption {channelId} purgeorigin"),
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData( "3. 拒绝此频道的投稿", $"cmd {dbUser.UserID} channeloption {channelId} autoreject"),
+                InlineKeyboardButton.WithCallbackData( "拒绝此频道的投稿", $"cmd {dbUser.UserID} channeloption {channelId} autoreject"),
             },
             new[]
             {
