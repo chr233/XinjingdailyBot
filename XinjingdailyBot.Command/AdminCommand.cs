@@ -1552,7 +1552,7 @@ internal class AdminCommand
                 return "第二频道未设定";
             }
 
-            if (post.WarnTextID != -1)
+            if (post.WarnTextID != -1 && post.WarnTextID != 0)
             {
                 try
                 {
