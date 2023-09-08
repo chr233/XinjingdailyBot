@@ -32,6 +32,11 @@ public enum EAdMode
     SubGroup = 1 << 4,
 
     /// <summary>
+    /// 第二频道
+    /// </summary>
+    SecondChannel = 1 << 5,
+
+    /// <summary>
     /// 所有公开位置
     /// </summary>
     AllPublic = AcceptChannel | RejectChannel | CommentGroup | SubGroup,
