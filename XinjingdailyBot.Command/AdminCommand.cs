@@ -1546,6 +1546,24 @@ internal class AdminCommand
             post.ModifyAt = DateTime.Now;
             await _postService.Updateable(post).UpdateColumns(static x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
 
+            var chat = post.Status == EPostStatus.Accepted ? _channelService.AcceptChannel : _channelService.SecondChannel;
+            if (chat == null)
+            {
+                return "第二频道未设定";
+            }
+
+            if (post.WarnTextID != -1)
+            {
+                try
+                {
+                    await _botClient.DeleteMessageAsync(chat, (int)post.WarnTextID);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "删除消息出错");
+                }
+            }
+
             if (post.IsMediaGroup)
             {
                 var mediaGroups = await _mediaGroupService.QueryMediaGroup(post.PublishMediaGroupID);
@@ -1571,12 +1589,6 @@ internal class AdminCommand
             }
             else
             {
-                var chat = post.Status == EPostStatus.Accepted ? _channelService.AcceptChannel : _channelService.SecondChannel;
-                if (chat == null)
-                {
-                    return "第二频道未设定";
-                }
-
                 try
                 {
                     await _botClient.DeleteMessageAsync(chat, (int)post.PublicMsgID);

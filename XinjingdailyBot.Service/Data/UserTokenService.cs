@@ -16,7 +16,7 @@ internal sealed class UserTokenService : BaseService<UserTokens>, IUserTokenServ
     public UserTokenService(
         ILogger<UserTokenService> logger,
         ISqlSugarClient context) : base(context)
-    { 
+    {
         _logger = logger;
     }
 

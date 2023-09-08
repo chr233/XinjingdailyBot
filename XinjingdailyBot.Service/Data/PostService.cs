@@ -712,7 +712,8 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
                 string? warnText = _tagRepository.GetActivedTagWarnings(post.Tags);
                 if (!string.IsNullOrEmpty(warnText))
                 {
-                    await _botClient.SendTextMessageAsync(acceptChannel, warnText, allowSendingWithoutReply: true);
+                    var warnMsg = await _botClient.SendTextMessageAsync(acceptChannel, warnText, allowSendingWithoutReply: true);
+                    post.WarnTextID = warnMsg.MessageId;
                 }
 
                 Message? postMessage = null;
@@ -772,7 +773,8 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
                 string? warnText = _tagRepository.GetActivedTagWarnings(post.Tags);
                 if (!string.IsNullOrEmpty(warnText))
                 {
-                    await _botClient.SendTextMessageAsync(acceptChannel, warnText, allowSendingWithoutReply: true);
+                    var warnMsg = await _botClient.SendTextMessageAsync(acceptChannel, warnText, allowSendingWithoutReply: true);
+                    post.WarnTextID = warnMsg.MessageId;
                 }
 
                 var postMessages = await _botClient.SendMediaGroupAsync(acceptChannel, group);
@@ -814,6 +816,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
             x.PublicMsgID,
             x.PublishMediaGroupID,
             x.ReviewerUID,
+            x.WarnTextID,
             x.Status,
             x.ModifyAt
         }).ExecuteCommandAsync();
@@ -877,7 +880,8 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
                 string? warnText = _tagRepository.GetActivedTagWarnings(post.Tags);
                 if (!string.IsNullOrEmpty(warnText))
                 {
-                    await _botClient.SendTextMessageAsync(_channelService.AcceptChannel, warnText, allowSendingWithoutReply: true);
+                    var warnMsg = await _botClient.SendTextMessageAsync(_channelService.AcceptChannel, warnText, allowSendingWithoutReply: true);
+                    post.WarnTextID = warnMsg.MessageId;
                 }
 
                 Message? postMessage = null;
@@ -936,7 +940,8 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
                 string? warnText = _tagRepository.GetActivedTagWarnings(post.Tags);
                 if (!string.IsNullOrEmpty(warnText))
                 {
-                    await _botClient.SendTextMessageAsync(_channelService.AcceptChannel, warnText, allowSendingWithoutReply: true);
+                    var warnMsg = await _botClient.SendTextMessageAsync(_channelService.AcceptChannel, warnText, allowSendingWithoutReply: true);
+                    post.WarnTextID = warnMsg.MessageId;
                 }
 
                 var postMessages = await _botClient.SendMediaGroupAsync(_channelService.AcceptChannel, group);
