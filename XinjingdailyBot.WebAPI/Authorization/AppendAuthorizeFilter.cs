@@ -1,9 +1,3 @@
-using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-
 namespace XinjingdailyBot.WebAPI.Authorization;
 
 //public class AppendAuthorizeFilter : IOperationFilter

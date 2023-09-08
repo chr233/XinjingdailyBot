@@ -70,6 +70,10 @@ public sealed record NewPosts : BaseModel, IModifyAt, ICreateAt
     public long PublicMsgID { get; set; } = -1;
 
     /// <summary>
+    /// 警告消息Id
+    /// </summary>
+    public long WarnTextID { get; set; } = -1;
+    /// <summary>
     /// 是否为直接投稿
     /// </summary>
     [SugarColumn(IsIgnore = true)]

@@ -1,12 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Server.IIS;
-using NLog;
-using System.DirectoryServices.Protocols;
-
 namespace ZR.Admin.WebApi.Filters;
 
 /// <summary>

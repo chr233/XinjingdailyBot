@@ -1,11 +1,7 @@
-using NLog.Fluent;
 using SqlSugar;
-using SqlSugar.IOC;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Service.Bot.Common;
-using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
