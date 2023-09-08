@@ -55,18 +55,24 @@ internal class PostAdvertiseTask : IJob
 
         var operates = new List<(EAdMode, ChatId)>
         {
-           new (EAdMode.AcceptChannel, channelService.AcceptChannel),
-           new (EAdMode.RejectChannel, channelService.RejectChannel),
-           new (EAdMode.ReviewGroup, channelService.ReviewGroup),
-           new (EAdMode.CommentGroup, channelService.CommentGroup),
-           new (EAdMode.SubGroup, channelService.SubGroup),
+            (EAdMode.AcceptChannel, channelService.AcceptChannel),
+            (EAdMode.RejectChannel, channelService.RejectChannel),
+            (EAdMode.ReviewGroup, channelService.ReviewGroup),
+            (EAdMode.CommentGroup, channelService.CommentGroup),
+            (EAdMode.SubGroup, channelService.SubGroup),
         };
+
+        if (channelService.HasSecondChannel)
+        {
+            operates.Add((EAdMode.SecondChannel, channelService.SecondChannel!));
+        }
 
         foreach (var (mode, chat) in operates)
         {
             if (ad.Mode.HasFlag(mode) && chat.Identifier != null)
             {
                 var chatId = chat.Identifier.Value;
+
                 try
                 {
                     var isFirst = await _advertisePostService.IsFirstAdPost(ad);
