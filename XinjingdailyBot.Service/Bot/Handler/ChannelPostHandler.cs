@@ -5,6 +5,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
+using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
@@ -25,6 +26,7 @@ internal class ChannelPostHandler : IChannelPostHandler
     private readonly TagRepository _tagRepository;
     private readonly ITelegramBotClient _botClient;
     private readonly IMediaGroupService _mediaGroupService;
+    private readonly IChannelService _channelService;
 
     public ChannelPostHandler(
         ILogger<ChannelPostHandler> logger,
@@ -35,7 +37,8 @@ internal class ChannelPostHandler : IChannelPostHandler
         IChannelOptionService channelOptionService,
         TagRepository tagRepository,
         ITelegramBotClient botClient,
-        IMediaGroupService mediaGroupService)
+        IMediaGroupService mediaGroupService,
+        IChannelService channelService)
     {
         _logger = logger;
         _postService = postService;
@@ -46,6 +49,7 @@ internal class ChannelPostHandler : IChannelPostHandler
         _tagRepository = tagRepository;
         _botClient = botClient;
         _mediaGroupService = mediaGroupService;
+        _channelService = channelService;
     }
 
     public async Task OnTextChannelPostReceived(Users dbUser, Message message)
@@ -58,6 +62,8 @@ internal class ChannelPostHandler : IChannelPostHandler
         {
             return;
         }
+
+        var second = message.Chat.Id == _channelService.SecondChannel?.Id;
 
         long channelId = -1, channelMsgId = -1;
         if (message.ForwardFromChat?.Type == ChatType.Channel)
@@ -95,7 +101,7 @@ internal class ChannelPostHandler : IChannelPostHandler
             RawText = message.Text ?? "",
             ChannelID = channelId,
             ChannelMsgID = channelMsgId,
-            Status = EPostStatus.Accepted,
+            Status = !second ? EPostStatus.Accepted : EPostStatus.AcceptedSecond,
             PostType = message.Type,
             Tags = newTag,
             PosterUID = dbUser.UserID,
@@ -112,6 +118,8 @@ internal class ChannelPostHandler : IChannelPostHandler
 
     public async Task OnMediaChannelPostReceived(Users dbUser, Message message)
     {
+        var second = message.Chat.Id == _channelService.SecondChannel?.Id;
+
         long channelId = -1, channelMsgId = -1;
         if (message.ForwardFromChat?.Type == ChatType.Channel)
         {
@@ -146,7 +154,7 @@ internal class ChannelPostHandler : IChannelPostHandler
             RawText = message.Text ?? "",
             ChannelID = channelId,
             ChannelMsgID = channelMsgId,
-            Status = EPostStatus.Accepted,
+            Status = !second ? EPostStatus.Accepted : EPostStatus.AcceptedSecond,
             PostType = message.Type,
             Tags = newTags,
             HasSpoiler = message.HasMediaSpoiler ?? false,
@@ -179,6 +187,8 @@ internal class ChannelPostHandler : IChannelPostHandler
         string mediaGroupId = message.MediaGroupId!;
         if (!MediaGroupIDs.TryGetValue(mediaGroupId, out long postID)) //如果mediaGroupId不存在则创建新Post
         {
+            var second = message.Chat.Id == _channelService.SecondChannel?.Id;
+
             MediaGroupIDs.TryAdd(mediaGroupId, -1);
 
             bool exists = await _postService.Queryable().AnyAsync(x => x.OriginMediaGroupID == mediaGroupId);
@@ -220,7 +230,7 @@ internal class ChannelPostHandler : IChannelPostHandler
                     RawText = message.Text ?? "",
                     ChannelID = channelId,
                     ChannelMsgID = channelMsgId,
-                    Status = EPostStatus.Accepted,
+                    Status = !second ? EPostStatus.Accepted : EPostStatus.AcceptedSecond,
                     PostType = message.Type,
                     Tags = newTags,
                     HasSpoiler = message.HasMediaSpoiler ?? false,

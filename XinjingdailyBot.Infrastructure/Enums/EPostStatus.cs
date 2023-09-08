@@ -40,7 +40,6 @@ public enum EPostStatus : int
     /// <summary>
     /// 已计划发布
     /// </summary>
-    [Obsolete("废弃功能")]
     InPlan,
     /// <summary>
     /// 已过审并发布在第二频道

@@ -108,7 +108,8 @@ internal class DispatcherService : IDispatcherService
     public async Task OnChannalPostReceived(Users dbUser, Message message)
     {
         //仅监听发布频道的消息
-        if (message.Chat.Id == _channelService.AcceptChannel.Id)
+        var chatId = message.Chat.Id;
+        if (_channelService.IsChannelMessage(chatId) && chatId != _channelService.RejectChannel.Id)
         {
             var handler = message.Type switch {
                 MessageType.Text => _channelPostHandler.OnTextChannelPostReceived(dbUser, message),
