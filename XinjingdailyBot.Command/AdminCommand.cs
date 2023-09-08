@@ -419,7 +419,7 @@ internal class AdminCommand
                 //获取最近一条解封记录
                 var lastUnbaned = await _banRecordService.Queryable()
                     .Where(x => x.UserID == targetUser.UserID && (x.Type == EBanType.UnBan || x.Type == EBanType.Ban))
-                    .OrderByDescending(static x => x.BanTime.GetTimestamp()).FirstAsync();
+                    .OrderByDescending(static x => x.Id).FirstAsync();
 
                 var expireTime = DateTime.Now.AddDays(-WarnDuration);
                 int warnCount = await _banRecordService.Queryable()
