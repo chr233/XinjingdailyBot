@@ -259,7 +259,7 @@ internal class SuperCommand
 
             var tasks = users.Select(async user => {
                 int postCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID);
-                int acceptCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == EPostStatus.Accepted);
+                int acceptCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && (x.Status == EPostStatus.Accepted || x.Status == EPostStatus.AcceptedSecond));
                 int rejectCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == EPostStatus.Rejected);
                 int expiredCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status < 0);
                 int reviewCount = await _postService.Queryable().CountAsync(x => x.ReviewerUID == user.UserID && x.PosterUID != user.UserID);
