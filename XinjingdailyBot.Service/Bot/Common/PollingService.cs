@@ -117,7 +117,6 @@ public class PollingService : BackgroundService
             catch (ApiRequestException ex)
             {
                 _logger.LogError(ex, "Telegram API 调用出错");
-                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
             }
             catch (Exception ex)
             {
