@@ -1,4 +1,4 @@
-﻿using Telegram.Bot;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
@@ -7,98 +7,97 @@ using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
 
-namespace XinjingdailyBot.Service.Bot.Handler
+namespace XinjingdailyBot.Service.Bot.Handler;
+
+[AppService(typeof(IMessageHandler), LifeTime.Singleton)]
+internal class MessageHandler : IMessageHandler
 {
-    [AppService(typeof(IMessageHandler), LifeTime.Singleton)]
-    internal class MessageHandler : IMessageHandler
+    private readonly IPostService _postService;
+    private readonly IGroupMessageHandler _groupMessageHandler;
+    private readonly ITelegramBotClient _botClient;
+    private readonly IForwardMessageHandler _forwardMessageHandler;
+
+    public MessageHandler(
+        IPostService postService,
+        IGroupMessageHandler groupMessageHandler,
+        ITelegramBotClient botClient,
+        IForwardMessageHandler forwardMessageHandler)
     {
-        private readonly IPostService _postService;
-        private readonly IGroupMessageHandler _groupMessageHandler;
-        private readonly ITelegramBotClient _botClient;
-        private readonly IForwardMessageHandler _forwardMessageHandler;
+        _postService = postService;
+        _groupMessageHandler = groupMessageHandler;
+        _botClient = botClient;
+        _forwardMessageHandler = forwardMessageHandler;
+    }
 
-        public MessageHandler(
-            IPostService postService,
-            IGroupMessageHandler groupMessageHandler,
-            ITelegramBotClient botClient,
-            IForwardMessageHandler forwardMessageHandler)
+    public async Task OnTextMessageReceived(Users dbUser, Message message)
+    {
+        if (dbUser.IsBan)
         {
-            _postService = postService;
-            _groupMessageHandler = groupMessageHandler;
-            _botClient = botClient;
-            _forwardMessageHandler = forwardMessageHandler;
+            return;
         }
 
-        public async Task OnTextMessageReceived(Users dbUser, Message message)
+        if (message.Chat.Type == ChatType.Private)
         {
-            if (dbUser.IsBan)
+            if (message.ForwardFromChat != null)
             {
-                return;
-            }
-
-            if (message.Chat.Type == ChatType.Private)
-            {
-                if (message.ForwardFromChat != null)
+                var handled = await _forwardMessageHandler.OnForwardMessageReceived(dbUser, message);
+                if (handled)
                 {
-                    var handled = await _forwardMessageHandler.OnForwardMessageReceived(dbUser, message);
-                    if (handled)
-                    {
-                        return;
-                    }
-                }
-                if (await _postService.CheckPostLimit(dbUser, message, null))
-                {
-                    await _postService.HandleTextPosts(dbUser, message);
+                    return;
                 }
             }
-            else if (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup)
+            if (await _postService.CheckPostLimit(dbUser, message, null))
             {
-                await _groupMessageHandler.OnGroupTextMessageReceived(dbUser, message);
+                await _postService.HandleTextPosts(dbUser, message);
             }
         }
-
-        public async Task OnMediaMessageReceived(Users dbUser, Message message)
+        else if (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup)
         {
-            if (dbUser.IsBan)
-            {
-                return;
-            }
+            await _groupMessageHandler.OnGroupTextMessageReceived(dbUser, message);
+        }
+    }
 
-            if (message.Chat.Type == ChatType.Private)
+    public async Task OnMediaMessageReceived(Users dbUser, Message message)
+    {
+        if (dbUser.IsBan)
+        {
+            return;
+        }
+
+        if (message.Chat.Type == ChatType.Private)
+        {
+            if (message.ForwardFromChat != null)
             {
-                if (message.ForwardFromChat != null)
+                var handled = await _forwardMessageHandler.OnForwardMessageReceived(dbUser, message);
+                if (handled)
                 {
-                    var handled = await _forwardMessageHandler.OnForwardMessageReceived(dbUser, message);
-                    if (handled)
-                    {
-                        return;
-                    }
+                    return;
                 }
-                switch (message.Type)
-                {
-                    case MessageType.Photo:
-                    case MessageType.Audio:
-                    case MessageType.Video:
-                    case MessageType.Voice:
-                    case MessageType.Document:
-                    case MessageType.Animation:
-                        if (await _postService.CheckPostLimit(dbUser, message, null))
+            }
+            switch (message.Type)
+            {
+                case MessageType.Photo:
+                case MessageType.Audio:
+                case MessageType.Video:
+                case MessageType.Voice:
+                case MessageType.Document:
+                case MessageType.Animation:
+                    if (await _postService.CheckPostLimit(dbUser, message, null))
+                    {
+                        if (message.MediaGroupId != null)
                         {
-                            if (message.MediaGroupId != null)
-                            {
-                                await _postService.HandleMediaGroupPosts(dbUser, message);
-                            }
-                            else
-                            {
-                                await _postService.HandleMediaPosts(dbUser, message);
-                            }
+                            await _postService.HandleMediaGroupPosts(dbUser, message);
                         }
+                        else
+                        {
+                            await _postService.HandleMediaPosts(dbUser, message);
+                        }
+                    }
 
-                        break;
-                    default:
-                        await _botClient.AutoReplyAsync($"暂不支持的投稿类型 {message.Type}", message);
-                        break;
-                }
+                    break;
+                default:
+                    await _botClient.AutoReplyAsync($"暂不支持的投稿类型 {message.Type}", message);
+                    break;
             }
         }
     }

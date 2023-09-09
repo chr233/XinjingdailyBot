@@ -21,6 +21,7 @@ internal class ChannelService : IChannelService
     public Chat ReviewLogChannel { get; private set; } = new();
     public Chat CommentGroup { get; private set; } = new();
     public Chat SubGroup { get; private set; } = new();
+    public Chat SecondCommentGroup { get; private set; } = new();
     public Chat AcceptChannel { get; private set; } = new();
     public Chat? SecondChannel { get; private set; }
     public Chat RejectChannel { get; private set; } = new();
@@ -135,6 +136,24 @@ internal class ChannelService : IChannelService
             SubGroup = new Chat { Id = -1 };
         }
 
+        try
+        {
+            if (long.TryParse(channelOption.SecondCommentGroup, out var subGroupId))
+            {
+                SecondCommentGroup = await _botClient.GetChatAsync(subGroupId);
+            }
+            else
+            {
+                SecondCommentGroup = await _botClient.GetChatAsync(channelOption.SecondCommentGroup);
+            }
+            _logger.LogInformation("第二频道评论区群组: {chatProfile}", SecondCommentGroup.ChatProfile());
+        }
+        catch
+        {
+            _logger.LogError("未找到指定的闲聊群组, 可以使用 /groupinfo 命令获取群组信息");
+            SecondCommentGroup = new Chat { Id = -1 };
+        }
+
         if (SubGroup.Id == -1 && CommentGroup.Id != -1)
         {
             SubGroup = CommentGroup;
@@ -156,7 +175,7 @@ internal class ChannelService : IChannelService
 
     public bool IsGroupMessage(long chatId)
     {
-        return chatId == SubGroup.Id || chatId == CommentGroup.Id;
+        return chatId == SubGroup.Id || chatId == CommentGroup.Id || chatId == SecondCommentGroup.Id;
     }
     public bool IsGroupMessage(Chat chat)
     {
@@ -169,7 +188,7 @@ internal class ChannelService : IChannelService
     }
     public bool IsReviewMessage(Chat chat)
     {
-        return chat.Id == ReviewGroup.Id;
+        return IsReviewMessage(chat.Id);
     }
     public bool HasSecondChannel => SecondChannel != null;
 }

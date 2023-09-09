@@ -120,6 +120,10 @@ public sealed record OptionsSetting
         /// </summary>
         public string? SecondChannel { get; set; }
         /// <summary>
+        /// 第二频道评论区
+        /// </summary>
+        public string SecondCommentGroup { get; set; } = "";         
+        /// <summary>
         /// 拒稿频道
         /// </summary>
         public string RejectChannel { get; set; } = "";
