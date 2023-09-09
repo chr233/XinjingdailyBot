@@ -56,7 +56,7 @@ internal class UpdateService : IUpdateService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "处理轮询出错 {0}", update);
+                _logger.LogError(ex, "处理轮询出错 {update}", update);
             }
         }
     }
