@@ -81,7 +81,7 @@ internal class DispatcherService : IDispatcherService
 
         if (dbUser.UserID == 777000 && (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup))
         {
-            if (message.Chat.Id == _channelService.SubGroup.Id || message.Chat.Id == _channelService.CommentGroup.Id)
+            if (_channelService.IsGroupMessage(message.Chat.Id))
             {
                 await UnPinMessage(message);
                 return;

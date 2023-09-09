@@ -31,6 +31,7 @@ public interface IChannelService
     /// 第二频道
     /// </summary>
     Chat? SecondChannel { get; }
+    Chat? SecondCommentGroup { get; }
     /// <summary>
     /// 拒绝频道
     /// </summary>
