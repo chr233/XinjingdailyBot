@@ -36,11 +36,18 @@ internal class ExpiredPostsTask : IJob
         _postService = postService;
         _userService = userService;
         _botClient = botClient;
-        PostExpiredTime = TimeSpan.FromDays(options.Value.Post.PostExpiredTime);
+
+        var expiredTime = options.Value.Post.PostExpiredTime;
+        PostExpiredTime = expiredTime > 0 ? TimeSpan.FromDays(options.Value.Post.PostExpiredTime) : TimeSpan.Zero;
     }
 
     public async Task Execute(IJobExecutionContext context)
     {
+        if (PostExpiredTime.TotalDays == 0)
+        {
+            return;
+        }
+
         _logger.LogInformation("开始定时任务, 清理过期稿件任务");
 
         var expiredDate = DateTime.Now - PostExpiredTime;
