@@ -44,6 +44,7 @@ public interface IPostService : IBaseService<NewPosts>
     /// <param name="message"></param>
     /// <returns></returns>
     Task<NewPosts?> FetchPostFromReplyToMessage(Message message);
+    Task<NewPosts?> GetLatestReviewingPostLink();
 
     /// <summary>
     /// 处理多媒体投稿(mediaGroup)

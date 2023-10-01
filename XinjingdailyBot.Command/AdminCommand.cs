@@ -39,6 +39,7 @@ internal class AdminCommand
     private readonly ICmdRecordService _cmdRecordService;
     private readonly IUserTokenService _userTokenService;
     private readonly IMediaGroupService _mediaGroupService;
+    private readonly ITextHelperService _textHelperService;
 
     public AdminCommand(
         ILogger<AdminCommand> logger,
@@ -53,7 +54,8 @@ internal class AdminCommand
         IMarkupHelperService markupHelperService,
         ICmdRecordService cmdRecordService,
         IUserTokenService userTokenService,
-        IMediaGroupService mediaGroupService)
+        IMediaGroupService mediaGroupService,
+        ITextHelperService textHelperService)
     {
         _logger = logger;
         _botClient = botClient;
@@ -68,6 +70,7 @@ internal class AdminCommand
         _cmdRecordService = cmdRecordService;
         _userTokenService = userTokenService;
         _mediaGroupService = mediaGroupService;
+        _textHelperService = textHelperService;
     }
 
     /// <summary>
@@ -1655,5 +1658,42 @@ internal class AdminCommand
     {
         _logger.LogInformation("todo {user}", dbUser);
         await _botClient.AutoReplyAsync("未实现", callbackQuery, false);
+    }
+
+    /// <summary>
+    /// 获取当天未审核稿件链接
+    /// </summary>
+    /// <param name="dbUser"></param>
+    /// <param name="callbackQuery"></param>
+    /// <returns></returns>
+    [QueryCmd("GOTOLATEST", EUserRights.AdminCmd)]
+    public async Task QResponseGotoLatest(Users dbUser, CallbackQuery callbackQuery)
+    {
+        if (dbUser.PrivateChatID == -1)
+        {
+            await _botClient.AutoReplyAsync("未私聊过机器人, 无法发送消息", callbackQuery, true);
+            return;
+        }
+
+        var post = await _postService.GetLatestReviewingPostLink();
+        if (post != null)
+        {
+            var chatId = Math.Abs(post.ReviewChatID + 1000000000000);
+            var link = _textHelperService.HtmlMessageLink(post.ReviewMsgID, $"c/{chatId}", $"前往投稿{post.Id}");
+            try
+            {
+                await _botClient.SendTextMessageAsync(dbUser.PrivateChatID, link, parseMode: ParseMode.Html);
+                await _botClient.AutoReplyAsync("消息链接已发送", callbackQuery, false);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "发送消息失败");
+                await _botClient.AutoReplyAsync("消息链接发送失败", callbackQuery, false);
+            }
+        }
+        else
+        {
+            await _botClient.AutoReplyAsync("今天没有未审核的稿件", callbackQuery, false);
+        }
     }
 }

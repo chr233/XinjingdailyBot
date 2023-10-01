@@ -545,7 +545,7 @@ internal sealed class MarkupHelperService : IMarkupHelperService
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("前往今日最早的待审核稿件", $"cmd -1 gotolatest"),
+                InlineKeyboardButton.WithCallbackData("今日最早未审核稿件", $"cmd -1 gotolatest"),
             },
         });
 
