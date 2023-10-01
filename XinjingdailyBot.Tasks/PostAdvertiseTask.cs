@@ -57,7 +57,7 @@ internal class PostAdvertiseTask : IJob
         {
             (EAdMode.AcceptChannel, channelService.AcceptChannel),
             (EAdMode.RejectChannel, channelService.RejectChannel),
-            (EAdMode.ReviewGroup, channelService.ReviewGroup),
+            //(EAdMode.ReviewGroup, channelService.ReviewGroup),
             (EAdMode.CommentGroup, channelService.CommentGroup),
             (EAdMode.SubGroup, channelService.SubGroup),
         };
@@ -86,13 +86,13 @@ internal class PostAdvertiseTask : IJob
                     }
 
                     //删除旧的广告
-                    await _advertisePostService.DeleteOldAdPosts(ad, chatId, true);
+                    await _advertisePostService.DeleteOldAdPosts(ad, chatId);
 
                     var adpost = new AdvertisePosts {
                         AdId = ad.Id,
                         ChatID = chatId,
                         MessageID = msgId.Id,
-                        Pined = ad.PinMessage && isFirst,
+                        Pined = ad.PinMessage,
                         CreateAt = DateTime.Now,
                         ModifyAt = DateTime.Now,
                     };
@@ -107,9 +107,10 @@ internal class PostAdvertiseTask : IJob
                         await _botClient.PinChatMessageAsync(chatId, msgId.Id, true);
                     }
 
-                    await _advertisesService.Updateable(ad).UpdateColumns(static x => new {
-                        x.ShowCount, x.LastPostAt
-                    }).ExecuteCommandAsync();
+                    await _advertisesService.Updateable(ad)
+                        .UpdateColumns(static x => new {
+                            x.ShowCount, x.LastPostAt
+                        }).ExecuteCommandAsync();
                 }
                 catch (Exception ex)
                 {
