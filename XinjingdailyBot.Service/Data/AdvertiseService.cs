@@ -35,7 +35,7 @@ internal sealed class AdvertiseService : BaseService<Advertises>, IAdvertiseServ
             {
                 ad.Enable = false;
                 await Updateable(ad).UpdateColumns(static x => new { x.Enable }).ExecuteCommandAsync();
-                await _advertisePostService.DeleteOldAdPosts(ad, false);
+                await _advertisePostService.DeleteOldAdPosts(ad);
             }
         }
     }
@@ -56,7 +56,7 @@ internal sealed class AdvertiseService : BaseService<Advertises>, IAdvertiseServ
             {
                 ad.Enable = false;
                 await Updateable(ad).UpdateColumns(static x => new { x.Enable }).ExecuteCommandAsync();
-                await _advertisePostService.DeleteOldAdPosts(ad, false);
+                await _advertisePostService.DeleteOldAdPosts(ad);
             }
         }
 

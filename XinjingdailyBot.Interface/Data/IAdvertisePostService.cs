@@ -13,16 +13,14 @@ public interface IAdvertisePostService : IBaseService<AdvertisePosts>
     /// </summary>
     /// <param name="advertises"></param>
     /// <param name="chatId"></param>
-    /// <param name="excludePin">排除置顶</param>
     /// <returns></returns>
-    Task DeleteOldAdPosts(Advertises advertises, long chatId, bool excludePin);
+    Task DeleteOldAdPosts(Advertises advertises, long chatId);
     /// <summary>
     /// 删除旧的广告消息
     /// </summary>
     /// <param name="advertises"></param>
-    /// <param name="excludePin">排除置顶</param>
     /// <returns></returns>
-    Task DeleteOldAdPosts(Advertises advertises, bool excludePin);
+    Task DeleteOldAdPosts(Advertises advertises);
 
     /// <summary>
     /// 是否为第一次发布

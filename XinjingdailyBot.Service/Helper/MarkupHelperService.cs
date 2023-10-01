@@ -538,4 +538,17 @@ internal sealed class MarkupHelperService : IMarkupHelperService
 
         return line.Any() ? new InlineKeyboardMarkup(new[] { line }) : null;
     }
+
+    public InlineKeyboardMarkup ReviewStatusButton()
+    {
+        var keyboard = new InlineKeyboardMarkup(new[]
+        {
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("前往今日最早的待审核稿件", $"cmd -1 gotolatest"),
+            },
+        });
+
+        return keyboard;
+    }
 }

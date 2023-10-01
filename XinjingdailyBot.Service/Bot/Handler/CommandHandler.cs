@@ -309,8 +309,8 @@ internal class CommandHandler : ICommandHandler
                 return;
             }
 
-            //判断消息发起人是不是同一个
-            if (dbUser.UserID != userID)
+            //判断消息发起人是不是同一个, userID 为 -1 时所有人均可用
+            if (dbUser.UserID != userID && userID != -1)
             {
                 await _botClient.AutoReplyAsync("这不是你的消息, 请不要瞎点", query, true);
                 return;

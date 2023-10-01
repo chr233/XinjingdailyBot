@@ -94,6 +94,8 @@ public interface IMarkupHelperService
     /// </summary>
     /// <returns></returns>
     InlineKeyboardMarkup ReviewKeyboardB();
+    InlineKeyboardMarkup ReviewStatusButton();
+
     /// <summary>
     /// 频道选项键盘
     /// </summary>

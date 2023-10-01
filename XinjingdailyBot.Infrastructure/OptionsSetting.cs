@@ -122,7 +122,7 @@ public sealed record OptionsSetting
         /// <summary>
         /// 第二频道评论区
         /// </summary>
-        public string SecondCommentGroup { get; set; } = "";         
+        public string SecondCommentGroup { get; set; } = "";
         /// <summary>
         /// 拒稿频道
         /// </summary>

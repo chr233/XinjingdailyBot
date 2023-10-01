@@ -79,15 +79,21 @@ internal sealed class UserService : BaseService<Users>, IUserService
 
         await AutoLeaveChat(msgChat);
 
+        var message = update.Type switch {
+            UpdateType.Message => update.Message!,
+            UpdateType.ChannelPost => update.ChannelPost!,
+            _ => null,
+        };
+
+        // 自动删除置顶通知 和 群名修改通知
+        if (message != null && (message.Type == MessageType.MessagePinned || message.Type == MessageType.ChatTitleChanged))
+        {
+            await AutoDeleteNotification(message);
+            return null;
+        }
+
         if (update.Type == UpdateType.ChannelPost)
         {
-            var message = update.ChannelPost!;
-            // 自动删除置顶通知 和 群名修改通知
-            if (message.Type == MessageType.MessagePinned || message.Type == MessageType.ChatTitleChanged)
-            {
-                await AutoDeleteNotification(message);
-                return null;
-            }
             return await QueryUserFromChannelPost(update.ChannelPost!);
         }
         else
@@ -375,7 +381,7 @@ internal sealed class UserService : BaseService<Users>, IUserService
     /// <returns></returns>
     private async Task AutoDeleteNotification(Message message)
     {
-        if (message.Chat.Id == _channelService.AcceptChannel.Id || message.Chat.Id == _channelService.RejectChannel.Id)
+        if (_channelService.IsChannelMessage(message.Chat) || _channelService.IsGroupMessage(message.Chat) || _channelService.IsReviewMessage(message.Chat))
         {
             try
             {

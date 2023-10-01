@@ -24,21 +24,16 @@ internal sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdve
         _botClient = botClient;
     }
 
-    public async Task DeleteOldAdPosts(Advertises advertises, bool excludePin)
+    public async Task DeleteOldAdPosts(Advertises advertises)
     {
         var oldPosts = await Queryable()
             .Where(x => x.AdId == advertises.Id && !x.Deleted)
-            .WhereIF(excludePin, static x => !x.Pined)
             .ToListAsync();
 
         foreach (var oldPost in oldPosts)
         {
             try
             {
-                oldPost.Deleted = true;
-                oldPost.ModifyAt = DateTime.Now;
-                await Updateable(oldPost).ExecuteCommandAsync();
-
                 await _botClient.DeleteMessageAsync(oldPost.ChatID, (int)oldPost.MessageID);
             }
             catch (Exception ex)
@@ -48,26 +43,25 @@ internal sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdve
             }
             finally
             {
-                await Updateable(oldPost).ExecuteCommandAsync();
+                oldPost.Deleted = true;
+                oldPost.ModifyAt = DateTime.Now;
+                await Updateable(oldPost)
+                    .UpdateColumns(static x => new { x.Deleted, x.ModifyAt })
+                    .ExecuteCommandAsync();
             }
         }
     }
 
-    public async Task DeleteOldAdPosts(Advertises advertises, long chatId, bool excludePin)
+    public async Task DeleteOldAdPosts(Advertises advertises, long chatId)
     {
         var oldPosts = await Queryable()
             .Where(x => x.AdId == advertises.Id && x.ChatID == chatId && !x.Deleted)
-            .WhereIF(excludePin, static x => !x.Pined)
             .ToListAsync();
 
         foreach (var oldPost in oldPosts)
         {
             try
             {
-                oldPost.Deleted = true;
-                oldPost.ModifyAt = DateTime.Now;
-                await Updateable(oldPost).ExecuteCommandAsync();
-
                 await _botClient.DeleteMessageAsync(oldPost.ChatID, (int)oldPost.MessageID);
             }
             catch (Exception ex)
@@ -77,7 +71,11 @@ internal sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdve
             }
             finally
             {
-                await Updateable(oldPost).ExecuteCommandAsync();
+                oldPost.Deleted = true;
+                oldPost.ModifyAt = DateTime.Now;
+                await Updateable(oldPost)
+                    .UpdateColumns(static x => new { x.Deleted, x.ModifyAt })
+                    .ExecuteCommandAsync();
             }
         }
     }
