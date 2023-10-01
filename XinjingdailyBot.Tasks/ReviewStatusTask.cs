@@ -45,16 +45,16 @@ internal class ReviewStatusTask : IJob
         _logger.LogInformation("开始定时任务, 更新投稿状态显示");
 
         var now = DateTime.Now;
-        var prev1Day = now.AddDays(-1).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+        var today = now.AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
 
-        var todayPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status > EPostStatus.Cancel).CountAsync();
-        var todayAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status == EPostStatus.Accepted).CountAsync();
-        var todayRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status == EPostStatus.Rejected).CountAsync();
-        var todayPaddingPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status == EPostStatus.Reviewing).CountAsync();
+        var todayPost = await _postService.Queryable().Where(x => x.CreateAt >= today && x.Status > EPostStatus.Cancel).CountAsync();
+        var todayAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= today && x.Status == EPostStatus.Accepted).CountAsync();
+        var todayRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= today && x.Status == EPostStatus.Rejected).CountAsync();
+        var todayPaddingPost = await _postService.Queryable().Where(x => x.CreateAt >= today && x.Status == EPostStatus.Reviewing).CountAsync();
 
         if (_channelService.HasSecondChannel)
         {
-            var todayAcceptSecondPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status == EPostStatus.AcceptedSecond).CountAsync();
+            var todayAcceptSecondPost = await _postService.Queryable().Where(x => x.CreateAt >= today && x.Status == EPostStatus.AcceptedSecond).CountAsync();
             todayAcceptPost += todayAcceptSecondPost;
         }
 
@@ -62,7 +62,7 @@ internal class ReviewStatusTask : IJob
         var reviewRate = todayPost > 0 ? (100 * (todayPost - todayPaddingPost) / todayPost).ToString("f2") : "--";
 
         var sb = new StringBuilder();
-        sb.AppendLine($"[审核统计 {now:HH:mm:ss}]");
+        sb.AppendLine($"[今日审核统计 {now:HH:mm:ss}]");
         sb.AppendLine($"接受 <code>{todayAcceptPost}</code> 拒绝 <code>{todayRejectPost}</code> 待审核 <code>{todayPaddingPost}</code>");
         sb.AppendLine($"通过率: <code>{acceptRate}%</code> 审核率: <code>{reviewRate}%</code>");
 

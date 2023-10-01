@@ -1005,4 +1005,13 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         var post = await FetchPostFromReplyToMessage(query.Message);
         return post;
     }
+
+    public async Task<NewPosts?> GetLatestReviewingPostLink()
+    {
+        var now = DateTime.Now;
+        var today = now.AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+
+        var post = await Queryable().Where(x => x.CreateAt >= today && x.Status == EPostStatus.Reviewing).FirstAsync();
+        return post;
+    }
 }
