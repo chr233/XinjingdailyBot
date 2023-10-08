@@ -195,6 +195,8 @@ internal class CommandHandler : ICommandHandler
             {
                 try
                 {
+                    await _botClient.SendChatActionAsync(message, ChatAction.Typing);
+
                     await CallCommandAsync(dbUser, message, type, method);
 
                     if (_channelService.IsGroupMessage(message.Chat.Id))
