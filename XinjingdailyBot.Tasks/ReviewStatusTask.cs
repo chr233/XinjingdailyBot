@@ -14,7 +14,7 @@ namespace XinjingdailyBot.Tasks;
 /// <summary>
 /// 定期发布审核状态通知
 /// </summary>
-[Job("*/10 * * * ?")]
+[Job("0 * * * * ?")]
 internal class ReviewStatusTask : IJob
 {
     private readonly ILogger<ReviewStatusTask> _logger;

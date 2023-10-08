@@ -39,7 +39,7 @@ public static class TaskExtension
         services.AddQuartz(qz => {
             //qz.UseMicrosoftDependencyInjectionJobFactory();
 
-            _logger.Debug($"===== 注册定时任务 =====");
+            _logger.Debug("===== 注册定时任务 =====");
             uint count = 0;
             foreach (var jobType in tasks)
             {
@@ -52,15 +52,22 @@ public static class TaskExtension
 
                     var schedule = cron.GetValueOrDefault(jobType.Name, jobAttribute.Schedule);
 
-                    qz.AddJob(jobType, jobKey, opts => opts.WithIdentity(jobKey));
-                    qz.AddTrigger(opts => opts
-                        .ForJob(jobKey)
-                        .WithIdentity(tiggerKey)
-                        .WithCronSchedule(schedule)
-                    );
+                    try
+                    {
+                        qz.AddJob(jobType, jobKey, opts => opts.WithIdentity(jobKey));
+                        qz.AddTrigger(opts => opts
+                            .ForJob(jobKey)
+                            .WithIdentity(tiggerKey)
+                            .WithCronSchedule(schedule)
+                        );
 
-                    _logger.Debug($"[{schedule}] - {jobType}");
-                    count++;
+                        _logger.Debug("[{schedule}] - {jobType} 注册成功", schedule, jobType);
+                        count++;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error(ex, "[{schedule}] - {jobType} 注册失败", schedule, jobType);
+                    }
                 }
             }
             _logger.Debug($"===== 注册了 {count} 定时任务 =====");

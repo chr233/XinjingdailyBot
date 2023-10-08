@@ -65,7 +65,6 @@ internal class DispatcherService : IDispatcherService
             }
             else
             {
-
                 await _botClient.UnpinChatMessageAsync(message.Chat.Id, message.MessageId);
             }
         }

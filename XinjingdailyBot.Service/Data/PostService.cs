@@ -372,6 +372,8 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
             bool exists = await Queryable().AnyAsync(x => x.OriginMediaGroupID == mediaGroupId);
             if (!exists)
             {
+                await _botClient.SendChatActionAsync(message, ChatAction.Typing);
+
                 var channelOption = EChannelOption.Normal;
 
                 long channelId = -1, channelMsgId = -1;
