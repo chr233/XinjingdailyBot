@@ -105,7 +105,7 @@ internal class ReviewStatusTask : IJob
                 old.AppendLine($"通过率: <code>{accept}%</code> 审核率: <code>{review}%</code>");
                 old.AppendLine($"#审核统计 [{oldTime:yyyy-MM-dd}]");
 
-                var oldMsg = await _botClient.EditMessageTextAsync(reviewGroup, (int)oldPost.MessageID, old.ToString(), parseMode: ParseMode.Html, replyMarkup: kbd);
+                var oldMsg = await _botClient.EditMessageTextAsync(reviewGroup, (int)oldPost.MessageID, old.ToString(), parseMode: ParseMode.Html);
                 await _botClient.UnpinChatMessageAsync(reviewGroup, oldMsg.MessageId);
 
                 await _reviewStatusService.DeleteReviewStatus(oldPost);
