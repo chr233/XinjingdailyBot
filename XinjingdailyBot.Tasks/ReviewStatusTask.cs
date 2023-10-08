@@ -62,9 +62,9 @@ internal class ReviewStatusTask : IJob
         var reviewRate = todayPost > 0 ? (100 * (todayPost - todayPaddingPost) / todayPost).ToString("f2") : "--";
 
         var sb = new StringBuilder();
-        sb.AppendLine($"[今日审核统计 {now:HH:mm:ss}]");
         sb.AppendLine($"接受 <code>{todayAcceptPost}</code> 拒绝 <code>{todayRejectPost}</code> 待审核 <code>{todayPaddingPost}</code>");
         sb.AppendLine($"通过率: <code>{acceptRate}%</code> 审核率: <code>{reviewRate}%</code>");
+        sb.AppendLine($"#审核统计 [{now:HH:mm:ss}]");
 
         Message? statusMsg = null;
 
@@ -75,19 +75,57 @@ internal class ReviewStatusTask : IJob
 
         if (oldPost != null)
         {
-            try
+            if (oldPost.CreateAt.Day != now.Day) //隔天的统计
             {
-                statusMsg = await _botClient.EditMessageTextAsync(reviewGroup, (int)oldPost.MessageID, sb.ToString(), parseMode: ParseMode.Html, replyMarkup: kbd);
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.StartsWith("Bad Request: message is not modified"))
+                var oldTime = oldPost.CreateAt;
+                var startTime = oldTime.AddHours(-oldTime.Hour).AddMinutes(-oldTime.Minute).AddSeconds(oldTime.Second);
+                var endTime = startTime.AddDays(1);
+
+                var post = await _postService.Queryable()
+                    .Where(x => x.CreateAt >= startTime && x.CreateAt < endTime && x.Status > EPostStatus.Cancel).CountAsync();
+                var acceptPost = await _postService.Queryable()
+                    .Where(x => x.CreateAt >= startTime && x.CreateAt < endTime && x.Status == EPostStatus.Accepted).CountAsync();
+                var rejectPost = await _postService.Queryable()
+                    .Where(x => x.CreateAt >= startTime && x.CreateAt < endTime && x.Status == EPostStatus.Rejected).CountAsync();
+                var paddingPost = await _postService.Queryable()
+                    .Where(x => x.CreateAt >= startTime && x.CreateAt < endTime && x.Status == EPostStatus.Reviewing).CountAsync();
+
+                if (_channelService.HasSecondChannel)
                 {
-                    return;
+                    var acceptSecondPost = await _postService.Queryable()
+                        .Where(x => x.CreateAt >= startTime && x.CreateAt < endTime && x.Status == EPostStatus.AcceptedSecond).CountAsync();
+                    acceptPost += acceptSecondPost;
                 }
-                // 删除旧的消息
-                await _reviewStatusService.DeleteOldReviewStatus();
-                _logger.LogError(ex, "编辑消息失败");
+
+                var accept = post > 0 ? (100 * acceptPost / post).ToString("f2") : "--";
+                var review = post > 0 ? (100 * (post - paddingPost) / post).ToString("f2") : "--";
+
+                var old = new StringBuilder();
+                old.AppendLine($"接受 <code>{acceptPost}</code> 拒绝 <code>{rejectPost}</code> 待审核 <code>{paddingPost}</code>");
+                old.AppendLine($"通过率: <code>{accept}%</code> 审核率: <code>{review}%</code>");
+                old.AppendLine($"#审核统计 [{oldTime:yyyy-MM-dd}]");
+
+                var oldMsg = await _botClient.EditMessageTextAsync(reviewGroup, (int)oldPost.MessageID, old.ToString(), parseMode: ParseMode.Html, replyMarkup: kbd);
+                await _botClient.UnpinChatMessageAsync(reviewGroup, oldMsg.MessageId);
+
+                await _reviewStatusService.DeleteReviewStatus(oldPost);
+            }
+            else // 同一天的统计
+            {
+                try
+                {
+                    statusMsg = await _botClient.EditMessageTextAsync(reviewGroup, (int)oldPost.MessageID, sb.ToString(), parseMode: ParseMode.Html, replyMarkup: kbd);
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message.StartsWith("Bad Request: message is not modified"))
+                    {
+                        return;
+                    }
+                    // 删除旧的消息
+                    await _reviewStatusService.DeleteOldReviewStatus();
+                    _logger.LogError(ex, "编辑消息失败");
+                }
             }
         }
 

@@ -59,7 +59,7 @@ internal sealed class ReviewStatusService : BaseService<ReviewStatus>, IReviewSt
         }
     }
 
-    public async Task CreateNewReviewStatus(Message message)
+    public Task CreateNewReviewStatus(Message message)
     {
         var reviewStatus = new ReviewStatus {
             ChatID = message.Chat.Id,
@@ -69,6 +69,15 @@ internal sealed class ReviewStatusService : BaseService<ReviewStatus>, IReviewSt
             Deleted = false,
         };
 
-        await Insertable(reviewStatus).ExecuteCommandAsync();
+        return Insertable(reviewStatus).ExecuteCommandAsync();
+    }
+
+    public Task DeleteReviewStatus(ReviewStatus reviewStatus)
+    {
+        reviewStatus.Deleted = true;
+        reviewStatus.ModifyAt = DateTime.Now;
+        return Updateable(reviewStatus)
+            .UpdateColumns(static x => new { x.Deleted, x.ModifyAt })
+            .ExecuteCommandAsync();
     }
 }

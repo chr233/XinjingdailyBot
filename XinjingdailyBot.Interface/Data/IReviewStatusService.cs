@@ -6,5 +6,6 @@ public interface IReviewStatusService
 {
     Task CreateNewReviewStatus(Message message);
     Task DeleteOldReviewStatus();
+    Task DeleteReviewStatus(ReviewStatus reviewStatus);
     Task<ReviewStatus?> GetOldReviewStatu();
 }
