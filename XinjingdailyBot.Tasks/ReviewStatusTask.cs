@@ -64,7 +64,7 @@ internal class ReviewStatusTask : IJob
         var sb = new StringBuilder();
         sb.AppendLine($"接受 <code>{todayAcceptPost}</code> 拒绝 <code>{todayRejectPost}</code> 待审核 <code>{todayPaddingPost}</code>");
         sb.AppendLine($"通过率: <code>{acceptRate}%</code> 审核率: <code>{reviewRate}%</code>");
-        sb.AppendLine($"#审核统计 [{now:HH:mm:ss}]");
+        sb.AppendLine($"#审核统计 [更新于 {now:HH:mm:ss}]");
 
         Message? statusMsg = null;
 
@@ -105,10 +105,21 @@ internal class ReviewStatusTask : IJob
                 old.AppendLine($"通过率: <code>{accept}%</code> 审核率: <code>{review}%</code>");
                 old.AppendLine($"#审核统计 [{oldTime:yyyy-MM-dd}]");
 
-                var oldMsg = await _botClient.EditMessageTextAsync(reviewGroup, (int)oldPost.MessageID, old.ToString(), parseMode: ParseMode.Html);
-                await _botClient.UnpinChatMessageAsync(reviewGroup, oldMsg.MessageId);
-
-                await _reviewStatusService.DeleteReviewStatus(oldPost);
+                try
+                {
+                    try
+                    {
+                        var oldMsg = await _botClient.EditMessageTextAsync(reviewGroup, (int)oldPost.MessageID, old.ToString(), parseMode: ParseMode.Html);
+                    }
+                    finally
+                    {
+                        await _botClient.UnpinChatMessageAsync(reviewGroup, (int)oldPost.MessageID);
+                    }
+                }
+                finally
+                {
+                    await _reviewStatusService.DeleteReviewStatus(oldPost);
+                }
             }
             else // 同一天的统计
             {
