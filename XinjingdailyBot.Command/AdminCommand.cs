@@ -1052,7 +1052,7 @@ internal class AdminCommand
         var userAcceptCountRank = await _userService.Queryable()
             .Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
             .OrderByDescending(static x => x.AcceptCount).Take(topCount).ToListAsync();
-        if (userAcceptCountRank?.Count > 0)
+        if (userAcceptCountRank.Count > 0)
         {
             var count = 1;
             foreach (var user in userAcceptCountRank)
@@ -1070,7 +1070,7 @@ internal class AdminCommand
         var adminAcceptCountRank = await _userService.Queryable()
             .Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.AcceptCount > miniumPost && x.ModifyAt >= prev30Days)
             .OrderByDescending(static x => x.AcceptCount).Take(topCount).ToListAsync();
-        if (adminAcceptCountRank?.Count > 0)
+        if (adminAcceptCountRank.Count > 0)
         {
             var count = 1;
             foreach (var user in adminAcceptCountRank)
@@ -1087,7 +1087,7 @@ internal class AdminCommand
         sb.AppendLine("-- 管理员审核数量排名 --");
         var adminReviewCountRank = await _userService.Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.ReviewCount > miniumPost && x.ModifyAt >= prev30Days)
             .OrderByDescending(static x => x.ReviewCount).Take(topCount).ToListAsync();
-        if (adminReviewCountRank?.Count > 0)
+        if (adminReviewCountRank.Count > 0)
         {
             var count = 1;
             foreach (var user in adminReviewCountRank)
