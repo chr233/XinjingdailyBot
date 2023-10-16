@@ -14,7 +14,7 @@ namespace XinjingdailyBot.Tasks;
 /// <summary>
 /// 发布广告
 /// </summary>
-[Job("0 0 9 * * ?")]
+[Job("0 0 10 * * ?")]
 internal class PostAdvertiseTask : IJob
 {
     private readonly ILogger<PostAdvertiseTask> _logger;
@@ -51,6 +51,9 @@ internal class PostAdvertiseTask : IJob
             return;
         }
 
+        //取消置顶旧的广告
+        await _advertisePostService.UnPinOldAdPosts(ad);
+
         var channelService = _serviceProvider.GetRequiredService<IChannelService>();
 
         var operates = new List<(EAdMode, ChatId)>
@@ -75,8 +78,6 @@ internal class PostAdvertiseTask : IJob
 
                 try
                 {
-                    var isFirst = await _advertisePostService.IsFirstAdPost(ad);
-
                     var msgId = await _botClient.CopyMessageAsync(chatId, ad.ChatID, (int)ad.MessageID, disableNotification: true);
 
                     var kbd = _markupHelperService.AdvertiseExternalLinkButton(ad.ExternalLink, ad.ExternalLinkName);
@@ -84,9 +85,6 @@ internal class PostAdvertiseTask : IJob
                     {
                         await _botClient.EditMessageReplyMarkupAsync(chat, msgId.Id, kbd);
                     }
-
-                    //删除旧的广告
-                    await _advertisePostService.DeleteOldAdPosts(ad, chatId);
 
                     var adpost = new AdvertisePosts {
                         AdId = ad.Id,

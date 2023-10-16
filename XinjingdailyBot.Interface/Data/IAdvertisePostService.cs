@@ -12,20 +12,12 @@ public interface IAdvertisePostService : IBaseService<AdvertisePosts>
     /// 删除旧的广告消息
     /// </summary>
     /// <param name="advertises"></param>
-    /// <param name="chatId"></param>
-    /// <returns></returns>
-    Task DeleteOldAdPosts(Advertises advertises, long chatId);
-    /// <summary>
-    /// 删除旧的广告消息
-    /// </summary>
-    /// <param name="advertises"></param>
     /// <returns></returns>
     Task DeleteOldAdPosts(Advertises advertises);
-
     /// <summary>
-    /// 是否为第一次发布
+    /// 取消置顶广告消息
     /// </summary>
     /// <param name="advertises"></param>
     /// <returns></returns>
-    Task<bool> IsFirstAdPost(Advertises advertises);
+    Task UnPinOldAdPosts(Advertises advertises);
 }

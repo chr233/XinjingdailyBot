@@ -19,27 +19,6 @@ internal sealed class AdvertiseService : BaseService<Advertises>, IAdvertiseServ
         _advertisePostService = advertisePostService;
     }
 
-    public async Task DisableExpiredAdvertise()
-    {
-        var ads = await Queryable()
-           .Where(static x => x.Enable)
-           .OrderBy(static x => x.Weight)
-           .ToListAsync();
-
-        var now = DateTime.Now;
-        //检查是否过期
-        foreach (var ad in ads)
-        {
-            if ((ad.MaxShowCount > 0 && ad.ShowCount >= ad.MaxShowCount) ||
-                now >= ad.ExpiredAt || ad.Weight == 0)
-            {
-                ad.Enable = false;
-                await Updateable(ad).UpdateColumns(static x => new { x.Enable }).ExecuteCommandAsync();
-                await _advertisePostService.DeleteOldAdPosts(ad);
-            }
-        }
-    }
-
     public async Task<Advertises?> GetPostableAdvertise()
     {
         var ads = await Queryable()
@@ -56,6 +35,7 @@ internal sealed class AdvertiseService : BaseService<Advertises>, IAdvertiseServ
             {
                 ad.Enable = false;
                 await Updateable(ad).UpdateColumns(static x => new { x.Enable }).ExecuteCommandAsync();
+                //删除过期广告
                 await _advertisePostService.DeleteOldAdPosts(ad);
             }
         }
