@@ -52,37 +52,31 @@ internal sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdve
         }
     }
 
-    public async Task DeleteOldAdPosts(Advertises advertises, long chatId)
+    public async Task UnPinOldAdPosts(Advertises advertises)
     {
         var oldPosts = await Queryable()
-            .Where(x => x.AdId == advertises.Id && x.ChatID == chatId && !x.Deleted)
+            .Where(x => x.AdId == advertises.Id && x.Pined)
             .ToListAsync();
 
         foreach (var oldPost in oldPosts)
         {
             try
             {
-                await _botClient.DeleteMessageAsync(oldPost.ChatID, (int)oldPost.MessageID);
+                await _botClient.UnpinChatMessageAsync(oldPost.ChatID, (int)oldPost.MessageID);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "删除消息失败");
+                _logger.LogError(ex, "取消置顶消息失败");
                 await Task.Delay(500);
             }
             finally
             {
-                oldPost.Deleted = true;
+                oldPost.Pined = false;
                 oldPost.ModifyAt = DateTime.Now;
                 await Updateable(oldPost)
-                    .UpdateColumns(static x => new { x.Deleted, x.ModifyAt })
+                    .UpdateColumns(static x => new { x.Pined, x.ModifyAt })
                     .ExecuteCommandAsync();
             }
         }
-    }
-
-    public async Task<bool> IsFirstAdPost(Advertises advertises)
-    {
-        var post = await Queryable().Where(x => x.AdId == advertises.Id).FirstAsync();
-        return post == null;
     }
 }
