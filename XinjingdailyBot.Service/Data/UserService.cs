@@ -148,7 +148,14 @@ internal sealed class UserService : BaseService<Users>, IUserService
 
         if (autoLeave)
         {
-            await _botClient.LeaveChatAsync(msgChat.Id);
+            try
+            {
+                await _botClient.LeaveChatAsync(msgChat.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "退出群组失败");
+            }
         }
     }
 
