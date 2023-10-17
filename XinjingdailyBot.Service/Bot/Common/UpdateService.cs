@@ -27,6 +27,8 @@ internal class UpdateService : IUpdateService
         _dispatcherService = dispatcherService;
     }
 
+    private int LastUpdateId { get; set; } = 0;
+
     public async Task HandleUpdateAsync(ITelegramBotClient _, Update update, CancellationToken cancellationToken)
     {
         _logger.LogUpdate(update);
@@ -38,6 +40,14 @@ internal class UpdateService : IUpdateService
             _logger.LogWarning("User not found in database");
             return;
         }
+
+        if (LastUpdateId == update.Id)
+        {
+            _logger.LogWarning("检测到处理重复的 Update 跳过执行 {update}", update);
+            return;
+        }
+
+        LastUpdateId = update.Id;
 
         var handler = update.Type switch {
             UpdateType.ChannelPost => _dispatcherService.OnChannalPostReceived(dbUser, update.ChannelPost!),
