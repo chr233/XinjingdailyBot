@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using SqlSugar;
 using System.Net;
 using System.Text;
@@ -20,6 +21,7 @@ namespace XinjingdailyBot.Command;
 [AppService(LifeTime.Scoped)]
 internal class NormalCommand
 {
+    private readonly ILogger<NormalCommand> _logger;
     private readonly ITelegramBotClient _botClient;
     private readonly IUserService _userService;
     private readonly GroupRepository _groupRepository;
@@ -31,6 +33,7 @@ internal class NormalCommand
     private readonly IMediaGroupService _mediaGroupService;
 
     public NormalCommand(
+        ILogger<NormalCommand> logger,
         ITelegramBotClient botClient,
         IUserService userService,
         GroupRepository groupRepository,
@@ -41,6 +44,7 @@ internal class NormalCommand
         IHttpHelperService httpHelperService,
         IMediaGroupService mediaGroupService)
     {
+        _logger = logger;
         _botClient = botClient;
         _userService = userService;
         _groupRepository = groupRepository;
@@ -182,7 +186,7 @@ internal class NormalCommand
     /// <param name="message"></param>
     /// <returns></returns>
     [TextCmd("ADMIN", EUserRights.NormalCmd, Description = "艾特群管理")]
-    public async Task ResponseCallAdmins(Message message)
+    public async Task ResponseCallAdmins(Users dbUser, Message message)
     {
         var sb = new StringBuilder();
 
@@ -204,7 +208,20 @@ internal class NormalCommand
             }
         }
 
-        await _botClient.SendCommandReply(sb.ToString(), message);
+        sb.AppendLine($"用户 {dbUser} 呼叫群管理");
+
+        var msg = await _botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
+
+        await Task.Delay(2000);
+
+        try
+        {
+            await _botClient.EditMessageTextAsync(msg, $"用户 {dbUser} 呼叫群管理", ParseMode.Html);
+        }
+        catch (Exception)
+        {
+            _logger.LogWarning("编辑消息失败");
+        }
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using System;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -36,6 +37,9 @@ public static class LoggerExtensions
             case UpdateType.InlineQuery:
                 logger.LogInlineQuery(update.InlineQuery!);
                 break;
+            case UpdateType.MyChatMember:
+                logger.LogMyChatMember(update.MyChatMember!);
+                break;
             default:
                 logger.LogDebug("U 未知消息 {Type}", update.Type);
                 break;
@@ -72,12 +76,12 @@ public static class LoggerExtensions
         var chat = message.Chat;
 
         string chatFrom = chat.Type switch {
-            ChatType.Private => $"【私聊|{chat.FirstName}{chat.LastName}】",
-            ChatType.Group => $"【群组|{chat.Title}】",
-            ChatType.Channel => $"【频道|{chat.Title}】",
-            ChatType.Supergroup => $"【群组|{chat.Title}】",
-            ChatType.Sender => $"【发送者|{chat.Title}】",
-            _ => $"【未知|{chat.Title}】",
+            ChatType.Private => $"[私聊|{chat.FirstName}{chat.LastName}]",
+            ChatType.Group => $"[群组|{chat.Title}]",
+            ChatType.Channel => $"[频道|{chat.Title}]",
+            ChatType.Supergroup => $"[群组|{chat.Title}]",
+            ChatType.Sender => $"[发送者|{chat.Title}]",
+            _ => $"[未知|{chat.Title}]",
         };
 
         string user = message.From?.UserToString() ?? "未知";
@@ -93,7 +97,7 @@ public static class LoggerExtensions
     public static void LogCallbackQuery(this ILogger logger, CallbackQuery callbackQuery)
     {
         string user = callbackQuery.From.UserToString();
-        logger.LogInformation("【回调|{Id}】 {user} {Data}", callbackQuery.Id, user, callbackQuery.Data);
+        logger.LogInformation("[回调|{Id}] {user} {Data}", callbackQuery.Id, user, callbackQuery.Data);
     }
 
     /// <summary>
@@ -104,6 +108,52 @@ public static class LoggerExtensions
     public static void LogInlineQuery(this ILogger logger, InlineQuery inlineQuery)
     {
         string user = inlineQuery.From.UserToString();
-        logger.LogDebug("【查询|{Id}】 {user} {Data}", inlineQuery.Id, user, inlineQuery.Query);
+        logger.LogDebug("[查询|{Id}] {user} {Data}", inlineQuery.Id, user, inlineQuery.Query);
+    }
+
+    /// <summary>
+    /// 输出MyChatMember
+    /// </summary>
+    /// <param name="logger"></param>
+    /// <param name="chatMemberUpdated"></param>
+    public static void LogMyChatMember(this ILogger logger, ChatMemberUpdated chatMemberUpdated)
+    {
+        var chat = chatMemberUpdated.Chat;
+        string chatFrom = chat.Type switch {
+            ChatType.Private => $"[私聊|{chat.FirstName}{chat.LastName}]",
+            ChatType.Group => $"[群组|{chat.Title}]",
+            ChatType.Channel => $"[频道|{chat.Title}]",
+            ChatType.Supergroup => $"[群组|{chat.Title}]",
+            ChatType.Sender => $"[发送者|{chat.Title}]",
+            _ => $"[未知|{chat.Title}]",
+        };
+
+        var op = chatMemberUpdated.From.UserToString();
+        var user = chatMemberUpdated.NewChatMember.User.UserToString();
+
+        var oldAction = chatMemberUpdated.OldChatMember.GetMemberAction();
+        var newAction = chatMemberUpdated.NewChatMember.GetMemberAction();
+
+        if (op != user)
+        {
+            logger.LogDebug("[成员变更] {chatFrom} 用户 {op} 设置 {user} {old}->{new}", chatFrom, op, user, oldAction, newAction);
+        }
+        else
+        {
+            logger.LogDebug("[成员变更] {chatFrom} 用户 {user} {old}->{new}", chatFrom, user, oldAction, newAction);
+        }
+    }
+
+    private static string GetMemberAction(this ChatMember chatMember)
+    {
+        return chatMember.Status switch {
+            ChatMemberStatus.Creator => "所有者",
+            ChatMemberStatus.Administrator => "管理员",
+            ChatMemberStatus.Member => "普通成员",
+            ChatMemberStatus.Left => "退出",
+            ChatMemberStatus.Kicked => "被踢出",
+            ChatMemberStatus.Restricted => "被限制",
+            _ => "未知",
+        };
     }
 }
