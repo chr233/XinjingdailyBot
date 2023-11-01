@@ -5,10 +5,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SqlSugar.IOC" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<ProjectReference Include="..\XinjingdailyBot.Infrastructure\XinjingdailyBot.Infrastructure.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Model\XinjingdailyBot.Model.csproj" />
 	</ItemGroup>
