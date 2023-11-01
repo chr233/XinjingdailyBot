@@ -206,7 +206,7 @@ internal class CommandHandler : ICommandHandler
                             await Task.Delay(TimeSpan.FromSeconds(30));
                             try
                             {
-                                await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+                                await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
                             }
                             catch
                             {

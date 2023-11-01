@@ -28,7 +28,7 @@ public static class BotClientExtension
         ParseMode? parsemode = null,
         CancellationToken cancellationToken = default)
     {
-        return botClient.SendTextMessageAsync(message.Chat.Id, text, parseMode: parsemode, replyToMessageId: message.MessageId, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
+        return botClient.SendTextMessageAsync(message.Chat, text, parseMode: parsemode, replyToMessageId: message.MessageId, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
     }
 
     /// <summary>
@@ -64,7 +64,7 @@ public static class BotClientExtension
         InlineKeyboardMarkup? replyMarkup = default,
         CancellationToken cancellationToken = default)
     {
-        return botClient.EditMessageReplyMarkupAsync(message.Chat.Id, message.MessageId, replyMarkup, cancellationToken: cancellationToken);
+        return botClient.EditMessageReplyMarkupAsync(message.Chat, message.MessageId, replyMarkup, cancellationToken: cancellationToken);
     }
 
     /// <summary>
@@ -79,7 +79,7 @@ public static class BotClientExtension
         Message message,
         CancellationToken cancellationToken = default)
     {
-        return botClient.EditMessageReplyMarkupAsync(message.Chat.Id, message.MessageId, null, cancellationToken: cancellationToken);
+        return botClient.EditMessageReplyMarkupAsync(message.Chat, message.MessageId, null, cancellationToken: cancellationToken);
     }
 
     /// <summary>
@@ -103,7 +103,7 @@ public static class BotClientExtension
 
         CancellationToken cancellationToken = default)
     {
-        return botClient.EditMessageTextAsync(message.Chat.Id, message.MessageId, text, parseMode: parseMode, disableWebPagePreview: disableWebPagePreview, replyMarkup: replyMarkup, cancellationToken: cancellationToken);
+        return botClient.EditMessageTextAsync(message.Chat, message.MessageId, text, parseMode: parseMode, disableWebPagePreview: disableWebPagePreview, replyMarkup: replyMarkup, cancellationToken: cancellationToken);
     }
 
     /// <summary>
@@ -129,7 +129,7 @@ public static class BotClientExtension
         //私聊始终不删除消息, 群聊中默认删除消息, 但可以指定不删除
         bool delete = (autoDelete != null ? autoDelete.Value : (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup)) && message.Chat.Type != ChatType.Private;
 
-        var msg = await botClient.SendTextMessageAsync(message.Chat.Id, text, parseMode: parsemode, replyToMessageId: message.MessageId, replyMarkup: replyMarkup, disableWebPagePreview: true, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
+        var msg = await botClient.SendTextMessageAsync(message.Chat, text, parseMode: parsemode, replyToMessageId: message.MessageId, replyMarkup: replyMarkup, disableWebPagePreview: true, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
 
         if (delete)
         {
@@ -137,7 +137,7 @@ public static class BotClientExtension
                 await Task.Delay(TimeSpan.FromSeconds(30));
                 try
                 {
-                    await botClient.DeleteMessageAsync(msg.Chat.Id, msg.MessageId, cancellationToken);
+                    await botClient.DeleteMessageAsync(msg.Chat, msg.MessageId, cancellationToken);
                 }
                 catch
                 {

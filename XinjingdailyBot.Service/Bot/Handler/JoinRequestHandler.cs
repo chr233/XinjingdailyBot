@@ -27,7 +27,7 @@ internal class JoinRequestHandler : IJoinRequestHandler
         {
             try
             {
-                await _botClient.ApproveChatJoinRequest(request.Chat.Id, dbUser.UserID);
+                await _botClient.ApproveChatJoinRequest(request.Chat, dbUser.UserID);
 
                 _logger.LogInformation("自动通过了 {user} 的加群请求", dbUser);
 
