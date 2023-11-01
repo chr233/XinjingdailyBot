@@ -221,7 +221,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
                 return;
         }
 
-        var actionMsg = await _botClient.SendTextMessageAsync(message.Chat.Id, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+        var actionMsg = await _botClient.SendTextMessageAsync(message.Chat, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
         //修改数据库实体
         newPost.OriginChatID = message.Chat.Id;
@@ -320,7 +320,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
                 return;
         }
 
-        var actionMsg = await _botClient.SendTextMessageAsync(message.Chat.Id, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+        var actionMsg = await _botClient.SendTextMessageAsync(message.Chat, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
         //修改数据库实体
         newPost.OriginChatID = message.Chat.Id;
@@ -409,7 +409,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
                     _markupHelperService.PostKeyboard(anonymous);
                 string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
-                var actionMsg = await _botClient.SendTextMessageAsync(message.Chat.Id, "处理中, 请稍后", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
+                var actionMsg = await _botClient.SendTextMessageAsync(message.Chat, "处理中, 请稍后", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
 
                 //生成数据库实体
                 var newPost = new NewPosts {
@@ -882,14 +882,14 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
                 string? warnText = _tagRepository.GetActivedTagWarnings(post.Tags);
                 if (!string.IsNullOrEmpty(warnText))
                 {
-                    var warnMsg = await _botClient.SendTextMessageAsync(_channelService.AcceptChannel, warnText, allowSendingWithoutReply: true);
+                    var warnMsg = await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, warnText, allowSendingWithoutReply: true);
                     post.WarnTextID = warnMsg.MessageId;
                 }
 
                 Message? postMessage = null;
                 if (post.PostType == MessageType.Text)
                 {
-                    postMessage = await _botClient.SendTextMessageAsync(_channelService.AcceptChannel, postText, parseMode: ParseMode.Html, disableWebPagePreview: true);
+                    postMessage = await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, postText, parseMode: ParseMode.Html, disableWebPagePreview: true);
                 }
                 else
                 {
@@ -897,12 +897,12 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
 
                     var inputFile = new InputFileId(attachment.FileID);
                     var handler = post.PostType switch {
-                        MessageType.Photo => _botClient.SendPhotoAsync(_channelService.AcceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
-                        MessageType.Audio => _botClient.SendAudioAsync(_channelService.AcceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, title: attachment.FileName),
-                        MessageType.Video => _botClient.SendVideoAsync(_channelService.AcceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
-                        MessageType.Voice => _botClient.SendVoiceAsync(_channelService.AcceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html),
-                        MessageType.Document => _botClient.SendDocumentAsync(_channelService.AcceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html),
-                        MessageType.Animation => _botClient.SendAnimationAsync(_channelService.AcceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Photo => _botClient.SendPhotoAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Audio => _botClient.SendAudioAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, title: attachment.FileName),
+                        MessageType.Video => _botClient.SendVideoAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Voice => _botClient.SendVoiceAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html),
+                        MessageType.Document => _botClient.SendDocumentAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html),
+                        MessageType.Animation => _botClient.SendAnimationAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
                         _ => null,
                     };
 

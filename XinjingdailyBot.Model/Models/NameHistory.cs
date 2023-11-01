@@ -7,7 +7,7 @@ namespace XinjingdailyBot.Model.Models;
 /// <summary>
 /// 用户曾用名记录
 /// </summary>
-[SugarTable("name_history", TableDescription = "等级组")]
+[SugarTable("name_history", TableDescription = "用户名历史记录")]
 public sealed record NameHistory : BaseModel, ICreateAt
 {
     /// <summary>

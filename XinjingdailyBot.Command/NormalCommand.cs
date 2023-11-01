@@ -183,6 +183,7 @@ internal class NormalCommand
     /// <summary>
     /// 艾特群管理
     /// </summary>
+    /// <param name="dbUser"></param>
     /// <param name="message"></param>
     /// <returns></returns>
     [TextCmd("ADMIN", EUserRights.NormalCmd, Description = "艾特群管理")]

@@ -362,7 +362,7 @@ internal sealed class UserService : BaseService<Users>, IUserService
         }
         else //缓存中没有该用户, 更新缓存
         {
-            var admins = await _botClient.GetChatAdministratorsAsync(message.Chat.Id);
+            var admins = await _botClient.GetChatAdministratorsAsync(message.Chat);
             if (admins == null)
             {
                 return null;
