@@ -1,26 +1,14 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.OpenApi" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
-		<PackageReference Include="Microsoft.Extensions.Http" />
-		<PackageReference Include="Microsoft.Extensions.Logging" />
-		<PackageReference Include="MySql.Data" />
-		<PackageReference Include="NLog" />
 		<PackageReference Include="NLog.Extensions.Logging" />
-		<PackageReference Include="NLog.Web.AspNetCore" />
-		<PackageReference Include="Quartz" />
 		<PackageReference Include="Quartz.AspNetCore" />
-		<PackageReference Include="SqlSugar.IOC" />
-		<PackageReference Include="SqlSugarCore" />
 		<PackageReference Include="Swashbuckle.AspNetCore" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
-		<PackageReference Include="Telegram.Bot" />
 	</ItemGroup>
 
 	<ItemGroup>
