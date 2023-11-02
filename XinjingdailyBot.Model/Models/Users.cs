@@ -124,11 +124,11 @@ public sealed record Users : BaseModel, IModifyAt, ICreateAt
     {
         if (string.IsNullOrEmpty(UserName))
         {
-            return $"{FullName}(#{UserID})";
+            return $"{FullName}(#{UserID})".EscapeHtml();
         }
         else
         {
-            return $"{FullName}(@{UserName})";
+            return $"{FullName}(@{UserName})".EscapeHtml();
         }
     }
 

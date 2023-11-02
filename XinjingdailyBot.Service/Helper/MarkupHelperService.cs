@@ -539,16 +539,32 @@ internal sealed class MarkupHelperService : IMarkupHelperService
         return line.Any() ? new InlineKeyboardMarkup(new[] { line }) : null;
     }
 
-    public InlineKeyboardMarkup ReviewStatusButton()
+    public InlineKeyboardMarkup ReviewStatusButton(NewPosts? post)
     {
-        var keyboard = new InlineKeyboardMarkup(new[]
+        InlineKeyboardMarkup keyboard;
+        if (post != null)
         {
-            new[]
-            {
-                InlineKeyboardButton.WithCallbackData("今日最早未审核稿件", $"cmd -1 gotolatest"),
-            },
-        });
+            var chatId = Math.Abs(post.ReviewChatID + 1000000000000);
+            var link = $"https://t.me/c/{chatId}/{post.ReviewMsgID}";
 
+            keyboard = new InlineKeyboardMarkup(new[]
+            {
+                new[]
+                {
+                    InlineKeyboardButton.WithUrl($"前往稿件 {post.Id}", link),
+                },
+            });
+        }
+        else
+        {
+            keyboard = new InlineKeyboardMarkup(new[]
+            {
+                new[]
+                {
+                    InlineKeyboardButton.WithCallbackData("无待审核稿件", $"cmd -1 say 无待审核稿件"),
+                },
+            });
+        }
         return keyboard;
     }
 }

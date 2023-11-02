@@ -94,7 +94,12 @@ public interface IMarkupHelperService
     /// </summary>
     /// <returns></returns>
     InlineKeyboardMarkup ReviewKeyboardB();
-    InlineKeyboardMarkup ReviewStatusButton();
+    /// <summary>
+    /// 获取指向今日最早未审核稿件的链接
+    /// </summary>
+    /// <param name="post"></param>
+    /// <returns></returns>
+    InlineKeyboardMarkup ReviewStatusButton(NewPosts? post);
 
     /// <summary>
     /// 频道选项键盘

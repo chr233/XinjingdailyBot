@@ -39,5 +39,9 @@ public interface ICommandHandler
     /// <param name="query"></param>
     /// <returns></returns>
     Task OnQueryCommandReceived(Users dbUser, CallbackQuery query);
+    /// <summary>
+    /// 清除机器人命令
+    /// </summary>
+    /// <returns></returns>
     Task<bool> ClearCommandsMenu();
 }

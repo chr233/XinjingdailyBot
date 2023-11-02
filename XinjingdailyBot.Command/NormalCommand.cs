@@ -189,16 +189,14 @@ internal class NormalCommand
     [TextCmd("ADMIN", EUserRights.NormalCmd, Description = "艾特群管理")]
     public async Task ResponseCallAdmins(Users dbUser, Message message)
     {
-        var sb = new StringBuilder();
-
         if (message.Chat.Type != ChatType.Group && message.Chat.Type != ChatType.Supergroup)
         {
-            sb.AppendLine("该命令仅在群组内有效");
+            await _botClient.SendCommandReply("该命令仅在群组内有效", message, false, ParseMode.Html);
         }
         else
         {
+            var sb = new StringBuilder();
             var admins = await _botClient.GetChatAdministratorsAsync(message.Chat.Id);
-
             foreach (var menber in admins)
             {
                 var admin = menber.User;
@@ -207,21 +205,18 @@ internal class NormalCommand
                     sb.AppendLine($"@{admin.Username}");
                 }
             }
-        }
 
-        sb.AppendLine($"用户 {dbUser} 呼叫群管理");
+            var msg = await _botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
+            await Task.Delay(2000);
 
-        var msg = await _botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
-
-        await Task.Delay(2000);
-
-        try
-        {
-            await _botClient.EditMessageTextAsync(msg, $"用户 {dbUser} 呼叫群管理", ParseMode.Html);
-        }
-        catch (Exception)
-        {
-            _logger.LogWarning("编辑消息失败");
+            try
+            {
+                await _botClient.EditMessageTextAsync(msg, $"用户 {dbUser} 呼叫群管理", ParseMode.Html);
+            }
+            catch (Exception)
+            {
+                _logger.LogWarning("编辑消息失败");
+            }
         }
     }
 

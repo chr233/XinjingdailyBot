@@ -71,7 +71,9 @@ internal class ReviewStatusTask : IJob
         var oldPost = await _reviewStatusService.GetOldReviewStatu();
 
         var reviewGroup = _channelService.ReviewGroup;
-        var kbd = _markupHelperService.ReviewStatusButton();
+
+        var newestPost = await _postService.GetLatestReviewingPostLink();
+        var kbd = _markupHelperService.ReviewStatusButton(newestPost);
 
         if (oldPost != null)
         {
