@@ -44,6 +44,10 @@ public interface IPostService : IBaseService<NewPosts>
     /// <param name="message"></param>
     /// <returns></returns>
     Task<NewPosts?> FetchPostFromReplyToMessage(Message message);
+    /// <summary>
+    /// 获取最新未审核稿件
+    /// </summary>
+    /// <returns></returns>
     Task<NewPosts?> GetLatestReviewingPostLink();
 
     /// <summary>

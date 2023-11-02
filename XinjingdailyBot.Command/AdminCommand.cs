@@ -530,6 +530,7 @@ internal class AdminCommand
         }
         else
         {
+            sb.AppendLine("投稿机器人封禁状态:");
             var records = await _banRecordService.Queryable()
                 .Where(x => x.UserID == targetUser.UserID)
                 .OrderByDescending(static x => new { x.BanTime }).ToListAsync();
@@ -583,6 +584,19 @@ internal class AdminCommand
                     sb.AppendLine($"在 <code>{date}</code> 因为 <code>{record.Reason}</code> 被 <code>{admin}</code> {operate}");
                 }
             }
+
+            sb.AppendLine();
+            sb.AppendLine("频道和群组封禁状态:");
+            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(_channelService.AcceptChannel, targetUser.UserID));
+            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(_channelService.RejectChannel, targetUser.UserID));
+            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(_channelService.CommentGroup, targetUser.UserID));
+            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(_channelService.SubGroup, targetUser.UserID));
+            if (_channelService.HasSecondChannel)
+            {
+                sb.AppendLine(await _botClient.GetChatMemberStatusAsync(_channelService.SecondChannel, targetUser.UserID));
+                sb.AppendLine(await _botClient.GetChatMemberStatusAsync(_channelService.SecondCommentGroup, targetUser.UserID));
+            }
+
         }
 
         await _botClient.SendCommandReply(sb.ToString(), message, false, parsemode: ParseMode.Html);
@@ -1695,5 +1709,41 @@ internal class AdminCommand
         {
             await _botClient.AutoReplyAsync("今天没有未审核的稿件", callbackQuery, false);
         }
+    }
+
+    //TODO
+    //[TextCmd("RECENTMESSAGE", EUserRights.AdminCmd, Description = "查询最近发言", Alias = "RECENTMSG")]
+    public async Task ResponseRecentMessage(Message message, string[] args)
+    {
+        async Task<string> exec()
+        {
+            var targetUser = await _userService.FetchTargetUser(message);
+
+            if (targetUser == null)
+            {
+                if (args.Any())
+                {
+                    targetUser = await _userService.FetchUserByUserNameOrUserID(args.First());
+                }
+            }
+
+            if (targetUser == null)
+            {
+                return "找不到指定用户";
+            }
+
+            if (targetUser.Id == _channelService.BotUser.Id)
+            {
+                return "无法查询当前机器人的发言";
+            }
+
+            var sb = new StringBuilder();
+
+
+            return sb.ToString();
+        }
+
+        var text = await exec();
+        await _botClient.SendCommandReply(text, message, false, parsemode: ParseMode.Html);
     }
 }

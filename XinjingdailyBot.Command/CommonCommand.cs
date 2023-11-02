@@ -7,6 +7,7 @@ using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
+using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
@@ -25,19 +26,22 @@ internal class CommonCommand
     private readonly IBanRecordService _banRecordService;
     private readonly ITextHelperService _textHelperService;
     private readonly ICommandHandler _commandHandler;
+    private readonly IChannelService _channelService;
 
     public CommonCommand(
         ITelegramBotClient botClient,
         IOptions<OptionsSetting> options,
         IBanRecordService banRecordService,
         ITextHelperService textHelperService,
-        ICommandHandler commandHandler)
+        ICommandHandler commandHandler,
+        IChannelService channelService)
     {
         _botClient = botClient;
         _optionsSetting = options.Value;
         _banRecordService = banRecordService;
         _textHelperService = textHelperService;
         _commandHandler = commandHandler;
+        _channelService = channelService;
     }
 
     /// <inheritdoc cref="IBanRecordService.WarnDuration"/>
@@ -151,6 +155,7 @@ internal class CommonCommand
 
         var sb = new StringBuilder();
 
+        sb.AppendLine("投稿机器人封禁状态:");
         string status = dbUser.IsBan ? "已封禁" : "正常";
         sb.AppendLine($"用户名: <code>{dbUser.EscapedFullName()}</code>");
         sb.AppendLine($"用户ID: <code>{dbUser.UserID}</code>");
@@ -180,7 +185,7 @@ internal class CommonCommand
                     EBanType.GlobalUnBan => "撤销全局封禁",
                     _ => "其他",
                 };
-                sb.AppendLine($"在 <code>{date}</code> 因为 <code>{record.Reason}</code> 被{operate}");
+                sb.AppendLine($"在 <code>{date}</code> 因为 <code>{record.Reason}</code> 被 {operate}");
                 if (record.Type == EBanType.UnBan || record.Type == EBanType.Ban)
                 {
                     sb.AppendLine();
@@ -188,6 +193,19 @@ internal class CommonCommand
             }
         }
         sb.AppendLine("\n仅显示90天内的警告记录");
+
+        sb.AppendLine();
+        sb.AppendLine("频道和群组封禁状态:");
+        sb.AppendLine(await _botClient.GetChatMemberStatusAsync(_channelService.AcceptChannel, dbUser.UserID));
+        sb.AppendLine(await _botClient.GetChatMemberStatusAsync(_channelService.RejectChannel, dbUser.UserID));
+        sb.AppendLine(await _botClient.GetChatMemberStatusAsync(_channelService.CommentGroup, dbUser.UserID));
+        sb.AppendLine(await _botClient.GetChatMemberStatusAsync(_channelService.SubGroup, dbUser.UserID));
+
+        if (_channelService.HasSecondChannel)
+        {
+            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(_channelService.SecondChannel, dbUser.UserID));
+            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(_channelService.SecondCommentGroup, dbUser.UserID));
+        }
 
         await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
     }

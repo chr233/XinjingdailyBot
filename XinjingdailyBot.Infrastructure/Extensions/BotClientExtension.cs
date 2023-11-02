@@ -149,6 +149,14 @@ public static class BotClientExtension
         return msg;
     }
 
+    /// <summary>
+    /// 发送会话状态
+    /// </summary>
+    /// <param name="botClient"></param>
+    /// <param name="message"></param>
+    /// <param name="chatAction"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public static Task SendChatActionAsync(
         this ITelegramBotClient botClient,
         Message message,
@@ -164,5 +172,49 @@ public static class BotClientExtension
             _logger.Error(ex, "SendChatAction出错");
             return Task.CompletedTask;
         }
+    }
+
+    /// <summary>
+    /// 获取群成员状态
+    /// </summary>
+    /// <param name="botClient"></param>
+    /// <param name="chat"></param>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    public static async Task<string> GetChatMemberStatusAsync(
+        this ITelegramBotClient botClient,
+        Chat? chat,
+        long userId)
+    {
+        string title = chat?.Title?.EscapeHtml() ?? "未设置群组";
+
+        string status;
+        if (chat != null)
+        {
+            try
+            {
+                var chatMember = await botClient.GetChatMemberAsync(chat, userId);
+                status = chatMember.Status switch {
+                    ChatMemberStatus.Creator or
+                    ChatMemberStatus.Administrator or
+                    ChatMemberStatus.Member or
+                    ChatMemberStatus.Left => "正常",
+                    ChatMemberStatus.Kicked => "封禁",
+                    ChatMemberStatus.Restricted => "受限",
+                    _ => "未知",
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "读取用户状态出错");
+                status = "出错";
+            }
+        }
+        else
+        {
+            status = "---";
+        }
+
+        return string.Format("{0}: {1}", title, status);
     }
 }

@@ -17,15 +17,12 @@ namespace XinjingdailyBot.Service.Helper;
 [AppService(typeof(ITextHelperService), LifeTime.Transient)]
 internal sealed class TextHelperService : ITextHelperService
 {
-    private readonly IChannelService _channelService;
     private readonly TagRepository _tagRepository;
 
     public TextHelperService(
-        IChannelService channelService,
         IOptions<OptionsSetting> options,
         TagRepository tagRepository)
     {
-        _channelService = channelService;
         _tagRepository = tagRepository;
 
         var postOption = options.Value.Post;
