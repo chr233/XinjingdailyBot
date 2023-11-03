@@ -1,4 +1,5 @@
 using SqlSugar;
+using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
