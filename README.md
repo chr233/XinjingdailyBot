@@ -74,20 +74,27 @@
 
   // 调试模式
   "Debug": false,
+  // Swagger
+  "Swagger": true,
+  "Statistic": true,
   // 机器人设置
   "Bot": {
     "BotToken": "",
     "Proxy": null,
     "ThrowPendingUpdates": false,
     "AutoLeaveOtherGroup": false,
-    "SuperAdmins": []
+    "SuperAdmins": [],
+    "EnablePlanPost": false,
+    "PostSecondMenu": true
   },
   "Channel": {
     "ReviewGroup": "",
     "CommentGroup": "",
     "SubGroup": "",
     "AcceptChannel": "",
-    "RejectChannel": ""
+    "RejectChannel": "",
+    "SecondChannel": "",
+    "SecondCommentGroup": ""
   },
   // 消息设置
   "Message": {
@@ -117,48 +124,78 @@
     "PureHashTag": true,
     "PureWords": "",
     "PostExpiredTime": 3
+  },
+  // IpInfo设置
+  "IpInfo": {
+    "Token": ""
+  },
+  // 计划任务
+  "Schedule": {
+    "Cron": {
+      // 处理过期稿件
+      "ExpiredPostTask": "0 0 0 * * ?",
+      // 定时发布广告
+      "PostAdvertiseTask": "0 0 9 * * ?",
+      // 拒绝频道定时置顶
+      "RejectChannelTask": "0 0 0 * * ?",
+      // 已排期稿件定时发布
+      "PlanedPostsTask": "0 0 0 * * ?",
+      // 定时更新审核群审核状态
+      "ReviewStatusTask": "0,30 * * * * ?"
+    }
   }
 }
 ```
 
-|     节     |        配置项         |   类型   |                     默认值                     | 必须 | 说明                                     |
-| :--------: | :-------------------: | :------: | :--------------------------------------------: | :--: | ---------------------------------------- |
-|     无     |        `Debug`        |  `bool`  |                    `false`                     |      | 是否开启调试模式                         |
-|     -      |           -           |    -     |                       -                        |  -   |                                          |
-|   `Bot`    |      `BotToken`       | `string` |                                                |  ✔️  | 机器人 Token                             |
-|   `Bot`    |        `Proxy`        | `string` |                     `null`                     |      | 代理地址, 支持 http 和 sock5             |
-|   `Bot`    | `ThrowPendingUpdates` |  `bool`  |                    `false`                     |      | 启动时是否忽略机器人离线时产生的 Update  |
-|   `Bot`    | `AutoLeaveOtherGroup` |  `bool`  |                    `false`                     |      | 是否自动离开无关群组                     |
-|   `Bot`    |     `SuperAdmins`     | `int[]`  |                       []                       |      | 超级管理员 数字 ID 列表                  |
-|     -      |           -           |    -     |                       -                        |  -   |                                          |
-| `Channel`  |     `ReviewGroup`     | `string` |                                                |      | 审核群组 ID                              |
-| `Channel`  |    `CommentGroup`     | `string` |                                                |      | 评论群组 ID                              |
-| `Channel`  |      `SubGroup`       | `string` |                                                |      | 闲聊群组 ID                              |
-| `Channel`  |    `AcceptChannel`    | `string` |                                                |  ✔️  | 审核通过频道 ID                          |
-| `Channel`  |    `RejectChannel`    | `string` |                                                |  ✔️  | 审核拒绝频道 ID                          |
-|     -      |           -           |    -     |                       -                        |  -   |                                          |
-| `Message`  |        `Start`        | `string` | "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人" |      | 使用 /start 命令显示的欢迎语             |
-| `Message`  |        `Help`         | `string` |      "发送图片/视频或者文字内容即可投稿"       |      | 使用 /help 命令显示语句                  |
-|     -      |           -           |    -     |                       -                        |  -   |                                          |
-| `Database` |      `Generate`       |  `bool`  |                     `true`                     |      | 是否自动生成数据库表                     |
-| `Database` |      `UseMySQL`       |  `bool`  |                     `true`                     |      | 是否使用 MySQL 作为数据库实现            |
-| `Database` |       `LogSQL`        |  `bool`  |                    `false`                     |      | 是否输出 SQL 日志                        |
-| `Database` |       `DBHost`        | `string` |                 `"127.0.0.1"`                  |      | MySQL 主机                               |
-| `Database` |       `DBPort`        |  `int`   |                     `3306`                     |      | MySQL 端口                               |
-| `Database` |       `DBName`        | `string` |                   `"xjb_db"`                   |      | 数据库名                                 |
-| `Database` |       `DBUser`        | `string` |                    `"root"`                    |      | 数据库用户名                             |
-| `Database` |     `DBPassword`      | `string` |                   `"123456"`                   |      | 数据库密码                               |
-|     -      |           -           |    -     |                       -                        |  -   |                                          |
-|   `Post`   |   `EnablePostLimit`   |  `bool`  |                    `false`                     |      | 是否启用每日投稿数量限制                 |
-|   `Post`   |  `DailyPaddingLimit`  |  `int`   |                      `5`                       |      | 每日待定稿件数量上限                     |
-|   `Post`   |  `DailyReviewLimit`   |  `int`   |                      `5`                       |      | 每日审核中稿件数量上限基数               |
-|   `Post`   |   `DailyPostLimit`    |  `int`   |                      `5`                       |      | 每日通过以及未通过稿件数量上限基数       |
-|   `Post`   |    `RatioDivisor`     |  `int`   |                     `100`                      |      | 每日投稿数量上限倍率除数                 |
-|   `Post`   |      `MaxRatio`       |  `int`   |                      `10`                      |      | 每日投稿数量上限最高倍率                 |
-|   `Post`   |     `PureRetuens`     |  `bool`  |                     `true`                     |      | 是否启用回车过滤开关                     |
-|   `Post`   |     `PureHashTag`     |  `bool`  |                     `true`                     |      | 是否启用标签过滤开关                     |
-|   `Post`   |      `PureWords`      | `string` |                      `""`                      |      | 过滤稿件和 ID 中的特定字符, 以 `\|` 分隔 |
-|   `Post`   |   `PostExpiredTime`   |  `int`   |                      `3`                       |      | 稿件过期时间                             |
+|     节     |        配置项         |   类型   |                     默认值                     | 必须 | 说明                                                                                                        |
+| :--------: | :-------------------: | :------: | :--------------------------------------------: | :--: | ----------------------------------------------------------------------------------------------------------- |
+|     无     |        `Debug`        |  `bool`  |                    `false`                     |      | 是否开启调试模式                                                                                            |
+|     -      |           -           |    -     |                       -                        |  -   |                                                                                                             |
+|     无     |       `Swagger`       |  `bool`  |                    `false`                     |      | 是否开启 Swagger                                                                                            |
+|     无     |      `Statistic`      |  `bool`  |                     `true`                     |      | 是否开启使用情况统计(仅用于统计日活,不会发送隐私数据)                                                       |
+|     -      |           -           |    -     |                       -                        |  -   |                                                                                                             |
+|   `Bot`    |      `BotToken`       | `string` |                                                |  ✔️  | 机器人 Token                                                                                                |
+|   `Bot`    |        `Proxy`        | `string` |                     `null`                     |      | 代理地址, 支持 http 和 sock5                                                                                |
+|   `Bot`    | `ThrowPendingUpdates` |  `bool`  |                    `false`                     |      | 启动时是否忽略机器人离线时产生的 Update                                                                     |
+|   `Bot`    | `AutoLeaveOtherGroup` |  `bool`  |                    `false`                     |      | 是否自动离开无关群组                                                                                        |
+|   `Bot`    |     `SuperAdmins`     | `int[]`  |                       []                       |      | 超级管理员 数字 ID 列表                                                                                     |
+|   `Bot`    |   `EnablePlanPost`    |  `bool`  |                    `false`                     |      | 启用延时投稿功能                                                                                            |
+|   `Bot`    |   `PostSecondMenu`    |  `bool`  |                    `false`                     |      | 第二频道投稿按钮放在一级菜单还是二级菜单, `true`: 二级菜单中, `false`: 一级菜单中 (需要设置`SecondChannel`) |
+|     -      |           -           |    -     |                       -                        |  -   |                                                                                                             |
+| `Channel`  |     `ReviewGroup`     | `string` |                                                |      | 审核群组 ID                                                                                                 |
+| `Channel`  |    `CommentGroup`     | `string` |                                                |      | 评论群组 ID                                                                                                 |
+| `Channel`  |      `SubGroup`       | `string` |                                                |      | 闲聊群组 ID                                                                                                 |
+| `Channel`  |    `AcceptChannel`    | `string` |                                                |  ✔️  | 审核通过频道 ID                                                                                             |
+| `Channel`  |    `RejectChannel`    | `string` |                                                |  ✔️  | 审核拒绝频道 ID                                                                                             |
+| `Channel`  |    `SecondChannel`    | `string` |                                                |      | 第二发布频道 ID                                                                                             |
+| `Channel`  | `SecondCommentGroup`  | `string` |                                                |      | 第二发布频道的评论区 ID                                                                                     |
+|     -      |           -           |    -     |                       -                        |  -   |                                                                                                             |
+| `Message`  |        `Start`        | `string` | "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人" |      | 使用 /start 命令显示的欢迎语                                                                                |
+| `Message`  |        `Help`         | `string` |      "发送图片/视频或者文字内容即可投稿"       |      | 使用 /help 命令显示语句                                                                                     |
+|     -      |           -           |    -     |                       -                        |  -   |                                                                                                             |
+| `Database` |      `Generate`       |  `bool`  |                     `true`                     |      | 是否自动生成数据库表                                                                                        |
+| `Database` |      `UseMySQL`       |  `bool`  |                     `true`                     |      | 是否使用 MySQL 作为数据库实现                                                                               |
+| `Database` |       `LogSQL`        |  `bool`  |                    `false`                     |      | 是否输出 SQL 日志                                                                                           |
+| `Database` |       `DBHost`        | `string` |                 `"127.0.0.1"`                  |      | MySQL 主机                                                                                                  |
+| `Database` |       `DBPort`        |  `int`   |                     `3306`                     |      | MySQL 端口                                                                                                  |
+| `Database` |       `DBName`        | `string` |                   `"xjb_db"`                   |      | 数据库名                                                                                                    |
+| `Database` |       `DBUser`        | `string` |                    `"root"`                    |      | 数据库用户名                                                                                                |
+| `Database` |     `DBPassword`      | `string` |                   `"123456"`                   |      | 数据库密码                                                                                                  |
+|     -      |           -           |    -     |                       -                        |  -   |                                                                                                             |
+|   `Post`   |   `EnablePostLimit`   |  `bool`  |                    `false`                     |      | 是否启用每日投稿数量限制                                                                                    |
+|   `Post`   |  `DailyPaddingLimit`  |  `int`   |                      `5`                       |      | 每日待定稿件数量上限                                                                                        |
+|   `Post`   |  `DailyReviewLimit`   |  `int`   |                      `5`                       |      | 每日审核中稿件数量上限基数                                                                                  |
+|   `Post`   |   `DailyPostLimit`    |  `int`   |                      `5`                       |      | 每日通过以及未通过稿件数量上限基数                                                                          |
+|   `Post`   |    `RatioDivisor`     |  `int`   |                     `100`                      |      | 每日投稿数量上限倍率除数                                                                                    |
+|   `Post`   |      `MaxRatio`       |  `int`   |                      `10`                      |      | 每日投稿数量上限最高倍率                                                                                    |
+|   `Post`   |     `PureRetuens`     |  `bool`  |                     `true`                     |      | 是否启用回车过滤开关                                                                                        |
+|   `Post`   |     `PureHashTag`     |  `bool`  |                     `true`                     |      | 是否启用标签过滤开关                                                                                        |
+|   `Post`   |      `PureWords`      | `string` |                      `""`                      |      | 过滤稿件和 ID 中的特定字符, 以 `\|` 分隔                                                                    |
+|   `Post`   |   `PostExpiredTime`   |  `int`   |                      `3`                       |      | 稿件过期时间                                                                                                |
+|     -      |           -           |    -     |                       -                        |  -   |                                                                                                             |
+|  `IpInfo`  |        `Token`        | `string` |                                                |      | `/ip` 命令使用, 用于查询 IP 信息, 可选 (前往 https://ipinfo.io/ 获取)                                       |
+|     -      |           -           |    -     |                       -                        |  -   |                                                                                                             |
+| `Schedule` |        `Cron`         |  `dict`  |                                                |      | 定时任务配置, key 为定时任务名称, value 为 cron 表达式, 例如 ·`0 0 0 * * ?` 代表每天 00:00:00 执行一次      |
 
 > 新安装或者数据库结构变动后一定要修改 `DBGenerate` 为 `true`, 会自动生成数据表, 生成完毕后建议禁用以加快启动速度
 
