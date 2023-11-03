@@ -2,10 +2,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Interface.Bot.Common;
+using XinjingdailyBot.Interface.Data;
+using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Common;
 
@@ -191,4 +194,48 @@ internal class ChannelService : IChannelService
         return IsReviewMessage(chat.Id);
     }
     public bool HasSecondChannel => SecondChannel != null;
+
+    private static void UpdateChatTitle(Chat originChat, Chat targetChat)
+    {
+        targetChat.Title = originChat.Title;
+        targetChat.Username = originChat.Username;
+        targetChat.FirstName = originChat.FirstName;
+        targetChat.LastName = originChat.LastName;
+    }
+
+    public void OnChatTitleChanged(Chat chat, string? newChatTitle)
+    {
+        if (chat.Id == AcceptChannel.Id)
+        {
+            UpdateChatTitle(chat, AcceptChannel);
+        }
+        else if (chat.Id == RejectChannel.Id)
+        {
+            UpdateChatTitle(chat, RejectChannel);
+        }
+        else if (chat.Id == SecondChannel?.Id)
+        {
+            UpdateChatTitle(chat, SecondChannel);
+        }
+        else if (chat.Id == CommentGroup.Id)
+        {
+            UpdateChatTitle(chat, CommentGroup);
+        }
+        else if (chat.Id == SubGroup.Id)
+        {
+            UpdateChatTitle(chat, SubGroup);
+        }
+        else if (chat.Id == SecondCommentGroup.Id)
+        {
+            UpdateChatTitle(chat, SecondCommentGroup);
+        }
+        else if (chat.Id == ReviewGroup.Id)
+        {
+            UpdateChatTitle(chat, ReviewGroup);
+        }
+        else if (chat.Id == ReviewLogChannel.Id)
+        {
+            UpdateChatTitle(chat, ReviewLogChannel);
+        }
+    }
 }

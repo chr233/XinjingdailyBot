@@ -90,4 +90,10 @@ public interface IChannelService
     /// <param name="chat"></param>
     /// <returns></returns>
     bool IsReviewMessage(Chat chat);
+    /// <summary>
+    /// 更新频道信息
+    /// </summary>
+    /// <param name="chat"></param>
+    /// <param name="newChatTitle"></param>
+    void OnChatTitleChanged(Chat chat, string? newChatTitle);
 }

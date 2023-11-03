@@ -16,15 +16,18 @@ internal class UpdateService : IUpdateService
     private readonly ILogger<UpdateService> _logger;
     private readonly IUserService _userService;
     private readonly IDispatcherService _dispatcherService;
+    private readonly IChannelService _channelService;
 
     public UpdateService(
         ILogger<UpdateService> logger,
         IUserService userService,
-        IDispatcherService dispatcherService)
+        IDispatcherService dispatcherService,
+        IChannelService channelService)
     {
         _logger = logger;
         _userService = userService;
         _dispatcherService = dispatcherService;
+        _channelService = channelService;
     }
 
     private int LastUpdateId { get; set; } = 0;
@@ -32,6 +35,11 @@ internal class UpdateService : IUpdateService
     public async Task HandleUpdateAsync(ITelegramBotClient _, Update update, CancellationToken cancellationToken)
     {
         _logger.LogUpdate(update);
+
+        if (update.Type == UpdateType.Message && update.Message!.Type == MessageType.ChatTitleChanged)
+        {
+            _channelService.OnChatTitleChanged(update.Message.Chat, update.Message.NewChatTitle);
+        }
 
         var dbUser = await _userService.FetchUserFromUpdate(update);
 
