@@ -118,7 +118,7 @@ public sealed record OptionsSetting
         /// <summary>
         /// 第二频道
         /// </summary>
-        public string? SecondChannel { get; set; }
+        public string SecondChannel { get; set; } = "";
         /// <summary>
         /// 第二频道评论区
         /// </summary>
@@ -127,10 +127,6 @@ public sealed record OptionsSetting
         /// 拒稿频道
         /// </summary>
         public string RejectChannel { get; set; } = "";
-        /// <summary>
-        /// 自动退出未在配置文件中定义的群组和频道, 默认 false
-        /// </summary>
-        public bool AutoLeaveOtherGroup { get; set; }
     }
 
     /// <summary>
