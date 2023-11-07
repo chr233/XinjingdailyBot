@@ -1,57 +1,105 @@
-namespace ZR.Admin.WebApi.Filters;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Options;
+using System.Net;
+using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.Interface.Data;
+using XinjingdailyBot.Repository;
+using XinjingdailyBot.WebAPI.IPC.Responses;
+
+namespace XinjingdailyBot.WebAPI.Authorization;
 
 /// <summary>
 /// 授权校验访问
 /// 如果跳过授权登录在Action 或controller加上 AllowAnonymousAttribute
 /// </summary>
-//public class VerifyAttribute : Attribute, IAuthorizationFilter
-//{
-//    static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-//    /// <summary>
-//    /// 只判断token是否正确，不判断权限
-//    /// 如果需要判断权限的在Action上加上ApiActionPermission属性标识权限类别，ActionPermissionFilter作权限处理
-//    /// </summary>
-//    /// <param name="context"></param>
-//    public void OnAuthorization(AuthorizationFilterContext context)
-//    {
-//        var noNeedCheck = false;
-//        if (context.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
-//        {
-//            noNeedCheck = controllerActionDescriptor.MethodInfo.GetCustomAttributes(inherit: true)
-//              .Any(a => a.GetType().Equals(typeof(AllowAnonymousAttribute)));
-//        }
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+public class VerifyAttribute : Attribute, IAuthorizationFilter
+{
+    /// <summary>
+    /// Header参数名称
+    /// </summary>
+    public static string HeaderName => "Authentication";
+    /// <summary>
+    /// Query参数名称
+    /// </summary>
+    public static string QueryName => "token";
+    /// <summary>
+    /// 显示名称
+    /// </summary>
+    public static string FieldName => "UserToken";
 
-//        if (noNeedCheck) return;
+    /// <summary>
+    /// 鉴权验证
+    /// </summary>
+    /// <param name="context"></param>
+    public void OnAuthorization(AuthorizationFilterContext context)
+    {
+        var request = context.HttpContext.Request;
+        if ((!request.Headers.TryGetValue(HeaderName, out var token) && !request.Query.TryGetValue(QueryName, out token)))
+        {
+            context.Result = new JsonResult(new GenericResponse {
+                Code = HttpStatusCode.Unauthorized,
+                Success = false,
+                Message = "Authorization header is missing",
+            });
+            return;
+        }
 
-//        string ip = HttpContextExtension.GetClientUserIp(context.HttpContext);
-//        string url = context.HttpContext.Request.Path;
-//        var isAuthed = context.HttpContext.User.Identity.IsAuthenticated;
+        if (!Guid.TryParse(token, out var guid))
+        {
+            context.Result = new JsonResult(new GenericResponse {
+                Code = HttpStatusCode.Unauthorized,
+                Success = false,
+                Message = "Invalid authorization key",
+            });
+            return;
+        }
 
-//        //使用jwt token校验2020-11-21
-//        TokenModel loginUser = JwtUtil.GetLoginUser(context.HttpContext);
-//        if (loginUser != null)
-//        {
-//            var nowTime = DateTime.UtcNow;
-//            TimeSpan ts = loginUser.ExpireTime - nowTime;
+        var userTokenService = context.HttpContext.RequestServices.GetRequiredService<IUserTokenService>();
+        var groupRepository = context.HttpContext.RequestServices.GetRequiredService<GroupRepository>();
+        var config = context.HttpContext.RequestServices.GetRequiredService<IOptions<OptionsSetting>>().Value;
 
-//            //Console.WriteLine($"jwt到期剩余：{ts.TotalMinutes}分,{ts.TotalSeconds}秒");
+        var dbUser = userTokenService.VerifyToken(guid).Result;
 
-//            var CK = "token_" + loginUser.UserId;
-//            if (!CacheHelper.Exists(CK) && ts.TotalMinutes < 5)
-//            {
-//                var newToken = JwtUtil.GenerateJwtToken(JwtUtil.AddClaims(loginUser));
 
-//                CacheHelper.SetCache(CK, CK, 1);
-//                context.HttpContext.Response.Headers.Add("X-Refresh-Token", newToken);
-//            }
-//        }
-//        if (loginUser == null || !isAuthed)
-//        {
-//            string msg = $"请求访问[{url}]失败，无法访问系统资源";
-//            //logger.Info(msg);
 
-//            context.Result = new JsonResult(new ApiResult((int)ResultCode.DENY, msg));
-//        }
-//    }
-//}
+        if (dbUser != null && !dbUser.IsBan)
+        {
+            //如果是配置文件中指定的管理员就覆盖用户组权限
+            if (config.Bot.SuperAdmins?.Contains(dbUser.UserID) ?? false)
+            {
+                dbUser.GroupID = groupRepository.GetMaxGroupId();
+            }
+
+            //根据GroupID设置用户权限信息 (封禁用户区别对待)
+            var group = groupRepository.GetGroupById(dbUser.GroupID);
+
+            if (group != null)
+            {
+                dbUser.Right = group.DefaultRight;
+                context.HttpContext.Items["Users"] = dbUser;
+            }
+            else
+            {
+                context.Result = new JsonResult(new GenericResponse {
+                    Code = HttpStatusCode.Unauthorized,
+                    Success = false,
+                    Message = "User group not found",
+                });
+                return;
+            }
+        }
+        else
+        {
+            context.Result = new JsonResult(new GenericResponse {
+                Code = HttpStatusCode.Unauthorized,
+                Success = false,
+                Message = "User not found or user is banned",
+            });
+            return;
+        }
+    }
+}
+

@@ -10,6 +10,7 @@ using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
+using XinjingdailyBot.WebAPI.Authorization;
 using XinjingdailyBot.WebAPI.IPC.Requests;
 using XinjingdailyBot.WebAPI.IPC.Responses;
 
@@ -18,7 +19,7 @@ namespace XinjingdailyBot.WebAPI.IPC.Controllers;
 /// <summary>
 /// 主页控制器
 /// </summary>
-[Route("Api/[controller]", Name = "投稿")]
+[Verify]
 public sealed class PostController : XjbController
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -77,7 +78,7 @@ public sealed class PostController : XjbController
     /// 连接测试
     /// </summary>
     /// <returns></returns>
-    [HttpPost("[action]")]
+    [HttpPost]
     public ActionResult<GenericResponse<TestTokenResponse>> TestToken()
     {
         var dbUser = _httpContextAccessor.GetUser();
@@ -103,7 +104,7 @@ public sealed class PostController : XjbController
     /// </summary>
     /// <param name="post"></param>
     /// <returns></returns>
-    [HttpPost("[action]")]
+    [HttpPost]
     public async Task<ActionResult<GenericResponse<NewPosts>>> CreatePost([FromForm] CreatePostRequest post)
     {
         var dbUser = _httpContextAccessor.GetUser();
@@ -338,11 +339,11 @@ public sealed class PostController : XjbController
     }
 
     /// <summary>
-    /// 创建稿件
+    /// 修改稿件
     /// </summary>
     /// <param name="post"></param>
     /// <returns></returns>
-    [HttpPut("[action]")]
+    [HttpPut]
     public async Task<ActionResult<GenericResponse<NewPosts>>> EditReviewMessage([FromForm] CreatePostRequest post)
     {
         var dbUser = _httpContextAccessor.GetUser();
