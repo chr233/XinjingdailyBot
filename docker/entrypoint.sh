@@ -4,7 +4,13 @@ cd /app
 
 rm -f $DB_DbName.db appsettings.json
 
-ln -s ./data/$DB_DbName.db  ./
+if [ -d "./data/$DB_DbName.db" ] ;then
+    mv $DB_DbName.db $DB_DbName.db.bak
+    ln -s ./data/$DB_DbName.db  ./
+else
+    mv $DB_DbName.db  ./data
+    ln -s ./data/$DB_DbName.db  ./
+fi
 
 if [ -d "./data/appsettings.json" ] ;then
     ln -s ./data/appsettings.json ./
