@@ -2,9 +2,9 @@
 
 cd /app
 
-rm -f xjb_db.db appsettings.json
+rm -f $DB_DbName.db appsettings.json
 
-ln -s ./data/xjb_db.db  ./
+ln -s ./data/$DB_DbName.db  ./
 
 if [ -d "./data/appsettings.json" ] ;then
     ln -s ./data/appsettings.json ./
