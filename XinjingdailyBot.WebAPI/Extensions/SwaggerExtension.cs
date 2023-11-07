@@ -1,5 +1,6 @@
 using Microsoft.OpenApi.Models;
 using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.WebAPI.Authorization;
 using XinjingdailyBot.WebAPI.IPC.Middlewares;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
@@ -36,17 +37,17 @@ public static class SwaggerExtension
             var scheme = new OpenApiSecurityScheme {
                 Type = SecuritySchemeType.ApiKey,
                 Description = "用户登录 Token, 使用命令 /token 获取",
-                Name = ApiAuthenticationMiddleware.HeaderName,
+                Name = VerifyAttribute.HeaderName,
                 In = ParameterLocation.Header,
             };
 
-            options.AddSecurityDefinition(ApiAuthenticationMiddleware.FieldName, scheme);
+            options.AddSecurityDefinition(VerifyAttribute.FieldName, scheme);
 
             options.AddSecurityRequirement(new OpenApiSecurityRequirement {
                     {
                         new OpenApiSecurityScheme {
                             Reference = new OpenApiReference {
-                                Id = ApiAuthenticationMiddleware.FieldName,
+                                Id = VerifyAttribute.FieldName,
                                 Type = ReferenceType.SecurityScheme
                             }
                         },

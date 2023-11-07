@@ -10,7 +10,6 @@ namespace XinjingdailyBot.WebAPI.IPC.Controllers;
 /// <summary>
 /// 主页控制器
 /// </summary>
-[Route("/", Name = "其他")]
 public sealed class CommonController : XjbController
 {
     private readonly bool _debug;
@@ -42,7 +41,7 @@ public sealed class CommonController : XjbController
     /// 错误页
     /// </summary>
     /// <returns></returns>
-    [HttpGet("Error")]
+    [HttpGet("/Error")]
     public ActionResult<GenericResponse<string>> Error()
     {
         var response = new GenericResponse<IExceptionHandlerPathFeature> {
