@@ -5,6 +5,7 @@
     <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="7.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.4" />
     <PackageVersion Include="MySql.Data" Version="8.2.0" />
     <PackageVersion Include="NLog" Version="5.2.5" />
     <PackageVersion Include="NLog.Extensions.Logging" Version="5.3.5" />
