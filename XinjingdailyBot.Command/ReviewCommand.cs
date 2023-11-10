@@ -91,7 +91,7 @@ internal class ReviewCommand
                 Name = reason,
                 FullText = reason,
             };
-            await _postService.RejetPost(post, dbUser, rejectReason);
+            await _postService.RejectPost(post, dbUser, rejectReason);
 
             return $"已拒绝该稿件, 理由: {reason}";
         }
@@ -325,7 +325,7 @@ internal class ReviewCommand
             await _botClient.AutoReplyAsync($"找不到 {payload} 对应的拒绝理由", query, true);
             return;
         }
-        await _postService.RejetPost(post, dbUser, reason);
+        await _postService.RejectPost(post, dbUser, reason);
     }
 
     /// <summary>
