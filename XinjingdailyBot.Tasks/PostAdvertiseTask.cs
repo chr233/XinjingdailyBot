@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -6,83 +6,118 @@ using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
+using XinjingdailyBot.Interface.Helper;
+using XinjingdailyBot.Model.Models;
 
-namespace XinjingdailyBot.Tasks
+namespace XinjingdailyBot.Tasks;
+
+/// <summary>
+/// 发布广告
+/// </summary>
+[Job("0 0 10 * * ?")]
+internal class PostAdvertiseTask : IJob
 {
-    /// <summary>
-    /// 发布广告
-    /// </summary>
-    [Job("0 0 19 * * ?")]
-    public class PostAdvertiseTask : IJob
-    {
-        private readonly ILogger<PostAdvertiseTask> _logger;
-        private readonly IServiceProvider _serviceProvider;
-        private readonly ITelegramBotClient _botClient;
-        private readonly IAdvertisesService _advertisesService;
+    private readonly ILogger<PostAdvertiseTask> _logger;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly ITelegramBotClient _botClient;
+    private readonly IAdvertiseService _advertisesService;
+    private readonly IAdvertisePostService _advertisePostService;
+    private readonly IMarkupHelperService _markupHelperService;
 
-        public PostAdvertiseTask(
-            ILogger<PostAdvertiseTask> logger,
-            IServiceProvider serviceProvider,
-            ITelegramBotClient botClient,
-            IAdvertisesService advertisesService)
+    public PostAdvertiseTask(
+        ILogger<PostAdvertiseTask> logger,
+        IServiceProvider serviceProvider,
+        ITelegramBotClient botClient,
+        IAdvertiseService advertisesService,
+        IAdvertisePostService advertisePostService,
+        IMarkupHelperService markupHelperService)
+    {
+        _logger = logger;
+        _serviceProvider = serviceProvider;
+        _botClient = botClient;
+        _advertisesService = advertisesService;
+        _advertisePostService = advertisePostService;
+        _markupHelperService = markupHelperService;
+    }
+
+    public async Task Execute(IJobExecutionContext context)
+    {
+        _logger.LogInformation("开始定时任务, 发布广告");
+
+        var ad = await _advertisesService.GetPostableAdvertise();
+
+        if (ad == null)
         {
-            _logger = logger;
-            _serviceProvider = serviceProvider;
-            _botClient = botClient;
-            _advertisesService = advertisesService;
+            return;
         }
 
-        public async Task Execute(IJobExecutionContext context)
+        //取消置顶旧的广告
+        await _advertisePostService.UnPinOldAdPosts(ad);
+
+        var channelService = _serviceProvider.GetRequiredService<IChannelService>();
+
+        var operates = new List<(EAdMode, ChatId)>
         {
-            _logger.LogInformation("开始定时任务, 发布广告");
+            (EAdMode.AcceptChannel, channelService.AcceptChannel),
+            (EAdMode.RejectChannel, channelService.RejectChannel),
+            //(EAdMode.ReviewGroup, channelService.ReviewGroup),
+            (EAdMode.CommentGroup, channelService.CommentGroup),
+            (EAdMode.SubGroup, channelService.SubGroup),
+        };
 
-            var ad = await _advertisesService.GetPostableAdvertise();
+        if (channelService.HasSecondChannel)
+        {
+            operates.Add((EAdMode.SecondChannel, channelService.SecondChannel!));
+        }
 
-            if (ad == null)
+        foreach (var (mode, chat) in operates)
+        {
+            if (ad.Mode.HasFlag(mode) && chat.Identifier != null)
             {
-                return;
-            }
+                var chatId = chat.Identifier.Value;
 
-            var channelService = _serviceProvider.GetService<IChannelService>();
-
-            if (channelService == null)
-            {
-                _logger.LogError("获取服务 {type} 失败", nameof(IChannelService));
-                return;
-            }
-
-            var operates = new List<(AdMode, ChatId)>
-            {
-               new (AdMode.AcceptChannel, channelService.AcceptChannel.Id),
-               new (AdMode.RejectChannel, channelService.RejectChannel.Id),
-               new (AdMode.ReviewGroup, channelService.ReviewGroup.Id),
-               new (AdMode.CommentGroup, channelService.CommentGroup.Id),
-               new (AdMode.SubGroup, channelService.SubGroup.Id),
-            };
-
-            foreach (var (mode, chatId) in operates)
-            {
-                if (ad.Mode.HasFlag(mode) && chatId.Identifier != 0)
+                try
                 {
-                    try
+                    var msgId = await _botClient.CopyMessageAsync(chatId, ad.ChatID, (int)ad.MessageID, disableNotification: true);
+
+                    var kbd = _markupHelperService.AdvertiseExternalLinkButton(ad.ExternalLink, ad.ExternalLinkName);
+                    if (kbd != null)
                     {
-                        var msgId = await _botClient.CopyMessageAsync(chatId, ad.ChatID, (int)ad.MessageID, disableNotification: true);
-                        ad.ShowCount++;
-                        if (ad.PinMessage)
-                        {
-                            await _botClient.PinChatMessageAsync(chatId, msgId.Id, true);
-                        }
+                        await _botClient.EditMessageReplyMarkupAsync(chat, msgId.Id, kbd);
                     }
-                    catch (Exception ex)
+
+                    var adpost = new AdvertisePosts {
+                        AdId = ad.Id,
+                        ChatID = chatId,
+                        MessageID = msgId.Id,
+                        Pined = ad.PinMessage,
+                        CreateAt = DateTime.Now,
+                        ModifyAt = DateTime.Now,
+                    };
+
+                    await _advertisePostService.Insertable(adpost).ExecuteCommandAsync();
+
+                    ad.ShowCount++;
+                    ad.LastPostAt = DateTime.Now;
+
+                    if (adpost.Pined)
                     {
-                        _logger.LogError(ex, "投放广告出错");
+                        await _botClient.PinChatMessageAsync(chatId, msgId.Id, true);
                     }
-                    finally
-                    {
-                        await Task.Delay(500);
-                    }
+
+                    await _advertisesService.Updateable(ad)
+                        .UpdateColumns(static x => new {
+                            x.ShowCount, x.LastPostAt
+                        }).ExecuteCommandAsync();
                 }
-                await _advertisesService.UpdateAsync(ad);
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "投放广告出错");
+                }
+                finally
+                {
+                    await Task.Delay(500);
+                }
             }
         }
     }

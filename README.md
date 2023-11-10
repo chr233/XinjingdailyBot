@@ -1,24 +1,23 @@
-# Xinjingdaily Bot
+# Xinjingdaily Bot Telegram 投稿机器人
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/67ca08867b7a4afda91db3b70bcd303c)](https://www.codacy.com/gh/chr233/XinjingdailyBot/dashboard?utm_source=github.com&utm_medium=referral&utm_content=chr233/XinjingdailyBot&utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/67ca08867b7a4afda91db3b70bcd303c)](https://www.codacy.com/gh/chr233/XinjingdailyBot/dashboard)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/chr233/XinjingdailyBot/publish.yml?logo=github)
 [![License](https://img.shields.io/github/license/chr233/XinjingdailyBot?logo=apache)](https://github.com/chr233/XinjingdailyBot/blob/master/license)
-![GitHub last commit](https://img.shields.io/github/last-commit/chr233/XinjingdailyBot?logo=github)
 
 [![GitHub Release](https://img.shields.io/github/v/release/chr233/XinjingdailyBot?logo=github)](https://github.com/chr233/XinjingdailyBot/releases)
 [![GitHub Release](https://img.shields.io/github/v/release/chr233/XinjingdailyBot?include_prereleases&label=pre-release&logo=github)](https://github.com/chr233/XinjingdailyBot/releases)
-[![GitHub Download](https://img.shields.io/github/downloads/chr233/XinjingdailyBot/total?logo=github)](https://img.shields.io/github/v/release/chr233/XinjingdailyBot)
+![GitHub last commit](https://img.shields.io/github/last-commit/chr233/XinjingdailyBot?logo=github)
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/chr233/XinjingdailyBot?logo=github)
+[![GitHub Download](https://img.shields.io/github/downloads/chr233/XinjingdailyBot/total?logo=github)](https://img.shields.io/github/v/release/chr233/XinjingdailyBot)
 
 [![爱发电](https://img.shields.io/badge/爱发电-chr__-ea4aaa.svg?logo=github-sponsors)](https://afdian.net/@chr233)
-[![Bilibili](https://img.shields.io/badge/bilibili-Chr__-00A2D8.svg?logo=bilibili)](https://space.bilibili.com/5805394)
-[![Steam](https://img.shields.io/badge/steam-Chr__-1B2838.svg?logo=steam)](https://steamcommunity.com/id/Chr_)
-[![Steam](https://img.shields.io/badge/steam-donate-1B2838.svg?logo=steam)](https://steamcommunity.com/tradeoffer/new/?partner=221260487&token=xgqMgL-i)
 
 ## 心惊报 [@xinjingdaily](https://t.me/xinjingdaily) 自主开发的投稿机器人
 
 心惊报投稿机器人 [@xinjingdaily_bot](https://t.me/xinjingdaily_bot)
+
+承接定制开发, 功能修改
 
 ## 功能特性
 
@@ -39,8 +38,11 @@
 - [x] 投稿数量限制
 - [x] 获取随机稿件
 - [x] 自定义稿件标签
+- [x] 自定义拒绝理由
+- [x] IPC 接口 (使用命令 /token 获取凭据)
 - [ ] 稿件检索
 - [ ] 实装用户等级系统
+- [ ] TODO
 
 ## 安装与使用
 
@@ -52,7 +54,9 @@
 
 自 `2.x` 后, 可选 `Sqlite` 作为数据库实现, 在配置文件的 `Database` 节设置 `UseMySQL` 为 `false` 即可
 
-自 `2.0.18.x` 后, 新增自定义标签支持, 之前版本的投稿数据请使用命令 `/mergepost` 进行一次性转换, 否则标签可能不能正确识别
+自 `2.0.18.x` 后, 新增自定义标签支持, 之前版本的投稿数据请使用命令 `/fixpost` 进行一次性转换, 否则标签可能不能正确识别
+
+自 `2.1.x.x` 后, 使用了新的稿件表, 之前版本的投稿数据请使用命令 `/mergepost` 进行一次性转换, 否则旧的投稿无法识别
 
 ### 配置说明
 
@@ -70,20 +74,27 @@
 
   // 调试模式
   "Debug": false,
+  // Swagger
+  "Swagger": true,
+  "Statistic": true,
   // 机器人设置
   "Bot": {
     "BotToken": "",
     "Proxy": null,
     "ThrowPendingUpdates": false,
     "AutoLeaveOtherGroup": false,
-    "SuperAdmins": []
+    "SuperAdmins": [],
+    "EnablePlanPost": false,
+    "PostSecondMenu": true
   },
   "Channel": {
     "ReviewGroup": "",
     "CommentGroup": "",
     "SubGroup": "",
     "AcceptChannel": "",
-    "RejectChannel": ""
+    "RejectChannel": "",
+    "SecondChannel": "",
+    "SecondCommentGroup": ""
   },
   // 消息设置
   "Message": {
@@ -113,48 +124,78 @@
     "PureHashTag": true,
     "PureWords": "",
     "PostExpiredTime": 3
+  },
+  // IpInfo设置
+  "IpInfo": {
+    "Token": ""
+  },
+  // 计划任务
+  "Schedule": {
+    "Cron": {
+      // 处理过期稿件
+      "ExpiredPostTask": "0 0 0 * * ?",
+      // 定时发布广告
+      "PostAdvertiseTask": "0 0 9 * * ?",
+      // 拒绝频道定时置顶
+      "RejectChannelTask": "0 0 0 * * ?",
+      // 已排期稿件定时发布
+      "PlanedPostsTask": "0 0 0 * * ?",
+      // 定时更新审核群审核状态
+      "ReviewStatusTask": "0,30 * * * * ?"
+    }
   }
 }
 ```
 
-|     节     |        配置项         |   类型   |                     默认值                     | 必须 | 说明                                     |
-| :--------: | :-------------------: | :------: | :--------------------------------------------: | :--: | ---------------------------------------- |
-|     无     |        `Debug`        |  `bool`  |                    `false`                     |      | 是否开启调试模式                         |
-|     -      |           -           |    -     |                       -                        |  -   |                                          |
-|   `Bot`    |      `BotToken`       | `string` |                                                |  ✔️  | 机器人 Token                             |
-|   `Bot`    |        `Proxy`        | `string` |                     `null`                     |      | 代理地址, 支持 http 和 sock5             |
-|   `Bot`    | `ThrowPendingUpdates` |  `bool`  |                    `false`                     |      | 启动时是否忽略机器人离线时产生的 Update  |
-|   `Bot`    | `AutoLeaveOtherGroup` |  `bool`  |                    `false`                     |      | 是否自动离开无关群组                     |
-|   `Bot`    |     `SuperAdmins`     | `int[]`  |                       []                       |      | 超级管理员 数字 ID 列表                  |
-|     -      |           -           |    -     |                       -                        |  -   |                                          |
-| `Channel`  |     `ReviewGroup`     | `string` |                                                |      | 审核群组 ID                              |
-| `Channel`  |    `CommentGroup`     | `string` |                                                |      | 评论群组 ID                              |
-| `Channel`  |      `SubGroup`       | `string` |                                                |      | 闲聊群组 ID                              |
-| `Channel`  |    `AcceptChannel`    | `string` |                                                |  ✔️  | 审核通过频道 ID                          |
-| `Channel`  |    `RejectChannel`    | `string` |                                                |  ✔️  | 审核拒绝频道 ID                          |
-|     -      |           -           |    -     |                       -                        |  -   |                                          |
-| `Message`  |        `Start`        | `string` | "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人" |      | 使用 /start 命令显示的欢迎语             |
-| `Message`  |        `Help`         | `string` |      "发送图片/视频或者文字内容即可投稿"       |      | 使用 /help 命令显示语句                  |
-|     -      |           -           |    -     |                       -                        |  -   |                                          |
-| `Database` |      `Generate`       |  `bool`  |                     `true`                     |      | 是否自动生成数据库表                     |
-| `Database` |      `UseMySQL`       |  `bool`  |                     `true`                     |      | 是否使用 MySQL 作为数据库实现            |
-| `Database` |       `LogSQL`        |  `bool`  |                    `false`                     |      | 是否输出 SQL 日志                        |
-| `Database` |       `DBHost`        | `string` |                 `"127.0.0.1"`                  |      | MySQL 主机                               |
-| `Database` |       `DBPort`        |  `int`   |                     `3306`                     |      | MySQL 端口                               |
-| `Database` |       `DBName`        | `string` |                   `"xjb_db"`                   |      | 数据库名                                 |
-| `Database` |       `DBUser`        | `string` |                    `"root"`                    |      | 数据库用户名                             |
-| `Database` |     `DBPassword`      | `string` |                   `"123456"`                   |      | 数据库密码                               |
-|     -      |           -           |    -     |                       -                        |  -   |                                          |
-|   `Post`   |   `EnablePostLimit`   |  `bool`  |                    `false`                     |      | 是否启用每日投稿数量限制                 |
-|   `Post`   |  `DailyPaddingLimit`  |  `int`   |                      `5`                       |      | 每日待定稿件数量上限                     |
-|   `Post`   |  `DailyReviewLimit`   |  `int`   |                      `5`                       |      | 每日审核中稿件数量上限基数               |
-|   `Post`   |   `DailyPostLimit`    |  `int`   |                      `5`                       |      | 每日通过以及未通过稿件数量上限基数       |
-|   `Post`   |    `RatioDivisor`     |  `int`   |                     `100`                      |      | 每日投稿数量上限倍率除数                 |
-|   `Post`   |      `MaxRatio`       |  `int`   |                      `10`                      |      | 每日投稿数量上限最高倍率                 |
-|   `Post`   |     `PureRetuens`     |  `bool`  |                     `true`                     |      | 是否启用回车过滤开关                     |
-|   `Post`   |     `PureHashTag`     |  `bool`  |                     `true`                     |      | 是否启用标签过滤开关                     |
-|   `Post`   |      `PureWords`      | `string` |                      `""`                      |      | 过滤稿件和 ID 中的特定字符, 以 `\|` 分隔 |
-|   `Post`   |   `PostExpiredTime`   |  `int`   |                      `3`                       |      | 稿件过期时间                             |
+|     节     |        配置项         |   类型   |                     默认值                     | 必须 | 说明                                                                                                        |
+| :--------: | :-------------------: | :------: | :--------------------------------------------: | :--: | ----------------------------------------------------------------------------------------------------------- |
+|     无     |        `Debug`        |  `bool`  |                    `false`                     |      | 是否开启调试模式                                                                                            |
+|     -      |           -           |    -     |                       -                        |  -   |                                                                                                             |
+|     无     |       `Swagger`       |  `bool`  |                    `false`                     |      | 是否开启 Swagger                                                                                            |
+|     无     |      `Statistic`      |  `bool`  |                     `true`                     |      | 是否开启使用情况统计(仅用于统计日活,不会发送隐私数据)                                                       |
+|     -      |           -           |    -     |                       -                        |  -   |                                                                                                             |
+|   `Bot`    |      `BotToken`       | `string` |                                                |  ✔️  | 机器人 Token                                                                                                |
+|   `Bot`    |        `Proxy`        | `string` |                     `null`                     |      | 代理地址, 支持 http 和 sock5                                                                                |
+|   `Bot`    | `ThrowPendingUpdates` |  `bool`  |                    `false`                     |      | 启动时是否忽略机器人离线时产生的 Update                                                                     |
+|   `Bot`    | `AutoLeaveOtherGroup` |  `bool`  |                    `false`                     |      | 是否自动离开无关群组                                                                                        |
+|   `Bot`    |     `SuperAdmins`     | `int[]`  |                       []                       |      | 超级管理员 数字 ID 列表                                                                                     |
+|   `Bot`    |   `EnablePlanPost`    |  `bool`  |                    `false`                     |      | 启用延时投稿功能                                                                                            |
+|   `Bot`    |   `PostSecondMenu`    |  `bool`  |                    `false`                     |      | 第二频道投稿按钮放在一级菜单还是二级菜单, `true`: 二级菜单中, `false`: 一级菜单中 (需要设置`SecondChannel`) |
+|     -      |           -           |    -     |                       -                        |  -   |                                                                                                             |
+| `Channel`  |     `ReviewGroup`     | `string` |                                                |      | 审核群组 ID                                                                                                 |
+| `Channel`  |    `CommentGroup`     | `string` |                                                |      | 评论群组 ID                                                                                                 |
+| `Channel`  |      `SubGroup`       | `string` |                                                |      | 闲聊群组 ID                                                                                                 |
+| `Channel`  |    `AcceptChannel`    | `string` |                                                |  ✔️  | 审核通过频道 ID                                                                                             |
+| `Channel`  |    `RejectChannel`    | `string` |                                                |  ✔️  | 审核拒绝频道 ID                                                                                             |
+| `Channel`  |    `SecondChannel`    | `string` |                                                |      | 第二发布频道 ID                                                                                             |
+| `Channel`  | `SecondCommentGroup`  | `string` |                                                |      | 第二发布频道的评论区 ID                                                                                     |
+|     -      |           -           |    -     |                       -                        |  -   |                                                                                                             |
+| `Message`  |        `Start`        | `string` | "欢迎使用 心惊报 @xinjingdaily 专用投稿机器人" |      | 使用 /start 命令显示的欢迎语                                                                                |
+| `Message`  |        `Help`         | `string` |      "发送图片/视频或者文字内容即可投稿"       |      | 使用 /help 命令显示语句                                                                                     |
+|     -      |           -           |    -     |                       -                        |  -   |                                                                                                             |
+| `Database` |      `Generate`       |  `bool`  |                     `true`                     |      | 是否自动生成数据库表                                                                                        |
+| `Database` |      `UseMySQL`       |  `bool`  |                     `true`                     |      | 是否使用 MySQL 作为数据库实现                                                                               |
+| `Database` |       `LogSQL`        |  `bool`  |                    `false`                     |      | 是否输出 SQL 日志                                                                                           |
+| `Database` |       `DBHost`        | `string` |                 `"127.0.0.1"`                  |      | MySQL 主机                                                                                                  |
+| `Database` |       `DBPort`        |  `int`   |                     `3306`                     |      | MySQL 端口                                                                                                  |
+| `Database` |       `DBName`        | `string` |                   `"xjb_db"`                   |      | 数据库名                                                                                                    |
+| `Database` |       `DBUser`        | `string` |                    `"root"`                    |      | 数据库用户名                                                                                                |
+| `Database` |     `DBPassword`      | `string` |                   `"123456"`                   |      | 数据库密码                                                                                                  |
+|     -      |           -           |    -     |                       -                        |  -   |                                                                                                             |
+|   `Post`   |   `EnablePostLimit`   |  `bool`  |                    `false`                     |      | 是否启用每日投稿数量限制                                                                                    |
+|   `Post`   |  `DailyPaddingLimit`  |  `int`   |                      `5`                       |      | 每日待定稿件数量上限                                                                                        |
+|   `Post`   |  `DailyReviewLimit`   |  `int`   |                      `5`                       |      | 每日审核中稿件数量上限基数                                                                                  |
+|   `Post`   |   `DailyPostLimit`    |  `int`   |                      `5`                       |      | 每日通过以及未通过稿件数量上限基数                                                                          |
+|   `Post`   |    `RatioDivisor`     |  `int`   |                     `100`                      |      | 每日投稿数量上限倍率除数                                                                                    |
+|   `Post`   |      `MaxRatio`       |  `int`   |                      `10`                      |      | 每日投稿数量上限最高倍率                                                                                    |
+|   `Post`   |     `PureRetuens`     |  `bool`  |                     `true`                     |      | 是否启用回车过滤开关                                                                                        |
+|   `Post`   |     `PureHashTag`     |  `bool`  |                     `true`                     |      | 是否启用标签过滤开关                                                                                        |
+|   `Post`   |      `PureWords`      | `string` |                      `""`                      |      | 过滤稿件和 ID 中的特定字符, 以 `\|` 分隔                                                                    |
+|   `Post`   |   `PostExpiredTime`   |  `int`   |                      `3`                       |      | 稿件过期时间                                                                                                |
+|     -      |           -           |    -     |                       -                        |  -   |                                                                                                             |
+|  `IpInfo`  |        `Token`        | `string` |                                                |      | `/ip` 命令使用, 用于查询 IP 信息, 可选 (前往 https://ipinfo.io/ 获取)                                       |
+|     -      |           -           |    -     |                       -                        |  -   |                                                                                                             |
+| `Schedule` |        `Cron`         |  `dict`  |                                                |      | 定时任务配置, key 为定时任务名称, value 为 cron 表达式, 例如 ·`0 0 0 * * ?` 代表每天 00:00:00 执行一次      |
 
 > 新安装或者数据库结构变动后一定要修改 `DBGenerate` 为 `true`, 会自动生成数据表, 生成完毕后建议禁用以加快启动速度
 
@@ -269,3 +310,80 @@
 | /command       | -                   | 设置命令菜单                                     |
 | /calcpost      | -                   | 重新计算投稿数量, 校准系统统计误差(误差有待修正) |
 | /mergepost     | -                   | 自动将 `2.0.18.x` 以前的旧版稿件数据转换成新版   |
+
+### 数据库配置说明
+
+> 当前部分设置仅能通过修改数据库字段实现, 未来可能会做一些完善
+
+#### 稿件标签自定义
+
+> `tag` 表
+
+![tag](resources/tag.png)
+
+| Id  | Name         | Payload | OnText          | OffText | HashTag         | KeyWords   | WarnText            |
+| --- | ------------ | ------- | --------------- | ------- | --------------- | ---------- | ------------------- |
+| 1   | NSFW         | nsfw    | `#NSFW`         | `#N___` | `#NSFW`         | NSFW       | ⚠️ NSFW 提前预警 ⚠️ |
+| 2   | 我有一个朋友 | friend  | `#我有一个朋友` | `#我`   | `#我有一个朋友` | 朋友\|英雄 |
+| 3   | 晚安         | wanan   | `#晚安`         | `#晚_`  | `#晚安`         | 晚安       |                     |
+| 4   | AI 怪图      | ai      | `#AI 怪图`      | `#A___` | `#AI 怪图`      | #AI        |                     |
+
+| 字段     | 解释                                                                         |
+| -------- | ---------------------------------------------------------------------------- |
+| Id       | 序号, 可选值 1~16                                                            |
+| Name     | 标签名称                                                                     |
+| Payload  | callbackData 回调值, 用来识别标签, 每个标签的该字段必须是唯一的              |
+| OnText   | 启用标签时按钮显示的文本                                                     |
+| OffText  | 禁用标签时按钮显示的文本                                                     |
+| HashTag  | 稿件中显示的 HashTag                                                         |
+| KeyWords | 标签关键词, `\|`分隔多个关键词, 当稿件文本包含关键词时将会自动启用标签       |
+| WarnText | 警告文本, 当激活的标签的警告文本字段不为空时, 稿件发布前将会先发一条警告消息 |
+
+#### 稿件拒绝理由自定义
+
+> `reject` 表
+
+![reject](resources/reject.png)
+
+| Id  | Name     | Payload   | FullText                     | IsCount |
+| --- | -------- | --------- | ---------------------------- | ------- |
+| 1   | 模糊     | fuzzy     | 图片模糊/看不清              | 0       |
+| 2   | 重复     | duplicate | 重复的稿件                   | 0       |
+| 3   | 无趣     | boring    | 内容不够有趣                 | 1       |
+| 4   | 没懂     | confusing | 审核没看懂,建议配文说明      | 1       |
+| 5   | 不合适   | deny      | 不合适发布的内容             | 1       |
+| 6   | 广告水印 | qrcode    | 稿件包含二维码水印           | 1       |
+| 7   | 其他原因 | other     | 其他原因                     | 1       |
+| 8   | 太多了   | toomuch   | 今天此类型的稿件的数量太多了 | 1       |
+
+| 字段     | 解释                                                                    |
+| -------- | ----------------------------------------------------------------------- |
+| Id       | 序号                                                                    |
+| Name     | 名称                                                                    |
+| Payload  | callbackData 回调值, 用来识别拒绝理由, 每个拒绝理由的该字段必须是唯一的 |
+| FullText | 完整的拒绝理由文本                                                      |
+| IsCount  | 是否计入每日投稿上限                                                    |
+
+#### 用户群组自定义
+
+> `group` 表
+
+![group](resources/group.png)
+
+| Id  | Name           | DefaultRight |
+| --- | -------------- | ------------ |
+| 0   | 封禁用户       | 0            |
+| 1   | 普通用户       | 17           |
+| 10  | 审核员         | 19           |
+| 11  | 发布员         | 21           |
+| 20  | 狗管理         | 55           |
+| 30  | 超级狗管理     | 247          |
+| 50  | \*超级狗管理\* | 247          |
+
+| 字段         | 解释             |
+| ------------ | ---------------- |
+| Id           | 序号             |
+| Name         | 群组名称         |
+| DefaultRight | 群组内用户权限值 |
+
+> 用户组 ID 大的用户可以修改用户组 ID 小的用户的用户组

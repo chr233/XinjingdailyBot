@@ -1,37 +1,69 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
-namespace XinjingdailyBot.Infrastructure.Model
+namespace XinjingdailyBot.Infrastructure.Model;
+
+/// <summary>
+/// IpInfo响应实体
+/// </summary>
+public sealed record IpInfoResponse
 {
-    public sealed record IpInfoResponse
-    {
-        [JsonPropertyName("ip")]
-        public string? Ip { get; set; }
+    /// <summary>
+    /// ip
+    /// </summary>
+    [JsonPropertyName("ip")]
+    public string? Ip { get; set; }
 
-        [JsonPropertyName("hostname")]
-        public string? Hostname { get; set; }
+    /// <summary>
+    /// hostname
+    /// </summary>
+    [JsonPropertyName("hostname")]
+    public string? Hostname { get; set; }
 
-        [JsonPropertyName("anycast")]
-        public bool AnyCast { get; set; }
+    /// <summary>
+    /// anycast
+    /// </summary>
+    [JsonPropertyName("anycast")]
+    public bool AnyCast { get; set; }
 
-        [JsonPropertyName("city")]
-        public string? City { get; set; }
+    /// <summary>
+    /// city
+    /// </summary>
+    [JsonPropertyName("city")]
+    public string? City { get; set; }
 
-        [JsonPropertyName("region")]
-        public string? Region { get; set; }
+    /// <summary>
+    /// region
+    /// </summary>
+    [JsonPropertyName("region")]
+    public string? Region { get; set; }
 
-        [JsonPropertyName("country")]
-        public string? Country { get; set; }
+    /// <summary>
+    /// country
+    /// </summary>
+    [JsonPropertyName("country")]
+    public string? Country { get; set; }
 
-        [JsonPropertyName("loc")]
-        public string? Loc { get; set; }
+    /// <summary>
+    /// loc
+    /// </summary>
+    [JsonPropertyName("loc")]
+    public string? Loc { get; set; }
 
-        [JsonPropertyName("org")]
-        public string? Org { get; set; }
+    /// <summary>
+    /// org
+    /// </summary>
+    [JsonPropertyName("org")]
+    public string? Org { get; set; }
 
-        [JsonPropertyName("postal")]
-        public string? Postal { get; set; }
+    /// <summary>
+    /// postal
+    /// </summary>
+    [JsonPropertyName("postal")]
+    public string? Postal { get; set; }
 
-        [JsonPropertyName("timezone")]
-        public string? Timezone { get; set; }
-    }
+    /// <summary>
+    /// timezone
+    /// </summary>
+    [JsonPropertyName("timezone")]
+    public string? Timezone { get; set; }
 }

@@ -1,126 +1,118 @@
-﻿using System.Text;
-using Microsoft.Extensions.Logging;
+using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
-using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
-using XinjingdailyBot.Service.Bot.Common;
 
-namespace XinjingdailyBot.Service.Bot.Handler
+namespace XinjingdailyBot.Service.Bot.Handler;
+
+[AppService(typeof(IForwardMessageHandler), LifeTime.Singleton)]
+internal class ForwardMessageHandler : IForwardMessageHandler
 {
-    [AppService(typeof(IForwardMessageHandler), LifeTime.Singleton)]
-    public class ForwardMessageHandler : IForwardMessageHandler
+    private readonly IChannelService _channelService;
+    private readonly ITelegramBotClient _botClient;
+    private readonly IPostService _postService;
+    private readonly IMarkupHelperService _markupHelperService;
+    private readonly IUserService _userService;
+    private readonly IMediaGroupService _mediaGroupService;
+
+    public ForwardMessageHandler(
+        ITelegramBotClient botClient,
+        IChannelService channelService,
+        IPostService postService,
+        IMarkupHelperService markupHelperService,
+        IUserService userService,
+        IMediaGroupService mediaGroupService)
     {
-        private readonly ILogger<ForwardMessageHandler> _logger;
-        private readonly IChannelService _channelService;
-        private readonly ITelegramBotClient _botClient;
-        private readonly IPostService _postService;
-        private readonly IMarkupHelperService _markupHelperService;
-        private readonly IUserService _userService;
-        private readonly IMediaGroupService _mediaGroupService;
+        _botClient = botClient;
+        _channelService = channelService;
+        _postService = postService;
+        _markupHelperService = markupHelperService;
+        _userService = userService;
+        _mediaGroupService = mediaGroupService;
+    }
 
-        public ForwardMessageHandler(
-            ILogger<ForwardMessageHandler> logger,
-            ITelegramBotClient botClient,
-            IChannelService channelService,
-            IPostService postService,
-            IMarkupHelperService markupHelperService,
-            IUserService userService,
-            IMediaGroupService mediaGroupService)
+    public async Task<bool> OnForwardMessageReceived(Users dbUser, Message message)
+    {
+        if (dbUser.Right.HasFlag(EUserRights.AdminCmd))
         {
-            _logger = logger;
-            _botClient = botClient;
-            _channelService = channelService;
-            _postService = postService;
-            _markupHelperService = markupHelperService;
-            _userService = userService;
-            _mediaGroupService = mediaGroupService;
-        }
+            var forwardFrom = message.ForwardFrom!;
+            var forwardChatId = message.ForwardFromChat?.Id ?? -1;
+            var foreardMsgId = message.ForwardFromMessageId ?? -1;
 
-        public async Task<bool> OnForwardMessageReceived(Users dbUser, Message message)
-        {
-            if (dbUser.Right.HasFlag(UserRights.AdminCmd))
+            if (forwardChatId != -1 && foreardMsgId != -1 &&
+               (_channelService.IsChannelMessage(forwardChatId) || _channelService.IsGroupMessage(forwardChatId)))
             {
-                var forwardFrom = message.ForwardFrom!;
-                var forwardFromChat = message.ForwardFromChat;
-                var foreardMsgId = message.ForwardFromMessageId;
+                NewPosts? post = null;
 
-                if (forwardFromChat != null && foreardMsgId != null
-                    && (_channelService.IsChannelMessage(forwardFromChat.Id) || _channelService.IsGroupMessage(forwardFromChat.Id)))
+                var mediaGroup = await _mediaGroupService.QueryMediaGroup(forwardChatId, foreardMsgId);
+                if (mediaGroup == null)
                 {
-                    Posts? post = null;
-
-                    bool isMediaGroup = !string.IsNullOrEmpty(message.MediaGroupId);
-                    if (!isMediaGroup)
+                    if (_channelService.IsChannelMessage(forwardChatId)) //转发自发布频道或拒绝存档
                     {
-                        if (forwardFromChat.Id == _channelService.AcceptChannel.Id)
-                        {
-                            post = await _postService.GetFirstAsync(x => x.PublicMsgID == foreardMsgId);
-                        }
-                        else if (forwardFromChat.Id == _channelService.ReviewGroup.Id)
-                        {
-                            post = await _postService.GetFirstAsync(x => x.ReviewMsgID == foreardMsgId || x.ManageMsgID == foreardMsgId);
-                        }
+                        post = await _postService.GetFirstAsync(x => x.PublicMsgID == foreardMsgId);
                     }
-                    else
+                    else //转发自关联群组
                     {
-                        var groupMsgs = await _mediaGroupService.QueryMediaGroup(message.MediaGroupId);
-                        var msgIds = groupMsgs.Select(x => x.MessageID).ToList();
-
-                        if (forwardFromChat.Id == _channelService.AcceptChannel.Id)
-                        {
-                            post = await _postService.GetFirstAsync(x => msgIds.Contains(x.PublicMsgID));
-                        }
-                        else if (forwardFromChat.Id == _channelService.ReviewGroup.Id)
-                        {
-                            post = await _postService.GetFirstAsync(x => msgIds.Contains(x.ReviewMsgID) || msgIds.Contains(x.ManageMsgID));
-                        }
+                        post = await _postService.GetFirstAsync(x =>
+                            (x.ReviewChatID == forwardChatId && x.ReviewMsgID == foreardMsgId) ||
+                            (x.ReviewActionChatID == forwardChatId && x.ReviewActionMsgID == foreardMsgId)
+                        );
                     }
-
-                    if (post != null)
+                }
+                else
+                {
+                    if (_channelService.IsChannelMessage(forwardChatId)) //转发自发布频道或拒绝存档
                     {
-                        var poster = await _userService.FetchUserByUserID(post.PosterUID);
-                        if (poster != null)
+                        post = await _postService.GetFirstAsync(x => x.PublishMediaGroupID == mediaGroup.MediaGroupID);
+                    }
+                    else //转发自关联群组 (仅支持审核群)
+                    {
+                        post = await _postService.GetFirstAsync(x => x.ReviewMediaGroupID == mediaGroup.MediaGroupID);
+                    }
+                }
+
+                if (post != null)
+                {
+                    var poster = await _userService.FetchUserByUserID(post.PosterUID);
+                    if (poster != null)
+                    {
+                        if (post.Status == EPostStatus.Reviewing)
                         {
-                            if (post.Status == PostStatus.Reviewing)
-                            {
-                                await _botClient.AutoReplyAsync("无法操作审核中的稿件", message);
-                                return false;
-                            }
-
-                            var keyboard = _markupHelperService.QueryPostMenuKeyboard(dbUser, post);
-
-                            string postStatus = post.Status switch
-                            {
-                                PostStatus.ConfirmTimeout => "投递超时",
-                                PostStatus.ReviewTimeout => "审核超时",
-                                PostStatus.Rejected => "已拒绝",
-                                PostStatus.Accepted => "已发布",
-                                _ => "未知",
-                            };
-                            string postMode = post.IsDirectPost ? "直接发布" : (post.Anonymous ? "匿名投稿" : "保留来源");
-                            string posterLink = poster.HtmlUserLink();
-
-                            StringBuilder sb = new();
-                            sb.AppendLine($"投稿人: {posterLink}");
-                            sb.AppendLine($"模式: {postMode}");
-                            sb.AppendLine($"状态: {postStatus}");
-
-                            await _botClient.SendTextMessageAsync(message.Chat, sb.ToString(), parseMode: ParseMode.Html, disableWebPagePreview: true, replyMarkup: keyboard, replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
-                            return true;
+                            await _botClient.AutoReplyAsync("无法操作审核中的稿件", message);
+                            return false;
                         }
+
+                        var keyboard = _markupHelperService.QueryPostMenuKeyboard(dbUser, post);
+
+                        string postStatus = post.Status switch {
+                            EPostStatus.ConfirmTimeout => "投递超时",
+                            EPostStatus.ReviewTimeout => "审核超时",
+                            EPostStatus.Rejected => "已拒绝",
+                            EPostStatus.Accepted => "已发布",
+                            _ => "未知",
+                        };
+                        string postMode = post.IsDirectPost ? "直接发布" : (post.Anonymous ? "匿名投稿" : "保留来源");
+                        string posterLink = poster.HtmlUserLink();
+
+                        var sb = new StringBuilder();
+                        sb.AppendLine($"投稿人: {posterLink}");
+                        sb.AppendLine($"模式: {postMode}");
+                        sb.AppendLine($"状态: {postStatus}");
+
+                        await _botClient.SendTextMessageAsync(message.Chat, sb.ToString(), parseMode: ParseMode.Html, disableWebPagePreview: true, replyMarkup: keyboard, replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
+                        return true;
                     }
                 }
             }
-            return false;
         }
+        return false;
     }
 }

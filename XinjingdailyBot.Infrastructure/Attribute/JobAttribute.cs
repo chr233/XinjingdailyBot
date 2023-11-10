@@ -1,23 +1,37 @@
-﻿namespace XinjingdailyBot.Infrastructure.Attribute
+namespace XinjingdailyBot.Infrastructure.Attribute;
+
+/// <summary>
+/// 标记定时任务
+/// </summary>
+[AttributeUsage(AttributeTargets.Class, Inherited = false)]
+public sealed class JobAttribute : System.Attribute
 {
     /// <summary>
-    /// 用于标记定时任务
+    /// Cron表达式
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public sealed class JobAttribute : System.Attribute
+    public string Schedule { get; set; }
+    /// <summary>
+    /// 群组
+    /// </summary>
+    public string? Group { get; set; }
+
+    /// <summary>
+    /// 标记定时任务
+    /// </summary>
+    /// <param name="schedule">Cron表达式</param>
+    public JobAttribute(string schedule)
     {
-        public string Schedule { get; set; }
-        public string? Group { get; set; }
+        Schedule = schedule;
+    }
 
-        public JobAttribute(string schedule)
-        {
-            Schedule = schedule;
-        }
-
-        public JobAttribute(string schedule, string group)
-        {
-            Schedule = schedule;
-            Group = group;
-        }
+    /// <summary>
+    /// 标记定时任务
+    /// </summary>
+    /// <param name="schedule"></param>
+    /// <param name="group"></param>
+    public JobAttribute(string schedule, string group)
+    {
+        Schedule = schedule;
+        Group = group;
     }
 }
