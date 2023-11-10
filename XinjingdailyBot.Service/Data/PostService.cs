@@ -625,11 +625,11 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         string posterMsg = _textHelperService.MakeNotification(rejectReason.FullText);
         if (poster.Notification)
         {
-            await _botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true);
+            await _botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, parseMode: ParseMode.Html, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true);
         }
         else
         {
-            await _botClient.EditMessageTextAsync(post.OriginActionChatID, (int)post.OriginActionMsgID, posterMsg);
+            await _botClient.EditMessageTextAsync(post.OriginActionChatID, (int)post.OriginActionMsgID, posterMsg, parseMode: ParseMode.Html);
         }
 
         poster.RejectCount++;

@@ -25,14 +25,15 @@ internal class ReviewCommand
     private readonly IPostService _postService;
     private readonly IMarkupHelperService _markupHelperService;
     private readonly RejectReasonRepository _rejectReasonRepository;
-
+    private readonly ITextHelperService _textHelperService;
     public ReviewCommand(
         ITelegramBotClient botClient,
         IUserService userService,
         IChannelService channelService,
         IPostService postService,
         IMarkupHelperService markupHelperService,
-        RejectReasonRepository rejectReasonRepository)
+        RejectReasonRepository rejectReasonRepository,
+        ITextHelperService textHelperService)
     {
         _botClient = botClient;
         _userService = userService;
@@ -40,6 +41,7 @@ internal class ReviewCommand
         _postService = postService;
         _markupHelperService = markupHelperService;
         _rejectReasonRepository = rejectReasonRepository;
+        _textHelperService = textHelperService;
     }
 
     /// <summary>
@@ -82,7 +84,9 @@ internal class ReviewCommand
                 return "请输入拒绝理由";
             }
 
-            post.RejectReason = reason;
+            var text = _textHelperService.ParseMessage(message);
+
+            post.RejectReason = text[4..];
             var rejectReason = new RejectReasons {
                 Name = reason,
                 FullText = reason,
@@ -93,7 +97,7 @@ internal class ReviewCommand
         }
 
         var text = await exec();
-        await _botClient.SendCommandReply(text, message, false);
+        await _botClient.SendCommandReply(text, message, false, ParseMode.Html);
     }
 
     /// <summary>
