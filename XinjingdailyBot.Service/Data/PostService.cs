@@ -111,7 +111,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
             if (postCount >= dailyLimit)
             {
                 await _botClient.AutoReplyAsync($"您已达到每日投稿上限 {postCount} / {dailyLimit}, 暂时无法继续投稿, 请明日再来", message);
-                return true;
+                return false;
             }
         }
 
