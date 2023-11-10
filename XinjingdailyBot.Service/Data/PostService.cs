@@ -527,7 +527,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         }
     }
 
-    public async Task RejetPost(NewPosts post, Users dbUser, RejectReasons rejectReason)
+    public async Task RejectPost(NewPosts post, Users dbUser, RejectReasons rejectReason)
     {
         var poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
 
