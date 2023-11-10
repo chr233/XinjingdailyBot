@@ -61,7 +61,7 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
-        ///   查找类似 🤔保留来源 的本地化字符串。
+        ///   查找类似 当前：🤔保留来源 的本地化字符串。
         /// </summary>
         public static string AnymouseOff {
             get {
@@ -70,7 +70,7 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
-        ///   查找类似 👻匿名投稿 的本地化字符串。
+        ///   查找类似 当前：👻匿名投稿 的本地化字符串。
         /// </summary>
         public static string AnymouseOn {
             get {
@@ -84,6 +84,24 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         public static string BanedUserTips {
             get {
                 return ResourceManager.GetString("BanedUserTips", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Copyright © 2022-2023 {0} 的本地化字符串。
+        /// </summary>
+        public static string Copyright {
+            get {
+                return ResourceManager.GetString("Copyright", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 ========================================================== 的本地化字符串。
+        /// </summary>
+        public static string Line {
+            get {
+                return ResourceManager.GetString("Line", resourceCulture);
             }
         }
         
@@ -232,11 +250,38 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
+        ///   查找类似 ✅二频 的本地化字符串。
+        /// </summary>
+        public static string ReviewAcceptSecond {
+            get {
+                return ResourceManager.GetString("ReviewAcceptSecond", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 ✅第二频道采用 的本地化字符串。
+        /// </summary>
+        public static string ReviewAcceptSecondFull {
+            get {
+                return ResourceManager.GetString("ReviewAcceptSecondFull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 尚未设置审核群组, 无法接收投稿 的本地化字符串。
         /// </summary>
         public static string ReviewGroupNotSet {
             get {
                 return ResourceManager.GetString("ReviewGroupNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 ⏳延时 的本地化字符串。
+        /// </summary>
+        public static string ReviewPlan {
+            get {
+                return ResourceManager.GetString("ReviewPlan", resourceCulture);
             }
         }
         
@@ -304,7 +349,7 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
-        ///   查找类似 🖼️禁用遮罩 的本地化字符串。
+        ///   查找类似 当前：🖼️禁用遮罩 的本地化字符串。
         /// </summary>
         public static string TagSpoilerOff {
             get {
@@ -313,7 +358,7 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
-        ///   查找类似 ⚠️开启遮罩 的本地化字符串。
+        ///   查找类似 当前：⚠️开启遮罩 的本地化字符串。
         /// </summary>
         public static string TagSpoilerOn {
             get {
@@ -358,11 +403,20 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
-        ///   查找类似 您已被{0}解封, 理由: {1}, 已恢复您的投稿和命令权限 的本地化字符串。
+        ///   查找类似 您已被 {0} 解封, 理由: {1}, 已恢复您的投稿和命令权限 的本地化字符串。
         /// </summary>
         public static string UnbanedUserTips {
             get {
                 return ResourceManager.GetString("UnbanedUserTips", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Version: {0} - {1} 的本地化字符串。
+        /// </summary>
+        public static string Version {
+            get {
+                return ResourceManager.GetString("Version", resourceCulture);
             }
         }
         
@@ -376,7 +430,7 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
-        ///   查找类似 当前累计受到警告&lt;code&gt;{0}&lt;/code&gt;次, 达到&lt;code&gt;{1}&lt;/code&gt;次后将会被系统自动封禁 的本地化字符串。
+        ///   查找类似 当前累计受到警告&lt;code&gt;{0}&lt;/code&gt;次, 达到&lt;code&gt;{1}&lt;/code&gt;次后将会被系统自动封禁, 警告90天后自动消除 的本地化字符串。
         /// </summary>
         public static string WarnUserTips2 {
             get {

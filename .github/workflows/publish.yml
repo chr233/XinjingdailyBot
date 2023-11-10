@@ -59,6 +59,12 @@ jobs:
           dotnet publish ${{ env.PROJECT_NAME }} -c "$env:CONFIGURATION" -o "./tmp/${{ env.PROJECT_NAME }}-fde" --self-contained=true -p:XJBVariant="$variant" -p:ContinuousIntegrationBuild=true --no-restore --nologo $commonArgs $buildArgs
           dotnet publish ${{ env.PROJECT_NAME }} -c "$env:CONFIGURATION" -o "./tmp/${{ env.PROJECT_NAME }}" --self-contained=false -p:XJBVariant="$variant" -p:ContinuousIntegrationBuild=true --no-restore --nologo $commonArgs $buildArgs
 
+      - name: Clean Xmls
+        shell: pwsh
+        run: |
+          Remove-Item './tmp/${{ env.PROJECT_NAME }}-fde/*.xml' 
+          Remove-Item './tmp/${{ env.PROJECT_NAME }}/*.xml' 
+
       - name: Zip files
         run: |
           7z a -bd -slp -tzip -mm=Deflate -mx=5 -mfb=150 -mpass=10 "./dist/${{ matrix.arch }}-fde.zip" "./tmp/${{ env.PROJECT_NAME }}-fde/*"
@@ -182,154 +188,22 @@ jobs:
         with:
           name: linux-arm64
           path: out
-
+            
       - name: Create ${{ env.PROJECT_NAME }} GitHub release
-        id: github_release
-        uses: actions/create-release@v1.1.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: ncipollo/release-action@v1.12.0
         with:
-          tag_name: ${{ github.ref_name }}
-          release_name: ${{ env.PROJECT_NAME }} ${{ github.ref_name }}
+          artifacts: "out/*"
+          makeLatest: false
           prerelease: true
-          body_path: .github/RELEASE_TEMPLATE.md
-
-      - name: Upload ${{ env.PROJECT_NAME }}-win-x64-fde
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.github_release.outputs.upload_url }}
-          asset_path: out/win-x64-fde.zip
-          asset_name: ${{ env.PROJECT_NAME }}-win-x64-fde.zip
-          asset_content_type: application/zip
-
-      - name: Upload ${{ env.PROJECT_NAME }}-win-x64
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.github_release.outputs.upload_url }}
-          asset_path: out/win-x64.zip
-          asset_name: ${{ env.PROJECT_NAME }}-win-x64.zip
-          asset_content_type: application/zip
-
-      - name: Upload ${{ env.PROJECT_NAME }}-win-arm64-fde
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.github_release.outputs.upload_url }}
-          asset_path: out/win-arm64-fde.zip
-          asset_name: ${{ env.PROJECT_NAME }}-win-arm64-fde.zip
-          asset_content_type: application/zip
-
-      - name: Upload ${{ env.PROJECT_NAME }}-win-arm64
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.github_release.outputs.upload_url }}
-          asset_path: out/win-arm64.zip
-          asset_name: ${{ env.PROJECT_NAME }}-win-arm64.zip
-          asset_content_type: application/zip
-
-      - name: Upload ${{ env.PROJECT_NAME }}-osx-x64-fde
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.github_release.outputs.upload_url }}
-          asset_path: out/osx-x64-fde.zip
-          asset_name: ${{ env.PROJECT_NAME }}-osx-x64-fde.zip
-          asset_content_type: application/zip
-
-      - name: Upload ${{ env.PROJECT_NAME }}-osx-x64
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.github_release.outputs.upload_url }}
-          asset_path: out/osx-x64.zip
-          asset_name: ${{ env.PROJECT_NAME }}-osx-x64.zip
-          asset_content_type: application/zip
-
-      - name: Upload ${{ env.PROJECT_NAME }}-osx-arm64-fde
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.github_release.outputs.upload_url }}
-          asset_path: out/osx-arm64-fde.zip
-          asset_name: ${{ env.PROJECT_NAME }}-osx-arm64-fde.zip
-          asset_content_type: application/zip
-
-      - name: Upload ${{ env.PROJECT_NAME }}-osx-arm64
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.github_release.outputs.upload_url }}
-          asset_path: out/osx-arm64.zip
-          asset_name: ${{ env.PROJECT_NAME }}-osx-arm64.zip
-          asset_content_type: application/zip
-
-      - name: Upload ${{ env.PROJECT_NAME }}-linux-x64-fde
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.github_release.outputs.upload_url }}
-          asset_path: out/linux-x64-fde.zip
-          asset_name: ${{ env.PROJECT_NAME }}-linux-x64-fde.zip
-          asset_content_type: application/zip
-
-      - name: Upload ${{ env.PROJECT_NAME }}-linux-x64
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.github_release.outputs.upload_url }}
-          asset_path: out/linux-x64.zip
-          asset_name: ${{ env.PROJECT_NAME }}-linux-x64.zip
-          asset_content_type: application/zip
-
-      - name: Upload ${{ env.PROJECT_NAME }}-linux-arm-fde
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.github_release.outputs.upload_url }}
-          asset_path: out/linux-arm-fde.zip
-          asset_name: ${{ env.PROJECT_NAME }}-linux-arm-fde.zip
-          asset_content_type: application/zip
-
-      - name: Upload ${{ env.PROJECT_NAME }}-linux-arm
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.github_release.outputs.upload_url }}
-          asset_path: out/linux-arm.zip
-          asset_name: ${{ env.PROJECT_NAME }}-linux-arm.zip
-          asset_content_type: application/zip
-
-      - name: Upload ${{ env.PROJECT_NAME }}-linux-arm64-fde
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.github_release.outputs.upload_url }}
-          asset_path: out/linux-arm64-fde.zip
-          asset_name: ${{ env.PROJECT_NAME }}-linux-arm64-fde.zip
-          asset_content_type: application/zip
-
-      - name: Upload ${{ env.PROJECT_NAME }}-linux-arm64
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.github_release.outputs.upload_url }}
-          asset_path: out/linux-arm64.zip
-          asset_name: ${{ env.PROJECT_NAME }}-linux-arm64.zip
-          asset_content_type: application/zip
+          tag: ${{ github.ref_name }}
+          name: ${{ env.PROJECT_NAME }} ${{ github.ref_name }}
+          body: |
+            # 更新说明
+            ![XinjingdailyBot Release](https://img.shields.io/badge/XinjingdailyBot-${{ github.ref_name }}-brightgreen) ![Downloads](https://img.shields.io/github/downloads/chr233/XinjingdailyBot/${{ github.ref_name }}/total?label=Downloads)
+            
+            release created bt github actions
+            
+            ---
+            
+            > 带 `fde` 表示可执行文件内置 .net 框架, 可以脱离框架运行, 但是体积比较大
+            > 如果电脑上已经安装过 .net 框架, 可以下载不带 `fde` 的版本, 节约硬盘空间

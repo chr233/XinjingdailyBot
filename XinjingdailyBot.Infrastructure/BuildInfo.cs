@@ -1,7 +1,12 @@
-﻿namespace XinjingdailyBot.Infrastructure
+#pragma warning disable CS1591 // 缺少对公共可见类型或成员的 XML 注释
+
+namespace XinjingdailyBot.Infrastructure;
+
+/// <summary>
+/// 编译信息
+/// </summary>
+public static class BuildInfo
 {
-    public static class BuildInfo
-    {
 #if XJB_VARIANT_GENERIC
 		    internal static bool CanUpdate => false;
 		    internal static string Variant => "generic";
@@ -27,8 +32,9 @@
 		    internal static bool CanUpdate => true;
 		    internal static string Variant => "win-x64";
 #else
-        public static bool CanUpdate => false;
-        public static string Variant => "source";
+    public static bool CanUpdate => false;
+    public static string Variant => "source";
 #endif
-    }
+    public static string Author => "chr233";
+    public static string Repo => "https://github.com/chr233/XinjingdailyBot/";
 }

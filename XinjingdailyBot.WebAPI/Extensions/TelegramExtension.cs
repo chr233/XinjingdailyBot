@@ -1,45 +1,44 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Service.Bot.Common;
 
-namespace XinjingdailyBot.WebAPI.Extensions
+namespace XinjingdailyBot.WebAPI.Extensions;
+
+/// <summary>
+/// Telegram扩展
+/// </summary>
+public static class TelegramExtension
 {
+    private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
     /// <summary>
-    /// Telegram扩展
+    /// 注册Telegram客户端
     /// </summary>
-    public static class TelegramExtension
+    /// <param name="services"></param>
+    public static void AddTelegramBotClient(this IServiceCollection services)
     {
-        private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-        /// <summary>
-        /// 注册Telegram客户端
-        /// </summary>
-        /// <param name="services"></param>
-        public static void AddTelegramBotClient(this IServiceCollection services)
-        {
-            services.AddSingleton<ITelegramBotClient>(serviceProvider =>
+        services.AddSingleton<ITelegramBotClient>(serviceProvider => {
+            var httpHelperService = serviceProvider.GetRequiredService<IHttpHelperService>();
+            var httpClient = httpHelperService.CreateClient("Telegram");
+
+            var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
+            string? token = config.Bot.BotToken;
+
+            if (string.IsNullOrEmpty(token))
             {
-                var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
-                var httpClient = httpClientFactory.CreateClient("Telegram");
+                _logger.Error("Telegram bot token 不能为空");
+                _logger.Error("按任意键退出...");
+                Console.ReadKey();
+                Environment.Exit(1);
+            }
 
-                var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
-                string? token = config.Bot.BotToken;
+            string? baseUrl = config.Bot.BaseUrl;
 
-                if (string.IsNullOrEmpty(token))
-                {
-                    _logger.Error("Telegram bot token 不能为空");
-                    _logger.Error("按任意键退出...");
-                    Console.ReadKey();
-                    Environment.Exit(1);
-                }
+            var options = new TelegramBotClientOptions(token, baseUrl, false);
+            return new TelegramBotClient(options, httpClient);
+        });
 
-                string? baseUrl = config.Bot.BaseUrl;
-
-                TelegramBotClientOptions options = new(token, baseUrl, false);
-                return new TelegramBotClient(options, httpClient);
-            });
-
-            services.AddHostedService<PollingService>();
-        }
+        services.AddHostedService<PollingService>();
     }
 }
