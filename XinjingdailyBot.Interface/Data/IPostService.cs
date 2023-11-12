@@ -84,8 +84,9 @@ public interface IPostService : IBaseService<NewPosts>
     /// <param name="post"></param>
     /// <param name="dbUser"></param>
     /// <param name="rejectReason"></param>
+    /// <param name="htmlRejectMessage"></param>
     /// <returns></returns>
-    Task RejectPost(NewPosts post, Users dbUser, RejectReasons rejectReason);
+    Task RejectPost(NewPosts post, Users dbUser, RejectReasons rejectReason, string? htmlRejectMessage);
     /// <summary>
     /// 设置稿件Tag
     /// </summary>

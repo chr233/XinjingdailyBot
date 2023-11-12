@@ -84,16 +84,15 @@ internal class ReviewCommand
                 return "请输入拒绝理由";
             }
 
-            var text = _textHelperService.ParseMessage(message);
-
-            post.RejectReason = text[4..];
+            var htmlText = _textHelperService.ParseMessage(message)[4..];
+            post.RejectReason = reason;
             var rejectReason = new RejectReasons {
                 Name = reason,
                 FullText = reason,
             };
-            await _postService.RejectPost(post, dbUser, rejectReason);
+            await _postService.RejectPost(post, dbUser, rejectReason, htmlText);
 
-            return $"已拒绝该稿件, 理由: {reason}";
+            return $"已拒绝该稿件, 理由: {htmlText}";
         }
 
         var text = await exec();
@@ -325,7 +324,7 @@ internal class ReviewCommand
             await _botClient.AutoReplyAsync($"找不到 {payload} 对应的拒绝理由", query, true);
             return;
         }
-        await _postService.RejectPost(post, dbUser, reason);
+        await _postService.RejectPost(post, dbUser, reason, null);
     }
 
     /// <summary>

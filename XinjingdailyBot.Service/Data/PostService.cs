@@ -527,7 +527,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         }
     }
 
-    public async Task RejectPost(NewPosts post, Users dbUser, RejectReasons rejectReason)
+    public async Task RejectPost(NewPosts post, Users dbUser, RejectReasons rejectReason, string? htmlRejectMessage)
     {
         var poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
 
@@ -622,7 +622,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         }
 
         //通知投稿人
-        string posterMsg = _textHelperService.MakeNotification(rejectReason.FullText);
+        string posterMsg = _textHelperService.MakeNotification(htmlRejectMessage ?? rejectReason.FullText);
         if (poster.Notification)
         {
             await _botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, parseMode: ParseMode.Html, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true);
