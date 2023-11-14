@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using SqlSugar;
 using System.Diagnostics;
+using System.Drawing;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -80,9 +81,6 @@ internal class AdminCommand
 
     /// <inheritdoc cref="IBanRecordService.WarningLimit"/>
     private readonly int WarningLimit = IBanRecordService.WarningLimit;
-
-    /// <inheritdoc cref="IBanRecordService.WarnDuration"/>
-    private readonly int WarnDuration = IBanRecordService.WarnDuration;
 
     /// <summary>
     /// 获取群组信息
@@ -218,19 +216,8 @@ internal class AdminCommand
             }
             else
             {
-                targetUser.IsBan = true;
-                targetUser.ModifyAt = DateTime.Now;
-                await _userService.Updateable(targetUser).UpdateColumns(static x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
-
-                var record = new BanRecords {
-                    UserID = targetUser.UserID,
-                    OperatorUID = dbUser.UserID,
-                    Type = EBanType.Ban,
-                    BanTime = DateTime.Now,
-                    Reason = reason,
-                };
-
-                await _banRecordService.Insertable(record).ExecuteCommandAsync();
+                await _userService.BanUser(targetUser, true);
+                await _banRecordService.AddBanRecord(targetUser, dbUser, EBanType.Ban, reason);
 
                 try
                 {
@@ -320,19 +307,8 @@ internal class AdminCommand
             }
             else
             {
-                targetUser.IsBan = false;
-                targetUser.ModifyAt = DateTime.Now;
-                await _userService.Updateable(targetUser).UpdateColumns(static x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
-
-                var record = new BanRecords {
-                    UserID = targetUser.UserID,
-                    OperatorUID = dbUser.UserID,
-                    Type = EBanType.UnBan,
-                    BanTime = DateTime.Now,
-                    Reason = reason,
-                };
-
-                await _banRecordService.Insertable(record).ExecuteCommandAsync();
+                await _userService.BanUser(targetUser, false);
+                await _banRecordService.AddBanRecord(targetUser, dbUser, EBanType.UnBan, reason);
 
                 try
                 {
@@ -419,26 +395,9 @@ internal class AdminCommand
             }
             else
             {
-                //获取最近一条解封记录
-                var lastUnbaned = await _banRecordService.Queryable()
-                    .Where(x => x.UserID == targetUser.UserID && (x.Type == EBanType.UnBan || x.Type == EBanType.Ban))
-                    .OrderByDescending(static x => x.Id).FirstAsync();
+                int warnCount = await _banRecordService.GetWarnCount(targetUser);
 
-                var expireTime = DateTime.Now.AddDays(-WarnDuration);
-                int warnCount = await _banRecordService.Queryable()
-                        .Where(x => x.UserID == targetUser.UserID && x.Type == EBanType.Warning && x.BanTime > expireTime)
-                        .WhereIF(lastUnbaned != null, x => x.BanTime >= lastUnbaned!.BanTime)
-                        .CountAsync();
-
-                var record = new BanRecords {
-                    UserID = targetUser.UserID,
-                    OperatorUID = dbUser.UserID,
-                    Type = EBanType.Warning,
-                    BanTime = DateTime.Now,
-                    Reason = reason,
-                };
-
-                await _banRecordService.Insertable(record).ExecuteCommandAsync();
+                await _banRecordService.AddBanRecord(targetUser, dbUser, EBanType.Warning, reason);
 
                 warnCount++;
 
@@ -450,19 +409,8 @@ internal class AdminCommand
 
                 if (warnCount >= WarningLimit)
                 {
-                    record = new BanRecords {
-                        UserID = targetUser.UserID,
-                        OperatorUID = 0,
-                        Type = EBanType.Ban,
-                        BanTime = DateTime.Now,
-                        Reason = "90天内受到警告过多, 自动封禁",
-                    };
-
-                    await _banRecordService.Insertable(record).ExecuteCommandAsync();
-
-                    targetUser.IsBan = true;
-                    targetUser.ModifyAt = DateTime.Now;
-                    await _userService.Updateable(targetUser).UpdateColumns(static x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
+                    await _userService.BanUser(targetUser, true);
+                    await _banRecordService.AddBanRecord(targetUser, dbUser, EBanType.Ban, "90天内受到警告过多, 自动封禁");
 
                     sb.AppendLine("90天内受到警告过多, 系统自动封禁该用户");
                 }
@@ -531,9 +479,7 @@ internal class AdminCommand
         else
         {
             sb.AppendLine("投稿机器人封禁状态:");
-            var records = await _banRecordService.Queryable()
-                .Where(x => x.UserID == targetUser.UserID)
-                .OrderByDescending(static x => new { x.BanTime }).ToListAsync();
+            var records = await _banRecordService.GetBanRecores(targetUser);
 
             var status = targetUser.IsBan ? "已封禁" : "正常";
             sb.AppendLine($"用户名: {targetUser.HtmlUserLink()}");

@@ -781,4 +781,11 @@ internal sealed class UserService : BaseService<Users>, IUserService
 
         return sb.ToString();
     }
+
+    public async Task BanUser(Users targetUser, bool isBan)
+    {
+        targetUser.IsBan = isBan;
+        targetUser.ModifyAt = DateTime.Now;
+        await Updateable(targetUser).UpdateColumns(static x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
+    }
 }
