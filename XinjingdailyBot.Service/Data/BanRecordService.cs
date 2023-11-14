@@ -1,5 +1,7 @@
 using SqlSugar;
+using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Service.Data.Base;
@@ -12,5 +14,42 @@ internal sealed class BanRecordService : BaseService<BanRecords>, IBanRecordServ
 {
     public BanRecordService(ISqlSugarClient context) : base(context)
     {
+    }
+
+    public async Task AddBanRecord(Users targetUser, Users operatorUser, EBanType banType, string reason)
+    {
+        var record = new BanRecords {
+            UserID = targetUser.UserID,
+            OperatorUID = operatorUser.UserID,
+            Type = banType,
+            BanTime = DateTime.Now,
+            Reason = reason,
+        };
+
+        await Insertable(record).ExecuteCommandAsync();
+    }
+
+    public async Task<int> GetWarnCount(Users targetUser)
+    {
+        //获取最近一条解封记录
+        var lastUnbaned = await Queryable()
+            .Where(x => x.UserID == targetUser.UserID && (x.Type == EBanType.UnBan || x.Type == EBanType.Ban))
+            .OrderByDescending(static x => x.Id).FirstAsync();
+
+        var expireTime = DateTime.Now.AddDays(-IBanRecordService.WarnDuration);
+
+        int warnCount = await Queryable()
+                        .Where(x => x.UserID == targetUser.UserID && x.Type == EBanType.Warning && x.BanTime > expireTime)
+                        .WhereIF(lastUnbaned != null, x => x.BanTime >= lastUnbaned!.BanTime)
+                        .CountAsync();
+
+        return warnCount;
+    }
+
+    public Task<List<BanRecords>> GetBanRecores(Users targetUser)
+    {
+        return Queryable()
+         .Where(x => x.UserID == targetUser.UserID)
+         .OrderByDescending(static x => new { x.BanTime }).ToListAsync();
     }
 }

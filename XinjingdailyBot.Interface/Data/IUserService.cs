@@ -81,4 +81,11 @@ public interface IUserService : IBaseService<Users>
     /// <param name="msgId"></param>
     /// <returns></returns>
     Task<Users?> FetchTargetUser(long chatId, int msgId);
+    /// <summary>
+    /// 封禁用户
+    /// </summary>
+    /// <param name="targetUser"></param>
+    /// <param name="isBan"></param>
+    /// <returns></returns>
+    Task BanUser(Users targetUser, bool isBan);
 }
