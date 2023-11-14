@@ -553,7 +553,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         }
 
         //修改审核群消息
-        string reviewMsg = _textHelperService.MakeReviewMessage(poster, dbUser, post.Anonymous, rejectReason.FullText);
+        string reviewMsg = _textHelperService.MakeReviewMessage(poster, dbUser, post.Anonymous, htmlRejectMessage ?? rejectReason.FullText);
         await _botClient.EditMessageTextAsync(post.ReviewActionChatID, (int)post.ReviewActionMsgID, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
 
         //拒稿频道发布消息

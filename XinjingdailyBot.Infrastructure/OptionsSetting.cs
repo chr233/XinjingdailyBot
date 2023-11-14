@@ -44,6 +44,9 @@ public sealed record OptionsSetting
     /// <inheritdoc cref="ScheduleOption"/>
     public ScheduleOption Schedule { get; set; } = new();
 
+    /// <inheritdoc cref="LevelOption"/>
+    public LevelOption Level { get; set; } = new();
+
     /// <summary>
     /// 机器人选项
     /// </summary>
@@ -266,5 +269,16 @@ public sealed record OptionsSetting
         /// 任务计划
         /// </summary>
         public Dictionary<string, string> Cron { get; set; } = new();
+    }
+
+    /// <summary>
+    /// 等级经验值设定
+    /// </summary>
+    public sealed record LevelOption
+    {
+        public float ExpPerAccept { get; set; }
+        public float ExpPerReject { get; set; }
+        public float ExpPerReview { get; set; }
+        public float ExpPerExpire { get; set; }
     }
 }

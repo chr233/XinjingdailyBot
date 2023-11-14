@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using SqlSugar;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
@@ -78,5 +79,19 @@ internal sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdve
                     .ExecuteCommandAsync();
             }
         }
+    }
+
+    public async Task AddAdPost(Advertises ad, long chatId, int msgId)
+    {
+        var adpost = new AdvertisePosts {
+            AdId = ad.Id,
+            ChatID = chatId,
+            MessageID = msgId,
+            Pined = ad.PinMessage,
+            CreateAt = DateTime.Now,
+            ModifyAt = DateTime.Now,
+        };
+
+        await Insertable(adpost).ExecuteCommandAsync();
     }
 }

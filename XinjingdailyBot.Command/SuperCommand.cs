@@ -275,14 +275,7 @@ internal class SuperCommand
 
                     effectCount++;
 
-                    await _userService.Updateable(user).UpdateColumns(static x => new {
-                        x.PostCount,
-                        x.AcceptCount,
-                        x.RejectCount,
-                        x.ExpiredPostCount,
-                        x.ReviewCount,
-                        x.ModifyAt
-                    }).ExecuteCommandAsync();
+                    await _userService.UpdateUserPostCount(user);
                 }
             }).ToList();
 

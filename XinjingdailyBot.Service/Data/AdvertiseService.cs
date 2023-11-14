@@ -64,4 +64,11 @@ internal sealed class AdvertiseService : BaseService<Advertises>, IAdvertiseServ
 
         return randomAd;
     }
+
+    public Task UpdateAdvertiseStatistics(Advertises ad)
+    {
+        return Updateable(ad).UpdateColumns(static x => new {
+            x.ShowCount, x.LastPostAt
+        }).ExecuteCommandAsync();
+    }
 }
