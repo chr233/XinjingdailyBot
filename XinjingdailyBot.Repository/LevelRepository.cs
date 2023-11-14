@@ -3,6 +3,8 @@ using SqlSugar;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository.Base;
+using XinjingdailyBot.Infrastructure;
+using Microsoft.Extensions.Options;
 
 namespace XinjingdailyBot.Repository;
 
@@ -13,17 +15,21 @@ namespace XinjingdailyBot.Repository;
 public class LevelRepository : BaseRepository<Levels>
 {
     private readonly ILogger<LevelRepository> _logger;
+    private readonly OptionsSetting.LevelOption _levelOption;
 
     /// <summary>
     /// 用户等级仓储类
     /// </summary>
     /// <param name="logger"></param>
     /// <param name="context"></param>
+    /// <param name="options"></param>
     public LevelRepository(
         ILogger<LevelRepository> logger,
-        ISqlSugarClient context) : base(context)
+        ISqlSugarClient context,
+       IOptions<OptionsSetting> options) : base(context)
     {
         _logger = logger;
+        _levelOption = options.Value.Level;
     }
 
     private Dictionary<int, Levels> LevelCache { get; } = new();
@@ -138,4 +144,6 @@ public class LevelRepository : BaseRepository<Levels>
         var level = GetLevelById(levelId);
         return level?.Name ?? "Lv-";
     }
+
+    //public Levels GetLevel
 }

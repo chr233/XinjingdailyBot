@@ -788,4 +788,23 @@ internal sealed class UserService : BaseService<Users>, IUserService
         targetUser.ModifyAt = DateTime.Now;
         await Updateable(targetUser).UpdateColumns(static x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
     }
+
+    private async Task UpdateUserInfo(Users targerUser)
+    {
+        //foreach(var level in _levelRepository.get)
+    }
+
+    public async Task UpdateUserPostCount(Users targerUser)
+    {
+        await UpdateUserInfo(targerUser);
+
+        await Updateable(targerUser).UpdateColumns(static x => new {
+            x.PostCount,
+            x.AcceptCount,
+            x.RejectCount,
+            x.ExpiredPostCount,
+            x.ReviewCount,
+            x.ModifyAt
+        }).ExecuteCommandAsync();
+    }
 }

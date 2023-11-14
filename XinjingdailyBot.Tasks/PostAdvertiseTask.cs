@@ -86,29 +86,17 @@ internal class PostAdvertiseTask : IJob
                         await _botClient.EditMessageReplyMarkupAsync(chat, msgId.Id, kbd);
                     }
 
-                    var adpost = new AdvertisePosts {
-                        AdId = ad.Id,
-                        ChatID = chatId,
-                        MessageID = msgId.Id,
-                        Pined = ad.PinMessage,
-                        CreateAt = DateTime.Now,
-                        ModifyAt = DateTime.Now,
-                    };
-
-                    await _advertisePostService.Insertable(adpost).ExecuteCommandAsync();
+                    await _advertisePostService.AddAdPost(ad, chatId, msgId.Id);
 
                     ad.ShowCount++;
                     ad.LastPostAt = DateTime.Now;
 
-                    if (adpost.Pined)
+                    if (ad.PinMessage)
                     {
                         await _botClient.PinChatMessageAsync(chatId, msgId.Id, true);
                     }
 
-                    await _advertisesService.Updateable(ad)
-                        .UpdateColumns(static x => new {
-                            x.ShowCount, x.LastPostAt
-                        }).ExecuteCommandAsync();
+                    await _advertisesService.UpdateAdvertiseStatistics(ad);
                 }
                 catch (Exception ex)
                 {

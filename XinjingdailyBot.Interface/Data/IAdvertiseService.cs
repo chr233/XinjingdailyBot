@@ -13,4 +13,5 @@ public interface IAdvertiseService : IBaseService<Advertises>
     /// </summary>
     /// <returns></returns>
     Task<Advertises?> GetPostableAdvertise();
+    Task UpdateAdvertiseStatistics(Advertises ad);
 }
