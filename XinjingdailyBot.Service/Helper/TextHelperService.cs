@@ -6,7 +6,6 @@ using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Model;
-using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;

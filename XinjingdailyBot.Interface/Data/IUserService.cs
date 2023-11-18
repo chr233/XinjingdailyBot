@@ -88,5 +88,10 @@ public interface IUserService : IBaseService<Users>
     /// <param name="isBan"></param>
     /// <returns></returns>
     Task BanUser(Users targetUser, bool isBan);
+    /// <summary>
+    /// 更新用户投稿数据
+    /// </summary>
+    /// <param name="targerUser"></param>
+    /// <returns></returns>
     Task UpdateUserPostCount(Users targerUser);
 }

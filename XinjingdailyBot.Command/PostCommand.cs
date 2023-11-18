@@ -66,9 +66,17 @@ internal class PostCommand
             return;
         }
 
+        if (post.Status == EPostStatus.ReviewTimeout || post.Status == EPostStatus.ConfirmTimeout)
+        {
+            var msg = "该稿件已过期, 无法操作";
+            await _botClient.AutoReplyAsync(msg, query);
+            await _botClient.EditMessageTextAsync(message, msg, null);
+            return;
+        }
+
         if (post.Status != EPostStatus.Padding)
         {
-            await _botClient.AutoReplyAsync("请不要重复操作", query);
+            await _botClient.AutoReplyAsync("请不要重复操作", query, true);
             await _botClient.EditMessageReplyMarkupAsync(message, null);
             return;
         }
@@ -153,7 +161,7 @@ internal class PostCommand
         }
         else
         {
-            var attachments = await _attachmentService.Queryable().Where(x => x.PostID == post.Id).ToListAsync();
+            var attachments = await _attachmentService.FetchAttachmentsByPostId(post.Id);
             var group = new IAlbumInputMedia[attachments.Count];
             for (int i = 0; i < attachments.Count; i++)
             {
@@ -219,6 +227,6 @@ internal class PostCommand
 
         dbUser.PostCount++;
         dbUser.ModifyAt = DateTime.Now;
-        await _userService.Updateable(dbUser).UpdateColumns(static x => new { x.PostCount, x.ModifyAt }).ExecuteCommandAsync();
+        await _userService.UpdateUserPostCount(dbUser);
     }
 }

@@ -3,8 +3,6 @@ using SqlSugar;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository.Base;
-using XinjingdailyBot.Infrastructure;
-using Microsoft.Extensions.Options;
 
 namespace XinjingdailyBot.Repository;
 
@@ -15,21 +13,17 @@ namespace XinjingdailyBot.Repository;
 public class LevelRepository : BaseRepository<Levels>
 {
     private readonly ILogger<LevelRepository> _logger;
-    private readonly OptionsSetting.LevelOption _levelOption;
 
     /// <summary>
     /// 用户等级仓储类
     /// </summary>
     /// <param name="logger"></param>
     /// <param name="context"></param>
-    /// <param name="options"></param>
     public LevelRepository(
         ILogger<LevelRepository> logger,
-        ISqlSugarClient context,
-       IOptions<OptionsSetting> options) : base(context)
+        ISqlSugarClient context) : base(context)
     {
         _logger = logger;
-        _levelOption = options.Value.Level;
     }
 
     private Dictionary<int, Levels> LevelCache { get; } = new();
@@ -145,5 +139,27 @@ public class LevelRepository : BaseRepository<Levels>
         return level?.Name ?? "Lv-";
     }
 
-    //public Levels GetLevel
+    /// <summary>
+    /// 根据经验获取等级组
+    /// </summary>
+    /// <param name="totalExp"></param>
+    /// <returns></returns>
+    public Levels? GetLevelByExp(ulong totalExp)
+    {
+        foreach (var (_, level) in LevelCache)
+        {
+            var min = level.MinExp;
+            var max = level.MaxExp;
+            if (min == 0 && max == 0)
+            {
+                continue;
+            }
+
+            if ((min <= totalExp || min == 0) && (max >= totalExp || max == 0))
+            {
+                return level;
+            }
+        }
+        return GetDefaultLevel();
+    }
 }

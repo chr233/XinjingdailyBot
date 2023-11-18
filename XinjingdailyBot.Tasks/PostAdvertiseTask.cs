@@ -7,7 +7,6 @@ using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
-using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Tasks;
 

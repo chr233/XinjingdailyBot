@@ -115,4 +115,29 @@ internal sealed class AttachmentService : BaseService<Attachments>, IAttachmentS
 
         return result;
     }
+
+    public Task CreateAttachment(Attachments attachment)
+    {
+        return Insertable(attachment).ExecuteCommandAsync();
+    }
+
+    public Task CreateAttachments(List<Attachments> attachments)
+    {
+        return Storageable(attachments).ExecuteCommandAsync();
+    }
+
+    public Task<Attachments> FetchAttachmentByPostId(long postId)
+    {
+        return Queryable().FirstAsync(x => x.PostID == postId);
+    }
+
+    public Task<List<Attachments>> FetchAttachmentsByPostId(long postId)
+    {
+        return Queryable().Where(x => x.PostID == postId).ToListAsync();
+    }
+
+    public Task<int> GetAttachmentCount()
+    {
+        return Queryable().CountAsync();
+    }
 }

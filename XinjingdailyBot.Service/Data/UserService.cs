@@ -466,7 +466,7 @@ internal sealed class UserService : BaseService<Users>, IUserService
             }
 
             //在CMD回调表里查看
-            var cmdAction = await _cmdRecordService.Queryable().FirstAsync(x => x.MessageID == replyToMsg.MessageId);
+            var cmdAction = await _cmdRecordService.FetchCmdRecordByMessageId(replyToMsg.MessageId);
             if (cmdAction != null)
             {
                 return await FetchUserByUserID(cmdAction.UserID);
@@ -509,7 +509,7 @@ internal sealed class UserService : BaseService<Users>, IUserService
         }
 
         //在CMD回调表里查看
-        var cmdAction = await _cmdRecordService.Queryable().FirstAsync(x => x.MessageID == msgId);
+        var cmdAction = await _cmdRecordService.FetchCmdRecordByMessageId(msgId);
         if (cmdAction != null)
         {
             return await FetchUserByUserID(cmdAction.UserID);
@@ -722,6 +722,7 @@ internal sealed class UserService : BaseService<Users>, IUserService
         sb.AppendLine($"用户名: <code>{userNick}</code>");
         sb.AppendLine($"用户ID: <code>{dbUser.UserID}</code>");
         sb.AppendLine($"用户组: <code>{group}</code>");
+        sb.AppendLine($"经验: <code>{dbUser.Experience}</code>");
         sb.AppendLine($"状态: <code>{status}</code>");
         sb.AppendLine($"等级:  <code>{level}</code>");
         sb.AppendLine($"投稿数量: <code>{totalPost}</code>");
@@ -789,16 +790,31 @@ internal sealed class UserService : BaseService<Users>, IUserService
         await Updateable(targetUser).UpdateColumns(static x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
     }
 
-    private async Task UpdateUserInfo(Users targerUser)
+    /// <summary>
+    /// 计算用户经验
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    private ulong CalcUserExp(Users user)
     {
-        //foreach(var level in _levelRepository.get)
+        var level = _optionsSetting.Level;
+        var exp =
+            level.ExpPerAccept * user.AcceptCount +
+            level.ExpPerReject * user.RejectCount +
+            level.ExpPerReview * user.ReviewCount +
+            level.ExpPerExpire * user.ExpiredPostCount;
+        return Convert.ToUInt64(exp);
     }
 
     public async Task UpdateUserPostCount(Users targerUser)
     {
-        await UpdateUserInfo(targerUser);
+        targerUser.Experience = CalcUserExp(targerUser);
+        var level = _levelRepository.GetLevelByExp(targerUser.Experience);
+        targerUser.Level = level?.Id ?? 1;
 
         await Updateable(targerUser).UpdateColumns(static x => new {
+            x.Experience,
+            x.Level,
             x.PostCount,
             x.AcceptCount,
             x.RejectCount,

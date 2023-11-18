@@ -156,74 +156,82 @@ internal class ReviewCommand
     /// 处理稿件
     /// </summary>
     /// <param name="dbUser"></param>
-    /// <param name="callbackQuery"></param>
+    /// <param name="query"></param>
     /// <returns></returns>
     [QueryCmd("REVIEW", EUserRights.ReviewPost, Alias = "REJECT", Description = "审核稿件")]
-    public async Task HandleQuery(Users dbUser, CallbackQuery callbackQuery)
+    public async Task HandleQuery(Users dbUser, CallbackQuery query)
     {
-        var message = callbackQuery.Message!;
-        var post = await _postService.FetchPostFromCallbackQuery(callbackQuery);
+        var message = query.Message!;
+        var post = await _postService.FetchPostFromCallbackQuery(query);
         if (post == null)
         {
-            await _botClient.AutoReplyAsync("未找到稿件", callbackQuery, true);
+            await _botClient.AutoReplyAsync("未找到稿件", query, true);
             await _botClient.EditMessageReplyMarkupAsync(message, null);
+            return;
+        }
+
+        if (post.Status == EPostStatus.ReviewTimeout || post.Status == EPostStatus.ConfirmTimeout)
+        {
+            var msg = "该稿件已过期, 无法操作";
+            await _botClient.AutoReplyAsync(msg, query);
+            await _botClient.EditMessageTextAsync(message, msg, null);
             return;
         }
 
         if (post.Status != EPostStatus.Reviewing)
         {
-            await _botClient.AutoReplyAsync("请不要重复操作", callbackQuery, true);
+            await _botClient.AutoReplyAsync("请不要重复操作", query, true);
             await _botClient.EditMessageReplyMarkupAsync(message, null);
             return;
         }
 
         if (!dbUser.Right.HasFlag(EUserRights.ReviewPost))
         {
-            await _botClient.AutoReplyAsync("无权操作", callbackQuery, true);
+            await _botClient.AutoReplyAsync("无权操作", query, true);
             return;
         }
 
-        var data = callbackQuery.Data;
+        var data = query.Data;
         if (string.IsNullOrEmpty(data))
         {
-            await _botClient.AutoReplyAsync("内部错误", callbackQuery, true);
+            await _botClient.AutoReplyAsync("内部错误", query, true);
             return;
         }
 
         switch (data)
         {
             case "review reject":
-                await SwitchKeyboard(true, post, callbackQuery);
+                await SwitchKeyboard(true, post, query);
                 break;
 
             //兼容旧的callback data
             case "reject back":
             case "review reject back":
-                await SwitchKeyboard(false, post, callbackQuery);
+                await SwitchKeyboard(false, post, query);
                 break;
 
             case "review spoiler":
-                await SetSpoiler(post, callbackQuery);
+                await SetSpoiler(post, query);
                 break;
 
             case "review inplan":
-                await _postService.AcceptPost(post, dbUser, true, false, callbackQuery);
+                await _postService.AcceptPost(post, dbUser, true, false, query);
                 break;
 
             case "review accept":
-                await _postService.AcceptPost(post, dbUser, false, false, callbackQuery);
+                await _postService.AcceptPost(post, dbUser, false, false, query);
                 break;
 
             case "review accept second":
-                await _postService.AcceptPost(post, dbUser, false, true, callbackQuery);
+                await _postService.AcceptPost(post, dbUser, false, true, query);
                 break;
 
             case "review anymouse":
-                await SetAnymouse(post, callbackQuery);
+                await SetAnymouse(post, query);
                 break;
 
             case "review cancel":
-                await CancelPost(post, callbackQuery);
+                await CancelPost(post, query);
                 break;
 
             default:
@@ -232,17 +240,17 @@ internal class ReviewCommand
                     var payload = data[11..];
                     if (payload != "spoiler")
                     {
-                        await _postService.SetPostTag(post, payload, callbackQuery);
+                        await _postService.SetPostTag(post, payload, query);
                     }
                     else
                     {
-                        await SetSpoiler(post, callbackQuery);
+                        await SetSpoiler(post, query);
                     }
                 }
                 else if (data.StartsWith("reject "))
                 {
                     var payload = data[7..];
-                    await RejectPostHelper(post, dbUser, callbackQuery, payload);
+                    await RejectPostHelper(post, dbUser, query, payload);
                 }
                 break;
         }
