@@ -65,4 +65,24 @@ internal sealed class CmdRecordService : BaseService<CmdRecords>, ICmdRecordServ
 
         await Insertable(record).ExecuteCommandAsync();
     }
+
+    public Task<CmdRecords> FetchCmdRecordByMessageId(int msgId)
+    {
+        return Queryable().FirstAsync(x => x.MessageID == msgId);
+    }
+
+    public Task<int> GetErrorCmdCount(DateTime startTime)
+    {
+        return Queryable().Where(x => x.Error && x.Handled && x.ExecuteAt >= startTime).CountAsync();
+    }
+
+    public Task<int> GetQueryCmdCount(DateTime startTime)
+    {
+        return Queryable().Where(x => x.IsQuery && x.Handled && x.ExecuteAt >= startTime).CountAsync();
+    }
+
+    public Task<int> GetTextCmdCount(DateTime startTime)
+    {
+        return Queryable().Where(x => !x.IsQuery && x.Handled && x.ExecuteAt >= startTime).CountAsync();
+    }
 }

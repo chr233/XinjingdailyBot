@@ -342,7 +342,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
 
         if (attachment != null)
         {
-            await _attachmentService.Insertable(attachment).ExecuteCommandAsync();
+            await _attachmentService.CreateAttachment(attachment);
         }
     }
 
@@ -477,7 +477,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
             var attachment = _attachmentService.GenerateAttachment(message, postID);
             if (attachment != null)
             {
-                await _attachmentService.Insertable(attachment).ExecuteCommandAsync();
+                await _attachmentService.CreateAttachment(attachment);
             }
 
             //记录媒体组
@@ -529,7 +529,12 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
 
     public async Task RejectPost(NewPosts post, Users dbUser, RejectReasons rejectReason, string? htmlRejectMessage)
     {
-        var poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
+        var poster = await _userService.FetchUserByUserID(post.PosterUID);
+
+        if (poster == null)
+        {
+            return;
+        }
 
         if (poster.IsBan)
         {
@@ -561,7 +566,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         {
             if (post.PostType != MessageType.Text)
             {
-                var attachment = await _attachmentService.Queryable().Where(x => x.PostID == post.Id).FirstAsync();
+                var attachment = await _attachmentService.FetchAttachmentByPostId(post.Id);
 
                 var inputFile = new InputFileId(attachment.FileID);
                 var handler = post.PostType switch {
@@ -582,7 +587,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         }
         else
         {
-            var attachments = await _attachmentService.Queryable().Where(x => x.PostID == post.Id).ToListAsync();
+            var attachments = await _attachmentService.FetchAttachmentsByPostId(post.Id);
             var group = new IAlbumInputMedia[attachments.Count];
             for (int i = 0; i < attachments.Count; i++)
             {
@@ -634,13 +639,13 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
 
         poster.RejectCount++;
         poster.ModifyAt = DateTime.Now;
-        await _userService.Updateable(poster).UpdateColumns(static x => new { x.RejectCount, x.ModifyAt }).ExecuteCommandAsync();
+        await _userService.UpdateUserPostCount(poster);
 
         if (poster.UserID != dbUser.UserID) //非同一个人才增加审核数量
         {
             dbUser.ReviewCount++;
             dbUser.ModifyAt = DateTime.Now;
-            await _userService.Updateable(dbUser).UpdateColumns(static x => new { x.ReviewCount, x.ModifyAt }).ExecuteCommandAsync();
+            await _userService.UpdateUserPostCount(dbUser);
         }
     }
 
@@ -678,7 +683,12 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
 
     public async Task AcceptPost(NewPosts post, Users dbUser, bool inPlan, bool second, CallbackQuery callbackQuery)
     {
-        var poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
+        var poster = await _userService.FetchUserByUserID(post.PosterUID);
+
+        if (poster == null)
+        {
+            return;
+        }
 
         if (poster.IsBan)
         {
@@ -725,7 +735,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
                 }
                 else
                 {
-                    var attachment = await _attachmentService.Queryable().FirstAsync(x => x.PostID == post.Id);
+                    var attachment = await _attachmentService.FetchAttachmentByPostId(post.Id);
 
                     var inputFile = new InputFileId(attachment.FileID);
                     var handler = post.PostType switch {
@@ -751,7 +761,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
             }
             else
             {
-                var attachments = await _attachmentService.Queryable().Where(x => x.PostID == post.Id).ToListAsync();
+                var attachments = await _attachmentService.FetchAttachmentsByPostId(post.Id);
                 var group = new IAlbumInputMedia[attachments.Count];
                 for (int i = 0; i < attachments.Count; i++)
                 {
@@ -839,7 +849,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         //增加通过数量
         poster.AcceptCount++;
         poster.ModifyAt = DateTime.Now;
-        await _userService.Updateable(poster).UpdateColumns(static x => new { x.AcceptCount, x.ModifyAt }).ExecuteCommandAsync();
+        await _userService.UpdateUserPostCount(poster);
 
         if (!post.IsDirectPost) //增加审核数量
         {
@@ -847,20 +857,26 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
             {
                 dbUser.ReviewCount++;
                 dbUser.ModifyAt = DateTime.Now;
-                await _userService.Updateable(dbUser).UpdateColumns(static x => new { x.ReviewCount, x.ModifyAt }).ExecuteCommandAsync();
+                await _userService.UpdateUserPostCount(dbUser);
             }
         }
         else
         {
             poster.PostCount++;
             poster.ModifyAt = DateTime.Now;
-            await _userService.Updateable(poster).UpdateColumns(static x => new { x.PostCount, x.ModifyAt }).ExecuteCommandAsync();
+            await _userService.UpdateUserPostCount(poster);
         }
     }
 
     public async Task<bool> PublicInPlanPost(NewPosts post)
     {
-        var poster = await _userService.Queryable().FirstAsync(x => x.UserID == post.PosterUID);
+        var poster = await _userService.FetchUserByUserID(post.PosterUID);
+
+        if (poster == null)
+        {
+            return false;
+        }
+
         if (post.IsDirectPost)
         {
             poster.PostCount++;
@@ -893,7 +909,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
                 }
                 else
                 {
-                    var attachment = await _attachmentService.Queryable().FirstAsync(x => x.PostID == post.Id);
+                    var attachment = await _attachmentService.FetchAttachmentByPostId(post.Id);
 
                     var inputFile = new InputFileId(attachment.FileID);
                     var handler = post.PostType switch {
@@ -918,7 +934,7 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
             }
             else
             {
-                var attachments = await _attachmentService.Queryable().Where(x => x.PostID == post.Id).ToListAsync();
+                var attachments = await _attachmentService.FetchAttachmentsByPostId(post.Id);
                 var group = new IAlbumInputMedia[attachments.Count];
                 for (int i = 0; i < attachments.Count; i++)
                 {

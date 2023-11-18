@@ -2,10 +2,10 @@
   <ItemGroup>
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="7.0.13" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.4" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
     <PackageVersion Include="MySql.Data" Version="8.2.0" />
     <PackageVersion Include="NLog" Version="5.2.5" />
     <PackageVersion Include="NLog.Extensions.Logging" Version="5.3.5" />
@@ -13,7 +13,7 @@
     <PackageVersion Include="Quartz" Version="3.7.0" />
     <PackageVersion Include="Quartz.AspNetCore" Version="3.7.0" />
     <PackageVersion Include="SqlSugar.IOC" Version="2.0.0" />
-    <PackageVersion Include="SqlSugarCore" Version="5.1.4.112" />
+    <PackageVersion Include="SqlSugarCore" Version="5.1.4.118-preview01" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
     <PackageVersion Include="Telegram.Bot" Version="20.0.0-alpha.1" />

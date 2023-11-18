@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.HttpOverrides;
-using XinjingdailyBot.WebAPI.IPC.Middlewares;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 

@@ -29,4 +29,8 @@ public interface ICmdRecordService : IBaseService<CmdRecords>
     /// <param name="exception"></param>
     /// <returns></returns>
     Task AddCmdRecord(CallbackQuery query, Users dbUser, bool handled, bool isQuery, string? exception);
+    Task<CmdRecords> FetchCmdRecordByMessageId(int msgId);
+    Task<int> GetErrorCmdCount(DateTime startTime);
+    Task<int> GetQueryCmdCount(DateTime startTime);
+    Task<int> GetTextCmdCount(DateTime startTime);
 }

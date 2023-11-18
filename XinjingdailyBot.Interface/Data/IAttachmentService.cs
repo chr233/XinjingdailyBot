@@ -9,6 +9,11 @@ namespace XinjingdailyBot.Interface.Data;
 /// </summary>
 public interface IAttachmentService : IBaseService<Attachments>
 {
+    Task CreateAttachment(Attachments attachment);
+    Task CreateAttachments(List<Attachments> attachments);
+    Task<Attachments> FetchAttachmentByPostId(long postId);
+    Task<List<Attachments>> FetchAttachmentsByPostId(long postId);
+
     /// <summary>
     /// 附件包装器
     /// </summary>
@@ -16,4 +21,5 @@ public interface IAttachmentService : IBaseService<Attachments>
     /// <param name="postID"></param>
     /// <returns></returns>
     Attachments? GenerateAttachment(Message message, long postID);
+    Task<int> GetAttachmentCount();
 }

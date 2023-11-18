@@ -87,7 +87,7 @@ public sealed record Users : BaseModel, IModifyAt, ICreateAt
     /// <summary>
     /// 经验
     /// </summary>
-    public long Experience { get; set; }
+    public ulong Experience { get; set; }
     /// <summary>
     /// 用户等级
     /// </summary>

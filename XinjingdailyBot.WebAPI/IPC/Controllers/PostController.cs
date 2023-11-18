@@ -245,7 +245,7 @@ public sealed class PostController : XjbController
             var attachment = _attachmentService.GenerateAttachment(originMsg, newPostId);
             if (attachment != null)
             {
-                await _attachmentService.Insertable(attachment).ExecuteCommandAsync();
+                await _attachmentService.CreateAttachment(attachment);
             }
             else
             {
@@ -286,7 +286,7 @@ public sealed class PostController : XjbController
 
             // 记录Attachment
             var attachments = messages.Select(x => _attachmentService.GenerateAttachment(x, newPostId)).ToList();
-            await _attachmentService.Storageable(attachments!).ExecuteCommandAsync();
+            await _attachmentService.CreateAttachments(attachments!);
 
             // 记录媒体组消息
             await _mediaGroupService.AddPostMediaGroup(messages);
@@ -326,7 +326,7 @@ public sealed class PostController : XjbController
 
         dbUser.PostCount++;
         dbUser.ModifyAt = DateTime.Now;
-        await _userService.Updateable(dbUser).UpdateColumns(static x => new { x.PostCount, x.ModifyAt }).ExecuteCommandAsync();
+        await _userService.UpdateUserPostCount(dbUser);
 
         var response = new GenericResponse<NewPosts> {
             Code = HttpStatusCode.OK,
@@ -484,7 +484,7 @@ public sealed class PostController : XjbController
             var attachment = _attachmentService.GenerateAttachment(originMsg, newPostId);
             if (attachment != null)
             {
-                await _attachmentService.Insertable(attachment).ExecuteCommandAsync();
+                await _attachmentService.CreateAttachment(attachment);
             }
             else
             {
@@ -525,7 +525,7 @@ public sealed class PostController : XjbController
 
             // 记录Attachment
             var attachments = messages.Select(x => _attachmentService.GenerateAttachment(x, newPostId)).ToList();
-            await _attachmentService.Storageable(attachments!).ExecuteCommandAsync();
+            await _attachmentService.CreateAttachments(attachments!);
 
             // 记录媒体组消息
             await _mediaGroupService.AddPostMediaGroup(messages);

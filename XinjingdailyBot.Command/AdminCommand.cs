@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Logging;
 using SqlSugar;
 using System.Diagnostics;
-using System.Drawing;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -851,7 +850,7 @@ internal class AdminCommand
         var totalRejectPost = await _postService.Queryable().Where(static x => x.Status == EPostStatus.Rejected).CountAsync();
         var totalExpiredPost = await _postService.Queryable().Where(static x => x.Status < 0).CountAsync();
         var totalChannel = await _channelOptionService.Queryable().CountAsync();
-        var totalAttachment = await _attachmentService.Queryable().CountAsync();
+        var totalAttachment = await _attachmentService.GetAttachmentCount();
 
         sb.AppendLine();
         sb.AppendLine("-- 历史投稿统计 --");
@@ -909,9 +908,9 @@ internal class AdminCommand
         sb.AppendLine($"运行时间: <code>{day}</code> 天 <code>{hours:F8}</code> 小时");
 
         var today = DateTime.Now.AddHours(-24);
-        var cmdCount = await _cmdRecordService.Queryable().Where(x => !x.IsQuery && x.Handled && x.ExecuteAt >= today).CountAsync();
-        var QueryCount = await _cmdRecordService.Queryable().Where(x => x.IsQuery && x.Handled && x.ExecuteAt >= today).CountAsync();
-        var errorCount = await _cmdRecordService.Queryable().Where(x => x.Error && x.Handled && x.ExecuteAt >= today).CountAsync();
+        var cmdCount = await _cmdRecordService.GetTextCmdCount(today);
+        var QueryCount = await _cmdRecordService.GetQueryCmdCount(today);
+        var errorCount = await _cmdRecordService.GetErrorCmdCount(today);
 
         sb.AppendLine();
         sb.AppendLine("-- 调用统计 --");

@@ -366,7 +366,7 @@ internal class NormalCommand
 
             if (randomPost.IsMediaGroup)
             {
-                var attachments = await _attachmentService.Queryable().Where(x => x.PostID == randomPost.Id).ToListAsync();
+                var attachments = await _attachmentService.FetchAttachmentsByPostId(randomPost.Id);
                 var group = new IAlbumInputMedia[attachments.Count];
                 for (int i = 0; i < attachments.Count; i++)
                 {
@@ -393,7 +393,7 @@ internal class NormalCommand
             }
             else
             {
-                var attachment = await _attachmentService.Queryable().FirstAsync(x => x.PostID == randomPost.Id);
+                var attachment = await _attachmentService.FetchAttachmentByPostId(randomPost.Id);
                 var handler = randomPost.PostType switch {
                     MessageType.Text => _botClient.SendTextMessageAsync(chat, randomPost.Text),
                     MessageType.Photo => _botClient.SendPhotoAsync(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard, hasSpoiler: hasSpoiler),

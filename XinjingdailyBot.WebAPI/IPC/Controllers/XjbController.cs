@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
-using XinjingdailyBot.WebAPI.Authorization;
 using XinjingdailyBot.WebAPI.IPC.Responses;
 
 namespace XinjingdailyBot.WebAPI.IPC.Controllers;
