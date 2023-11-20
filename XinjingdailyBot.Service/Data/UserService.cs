@@ -823,4 +823,62 @@ internal sealed class UserService : BaseService<Users>, IUserService
             x.ModifyAt
         }).ExecuteCommandAsync();
     }
+
+    public Task<int> CountUser()
+    {
+        return Queryable().CountAsync();
+    }
+
+    public Task<int> CountRecentlyUpdateUser(DateTime afterDate)
+    {
+        return Queryable().Where(x => x.ModifyAt >= afterDate).CountAsync();
+    }
+
+    public Task<int> CountUnBannedUser()
+    {
+        return Queryable().Where(static x => !x.IsBan).CountAsync();
+    }
+
+    public Task<int> CountPostedUser()
+    {
+        return Queryable().Where(static x => x.PostCount > 0).CountAsync();
+    }
+
+    public Task<List<Users>> GetUserList(IEnumerable<long> userIds)
+    {
+        return Queryable().Where(x => userIds.Contains(x.UserID)).Distinct().ToListAsync();
+    }
+
+    public Task<List<Users>> GetUserListAfterId(int startId, int count)
+    {
+        return Queryable().Where(x => x.Id >= startId).Take(count).ToListAsync();
+    }
+
+    public Task<List<Users>> GetUserAcceptCountRankList(int miniumPost, DateTime miniumPostTime, int takeCount)
+    {
+        return Queryable()
+            .Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > miniumPost && x.ModifyAt >= miniumPostTime)
+            .OrderByDescending(static x => x.AcceptCount).Take(takeCount).ToListAsync();
+    }
+
+    public Task<List<Users>> GetAdminUserAcceptCountRankList(int miniumPost, DateTime miniumPostTime, int takeCount)
+    {
+        return Queryable()
+            .Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.AcceptCount > miniumPost && x.ModifyAt >= miniumPostTime)
+            .OrderByDescending(static x => x.AcceptCount).Take(takeCount).ToListAsync();
+    }
+
+    public Task<List<Users>> GetAdminUserReviewCountRankList(int miniumPost, DateTime miniumPostTime, int takeCount)
+    {
+        return Queryable()
+            .Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.ReviewCount > miniumPost && x.ModifyAt >= miniumPostTime)
+            .OrderByDescending(static x => x.ReviewCount).Take(takeCount).ToListAsync();
+    }
+
+    public Task UpdateUserGroupId(Users user, int groupId)
+    {
+        user.GroupID = groupId;
+        user.ModifyAt = DateTime.Now;
+        return Updateable(user).UpdateColumns(static x => new { x.GroupID, x.ModifyAt }).ExecuteCommandAsync();
+    }
 }

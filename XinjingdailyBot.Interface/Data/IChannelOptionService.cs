@@ -11,6 +11,11 @@ namespace XinjingdailyBot.Interface.Data;
 public interface IChannelOptionService : IBaseService<ChannelOptions>
 {
     /// <summary>
+    /// 获取频道数量
+    /// </summary>
+    /// <returns></returns>
+    Task<int> ChannelCount();
+    /// <summary>
     /// 根据ID获取频道
     /// </summary>
     /// <param name="channelId"></param>
