@@ -1,3 +1,5 @@
+using Microsoft.Data.Sqlite;
+using MySqlConnector;
 using SqlSugar;
 using System.Diagnostics.CodeAnalysis;
 using XinjingdailyBot.Infrastructure;
@@ -33,9 +35,19 @@ public static class DatabaseExtension
 
         _logger.Info("数据库驱动: {0}", config.UseMySQL ? "MySQL" : "SQLite");
 
-        string connStr = config.UseMySQL ?
-            $"Host={config.DbHost};Port={config.DbPort};Database={config.DbName};UserID={config.DbUser};Password={config.DbPassword};CharSet=utf8mb4;AllowZeroDateTime=true" :
-            $"DataSource={config.DbName}.db";
+        var connStr = config.UseMySQL ?
+            new MySqlConnectionStringBuilder {
+                Server = config.DbHost,
+                Port = config.DbPort,
+                Database = config.DbName,
+                UserID = config.DbUser,
+                Password = config.DbPassword,
+                CharacterSet = "utf8mb4",
+                AllowZeroDateTime = true,
+            }.ToString() :
+            new SqliteConnectionStringBuilder {
+                DataSource = $"{config.DbName}.db",
+            }.ToString();
 
         services.AddSingleton<ISqlSugarClient>(s => {
             var sqlSugar = new SqlSugarScope(new ConnectionConfig {
