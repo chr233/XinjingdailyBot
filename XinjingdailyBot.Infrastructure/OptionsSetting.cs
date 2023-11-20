@@ -175,7 +175,7 @@ public sealed record OptionsSetting
         /// <summary>
         /// MySQL主机端口
         /// </summary>
-        public int DbPort { get; set; }
+        public uint DbPort { get; set; }
         /// <summary>
         /// MySQL数据库名称
         /// </summary>
