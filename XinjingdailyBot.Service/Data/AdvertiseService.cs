@@ -1,5 +1,7 @@
 using SqlSugar;
+using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Service.Data.Base;
@@ -17,6 +19,27 @@ internal sealed class AdvertiseService : BaseService<Advertises>, IAdvertiseServ
         ISqlSugarClient context) : base(context)
     {
         _advertisePostService = advertisePostService;
+    }
+
+    public Task CreateAdvertise(Message message)
+    {
+        var newAd = new Advertises {
+            ChatID = message.Chat.Id,
+            MessageID = message.MessageId,
+            Enable = false,
+            PinMessage = false,
+            Mode = EAdMode.All,
+            Weight = 100,
+            LastPostAt = DateTime.MinValue,
+            ShowCount = 0,
+            MaxShowCount = 0,
+            ExternalLink = "",
+            ExternalLinkName = "",
+            CreateAt = DateTime.Now,
+            ExpiredAt = DateTime.Now.AddDays(90),
+        };
+
+        return Insertable(newAd).ExecuteCommandAsync();
     }
 
     public async Task<Advertises?> GetPostableAdvertise()

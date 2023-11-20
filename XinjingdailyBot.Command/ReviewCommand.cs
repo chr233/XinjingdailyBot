@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -27,7 +26,6 @@ internal class ReviewCommand
     private readonly IMarkupHelperService _markupHelperService;
     private readonly RejectReasonRepository _rejectReasonRepository;
     private readonly ITextHelperService _textHelperService;
-    private readonly ILogger<ReviewCommand> _logger;
 
     public ReviewCommand(
         ITelegramBotClient botClient,
@@ -36,8 +34,7 @@ internal class ReviewCommand
         IPostService postService,
         IMarkupHelperService markupHelperService,
         RejectReasonRepository rejectReasonRepository,
-        ITextHelperService textHelperService,
-        ILogger<ReviewCommand> logger)
+        ITextHelperService textHelperService)
     {
         _botClient = botClient;
         _userService = userService;
@@ -46,7 +43,6 @@ internal class ReviewCommand
         _markupHelperService = markupHelperService;
         _rejectReasonRepository = rejectReasonRepository;
         _textHelperService = textHelperService;
-        _logger = logger;
     }
 
     /// <summary>

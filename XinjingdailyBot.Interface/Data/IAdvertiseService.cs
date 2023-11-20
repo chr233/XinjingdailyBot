@@ -1,3 +1,4 @@
+using Telegram.Bot.Types;
 using XinjingdailyBot.Interface.Data.Base;
 using XinjingdailyBot.Model.Models;
 
@@ -8,6 +9,8 @@ namespace XinjingdailyBot.Interface.Data;
 /// </summary>
 public interface IAdvertiseService : IBaseService<Advertises>
 {
+    Task CreateAdvertise(Message message);
+
     /// <summary>
     /// 获取可用的广告消息
     /// </summary>

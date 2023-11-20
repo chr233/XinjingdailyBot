@@ -1032,4 +1032,9 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         var post = await Queryable().Where(x => x.CreateAt >= today && x.Status == EPostStatus.Reviewing).FirstAsync();
         return post;
     }
+
+    public async Task<NewPosts?> GetPostByPostId(int postId)
+    {
+        return await Queryable().FirstAsync(x => x.Id == postId);
+    }
 }

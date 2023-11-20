@@ -49,6 +49,7 @@ public interface IPostService : IBaseService<NewPosts>
     /// </summary>
     /// <returns></returns>
     Task<NewPosts?> GetLatestReviewingPostLink();
+    Task<NewPosts?> GetPostByPostId(int postId);
 
     /// <summary>
     /// 处理多媒体投稿(mediaGroup)

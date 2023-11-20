@@ -31,9 +31,7 @@ internal sealed class BanRecordService : BaseService<BanRecords>, IBanRecordServ
     public async Task<int> GetWarnCount(Users targetUser)
     {
         //获取最近一条解封记录
-        var lastUnbaned = await Queryable()
-            .Where(x => x.UserID == targetUser.UserID && (x.Type == EBanType.UnBan || x.Type == EBanType.Ban))
-            .OrderByDescending(static x => x.Id).FirstAsync();
+        var lastUnbaned = await GetLatestBanRecord(targetUser.UserID);
 
         var expireTime = DateTime.Now.AddDays(-IBanRecordService.WarnDuration);
 
@@ -50,5 +48,12 @@ internal sealed class BanRecordService : BaseService<BanRecords>, IBanRecordServ
         return Queryable()
          .Where(x => x.UserID == targetUser.UserID)
          .OrderByDescending(static x => new { x.BanTime }).ToListAsync();
+    }
+
+    public async Task<BanRecords?> GetLatestBanRecord(long userId)
+    {
+        return await Queryable()
+                .Where(x => x.UserID == userId && (x.Type == EBanType.UnBan || x.Type == EBanType.Ban))
+                .OrderByDescending(static x => x.BanTime).FirstAsync();
     }
 }

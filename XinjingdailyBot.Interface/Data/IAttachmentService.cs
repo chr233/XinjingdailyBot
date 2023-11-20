@@ -9,9 +9,29 @@ namespace XinjingdailyBot.Interface.Data;
 /// </summary>
 public interface IAttachmentService : IBaseService<Attachments>
 {
+    /// <summary>
+    /// 创建单条附件
+    /// </summary>
+    /// <param name="attachment"></param>
+    /// <returns></returns>
     Task CreateAttachment(Attachments attachment);
+    /// <summary>
+    /// 创建多条附件
+    /// </summary>
+    /// <param name="attachments"></param>
+    /// <returns></returns>
     Task CreateAttachments(List<Attachments> attachments);
+    /// <summary>
+    /// 根据稿件ID获取附件
+    /// </summary>
+    /// <param name="postId"></param>
+    /// <returns></returns>
     Task<Attachments> FetchAttachmentByPostId(long postId);
+    /// <summary>
+    /// 根据稿件ID获取附件（多条）
+    /// </summary>
+    /// <param name="postId"></param>
+    /// <returns></returns>
     Task<List<Attachments>> FetchAttachmentsByPostId(long postId);
 
     /// <summary>
@@ -21,5 +41,9 @@ public interface IAttachmentService : IBaseService<Attachments>
     /// <param name="postID"></param>
     /// <returns></returns>
     Attachments? GenerateAttachment(Message message, long postID);
+    /// <summary>
+    /// 获取附件个数
+    /// </summary>
+    /// <returns></returns>
     Task<int> GetAttachmentCount();
 }

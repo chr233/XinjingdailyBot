@@ -94,4 +94,31 @@ public interface IUserService : IBaseService<Users>
     /// <param name="targerUser"></param>
     /// <returns></returns>
     Task UpdateUserPostCount(Users targerUser);
+    /// <summary>
+    /// 获取用户数量
+    /// </summary>
+    /// <returns></returns>
+    Task<int> CountUser();
+    /// <summary>
+    /// 获取指定日期后有更新的用户数量
+    /// </summary>
+    /// <param name="afterDate"></param>
+    /// <returns></returns>
+    Task<int> CountRecentlyUpdateUser(DateTime afterDate);
+    /// <summary>
+    /// 获取未封禁用户
+    /// </summary>
+    /// <returns></returns>
+    Task<int> CountUnBannedUser();
+    /// <summary>
+    /// 获取投稿通过的用户
+    /// </summary>
+    /// <returns></returns>
+    Task<int> CountPostedUser();
+    Task<List<Users>> GetUserList(IEnumerable<long> userIds);
+    Task<List<Users>> GetUserListAfterId(int startId, int count);
+    Task<List<Users>> GetUserAcceptCountRankList(int miniumPost, DateTime miniumPostTime, int takeCount);
+    Task<List<Users>> GetAdminUserAcceptCountRankList(int miniumPost, DateTime miniumPostTime, int takeCount);
+    Task<List<Users>> GetAdminUserReviewCountRankList(int miniumPost, DateTime miniumPostTime, int takeCount);
+    Task UpdateUserGroupId(Users user, int groupId);
 }

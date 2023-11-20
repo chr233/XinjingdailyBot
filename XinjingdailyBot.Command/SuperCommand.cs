@@ -136,7 +136,7 @@ internal class SuperCommand
                 return ("不是来自其他频道的投稿, 无法设置频道选项", null);
             }
 
-            var channel = await _channelOptionService.Queryable().FirstAsync(x => x.ChannelID == post.ChannelID);
+            var channel = await _channelOptionService.FetchChannelByChannelId(post.ChannelID);
 
             if (channel == null)
             {
@@ -245,13 +245,13 @@ internal class SuperCommand
         int startId = 1;
         int effectCount = 0;
 
-        int totalUsers = await _userService.Queryable().CountAsync();
+        int totalUsers = await _userService.CountUser();
 
         var msg = await _botClient.SendCommandReply($"开始更新用户表, 共计 {totalUsers} 条记录", message, autoDelete: false);
 
         while (startId <= totalUsers)
         {
-            var users = await _userService.Queryable().Where(x => x.Id >= startId).Take(threads).ToListAsync();
+            var users = await _userService.GetUserListAfterId(startId, threads);
             if (!users.Any())
             {
                 break;
@@ -704,23 +704,7 @@ internal class SuperCommand
             return;
         }
 
-        var newAd = new Advertises {
-            ChatID = replyMsg.Chat.Id,
-            MessageID = replyMsg.MessageId,
-            Enable = false,
-            PinMessage = false,
-            Mode = EAdMode.All,
-            Weight = 100,
-            LastPostAt = DateTime.MinValue,
-            ShowCount = 0,
-            MaxShowCount = 0,
-            ExternalLink = "",
-            ExternalLinkName = "",
-            CreateAt = DateTime.Now,
-            ExpiredAt = DateTime.Now.AddDays(90),
-        };
-
-        await _advertiseService.Insertable(newAd).ExecuteCommandAsync();
+        await _advertiseService.CreateAdvertise(replyMsg);
 
         await _botClient.SendCommandReply("创建广告成功, 请在数据库中修改广告配置并启用该广告", message, false, parsemode: ParseMode.Html);
     }

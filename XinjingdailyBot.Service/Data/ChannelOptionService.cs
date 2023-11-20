@@ -111,4 +111,9 @@ internal sealed class ChannelOptionService : BaseService<ChannelOptions>, IChann
         }
         return channel;
     }
+
+    public Task<int> ChannelCount()
+    {
+        return Queryable().CountAsync();
+    }
 }
