@@ -62,10 +62,12 @@ public sealed record Advertises : BaseModel, ICreateAt, IExpiredAt
     /// <summary>
     /// 外部链接
     /// </summary>
+    [SugarColumn(Length = 1000)]
     public string? ExternalLink { get; set; }
     /// <summary>
     /// 外部链接名称
     /// </summary>
+    [SugarColumn(Length = 1000)]
     public string? ExternalLinkName { get; set; }
 
     /// <inheritdoc cref="ICreateAt"/>
