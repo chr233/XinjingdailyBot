@@ -14,7 +14,7 @@ public interface IChannelService
     /// <summary>
     /// 审核日志频道
     /// </summary>
-    Chat ReviewLogChannel { get; }
+    Chat? LogChannel { get; }
     /// <summary>
     /// 评论区群组
     /// </summary>

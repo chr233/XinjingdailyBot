@@ -115,10 +115,50 @@ public interface IUserService : IBaseService<Users>
     /// </summary>
     /// <returns></returns>
     Task<int> CountPostedUser();
+    /// <summary>
+    /// 获取用户列表
+    /// </summary>
+    /// <param name="userIds"></param>
+    /// <returns></returns>
     Task<List<Users>> GetUserList(IEnumerable<long> userIds);
+    /// <summary>
+    /// 获取startId后的用户列表
+    /// </summary>
+    /// <param name="startId"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
     Task<List<Users>> GetUserListAfterId(int startId, int count);
+    /// <summary>
+    /// 获取通过数量排行
+    /// </summary>
+    /// <param name="miniumPost"></param>
+    /// <param name="miniumPostTime"></param>
+    /// <param name="takeCount"></param>
+    /// <returns></returns>
     Task<List<Users>> GetUserAcceptCountRankList(int miniumPost, DateTime miniumPostTime, int takeCount);
+    /// <summary>
+    /// 获取管理员通过排行
+    /// </summary>
+    /// <param name="miniumPost"></param>
+    /// <param name="miniumPostTime"></param>
+    /// <param name="takeCount"></param>
+    /// <returns></returns>
     Task<List<Users>> GetAdminUserAcceptCountRankList(int miniumPost, DateTime miniumPostTime, int takeCount);
+    /// <summary>
+    /// 获取管理员审核排行
+    /// </summary>
+    /// <param name="miniumPost"></param>
+    /// <param name="miniumPostTime"></param>
+    /// <param name="takeCount"></param>
+    /// <returns></returns>
     Task<List<Users>> GetAdminUserReviewCountRankList(int miniumPost, DateTime miniumPostTime, int takeCount);
+    /// <summary>
+    /// 更新用户组
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="groupId"></param>
+    /// <returns></returns>
     Task UpdateUserGroupId(Users user, int groupId);
+    Task SetUserNotification(Users user, bool notification);
+    Task SetUserPreferAnonymous(Users user, bool preferAnonymous);
 }

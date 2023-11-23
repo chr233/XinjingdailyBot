@@ -138,8 +138,8 @@ internal class ReviewCommand
                 return "未找到投稿用户";
             }
 
-            post.Text = string.Join(' ', args).Trim();
-            await _postService.Updateable(post).UpdateColumns(static x => new { x.Text }).ExecuteCommandAsync();
+            var text = string.Join(' ', args).Trim();
+            await _postService.EditPostText(post, text);
 
             return "稿件描述已更新";
         }
@@ -223,7 +223,7 @@ internal class ReviewCommand
                 break;
 
             case "review anymouse":
-                await SetAnymouse(post, query);
+                await SetAnonymous(post, query);
                 break;
 
             case "review cancel":
@@ -259,14 +259,12 @@ internal class ReviewCommand
     /// <param name="post"></param>
     /// <param name="query"></param>
     /// <returns></returns>
-    private async Task SetAnymouse(NewPosts post, CallbackQuery query)
+    private async Task SetAnonymous(NewPosts post, CallbackQuery query)
     {
-        await _botClient.AutoReplyAsync("可以使用命令 /anymouse 切换默认匿名投稿", query);
+        await _botClient.AutoReplyAsync("可以使用命令 /anonymous 切换默认匿名投稿", query);
 
         bool anonymous = !post.Anonymous;
-        post.Anonymous = anonymous;
-        post.ModifyAt = DateTime.Now;
-        await _postService.Updateable(post).UpdateColumns(static x => new { x.Anonymous, x.ModifyAt }).ExecuteCommandAsync();
+        await _postService.SetPostAnonymous(post, anonymous);
 
         bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
 
@@ -288,15 +286,15 @@ internal class ReviewCommand
             return;
         }
 
-        post.HasSpoiler = !post.HasSpoiler;
-        post.ModifyAt = DateTime.Now;
-        await _postService.Updateable(post).UpdateColumns(static x => new { x.HasSpoiler, x.ModifyAt }).ExecuteCommandAsync();
+        var hasSpoiler = !post.HasSpoiler;
 
-        await _botClient.AutoReplyAsync(post.HasSpoiler ? "启用遮罩" : "禁用遮罩", query);
+        await _postService.SetPostSpoiler(post, hasSpoiler);
+
+        await _botClient.AutoReplyAsync(hasSpoiler ? "启用遮罩" : "禁用遮罩", query);
 
         var keyboard = post.IsDirectPost ?
-            _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags, post.HasSpoiler) :
-            _markupHelperService.ReviewKeyboardA(post.Tags, post.HasSpoiler);
+            _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags, hasSpoiler) :
+            _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
         await _botClient.EditMessageReplyMarkupAsync(query.Message!, keyboard);
     }
 
@@ -308,9 +306,7 @@ internal class ReviewCommand
     /// <returns></returns>
     private async Task CancelPost(NewPosts post, CallbackQuery query)
     {
-        post.Status = EPostStatus.Cancel;
-        post.ModifyAt = DateTime.Now;
-        await _postService.Updateable(post).UpdateColumns(static x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
+        await _postService.CancelPost(post);
 
         await _botClient.EditMessageTextAsync(query.Message!, Langs.PostCanceled, replyMarkup: null);
 

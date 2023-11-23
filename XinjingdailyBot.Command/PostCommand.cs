@@ -111,12 +111,10 @@ internal class PostCommand
     /// <returns></returns>
     private async Task SetAnymouse(NewPosts post, CallbackQuery query)
     {
-        await _botClient.AutoReplyAsync("可以使用命令 /anymouse 切换默认匿名投稿", query);
+        await _botClient.AutoReplyAsync("可以使用命令 /anonymous 切换默认匿名投稿", query);
 
         bool anonymous = !post.Anonymous;
-        post.Anonymous = anonymous;
-        post.ModifyAt = DateTime.Now;
-        await _postService.Updateable(post).UpdateColumns(static x => new { x.Anonymous, x.ModifyAt }).ExecuteCommandAsync();
+        await _postService.SetPostAnonymous(post, anonymous);
 
         var keyboard = _markupHelperService.PostKeyboard(anonymous);
         await _botClient.EditMessageReplyMarkupAsync(query.Message!, keyboard);
@@ -130,10 +128,7 @@ internal class PostCommand
     /// <returns></returns>
     private async Task CancelPost(NewPosts post, CallbackQuery query)
     {
-        post.Status = EPostStatus.Cancel;
-        post.ModifyAt = DateTime.Now;
-
-        await _postService.Updateable(post).UpdateColumns(static x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
+        await _postService.CancelPost(post);
 
         await _botClient.EditMessageTextAsync(query.Message!, Langs.PostCanceled, replyMarkup: null);
 

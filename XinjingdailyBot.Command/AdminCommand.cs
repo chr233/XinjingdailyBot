@@ -40,6 +40,7 @@ internal class AdminCommand
     private readonly IUserTokenService _userTokenService;
     private readonly IMediaGroupService _mediaGroupService;
     private readonly ITextHelperService _textHelperService;
+    private readonly IDialogueService _dialogueService;
 
     public AdminCommand(
         ILogger<AdminCommand> logger,
@@ -55,7 +56,8 @@ internal class AdminCommand
         ICmdRecordService cmdRecordService,
         IUserTokenService userTokenService,
         IMediaGroupService mediaGroupService,
-        ITextHelperService textHelperService)
+        ITextHelperService textHelperService,
+        IDialogueService dialogueService)
     {
         _logger = logger;
         _botClient = botClient;
@@ -71,6 +73,7 @@ internal class AdminCommand
         _userTokenService = userTokenService;
         _mediaGroupService = mediaGroupService;
         _textHelperService = textHelperService;
+        _dialogueService = dialogueService;
     }
 
     /// <summary>
@@ -777,77 +780,75 @@ internal class AdminCommand
 
         var sb = new StringBuilder();
 
-        var todayPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status > EPostStatus.Cancel).CountAsync();
-        var todayAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status == EPostStatus.Accepted).CountAsync();
-        var todayRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status == EPostStatus.Rejected).CountAsync();
-        var todayExpiredPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status < 0).CountAsync();
+        var todayPost = await _postService.CountAllPosts(prev1Day);
+        var todayAcceptPost = await _postService.CountAcceptedPosts(prev1Day);
+        var todayRejectPost = await _postService.CountRejectedPosts(prev1Day);
 
         sb.AppendLine("-- 24小时投稿统计 --");
         sb.AppendLine($"接受/拒绝: <code>{todayAcceptPost}</code> / <code>{todayRejectPost}</code>");
         if (second)
         {
-            var todayAcceptSecondPost = await _postService.Queryable().Where(x => x.CreateAt >= prev1Day && x.Status == EPostStatus.AcceptedSecond).CountAsync();
+            var todayAcceptSecondPost = await _postService.CountAcceptedSecondPosts(prev1Day);
             sb.AppendLine($"接受(二频): <code>{todayAcceptSecondPost}</code>");
         }
         sb.AppendLine($"通过率: <code>{(todayPost > 0 ? (100 * todayAcceptPost / todayPost).ToString("f2") : "--")}%</code>");
-        sb.AppendLine($"过期投稿: <code>{todayExpiredPost}</code>");
-        sb.AppendLine($"累计投稿: <code>{todayPost + todayExpiredPost}</code>");
+        sb.AppendLine($"累计投稿: <code>{todayPost}</code>");
 
-        var weekPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status > EPostStatus.Cancel).CountAsync();
-        var weekAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status == EPostStatus.Accepted).CountAsync();
-        var weekRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status == EPostStatus.Rejected).CountAsync();
-        var weekExpiredPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status < 0).CountAsync();
+        var weekPost = await _postService.CountAllPosts(prev7Days);
+        var weekAcceptPost = await _postService.CountAcceptedPosts(prev7Days);
+        var weekRejectPost = await _postService.CountRejectedPosts(prev7Days);
+        var weekExpiredPost = await _postService.CountExpiredPosts(prev7Days);
 
         sb.AppendLine();
         sb.AppendLine("-- 7日投稿统计 --");
         sb.AppendLine($"接受/拒绝: <code>{weekAcceptPost}</code> / <code>{weekRejectPost}</code>");
         if (second)
         {
-            var weekAcceptSecondPost = await _postService.Queryable().Where(x => x.CreateAt >= prev7Days && x.Status == EPostStatus.AcceptedSecond).CountAsync();
+            var weekAcceptSecondPost = await _postService.CountAcceptedSecondPosts(prev7Days);
             sb.AppendLine($"接受(二频): <code>{weekAcceptSecondPost}</code>");
         }
         sb.AppendLine($"通过率: <code>{(weekPost > 0 ? (100 * weekAcceptPost / weekPost).ToString("f2") : "--")}%</code>");
         sb.AppendLine($"过期投稿: <code>{weekExpiredPost}</code>");
         sb.AppendLine($"累计投稿: <code>{weekPost + weekExpiredPost}</code>");
 
-        var monthPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status > EPostStatus.Cancel).CountAsync();
-        var monthAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status == EPostStatus.Accepted).CountAsync();
-        var monthRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status == EPostStatus.Rejected).CountAsync();
-        var monthExpiredPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status < 0).CountAsync();
+        var monthPost = await _postService.CountAllPosts(monthStart);
+        var monthAcceptPost = await _postService.CountAcceptedPosts(monthStart);
+        var monthRejectPost = await _postService.CountRejectedPosts(monthStart);
+        var monthExpiredPost = await _postService.CountExpiredPosts(monthStart);
 
         sb.AppendLine();
         sb.AppendLine($"-- {monthStart.ToString("MM")}月投稿统计 --");
         sb.AppendLine($"接受/拒绝: <code>{monthAcceptPost}</code> / <code>{monthRejectPost}</code>");
         if (second)
         {
-            var monthAcceptSecondPost = await _postService.Queryable().Where(x => x.CreateAt >= monthStart && x.Status == EPostStatus.AcceptedSecond).CountAsync();
+            var monthAcceptSecondPost = await _postService.CountAcceptedSecondPosts(monthStart);
             sb.AppendLine($"接受(二频): <code>{monthAcceptSecondPost}</code>");
         }
         sb.AppendLine($"通过率: <code>{(monthPost > 0 ? (100 * monthAcceptPost / monthPost).ToString("f2") : "--")}%</code>");
         sb.AppendLine($"过期投稿: <code>{monthExpiredPost}</code>");
         sb.AppendLine($"累计投稿: <code>{monthPost}</code>");
 
-        var yearPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status > EPostStatus.Cancel).CountAsync();
-        var yearAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status == EPostStatus.Accepted).CountAsync();
-        var yearRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status == EPostStatus.Rejected).CountAsync();
-        var yearExpiredPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status < 0).CountAsync();
+        var yearPost = await _postService.CountAllPosts(yearStart);
+        var yearAcceptPost = await _postService.CountAcceptedPosts(yearStart);
+        var yearRejectPost = await _postService.CountRejectedPosts(yearStart);
+        var yearExpiredPost = await _postService.CountExpiredPosts(yearStart);
 
         sb.AppendLine();
         sb.AppendLine($"-- {yearStart.ToString("yyyy")}年投稿统计 --");
         sb.AppendLine($"接受/拒绝: <code>{yearAcceptPost}</code> / <code>{yearRejectPost}</code>");
         if (second)
         {
-            var yearAcceptSecondPost = await _postService.Queryable().Where(x => x.CreateAt >= yearStart && x.Status == EPostStatus.AcceptedSecond).CountAsync();
+            var yearAcceptSecondPost = await _postService.CountAcceptedSecondPosts(yearStart);
             sb.AppendLine($"接受(二频): <code>{yearAcceptSecondPost}</code>");
         }
         sb.AppendLine($"通过率: <code>{(yearPost > 0 ? (100 * yearAcceptPost / yearPost).ToString("f2") : "--")}%</code>");
         sb.AppendLine($"过期投稿: <code>{yearExpiredPost}</code>");
         sb.AppendLine($"累计投稿: <code>{yearPost}</code>");
 
-        var totalPost = await _postService.Queryable().Where(static x => x.Status > EPostStatus.Cancel).CountAsync();
-        var totalAcceptPost = await _postService.Queryable().Where(static x => x.Status == EPostStatus.Accepted).CountAsync();
-        var totalRejectPost = await _postService.Queryable().Where(static x => x.Status == EPostStatus.Rejected).CountAsync();
-        var totalExpiredPost = await _postService.Queryable().Where(static x => x.Status < 0).CountAsync();
+        var totalPost = await _postService.CountAllPosts();
+        var totalAcceptPost = await _postService.CountAcceptedPosts();
+        var totalRejectPost = await _postService.CountRejectedPosts();
+        var totalExpiredPost = await _postService.CountExpiredPosts();
         var totalChannel = await _channelOptionService.ChannelCount();
         var totalAttachment = await _attachmentService.GetAttachmentCount();
 
@@ -856,7 +857,7 @@ internal class AdminCommand
         sb.AppendLine($"接受/拒绝: <code>{totalAcceptPost}</code> / <code>{totalRejectPost}</code>");
         if (second)
         {
-            var totalAcceptSecondPost = await _postService.Queryable().Where(static x => x.Status == EPostStatus.AcceptedSecond).CountAsync();
+            var totalAcceptSecondPost = await _postService.CountAcceptedSecondPosts();
             sb.AppendLine($"接受(二频): <code>{totalAcceptSecondPost}</code>");
         }
         sb.AppendLine($"通过率: <code>{(totalPost > 0 ? (100 * totalAcceptPost / totalPost).ToString("f2") : "--")}%</code>");
@@ -1482,10 +1483,7 @@ internal class AdminCommand
                 return "第二频道未设定";
             }
 
-            post.Status = EPostStatus.Revocation;
-            post.ModifyAt = DateTime.Now;
-            await _postService.Updateable(post).UpdateColumns(static x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
-
+            await _postService.RevocationPost(post);
 
             if (post.WarnTextID != -1 && post.WarnTextID != 0)
             {
@@ -1628,8 +1626,7 @@ internal class AdminCommand
         }
     }
 
-    //TODO
-    //[TextCmd("RECENTMESSAGE", EUserRights.AdminCmd, Description = "查询最近发言", Alias = "RECENTMSG")]
+    [TextCmd("RECENTMESSAGE", EUserRights.AdminCmd, Description = "查询最近发言", Alias = "RECENTMSG")]
     public async Task ResponseRecentMessage(Message message, string[] args)
     {
         async Task<string> exec()
@@ -1654,8 +1651,20 @@ internal class AdminCommand
                 return "无法查询当前机器人的发言";
             }
 
-            var sb = new StringBuilder();
+            var dialogs = await _dialogueService.FetchUserGroupMessages(targetUser, 0, 30);
 
+            if (!dialogs.Any())
+            {
+                return $"没有用户 {targetUser.EscapedFullName()} 的群聊发言记录";
+            }
+
+            var sb = new StringBuilder();
+            sb.AppendLine($"用户 {targetUser.EscapedFullName()} 的群聊发言记录");
+            var i = 1;
+            foreach (var dialog in dialogs)
+            {
+                sb.AppendLine(string.Format("{0} {1}", i++, dialog.Content));
+            }
 
             return sb.ToString();
         }

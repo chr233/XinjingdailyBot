@@ -18,7 +18,7 @@ internal class ChannelService : IChannelService
     private readonly ILogger<ChannelService> _logger;
 
     public Chat ReviewGroup { get; private set; } = new();
-    public Chat ReviewLogChannel { get; private set; } = new();
+    public Chat? LogChannel { get; private set; }
     public Chat CommentGroup { get; private set; } = new();
     public Chat SubGroup { get; private set; } = new();
     public Chat SecondCommentGroup { get; private set; } = new();
@@ -230,9 +230,9 @@ internal class ChannelService : IChannelService
         {
             UpdateChatTitle(chat, ReviewGroup);
         }
-        else if (chat.Id == ReviewLogChannel.Id)
+        else if (chat.Id == LogChannel?.Id)
         {
-            UpdateChatTitle(chat, ReviewLogChannel);
+            UpdateChatTitle(chat, LogChannel);
         }
     }
 }

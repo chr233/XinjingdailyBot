@@ -9,6 +9,8 @@ namespace XinjingdailyBot.Interface.Data;
 /// </summary>
 public interface IDialogueService : IBaseService<Dialogue>
 {
+    Task<List<Dialogue>> FetchUserGroupMessages(Users user, int startId = 0, int takeCount = 30);
+
     /// <summary>
     /// 记录群组聊天消息
     /// </summary>

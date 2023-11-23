@@ -83,9 +83,7 @@ internal class NormalCommand
         }
 
         bool anymouse = !dbUser.PreferAnonymous;
-        dbUser.PreferAnonymous = anymouse;
-        dbUser.ModifyAt = DateTime.Now;
-        await _userService.Updateable(dbUser).UpdateColumns(static x => new { x.PreferAnonymous, x.ModifyAt }).ExecuteCommandAsync();
+        await _userService.SetUserPreferAnonymous(dbUser, anymouse);
 
         var mode = anymouse ? "匿名投稿" : "保留来源";
         var text = $"后续投稿将默认使用【{mode}】";
@@ -107,12 +105,10 @@ internal class NormalCommand
             return;
         }
 
-        bool notificationg = !dbUser.Notification;
-        dbUser.Notification = notificationg;
-        dbUser.ModifyAt = DateTime.Now;
-        await _userService.Updateable(dbUser).UpdateColumns(static x => new { x.Notification, x.ModifyAt }).ExecuteCommandAsync();
+        bool notification = !dbUser.Notification;
+        await _userService.SetUserNotification(dbUser, notification);
 
-        var mode = notificationg ? "接收通知" : "静默模式";
+        var mode = notification ? "接收通知" : "静默模式";
         var text = $"稿件被审核或者过期时将会尝试通知用户\n当前通知设置: {mode}";
         await _botClient.SendCommandReply(text, message);
     }
