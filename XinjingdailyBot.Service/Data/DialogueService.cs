@@ -46,4 +46,9 @@ internal sealed class DialogueService : BaseService<Dialogue>, IDialogueService
 
         await InsertAsync(dialogue);
     }
+
+    public Task<List<Dialogue>> FetchUserGroupMessages(Users user, int startId = 0, int takeCount = 30)
+    {
+        return Queryable().Where(x => x.UserID == user.UserID && x.ChatID <= -1000000000000 && x.Id > startId).Take(takeCount).ToListAsync();
+    }
 }

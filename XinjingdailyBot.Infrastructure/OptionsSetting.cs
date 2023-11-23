@@ -97,9 +97,9 @@ public sealed record OptionsSetting
         /// </summary>
         public string ReviewGroup { get; set; } = "";
         /// <summary>
-        /// 审核日志频道
+        /// 日志频道
         /// </summary>
-        public string ReviewLogChannel { get; set; } = "";
+        public string LogChannel { get; set; } = "";
         /// <summary>
         /// 是否使用审核日志模式
         /// 启用: 审核后在审核群直接删除消息, 审核记录发送至审核日志频道

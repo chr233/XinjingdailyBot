@@ -25,6 +25,13 @@ public interface IPostService : IBaseService<NewPosts>
     /// <returns></returns>
     Task AcceptPost(NewPosts post, Users dbUser, bool inPlan, bool second, CallbackQuery callbackQuery);
     /// <summary>
+    /// 取消投稿
+    /// </summary>
+    /// <param name="post"></param>
+    /// <returns></returns>
+    Task CancelPost(NewPosts post);
+
+    /// <summary>
     /// 检查用户是否达到每日投稿上限
     /// </summary>
     /// <param name="dbUser"></param>
@@ -32,6 +39,69 @@ public interface IPostService : IBaseService<NewPosts>
     /// <param name="query"></param>
     /// <returns>true: 可以继续投稿 false: 无法继续投稿</returns>
     Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null);
+    /// <summary>
+    /// 统计通过投稿
+    /// </summary>
+    /// <param name="afterTime"></param>
+    /// <returns></returns>
+    Task<int> CountAcceptedPosts(DateTime afterTime);
+    /// <summary>
+    /// 统计通过投稿
+    /// </summary>
+    /// <returns></returns>
+    Task<int> CountAcceptedPosts();
+    /// <summary>
+    /// 统计二频通过投稿
+    /// </summary>
+    /// <param name="afterTime"></param>
+    /// <returns></returns>
+    Task<int> CountAcceptedSecondPosts(DateTime afterTime);
+    /// <summary>
+    /// 统计二频通过投稿
+    /// </summary>
+    /// <returns></returns>
+    Task<int> CountAcceptedSecondPosts();
+    /// <summary>
+    /// 统计全部投稿
+    /// </summary>
+    /// <param name="afterTime"></param>
+    /// <returns></returns>
+    Task<int> CountAllPosts(DateTime afterTime);
+    /// <summary>
+    /// 统计全部投稿
+    /// </summary>
+    /// <returns></returns>
+    Task<int> CountAllPosts();
+    /// <summary>
+    /// 统计过期投稿
+    /// </summary>
+    /// <param name="afterTime"></param>
+    /// <returns></returns>
+    Task<int> CountExpiredPosts(DateTime afterTime);
+    /// <summary>
+    /// 统计过期投稿
+    /// </summary>
+    /// <returns></returns>
+    Task<int> CountExpiredPosts();
+    /// <summary>
+    /// 统计拒绝投稿
+    /// </summary>
+    /// <param name="afterTime"></param>
+    /// <returns></returns>
+    Task<int> CountRejectedPosts(DateTime afterTime);
+    /// <summary>
+    /// 统计拒绝投稿
+    /// </summary>
+    /// <returns></returns>
+    Task<int> CountRejectedPosts();
+    /// <summary>
+    /// 编辑稿件描述
+    /// </summary>
+    /// <param name="post"></param>
+    /// <param name="text"></param>
+    /// <returns></returns>
+    Task EditPostText(NewPosts post, string text);
+
     /// <summary>
     /// 从审核回调中获取稿件
     /// </summary>
@@ -49,6 +119,11 @@ public interface IPostService : IBaseService<NewPosts>
     /// </summary>
     /// <returns></returns>
     Task<NewPosts?> GetLatestReviewingPostLink();
+    /// <summary>
+    /// 获取稿件
+    /// </summary>
+    /// <param name="postId"></param>
+    /// <returns></returns>
     Task<NewPosts?> GetPostByPostId(int postId);
 
     /// <summary>
@@ -88,6 +163,27 @@ public interface IPostService : IBaseService<NewPosts>
     /// <param name="htmlRejectMessage"></param>
     /// <returns></returns>
     Task RejectPost(NewPosts post, Users dbUser, RejectReasons rejectReason, string? htmlRejectMessage);
+    /// <summary>
+    /// 撤回稿件
+    /// </summary>
+    /// <param name="post"></param>
+    /// <returns></returns>
+    Task RevocationPost(NewPosts post);
+    /// <summary>
+    /// 设置稿件匿名
+    /// </summary>
+    /// <param name="post"></param>
+    /// <param name="anonymous"></param>
+    /// <returns></returns>
+    Task SetPostAnonymous(NewPosts post, bool anonymous);
+    /// <summary>
+    /// 设置稿件遮罩
+    /// </summary>
+    /// <param name="post"></param>
+    /// <param name="spoiler"></param>
+    /// <returns></returns>
+    Task SetPostSpoiler(NewPosts post, bool spoiler);
+
     /// <summary>
     /// 设置稿件Tag
     /// </summary>

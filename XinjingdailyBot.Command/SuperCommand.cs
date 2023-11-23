@@ -238,6 +238,7 @@ internal class SuperCommand
     /// <param name="message"></param>
     /// <returns></returns>
     [TextCmd("RECALCPOST", EUserRights.SuperCmd, Description = "重新计算用户投稿数量")]
+    [Obsolete("过时方法")]
     public async Task ResponseReCalcPost(Message message)
     {
         const int threads = 10;
@@ -536,6 +537,7 @@ internal class SuperCommand
     /// <param name="message"></param>
     /// <returns></returns>
     [TextCmd("FIXPOST", EUserRights.SuperCmd, Description = "修补稿件数据")]
+    [Obsolete("过时方法")]
     public async Task ResponseFixPost(Message message)
     {
         const int threads = 30;

@@ -881,4 +881,18 @@ internal sealed class UserService : BaseService<Users>, IUserService
         user.ModifyAt = DateTime.Now;
         return Updateable(user).UpdateColumns(static x => new { x.GroupID, x.ModifyAt }).ExecuteCommandAsync();
     }
+
+    public Task SetUserNotification(Users user, bool notification)
+    {
+        user.Notification = notification;
+        user.ModifyAt = DateTime.Now;
+        return Updateable(user).UpdateColumns(static x => new { x.Notification, x.ModifyAt }).ExecuteCommandAsync();
+    }
+
+    public Task SetUserPreferAnonymous(Users user, bool preferAnonymous)
+    {
+        user.PreferAnonymous = preferAnonymous;
+        user.ModifyAt = DateTime.Now;
+        return Updateable(user).UpdateColumns(static x => new { x.PreferAnonymous, x.ModifyAt }).ExecuteCommandAsync();
+    }
 }

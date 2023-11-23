@@ -1037,4 +1037,89 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
     {
         return await Queryable().FirstAsync(x => x.Id == postId);
     }
+
+    public Task<int> CountAllPosts()
+    {
+        return Queryable().Where(x => x.Status > EPostStatus.Cancel).CountAsync();
+    }
+
+    public Task<int> CountAllPosts(DateTime afterTime)
+    {
+        return Queryable().Where(x => x.CreateAt >= afterTime && x.Status > EPostStatus.Cancel).CountAsync();
+    }
+
+    public Task<int> CountAcceptedPosts()
+    {
+        return Queryable().Where(x => x.Status == EPostStatus.Accepted).CountAsync();
+    }
+
+    public Task<int> CountAcceptedPosts(DateTime afterTime)
+    {
+        return Queryable().Where(x => x.CreateAt >= afterTime && x.Status == EPostStatus.Accepted).CountAsync();
+    }
+
+    public Task<int> CountAcceptedSecondPosts()
+    {
+        return Queryable().Where(x => x.Status == EPostStatus.AcceptedSecond).CountAsync();
+    }
+
+    public Task<int> CountAcceptedSecondPosts(DateTime afterTime)
+    {
+        return Queryable().Where(x => x.CreateAt >= afterTime && x.Status == EPostStatus.AcceptedSecond).CountAsync();
+    }
+
+    public Task<int> CountRejectedPosts()
+    {
+        return Queryable().Where(x => x.Status == EPostStatus.Rejected).CountAsync();
+    }
+
+    public Task<int> CountRejectedPosts(DateTime afterTime)
+    {
+        return Queryable().Where(x => x.CreateAt >= afterTime && x.Status == EPostStatus.Rejected).CountAsync();
+    }
+
+    public Task<int> CountExpiredPosts()
+    {
+        return Queryable().Where(x => x.Status < 0).CountAsync();
+    }
+
+    public Task<int> CountExpiredPosts(DateTime afterTime)
+    {
+        return Queryable().Where(x => x.CreateAt >= afterTime && x.Status < 0).CountAsync();
+    }
+
+    public Task RevocationPost(NewPosts post)
+    {
+        post.Status = EPostStatus.Revocation;
+        post.ModifyAt = DateTime.Now;
+        return Updateable(post).UpdateColumns(static x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
+    }
+
+    public Task CancelPost(NewPosts post)
+    {
+        post.Status = EPostStatus.Cancel;
+        post.ModifyAt = DateTime.Now;
+        return Updateable(post).UpdateColumns(static x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
+    }
+
+    public Task EditPostText(NewPosts post, string text)
+    {
+        post.Text = text;
+        post.ModifyAt = DateTime.Now;
+        return Updateable(post).UpdateColumns(static x => new { x.Text }).ExecuteCommandAsync();
+    }
+
+    public Task SetPostAnonymous(NewPosts post, bool anonymous)
+    {
+        post.Anonymous = anonymous;
+        post.ModifyAt = DateTime.Now;
+        return Updateable(post).UpdateColumns(static x => new { x.Anonymous, x.ModifyAt }).ExecuteCommandAsync();
+    }
+
+    public Task SetPostSpoiler(NewPosts post, bool spoiler)
+    {
+        post.HasSpoiler = spoiler;
+        post.ModifyAt = DateTime.Now;
+        return Updateable(post).UpdateColumns(static x => new { x.HasSpoiler, x.ModifyAt }).ExecuteCommandAsync();
+    }
 }
