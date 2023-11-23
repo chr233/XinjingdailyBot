@@ -8,6 +8,13 @@ namespace XinjingdailyBot.Interface.Data;
 /// </summary>
 public interface IAdvertisePostService : IBaseService<AdvertisePosts>
 {
+    /// <summary>
+    /// 添加广告
+    /// </summary>
+    /// <param name="ad"></param>
+    /// <param name="chatId"></param>
+    /// <param name="msgId"></param>
+    /// <returns></returns>
     Task AddAdPost(Advertises ad, long chatId, int msgId);
 
     /// <summary>

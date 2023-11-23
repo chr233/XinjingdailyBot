@@ -221,7 +221,6 @@ internal class PostCommand
         await _botClient.EditMessageTextAsync(query.Message!, Langs.ThanksForSendingPost, replyMarkup: null);
 
         dbUser.PostCount++;
-        dbUser.ModifyAt = DateTime.Now;
         await _userService.UpdateUserPostCount(dbUser);
     }
 }

@@ -1,4 +1,3 @@
-using SqlSugar;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -40,16 +39,14 @@ internal class InlineQueryHandler : IInlineQueryHandler
 
             for (int i = 0; i < 10; i++)
             {
-                var randomPost = await _postService.Queryable()
-                    .Where(static x => x.Status == EPostStatus.Accepted && x.PostType == MessageType.Photo)
-                    .OrderBy(static x => SqlFunc.GetRandom()).Take(1).FirstAsync();
+                var randomPost = await _postService.GetRandomPost();
 
                 if (randomPost == null)
                 {
                     break;
                 }
 
-                var postAttachment = await _attachmentService.Queryable().Where(x => x.PostID == randomPost.Id).FirstAsync();
+                var postAttachment = await _attachmentService.FetchAttachmentByPostId(randomPost.Id);
                 var keyboard = _markupHelperService.LinkToOriginPostKeyboard(randomPost);
                 results.Add(new InlineQueryResultCachedPhoto(i.ToString(), postAttachment.FileID) {
                     Title = randomPost.Text,

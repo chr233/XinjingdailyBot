@@ -811,6 +811,7 @@ internal sealed class UserService : BaseService<Users>, IUserService
         targerUser.Experience = CalcUserExp(targerUser);
         var level = _levelRepository.GetLevelByExp(targerUser.Experience);
         targerUser.Level = level?.Id ?? 1;
+        targerUser.ModifyAt = DateTime.Now;
 
         await Updateable(targerUser).UpdateColumns(static x => new {
             x.Experience,

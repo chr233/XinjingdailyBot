@@ -770,7 +770,7 @@ internal class AdminCommand
     public async Task ResponsePostReport(Message message)
     {
         var now = DateTime.Now;
-        var prev1Day = now.AddDays(-1).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
+        var today = now.AddDays(-1).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
         var prev7Days = now.AddDays(-7).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
         var prev30Days = now.AddDays(-30).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
         var monthStart = now.AddDays(1 - now.Day).AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
@@ -780,15 +780,15 @@ internal class AdminCommand
 
         var sb = new StringBuilder();
 
-        var todayPost = await _postService.CountAllPosts(prev1Day);
-        var todayAcceptPost = await _postService.CountAcceptedPosts(prev1Day);
-        var todayRejectPost = await _postService.CountRejectedPosts(prev1Day);
+        var todayPost = await _postService.CountAllPosts(today);
+        var todayAcceptPost = await _postService.CountAcceptedPosts(today);
+        var todayRejectPost = await _postService.CountRejectedPosts(today);
 
         sb.AppendLine("-- 24小时投稿统计 --");
         sb.AppendLine($"接受/拒绝: <code>{todayAcceptPost}</code> / <code>{todayRejectPost}</code>");
         if (second)
         {
-            var todayAcceptSecondPost = await _postService.CountAcceptedSecondPosts(prev1Day);
+            var todayAcceptSecondPost = await _postService.CountAcceptedSecondPosts(today);
             sb.AppendLine($"接受(二频): <code>{todayAcceptSecondPost}</code>");
         }
         sb.AppendLine($"通过率: <code>{(todayPost > 0 ? (100 * todayAcceptPost / todayPost).ToString("f2") : "--")}%</code>");

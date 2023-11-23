@@ -325,7 +325,6 @@ public sealed class PostController : XjbController
         }).ExecuteCommandAsync();
 
         dbUser.PostCount++;
-        dbUser.ModifyAt = DateTime.Now;
         await _userService.UpdateUserPostCount(dbUser);
 
         var response = new GenericResponse<NewPosts> {
@@ -564,8 +563,7 @@ public sealed class PostController : XjbController
         }).ExecuteCommandAsync();
 
         dbUser.PostCount++;
-        dbUser.ModifyAt = DateTime.Now;
-        await _userService.Updateable(dbUser).UpdateColumns(static x => new { x.PostCount, x.ModifyAt }).ExecuteCommandAsync();
+        await _userService.UpdateUserPostCount(dbUser);
 
         var response = new GenericResponse<NewPosts> {
             Code = HttpStatusCode.OK,

@@ -638,13 +638,11 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         }
 
         poster.RejectCount++;
-        poster.ModifyAt = DateTime.Now;
         await _userService.UpdateUserPostCount(poster);
 
         if (poster.UserID != dbUser.UserID) //非同一个人才增加审核数量
         {
             dbUser.ReviewCount++;
-            dbUser.ModifyAt = DateTime.Now;
             await _userService.UpdateUserPostCount(dbUser);
         }
     }
@@ -856,14 +854,12 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
             if (poster.UserID != dbUser.UserID)
             {
                 dbUser.ReviewCount++;
-                dbUser.ModifyAt = DateTime.Now;
                 await _userService.UpdateUserPostCount(dbUser);
             }
         }
         else
         {
             poster.PostCount++;
-            poster.ModifyAt = DateTime.Now;
             await _userService.UpdateUserPostCount(poster);
         }
     }
@@ -1088,6 +1084,11 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         return Queryable().Where(x => x.CreateAt >= afterTime && x.Status < 0).CountAsync();
     }
 
+    public Task<int> CountReviewingPosts(DateTime afterTime)
+    {
+        return Queryable().Where(x => x.CreateAt >= afterTime && x.Status == EPostStatus.Reviewing).CountAsync();
+    }
+
     public Task RevocationPost(NewPosts post)
     {
         post.Status = EPostStatus.Revocation;
@@ -1121,5 +1122,22 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         post.HasSpoiler = spoiler;
         post.ModifyAt = DateTime.Now;
         return Updateable(post).UpdateColumns(static x => new { x.HasSpoiler, x.ModifyAt }).ExecuteCommandAsync();
+    }
+
+    public Task<bool> IfExistsMediaGroupId(string mediaGroupId)
+    {
+        return Queryable().AnyAsync(x => x.OriginMediaGroupID == mediaGroupId);
+    }
+
+    public async Task<NewPosts?> GetRandomPost()
+    {
+        return await Queryable()
+                    .Where(static x => x.Status == EPostStatus.Accepted && x.PostType == MessageType.Photo)
+                    .OrderBy(static x => SqlFunc.GetRandom()).FirstAsync();
+    }
+
+    public Task<NewPosts> GetInPlanPost()
+    {
+        return Queryable().Where(static x => x.Status == EPostStatus.InPlan).FirstAsync();
     }
 }

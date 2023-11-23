@@ -29,8 +29,28 @@ public interface ICmdRecordService : IBaseService<CmdRecords>
     /// <param name="exception"></param>
     /// <returns></returns>
     Task AddCmdRecord(CallbackQuery query, Users dbUser, bool handled, bool isQuery, string? exception);
+    /// <summary>
+    /// 获取命令调用记录
+    /// </summary>
+    /// <param name="msgId"></param>
+    /// <returns></returns>
     Task<CmdRecords> FetchCmdRecordByMessageId(int msgId);
+    /// <summary>
+    /// 获取错误命令调用数
+    /// </summary>
+    /// <param name="startTime"></param>
+    /// <returns></returns>
     Task<int> GetErrorCmdCount(DateTime startTime);
+    /// <summary>
+    /// 获取查询命令调用数
+    /// </summary>
+    /// <param name="startTime"></param>
+    /// <returns></returns>
     Task<int> GetQueryCmdCount(DateTime startTime);
+    /// <summary>
+    /// 获取文本命令调用数
+    /// </summary>
+    /// <param name="startTime"></param>
+    /// <returns></returns>
     Task<int> GetTextCmdCount(DateTime startTime);
 }

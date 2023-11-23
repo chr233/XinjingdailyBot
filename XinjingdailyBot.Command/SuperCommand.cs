@@ -272,7 +272,6 @@ internal class SuperCommand
                     user.RejectCount = rejectCount;
                     user.ExpiredPostCount = expiredCount;
                     user.ReviewCount = reviewCount;
-                    user.ModifyAt = DateTime.Now;
 
                     effectCount++;
 

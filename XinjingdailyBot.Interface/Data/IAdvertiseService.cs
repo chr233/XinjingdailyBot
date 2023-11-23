@@ -9,6 +9,11 @@ namespace XinjingdailyBot.Interface.Data;
 /// </summary>
 public interface IAdvertiseService : IBaseService<Advertises>
 {
+    /// <summary>
+    /// 创建广告
+    /// </summary>
+    /// <param name="message"></param>
+    /// <returns></returns>
     Task CreateAdvertise(Message message);
 
     /// <summary>
@@ -16,5 +21,10 @@ public interface IAdvertiseService : IBaseService<Advertises>
     /// </summary>
     /// <returns></returns>
     Task<Advertises?> GetPostableAdvertise();
+    /// <summary>
+    /// 更新广告统计
+    /// </summary>
+    /// <param name="ad"></param>
+    /// <returns></returns>
     Task UpdateAdvertiseStatistics(Advertises ad);
 }

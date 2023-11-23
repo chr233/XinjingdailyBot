@@ -50,6 +50,13 @@ internal sealed class BanRecordService : BaseService<BanRecords>, IBanRecordServ
          .OrderByDescending(static x => new { x.BanTime }).ToListAsync();
     }
 
+    public Task<List<BanRecords>> GetBanRecores(Users targetUser, DateTime expireTime)
+    {
+        return Queryable()
+            .Where(x => x.UserID == targetUser.UserID && (x.Type != EBanType.Warning || x.BanTime > expireTime))
+            .ToListAsync();
+    }
+
     public async Task<BanRecords?> GetLatestBanRecord(long userId)
     {
         return await Queryable()
