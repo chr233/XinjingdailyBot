@@ -159,6 +159,18 @@ public interface IUserService : IBaseService<Users>
     /// <param name="groupId"></param>
     /// <returns></returns>
     Task UpdateUserGroupId(Users user, int groupId);
+    /// <summary>
+    /// 设置用户通知偏好
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="notification"></param>
+    /// <returns></returns>
     Task SetUserNotification(Users user, bool notification);
+    /// <summary>
+    /// 设置默认匿名偏好
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="preferAnonymous"></param>
+    /// <returns></returns>
     Task SetUserPreferAnonymous(Users user, bool preferAnonymous);
 }

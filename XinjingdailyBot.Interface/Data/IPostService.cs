@@ -95,12 +95,25 @@ public interface IPostService : IBaseService<NewPosts>
     /// <returns></returns>
     Task<int> CountRejectedPosts();
     /// <summary>
+    /// 获取待审核稿件
+    /// </summary>
+    /// <param name="afterTime"></param>
+    /// <returns></returns>
+    Task<int> CountReviewingPosts(DateTime afterTime);
+
+    /// <summary>
     /// 编辑稿件描述
     /// </summary>
     /// <param name="post"></param>
     /// <param name="text"></param>
     /// <returns></returns>
     Task EditPostText(NewPosts post, string text);
+    /// <summary>
+    /// 是否存在指定媒体组ID的稿件
+    /// </summary>
+    /// <param name="mediaGroupId"></param>
+    /// <returns></returns>
+    Task<bool> IfExistsMediaGroupId(string mediaGroupId);
 
     /// <summary>
     /// 从审核回调中获取稿件
@@ -115,6 +128,12 @@ public interface IPostService : IBaseService<NewPosts>
     /// <returns></returns>
     Task<NewPosts?> FetchPostFromReplyToMessage(Message message);
     /// <summary>
+    /// 获取计划发布的投稿
+    /// </summary>
+    /// <returns></returns>
+    Task<NewPosts> GetInPlanPost();
+
+    /// <summary>
     /// 获取最新未审核稿件
     /// </summary>
     /// <returns></returns>
@@ -125,6 +144,11 @@ public interface IPostService : IBaseService<NewPosts>
     /// <param name="postId"></param>
     /// <returns></returns>
     Task<NewPosts?> GetPostByPostId(int postId);
+    /// <summary>
+    /// 获取随机稿件
+    /// </summary>
+    /// <returns></returns>
+    Task<NewPosts?> GetRandomPost();
 
     /// <summary>
     /// 处理多媒体投稿(mediaGroup)

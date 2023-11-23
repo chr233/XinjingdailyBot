@@ -148,10 +148,7 @@ internal class CommonCommand
     public async Task ResponseMyBan(Users dbUser, Message message)
     {
         var expireTime = DateTime.Now.AddDays(-WarnDuration);
-
-        var records = await _banRecordService.Queryable()
-            .Where(x => x.UserID == dbUser.UserID && (x.Type != EBanType.Warning || x.BanTime > expireTime))
-            .ToListAsync();
+        var records = await _banRecordService.GetBanRecores(dbUser, expireTime);
 
         var sb = new StringBuilder();
 

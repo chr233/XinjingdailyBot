@@ -47,14 +47,15 @@ internal class ReviewStatusTask : IJob
         var now = DateTime.Now;
         var today = now.AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
 
-        var todayPost = await _postService.Queryable().Where(x => x.CreateAt >= today && x.Status > EPostStatus.Cancel).CountAsync();
-        var todayAcceptPost = await _postService.Queryable().Where(x => x.CreateAt >= today && x.Status == EPostStatus.Accepted).CountAsync();
-        var todayRejectPost = await _postService.Queryable().Where(x => x.CreateAt >= today && x.Status == EPostStatus.Rejected).CountAsync();
-        var todayPaddingPost = await _postService.Queryable().Where(x => x.CreateAt >= today && x.Status == EPostStatus.Reviewing).CountAsync();
+
+        var todayPost = await _postService.CountAllPosts(today);
+        var todayAcceptPost = await _postService.CountAcceptedPosts(today);
+        var todayRejectPost = await _postService.CountRejectedPosts(today);
+        var todayPaddingPost = await _postService.CountReviewingPosts(today);
 
         if (_channelService.HasSecondChannel)
         {
-            var todayAcceptSecondPost = await _postService.Queryable().Where(x => x.CreateAt >= today && x.Status == EPostStatus.AcceptedSecond).CountAsync();
+            var todayAcceptSecondPost = await _postService.CountAcceptedSecondPosts(today);
             todayAcceptPost += todayAcceptSecondPost;
         }
 

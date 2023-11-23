@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Data;
 
 namespace XinjingdailyBot.Tasks;
@@ -26,8 +25,7 @@ internal class PlanedPostsTask : IJob
     {
         _logger.LogInformation("开始定时任务, 发布定时稿件");
 
-        var post = await _postService.Queryable()
-            .Where(static x => x.Status == EPostStatus.InPlan).FirstAsync();
+        var post = await _postService.GetInPlanPost();
 
         if (post == null)
         {
