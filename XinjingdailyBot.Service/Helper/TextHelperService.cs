@@ -153,7 +153,7 @@ internal sealed class TextHelperService : ITextHelperService
 
     public string MakeNotification(bool isDirect, bool inPlan, Message? message)
     {
-        var msgLink = message != null ? HtmlLink(message.GetMessageLink(), "消息直链") : "无"; ;
+        var msgLink = message != null ? HtmlLink(message.GetMessageLink(), "消息直链") : "无";
 
         if (!inPlan)
         {
