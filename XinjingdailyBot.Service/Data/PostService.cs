@@ -21,46 +21,21 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IPostService"/>
 [AppService(typeof(IPostService), LifeTime.Singleton)]
-internal sealed class PostService : BaseService<NewPosts>, IPostService
+internal sealed class PostService(
+    ILogger<PostService> _logger,
+    IAttachmentService _attachmentService,
+    IChannelService _channelService,
+    IChannelOptionService _channelOptionService,
+    ITextHelperService _textHelperService,
+    IMarkupHelperService _markupHelperService,
+    ITelegramBotClient _botClient,
+    IUserService _userService,
+    IOptions<OptionsSetting> options,
+    TagRepository _tagRepository,
+    IMediaGroupService _mediaGroupService,
+    ISqlSugarClient _context) : BaseService<NewPosts>(_context), IPostService
 {
-    private readonly ILogger<PostService> _logger;
-    private readonly IAttachmentService _attachmentService;
-    private readonly IChannelService _channelService;
-    private readonly IChannelOptionService _channelOptionService;
-    private readonly ITextHelperService _textHelperService;
-    private readonly IMarkupHelperService _markupHelperService;
-    private readonly ITelegramBotClient _botClient;
-    private readonly IUserService _userService;
-    private readonly OptionsSetting.PostOption _postOption;
-    private readonly TagRepository _tagRepository;
-    private readonly IMediaGroupService _mediaGroupService;
-
-    public PostService(
-        ILogger<PostService> logger,
-        IAttachmentService attachmentService,
-        IChannelService channelService,
-        IChannelOptionService channelOptionService,
-        ITextHelperService textHelperService,
-        IMarkupHelperService markupHelperService,
-        ITelegramBotClient botClient,
-        IUserService userService,
-        IOptions<OptionsSetting> options,
-        TagRepository tagRepository,
-        IMediaGroupService mediaGroupService,
-        ISqlSugarClient context) : base(context)
-    {
-        _logger = logger;
-        _attachmentService = attachmentService;
-        _channelService = channelService;
-        _channelOptionService = channelOptionService;
-        _textHelperService = textHelperService;
-        _markupHelperService = markupHelperService;
-        _botClient = botClient;
-        _userService = userService;
-        _postOption = options.Value.Post;
-        _tagRepository = tagRepository;
-        _mediaGroupService = mediaGroupService;
-    }
+    private readonly OptionsSetting.PostOption _postOption = options.Value.Post;
 
     public async Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null)
     {
@@ -1044,6 +1019,11 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         return Queryable().Where(x => x.CreateAt >= afterTime && x.Status > EPostStatus.Cancel).CountAsync();
     }
 
+    public Task<int> CountAllPosts(DateTime afterTime, DateTime beforeTime)
+    {
+        return Queryable().Where(x => x.CreateAt >= afterTime && x.CreateAt < beforeTime && x.Status > EPostStatus.Cancel).CountAsync();
+    }
+
     public Task<int> CountAcceptedPosts()
     {
         return Queryable().Where(x => x.Status == EPostStatus.Accepted).CountAsync();
@@ -1052,6 +1032,11 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
     public Task<int> CountAcceptedPosts(DateTime afterTime)
     {
         return Queryable().Where(x => x.CreateAt >= afterTime && x.Status == EPostStatus.Accepted).CountAsync();
+    }
+
+    public Task<int> CountAcceptedPosts(DateTime afterTime, DateTime beforeTime)
+    {
+        return Queryable().Where(x => x.CreateAt >= afterTime && x.CreateAt < beforeTime && x.Status == EPostStatus.Accepted).CountAsync();
     }
 
     public Task<int> CountAcceptedSecondPosts()
@@ -1064,6 +1049,11 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
         return Queryable().Where(x => x.CreateAt >= afterTime && x.Status == EPostStatus.AcceptedSecond).CountAsync();
     }
 
+    public Task<int> CountAcceptedSecondPosts(DateTime afterTime, DateTime beforeTime)
+    {
+        return Queryable().Where(x => x.CreateAt >= afterTime && x.CreateAt < beforeTime && x.Status == EPostStatus.AcceptedSecond).CountAsync();
+    }
+
     public Task<int> CountRejectedPosts()
     {
         return Queryable().Where(x => x.Status == EPostStatus.Rejected).CountAsync();
@@ -1072,6 +1062,11 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
     public Task<int> CountRejectedPosts(DateTime afterTime)
     {
         return Queryable().Where(x => x.CreateAt >= afterTime && x.Status == EPostStatus.Rejected).CountAsync();
+    }
+
+    public Task<int> CountRejectedPosts(DateTime afterTime, DateTime beforeTime)
+    {
+        return Queryable().Where(x => x.CreateAt >= afterTime && x.CreateAt < beforeTime && x.Status == EPostStatus.Rejected).CountAsync();
     }
 
     public Task<int> CountExpiredPosts()
@@ -1087,6 +1082,11 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
     public Task<int> CountReviewingPosts(DateTime afterTime)
     {
         return Queryable().Where(x => x.CreateAt >= afterTime && x.Status == EPostStatus.Reviewing).CountAsync();
+    }
+
+    public Task<int> CountReviewingPosts(DateTime afterTime, DateTime beforeTime)
+    {
+        return Queryable().Where(x => x.CreateAt >= afterTime && x.CreateAt < beforeTime && x.Status == EPostStatus.Reviewing).CountAsync();
     }
 
     public Task RevocationPost(NewPosts post)
@@ -1139,5 +1139,17 @@ internal sealed class PostService : BaseService<NewPosts>, IPostService
     public Task<NewPosts> GetInPlanPost()
     {
         return Queryable().Where(static x => x.Status == EPostStatus.InPlan).FirstAsync();
+    }
+
+    public Task UpdatePostStatus(NewPosts post, EPostStatus status)
+    {
+        post.Status = status;
+        post.ModifyAt = DateTime.Now;
+        return Updateable(post).UpdateColumns(static x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
+    }
+
+    public Task<int> CreateNewPosts(NewPosts post)
+    {
+        return Insertable(post).ExecuteReturnIdentityAsync();
     }
 }

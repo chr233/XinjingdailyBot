@@ -4,7 +4,6 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
@@ -15,30 +14,14 @@ namespace XinjingdailyBot.Tasks;
 /// 定期发布审核状态通知
 /// </summary>
 [Job("0 * * * * ?")]
-internal class ReviewStatusTask : IJob
+internal class ReviewStatusTask(
+    ILogger<ReviewStatusTask> _logger,
+    IPostService _postService,
+    ITelegramBotClient _botClient,
+    IChannelService _channelService,
+    IReviewStatusService _reviewStatusService,
+    IMarkupHelperService _markupHelperService) : IJob
 {
-    private readonly ILogger<ReviewStatusTask> _logger;
-    private readonly IPostService _postService;
-    private readonly ITelegramBotClient _botClient;
-    private readonly IChannelService _channelService;
-    private readonly IReviewStatusService _reviewStatusService;
-    private readonly IMarkupHelperService _markupHelperService;
-
-    public ReviewStatusTask(
-        ILogger<ReviewStatusTask> logger,
-        IPostService postService,
-        ITelegramBotClient botClient,
-        IChannelService channelService,
-        IReviewStatusService reviewStatusService,
-        IMarkupHelperService markupHelperService)
-    {
-        _logger = logger;
-        _postService = postService;
-        _botClient = botClient;
-        _channelService = channelService;
-        _reviewStatusService = reviewStatusService;
-        _markupHelperService = markupHelperService;
-    }
 
     public async Task Execute(IJobExecutionContext context)
     {
@@ -84,19 +67,14 @@ internal class ReviewStatusTask : IJob
                 var startTime = oldTime.AddHours(-oldTime.Hour).AddMinutes(-oldTime.Minute).AddSeconds(oldTime.Second);
                 var endTime = startTime.AddDays(1);
 
-                var post = await _postService.Queryable()
-                    .Where(x => x.CreateAt >= startTime && x.CreateAt < endTime && x.Status > EPostStatus.Cancel).CountAsync();
-                var acceptPost = await _postService.Queryable()
-                    .Where(x => x.CreateAt >= startTime && x.CreateAt < endTime && x.Status == EPostStatus.Accepted).CountAsync();
-                var rejectPost = await _postService.Queryable()
-                    .Where(x => x.CreateAt >= startTime && x.CreateAt < endTime && x.Status == EPostStatus.Rejected).CountAsync();
-                var paddingPost = await _postService.Queryable()
-                    .Where(x => x.CreateAt >= startTime && x.CreateAt < endTime && x.Status == EPostStatus.Reviewing).CountAsync();
+                var post = await _postService.CountAllPosts(startTime, endTime);
+                var acceptPost = await _postService.CountAcceptedPosts(startTime, endTime);
+                var rejectPost = await _postService.CountRejectedPosts(startTime, endTime);
+                var paddingPost = await _postService.CountReviewingPosts(startTime, endTime);
 
                 if (_channelService.HasSecondChannel)
                 {
-                    var acceptSecondPost = await _postService.Queryable()
-                        .Where(x => x.CreateAt >= startTime && x.CreateAt < endTime && x.Status == EPostStatus.AcceptedSecond).CountAsync();
+                    var acceptSecondPost = await _postService.CountAcceptedSecondPosts(startTime, endTime);
                     acceptPost += acceptSecondPost;
                 }
 

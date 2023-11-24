@@ -9,12 +9,8 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IBanRecordService"/>
 [AppService(typeof(IBanRecordService), LifeTime.Transient)]
-internal sealed class BanRecordService : BaseService<BanRecords>, IBanRecordService
+internal sealed class BanRecordService(ISqlSugarClient context) : BaseService<BanRecords>(context), IBanRecordService
 {
-    public BanRecordService(ISqlSugarClient context) : base(context)
-    {
-    }
-
     public async Task AddBanRecord(Users targetUser, Users operatorUser, EBanType banType, string reason)
     {
         var record = new BanRecords {

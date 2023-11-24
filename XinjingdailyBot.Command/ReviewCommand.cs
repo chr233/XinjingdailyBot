@@ -17,33 +17,15 @@ namespace XinjingdailyBot.Command;
 /// 审核命令
 /// </summary>
 [AppService(LifeTime.Scoped)]
-internal class ReviewCommand
+internal class ReviewCommand(
+        ITelegramBotClient _botClient,
+        IUserService _userService,
+        IChannelService _channelService,
+        IPostService _postService,
+        IMarkupHelperService _markupHelperService,
+        RejectReasonRepository _rejectReasonRepository,
+        ITextHelperService _textHelperService)
 {
-    private readonly ITelegramBotClient _botClient;
-    private readonly IUserService _userService;
-    private readonly IChannelService _channelService;
-    private readonly IPostService _postService;
-    private readonly IMarkupHelperService _markupHelperService;
-    private readonly RejectReasonRepository _rejectReasonRepository;
-    private readonly ITextHelperService _textHelperService;
-
-    public ReviewCommand(
-        ITelegramBotClient botClient,
-        IUserService userService,
-        IChannelService channelService,
-        IPostService postService,
-        IMarkupHelperService markupHelperService,
-        RejectReasonRepository rejectReasonRepository,
-        ITextHelperService textHelperService)
-    {
-        _botClient = botClient;
-        _userService = userService;
-        _channelService = channelService;
-        _postService = postService;
-        _markupHelperService = markupHelperService;
-        _rejectReasonRepository = rejectReasonRepository;
-        _textHelperService = textHelperService;
-    }
 
     /// <summary>
     /// 自定义拒绝稿件理由

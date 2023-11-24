@@ -16,36 +16,16 @@ namespace XinjingdailyBot.Command;
 /// 投稿命令
 /// </summary>
 [AppService(LifeTime.Scoped)]
-internal class PostCommand
+internal class PostCommand(
+    ITelegramBotClient _botClient,
+    IUserService _userService,
+    IChannelService _channelService,
+    IPostService _postService,
+    IMarkupHelperService _markupHelperService,
+    IAttachmentService _attachmentService,
+    ITextHelperService _textHelperService,
+    IMediaGroupService _mediaGroupService)
 {
-    private readonly ITelegramBotClient _botClient;
-    private readonly IUserService _userService;
-    private readonly IChannelService _channelService;
-    private readonly IPostService _postService;
-    private readonly IMarkupHelperService _markupHelperService;
-    private readonly IAttachmentService _attachmentService;
-    private readonly ITextHelperService _textHelperService;
-    private readonly IMediaGroupService _mediaGroupService;
-
-    public PostCommand(
-        ITelegramBotClient botClient,
-        IUserService userService,
-        IChannelService channelService,
-        IPostService postService,
-        IMarkupHelperService markupHelperService,
-        IAttachmentService attachmentService,
-        ITextHelperService textHelperService,
-        IMediaGroupService mediaGroupService)
-    {
-        _botClient = botClient;
-        _userService = userService;
-        _channelService = channelService;
-        _postService = postService;
-        _markupHelperService = markupHelperService;
-        _attachmentService = attachmentService;
-        _textHelperService = textHelperService;
-        _mediaGroupService = mediaGroupService;
-    }
 
     /// <summary>
     /// 投稿消息处理

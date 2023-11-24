@@ -14,32 +14,18 @@ namespace XinjingdailyBot.Tasks;
 /// 过期稿件处理
 /// </summary>
 [Job("0 0 0 * * ?")]
-internal class ExpiredPostsTask : IJob
+internal class ExpiredPostsTask(
+        ILogger<ExpiredPostsTask> _logger,
+        IPostService _postService,
+        IUserService _userService,
+        ITelegramBotClient _botClient,
+        IOptions<OptionsSetting> _options) : IJob
 {
-    private readonly ILogger<ExpiredPostsTask> _logger;
-    private readonly IPostService _postService;
-    private readonly IUserService _userService;
-    private readonly ITelegramBotClient _botClient;
+
     /// <summary>
     /// 稿件过期时间
     /// </summary>
-    private readonly TimeSpan PostExpiredTime;
-
-    public ExpiredPostsTask(
-        ILogger<ExpiredPostsTask> logger,
-        IPostService postService,
-        IUserService userService,
-        ITelegramBotClient botClient,
-        IOptions<OptionsSetting> options)
-    {
-        _logger = logger;
-        _postService = postService;
-        _userService = userService;
-        _botClient = botClient;
-
-        var expiredTime = options.Value.Post.PostExpiredTime;
-        PostExpiredTime = expiredTime > 0 ? TimeSpan.FromDays(options.Value.Post.PostExpiredTime) : TimeSpan.Zero;
-    }
+    private readonly TimeSpan PostExpiredTime = _options.Value.Post.PostExpiredTime > 0 ? TimeSpan.FromDays(_options.Value.Post.PostExpiredTime) : TimeSpan.Zero;
 
     public async Task Execute(IJobExecutionContext context)
     {
@@ -57,7 +43,7 @@ internal class ExpiredPostsTask : IJob
             .Where(x => (x.Status == EPostStatus.Padding || x.Status == EPostStatus.Reviewing) && x.ModifyAt < expiredDate)
             .Distinct().Select(x => x.PosterUID).ToListAsync();
 
-        if (!userIDList.Any())
+        if (userIDList.Count == 0)
         {
             _logger.LogInformation("结束定时任务, 没有需要清理的过期稿件");
             return;
@@ -72,7 +58,7 @@ internal class ExpiredPostsTask : IJob
                 .Where(x => x.PosterUID == userID && (x.Status == EPostStatus.Padding || x.Status == EPostStatus.Reviewing) && x.ModifyAt < expiredDate)
                 .ToListAsync();
 
-            if (!paddingPosts.Any())
+            if (paddingPosts.Count == 0)
             {
                 continue;
             }
@@ -80,22 +66,23 @@ internal class ExpiredPostsTask : IJob
             int cTmout = 0, rTmout = 0;
             foreach (var post in paddingPosts)
             {
+                EPostStatus status;
                 if (post.Status == EPostStatus.Padding)
                 {
-                    post.Status = EPostStatus.ConfirmTimeout;
+                    status = EPostStatus.ConfirmTimeout;
                     cTmout++;
                 }
                 else
                 {
-                    post.Status = EPostStatus.ReviewTimeout;
+                    status = EPostStatus.ReviewTimeout;
                     rTmout++;
                 }
                 post.ModifyAt = DateTime.Now;
 
-                await _postService.Updateable(post).UpdateColumns(static x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
+                await _postService.UpdatePostStatus(post, status);
             }
 
-            var user = await _userService.Queryable().FirstAsync(x => x.UserID == userID);
+            var user = await _userService.FetchUserByUserID(userID);
 
             if (user == null)
             {

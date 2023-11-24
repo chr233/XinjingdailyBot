@@ -19,42 +19,18 @@ namespace XinjingdailyBot.Command;
 /// 通用命令
 /// </summary>
 [AppService(LifeTime.Scoped)]
-internal class NormalCommand
+internal class NormalCommand(
+    ILogger<NormalCommand> _logger,
+    ITelegramBotClient _botClient,
+    IUserService _userService,
+    GroupRepository _groupRepository,
+    IMarkupHelperService _markupHelperService,
+    IAttachmentService _attachmentService,
+    IPostService _postService,
+    TagRepository _tagRepository,
+    IHttpHelperService _httpHelperService,
+    IMediaGroupService _mediaGroupService)
 {
-    private readonly ILogger<NormalCommand> _logger;
-    private readonly ITelegramBotClient _botClient;
-    private readonly IUserService _userService;
-    private readonly GroupRepository _groupRepository;
-    private readonly IMarkupHelperService _markupHelperService;
-    private readonly IAttachmentService _attachmentService;
-    private readonly IPostService _postService;
-    private readonly TagRepository _tagRepository;
-    private readonly IHttpHelperService _httpHelperService;
-    private readonly IMediaGroupService _mediaGroupService;
-
-    public NormalCommand(
-        ILogger<NormalCommand> logger,
-        ITelegramBotClient botClient,
-        IUserService userService,
-        GroupRepository groupRepository,
-        IMarkupHelperService markupHelperService,
-        IAttachmentService attachmentService,
-        IPostService postService,
-        TagRepository tagRepository,
-        IHttpHelperService httpHelperService,
-        IMediaGroupService mediaGroupService)
-    {
-        _logger = logger;
-        _botClient = botClient;
-        _userService = userService;
-        _groupRepository = groupRepository;
-        _markupHelperService = markupHelperService;
-        _attachmentService = attachmentService;
-        _postService = postService;
-        _tagRepository = tagRepository;
-        _httpHelperService = httpHelperService;
-        _mediaGroupService = mediaGroupService;
-    }
 
     /// <summary>
     /// 检测机器人是否存活

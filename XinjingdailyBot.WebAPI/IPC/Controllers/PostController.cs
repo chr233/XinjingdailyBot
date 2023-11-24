@@ -20,59 +20,19 @@ namespace XinjingdailyBot.WebAPI.IPC.Controllers;
 /// 主页控制器
 /// </summary>
 [Verify]
-public sealed class PostController : XjbController
+public sealed class PostController(
+        IHttpContextAccessor _httpContextAccessor,
+        IPostService _postService,
+        IChannelOptionService _channelOptionService,
+        IUserService _userService,
+        ITelegramBotClient _botClient,
+        IChannelService _channelService,
+        IMarkupHelperService _markupHelperService,
+        ITextHelperService _textHelperService,
+        IAttachmentService _attachmentService,
+        TagRepository _tagRepository,
+        IMediaGroupService _mediaGroupService) : XjbController
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IPostService _postService;
-    private readonly IChannelOptionService _channelOptionService;
-    private readonly IUserService _userService;
-    private readonly ITelegramBotClient _botClient;
-    private readonly IChannelService _channelService;
-    private readonly IMarkupHelperService _markupHelperService;
-    private readonly ITextHelperService _textHelperService;
-    private readonly IAttachmentService _attachmentService;
-    private readonly TagRepository _tagRepository;
-    private readonly IMediaGroupService _mediaGroupService;
-
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    /// <param name="httpContextAccessor"></param>
-    /// <param name="postService"></param>
-    /// <param name="channelOptionService"></param>
-    /// <param name="userService"></param>
-    /// <param name="botClient"></param>
-    /// <param name="channelService"></param>
-    /// <param name="markupHelperService"></param>
-    /// <param name="textHelperService"></param>
-    /// <param name="attachmentService"></param>
-    /// <param name="tagRepository"></param>
-    /// <param name="mediaGroupService"></param>
-    public PostController(
-        IHttpContextAccessor httpContextAccessor,
-        IPostService postService,
-        IChannelOptionService channelOptionService,
-        IUserService userService,
-        ITelegramBotClient botClient,
-        IChannelService channelService,
-        IMarkupHelperService markupHelperService,
-        ITextHelperService textHelperService,
-        IAttachmentService attachmentService,
-        TagRepository tagRepository,
-        IMediaGroupService mediaGroupService)
-    {
-        _httpContextAccessor = httpContextAccessor;
-        _postService = postService;
-        _channelOptionService = channelOptionService;
-        _userService = userService;
-        _botClient = botClient;
-        _channelService = channelService;
-        _markupHelperService = markupHelperService;
-        _textHelperService = textHelperService;
-        _attachmentService = attachmentService;
-        _tagRepository = tagRepository;
-        _mediaGroupService = mediaGroupService;
-    }
 
     /// <summary>
     /// 连接测试
@@ -198,7 +158,7 @@ public sealed class PostController : XjbController
             PosterUID = dbUser.UserID,
         };
 
-        var newPostId = await _postService.Insertable(newPost).ExecuteReturnIdentityAsync();
+        var newPostId = await _postService.CreateNewPosts(newPost);
 
         Message? originMsg = null;
 
@@ -436,7 +396,7 @@ public sealed class PostController : XjbController
             PosterUID = dbUser.UserID,
         };
 
-        var newPostId = await _postService.Insertable(newPost).ExecuteReturnIdentityAsync();
+        var newPostId = await _postService.CreateNewPosts(newPost);
 
         Message? originMsg = null;
 

@@ -8,18 +8,10 @@ namespace XinjingdailyBot.Tasks;
 /// 定期发布稿件处理
 /// </summary>
 [Job("0 0 0 * * ?")]
-internal class PlanedPostsTask : IJob
+internal class PlanedPostsTask(
+    ILogger<PlanedPostsTask> _logger,
+    IPostService _postService) : IJob
 {
-    private readonly ILogger<PlanedPostsTask> _logger;
-    private readonly IPostService _postService;
-
-    public PlanedPostsTask(
-        ILogger<PlanedPostsTask> logger,
-        IPostService postService)
-    {
-        _logger = logger;
-        _postService = postService;
-    }
 
     public async Task Execute(IJobExecutionContext context)
     {
