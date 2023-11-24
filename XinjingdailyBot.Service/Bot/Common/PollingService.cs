@@ -6,7 +6,6 @@ using System.Diagnostics.CodeAnalysis;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
-using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
@@ -17,55 +16,20 @@ namespace XinjingdailyBot.Service.Bot.Common;
 /// <summary>
 /// 消息接收服务
 /// </summary>
-public class PollingService : BackgroundService
+public class PollingService(
+        IServiceProvider _serviceProvider,
+        ILogger<PollingService> _logger,
+        IChannelService _channelService,
+        ICommandHandler _commandHandler,
+        GroupRepository _groupRepository,
+        LevelRepository _levelRepository,
+        TagRepository _tagRepository,
+        RejectReasonRepository _rejectReasonRepository,
+        ITelegramBotClient _botClient,
+        IOptions<OptionsSetting> options) : BackgroundService
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<PollingService> _logger;
-    private readonly IChannelService _channelService;
-    private readonly ICommandHandler _commandHandler;
-    private readonly GroupRepository _groupRepository;
-    private readonly LevelRepository _levelRepository;
-    private readonly TagRepository _tagRepository;
-    private readonly RejectReasonRepository _rejectReasonRepository;
-    private readonly ITelegramBotClient _botClient;
-    private readonly bool _throwPendingUpdates;
 
-    /// <summary>
-    /// 消息接收服务
-    /// </summary>
-    /// <param name="serviceProvider"></param>
-    /// <param name="logger"></param>
-    /// <param name="channelService"></param>
-    /// <param name="commandHandler"></param>
-    /// <param name="groupRepository"></param>
-    /// <param name="levelRepository"></param>
-    /// <param name="tagRepository"></param>
-    /// <param name="rejectReasonRepository"></param>
-    /// <param name="botClient"></param>
-    /// <param name="options"></param>
-    public PollingService(
-        IServiceProvider serviceProvider,
-        ILogger<PollingService> logger,
-        IChannelService channelService,
-        ICommandHandler commandHandler,
-        GroupRepository groupRepository,
-        LevelRepository levelRepository,
-        TagRepository tagRepository,
-        RejectReasonRepository rejectReasonRepository,
-        ITelegramBotClient botClient,
-        IOptions<OptionsSetting> options)
-    {
-        _serviceProvider = serviceProvider;
-        _logger = logger;
-        _channelService = channelService;
-        _commandHandler = commandHandler;
-        _groupRepository = groupRepository;
-        _levelRepository = levelRepository;
-        _tagRepository = tagRepository;
-        _rejectReasonRepository = rejectReasonRepository;
-        _botClient = botClient;
-        _throwPendingUpdates = options.Value.Bot.ThrowPendingUpdates;
-    }
+    private readonly bool _throwPendingUpdates = options.Value.Bot.ThrowPendingUpdates;
 
     /// <summary>
     /// 执行
@@ -101,7 +65,7 @@ public class PollingService : BackgroundService
             try
             {
                 var receiverOptions = new ReceiverOptions {
-                    AllowedUpdates = Array.Empty<UpdateType>(),
+                    AllowedUpdates = [],
                     ThrowPendingUpdates = _throwPendingUpdates,
                     Limit = 100,
                 };

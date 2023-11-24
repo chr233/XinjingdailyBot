@@ -11,25 +11,12 @@ using XinjingdailyBot.Interface.Data;
 namespace XinjingdailyBot.Service.Bot.Common;
 
 [AppService(typeof(IUpdateService), LifeTime.Scoped)]
-internal class UpdateService : IUpdateService
+internal class UpdateService(
+     ILogger<UpdateService> _logger,
+     IUserService _userService,
+     IDispatcherService _dispatcherService,
+     IChannelService _channelService) : IUpdateService
 {
-    private readonly ILogger<UpdateService> _logger;
-    private readonly IUserService _userService;
-    private readonly IDispatcherService _dispatcherService;
-    private readonly IChannelService _channelService;
-
-    public UpdateService(
-        ILogger<UpdateService> logger,
-        IUserService userService,
-        IDispatcherService dispatcherService,
-        IChannelService channelService)
-    {
-        _logger = logger;
-        _userService = userService;
-        _dispatcherService = dispatcherService;
-        _channelService = channelService;
-    }
-
     private int LastUpdateId { get; set; } = 0;
 
     public async Task HandleUpdateAsync(ITelegramBotClient _, Update update, CancellationToken cancellationToken)

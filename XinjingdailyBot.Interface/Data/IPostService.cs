@@ -1,4 +1,5 @@
 using Telegram.Bot.Types;
+using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Interface.Data.Base;
 using XinjingdailyBot.Model.Models;
 
@@ -224,4 +225,52 @@ public interface IPostService : IBaseService<NewPosts>
     /// <param name="callbackQuery"></param>
     /// <returns></returns>
     Task SetPostTag(NewPosts post, string payload, CallbackQuery callbackQuery);
+    /// <summary>
+    /// 统计全部稿件
+    /// </summary>
+    /// <param name="afterTime"></param>
+    /// <param name="beforeTime"></param>
+    /// <returns></returns>
+    Task<int> CountAllPosts(DateTime afterTime, DateTime beforeTime);
+    /// <summary>
+    /// 统计二频通过稿件
+    /// </summary>
+    /// <param name="afterTime"></param>
+    /// <param name="beforeTime"></param>
+    /// <returns></returns>
+    Task<int> CountAcceptedSecondPosts(DateTime afterTime, DateTime beforeTime);
+    /// <summary>
+    /// 统计拒绝稿件
+    /// </summary>
+    /// <param name="afterTime"></param>
+    /// <param name="beforeTime"></param>
+    /// <returns></returns>
+    Task<int> CountRejectedPosts(DateTime afterTime, DateTime beforeTime);
+    /// <summary>
+    /// 统计审核中稿件
+    /// </summary>
+    /// <param name="afterTime"></param>
+    /// <param name="beforeTime"></param>
+    /// <returns></returns>
+    Task<int> CountReviewingPosts(DateTime afterTime, DateTime beforeTime);
+    /// <summary>
+    /// 统计通过稿件
+    /// </summary>
+    /// <param name="afterTime"></param>
+    /// <param name="beforeTime"></param>
+    /// <returns></returns>
+    Task<int> CountAcceptedPosts(DateTime afterTime, DateTime beforeTime);
+    /// <summary>
+    /// 更新稿件状态
+    /// </summary>
+    /// <param name="post"></param>
+    /// <param name="status"></param>
+    /// <returns></returns>
+    Task UpdatePostStatus(NewPosts post, EPostStatus status);
+    /// <summary>
+    /// 创建稿件
+    /// </summary>
+    /// <param name="post"></param>
+    /// <returns></returns>
+    Task<int> CreateNewPosts(NewPosts post);
 }

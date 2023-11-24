@@ -25,7 +25,7 @@ internal sealed class TextHelperService : ITextHelperService
         _tagRepository = tagRepository;
 
         var postOption = options.Value.Post;
-        PureWords = postOption.PureWords.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+        PureWords = postOption.PureWords.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
         PureReturns = postOption.PureReturns;
         PureHashTag = postOption.PureHashTag;
     }
@@ -33,6 +33,8 @@ internal sealed class TextHelperService : ITextHelperService
     private string[] PureWords { get; init; }
     private bool PureReturns { get; init; }
     private bool PureHashTag { get; init; }
+
+    private static readonly char[] Separator = ['|'];
 
     public string PureText(string? text)
     {
@@ -315,22 +317,22 @@ internal sealed class TextHelperService : ITextHelperService
             int start = entity.Offset;
             int end = entity.Offset + entity.Length;
 
-            if (!tagMap.ContainsKey(start))
+            if (tagMap.TryGetValue(start, out var tagStart))
+            {
+                tagStart.AddLast(head);
+            }
+            else
             {
                 tagMap.Add(start, new TagObjct(head));
             }
-            else
-            {
-                tagMap[start].AddLast(head);
-            }
 
-            if (!tagMap.ContainsKey(end))
+            if (tagMap.TryGetValue(end, out var tagEnd))
+            {
+                tagEnd.AddFirst(tail);
+            }
+            else
             {
                 tagMap.Add(end, new TagObjct(tail));
-            }
-            else
-            {
-                tagMap[end].AddFirst(tail);
             }
         }
 

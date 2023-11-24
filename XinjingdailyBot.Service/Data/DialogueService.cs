@@ -10,12 +10,8 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IDialogueService"/>
 [AppService(typeof(IDialogueService), LifeTime.Transient)]
-internal sealed class DialogueService : BaseService<Dialogue>, IDialogueService
+internal sealed class DialogueService(ISqlSugarClient context) : BaseService<Dialogue>(context), IDialogueService
 {
-    public DialogueService(ISqlSugarClient context) : base(context)
-    {
-    }
-
     public async Task RecordMessage(Message message)
     {
         string? content = message.Type switch {

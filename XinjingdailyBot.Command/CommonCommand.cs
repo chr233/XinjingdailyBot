@@ -19,30 +19,15 @@ namespace XinjingdailyBot.Command;
 /// 通用命令
 /// </summary>
 [AppService(LifeTime.Scoped)]
-internal class CommonCommand
+internal class CommonCommand(
+        ITelegramBotClient _botClient,
+        IOptions<OptionsSetting> _configuration,
+        IBanRecordService _banRecordService,
+        ITextHelperService _textHelperService,
+        ICommandHandler _commandHandler,
+        IChannelService _channelService)
 {
-    private readonly ITelegramBotClient _botClient;
-    private readonly OptionsSetting _optionsSetting;
-    private readonly IBanRecordService _banRecordService;
-    private readonly ITextHelperService _textHelperService;
-    private readonly ICommandHandler _commandHandler;
-    private readonly IChannelService _channelService;
-
-    public CommonCommand(
-        ITelegramBotClient botClient,
-        IOptions<OptionsSetting> options,
-        IBanRecordService banRecordService,
-        ITextHelperService textHelperService,
-        ICommandHandler commandHandler,
-        IChannelService channelService)
-    {
-        _botClient = botClient;
-        _optionsSetting = options.Value;
-        _banRecordService = banRecordService;
-        _textHelperService = textHelperService;
-        _commandHandler = commandHandler;
-        _channelService = channelService;
-    }
+    private readonly OptionsSetting _optionsSetting = _configuration.Value;
 
     /// <inheritdoc cref="IBanRecordService.WarnDuration"/>
     private readonly int WarnDuration = IBanRecordService.WarnDuration;
@@ -163,7 +148,7 @@ internal class CommonCommand
         {
             sb.AppendLine("查询封禁/解封记录出错");
         }
-        else if (!records.Any())
+        else if (records.Count == 0)
         {
             sb.AppendLine("尚未查到封禁/解封/警告记录");
         }

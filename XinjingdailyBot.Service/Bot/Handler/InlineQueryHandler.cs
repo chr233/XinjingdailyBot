@@ -12,24 +12,12 @@ using XinjingdailyBot.Model.Models;
 namespace XinjingdailyBot.Service.Bot.Handler;
 
 [AppService(typeof(IInlineQueryHandler), LifeTime.Singleton)]
-internal class InlineQueryHandler : IInlineQueryHandler
+internal class InlineQueryHandler(
+        ITelegramBotClient _botClient,
+        IAttachmentService _attachmentService,
+        IPostService _postService,
+        IMarkupHelperService _markupHelperService) : IInlineQueryHandler
 {
-    private readonly ITelegramBotClient _botClient;
-    private readonly IAttachmentService _attachmentService;
-    private readonly IPostService _postService;
-    private readonly IMarkupHelperService _markupHelperService;
-
-    public InlineQueryHandler(
-        ITelegramBotClient botClient,
-        IAttachmentService attachmentService,
-        IPostService postService,
-        IMarkupHelperService markupHelperService)
-    {
-        _botClient = botClient;
-        _attachmentService = attachmentService;
-        _postService = postService;
-        _markupHelperService = markupHelperService;
-    }
 
     public async Task OnInlineQueryReceived(Users dbUser, InlineQuery query)
     {
@@ -70,9 +58,9 @@ internal class InlineQueryHandler : IInlineQueryHandler
         }
         else
         {
-            InlineQueryResult[] results = {
+            InlineQueryResult[] results = [
                 new InlineQueryResultArticle("1", "该功能暂时仅对管理员开放", new InputTextMessageContent("To be continued"))
-            };
+            ];
 
             await _botClient.AnswerInlineQueryAsync(inlineQueryId: query.Id, results: results, cacheTime: 10, isPersonal: true);
         }

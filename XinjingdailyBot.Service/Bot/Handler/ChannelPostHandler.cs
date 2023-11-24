@@ -15,42 +15,18 @@ using XinjingdailyBot.Repository;
 namespace XinjingdailyBot.Service.Bot.Handler;
 
 [AppService(typeof(IChannelPostHandler), LifeTime.Singleton)]
-internal class ChannelPostHandler : IChannelPostHandler
+internal class ChannelPostHandler(
+        ILogger<ChannelPostHandler> _logger,
+        IPostService _postService,
+        ITextHelperService _textHelperService,
+        IAttachmentService _attachmentService,
+        IUserService _userService,
+        IChannelOptionService _channelOptionService,
+        TagRepository _tagRepository,
+        ITelegramBotClient _botClient,
+        IMediaGroupService _mediaGroupService,
+        IChannelService _channelService) : IChannelPostHandler
 {
-    private readonly ILogger<ChannelPostHandler> _logger;
-    private readonly IPostService _postService;
-    private readonly ITextHelperService _textHelperService;
-    private readonly IAttachmentService _attachmentService;
-    private readonly IUserService _userService;
-    private readonly IChannelOptionService _channelOptionService;
-    private readonly TagRepository _tagRepository;
-    private readonly ITelegramBotClient _botClient;
-    private readonly IMediaGroupService _mediaGroupService;
-    private readonly IChannelService _channelService;
-
-    public ChannelPostHandler(
-        ILogger<ChannelPostHandler> logger,
-        IPostService postService,
-        ITextHelperService textHelperService,
-        IAttachmentService attachmentService,
-        IUserService userService,
-        IChannelOptionService channelOptionService,
-        TagRepository tagRepository,
-        ITelegramBotClient botClient,
-        IMediaGroupService mediaGroupService,
-        IChannelService channelService)
-    {
-        _logger = logger;
-        _postService = postService;
-        _textHelperService = textHelperService;
-        _attachmentService = attachmentService;
-        _userService = userService;
-        _channelOptionService = channelOptionService;
-        _tagRepository = tagRepository;
-        _botClient = botClient;
-        _mediaGroupService = mediaGroupService;
-        _channelService = channelService;
-    }
 
     public async Task OnTextChannelPostReceived(Users dbUser, Message message)
     {
@@ -79,7 +55,6 @@ internal class ChannelPostHandler : IChannelPostHandler
                 _logger.LogInformation("删除消息 {msgid}", message.MessageId);
                 return;
             }
-
         }
 
         int newTag = _tagRepository.FetchTags(message.Text);
@@ -108,7 +83,7 @@ internal class ChannelPostHandler : IChannelPostHandler
             ReviewerUID = dbUser.UserID
         };
 
-        await _postService.Insertable(newPost).ExecuteCommandAsync();
+        await _postService.CreateNewPosts(newPost);
 
         //增加通过数量
         dbUser.AcceptCount++;
@@ -161,7 +136,7 @@ internal class ChannelPostHandler : IChannelPostHandler
             ReviewerUID = dbUser.UserID
         };
 
-        long postID = await _postService.Insertable(newPost).ExecuteReturnBigIdentityAsync();
+        var postID = await _postService.CreateNewPosts(newPost);
 
         var attachment = _attachmentService.GenerateAttachment(message, postID);
 
@@ -236,7 +211,7 @@ internal class ChannelPostHandler : IChannelPostHandler
                     ReviewerUID = dbUser.UserID
                 };
 
-                postID = await _postService.Insertable(newPost).ExecuteReturnBigIdentityAsync();
+                postID = await _postService.CreateNewPosts(newPost);
 
                 MediaGroupIDs[mediaGroupId] = postID;
 

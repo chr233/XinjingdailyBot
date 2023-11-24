@@ -20,46 +20,22 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IUserService"/>
 [AppService(typeof(IUserService), LifeTime.Singleton)]
-internal sealed class UserService : BaseService<Users>, IUserService
+internal sealed class UserService(
+        ILogger<UserService> _logger,
+        IOptions<OptionsSetting> _configuration,
+        GroupRepository _groupRepository,
+        IMarkupHelperService _markupHelperService,
+        IChannelService _channelService,
+        ICmdRecordService _cmdRecordService,
+        PostRepository _postRepository,
+        ITelegramBotClient _botClient,
+        LevelRepository _levelRepository,
+        INameHistoryService _nameHistoryService,
+        IMediaGroupService _mediaGroupService,
+        ISqlSugarClient _context) : BaseService<Users>(_context), IUserService
 {
-    private readonly ILogger<UserService> _logger;
-    private readonly OptionsSetting _optionsSetting;
-    private readonly GroupRepository _groupRepository;
-    private readonly IMarkupHelperService _markupHelperService;
-    private readonly IChannelService _channelService;
-    private readonly ICmdRecordService _cmdRecordService;
-    private readonly PostRepository _postRepository;
-    private readonly ITelegramBotClient _botClient;
-    private readonly LevelRepository _levelRepository;
-    private readonly INameHistoryService _nameHistoryService;
-    private readonly IMediaGroupService _mediaGroupService;
 
-    public UserService(
-        ILogger<UserService> logger,
-        IOptions<OptionsSetting> configuration,
-        GroupRepository groupRepository,
-        IMarkupHelperService markupHelperService,
-        IChannelService channelService,
-        ICmdRecordService cmdRecordService,
-        PostRepository postRepository,
-        ITelegramBotClient botClient,
-        LevelRepository levelRepository,
-        INameHistoryService nameHistoryService,
-        IMediaGroupService mediaGroupService,
-        ISqlSugarClient context) : base(context)
-    {
-        _logger = logger;
-        _optionsSetting = configuration.Value;
-        _groupRepository = groupRepository;
-        _markupHelperService = markupHelperService;
-        _channelService = channelService;
-        _cmdRecordService = cmdRecordService;
-        _postRepository = postRepository;
-        _botClient = botClient;
-        _levelRepository = levelRepository;
-        _nameHistoryService = nameHistoryService;
-        _mediaGroupService = mediaGroupService;
-    }
+    private readonly OptionsSetting _optionsSetting = _configuration.Value;
 
     /// <summary>
     /// 更新周期
@@ -336,7 +312,7 @@ internal sealed class UserService : BaseService<Users>, IUserService
     /// <summary>
     /// 频道管理员缓存
     /// </summary>
-    private readonly Dictionary<string, long> _channelUserIdCache = new();
+    private readonly Dictionary<string, long> _channelUserIdCache = [];
 
     /// <summary>
     /// 根据ChannelPost Author获取用户

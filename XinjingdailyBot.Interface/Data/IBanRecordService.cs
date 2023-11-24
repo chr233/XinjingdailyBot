@@ -34,6 +34,12 @@ public interface IBanRecordService : IBaseService<BanRecords>
     /// <param name="targetUser"></param>
     /// <returns></returns>
     Task<List<BanRecords>> GetBanRecores(Users targetUser);
+    /// <summary>
+    /// 获取封禁记录
+    /// </summary>
+    /// <param name="targetUser"></param>
+    /// <param name="expireTime"></param>
+    /// <returns></returns>
     Task<List<BanRecords>> GetBanRecores(Users targetUser, DateTime expireTime);
 
     /// <summary>
