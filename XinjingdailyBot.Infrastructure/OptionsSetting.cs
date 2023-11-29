@@ -85,6 +85,10 @@ public sealed record OptionsSetting
         /// 二级菜单
         /// </summary>
         public bool PostSecondMenu { get; set; }
+        /// <summary>
+        /// 文本稿件发布时是否启用链接预览
+        /// </summary>
+        public bool EnableWebPagePreview { get; set; }
     }
 
     /// <summary>

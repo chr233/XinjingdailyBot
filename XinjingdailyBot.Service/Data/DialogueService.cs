@@ -1,16 +1,21 @@
+using Microsoft.Extensions.DependencyInjection;
 using SqlSugar;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
+using XinjingdailyBot.Service.Bot.Common;
 using XinjingdailyBot.Service.Data.Base;
 
 namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IDialogueService"/>
 [AppService(typeof(IDialogueService), LifeTime.Transient)]
-internal sealed class DialogueService(ISqlSugarClient context) : BaseService<Dialogue>(context), IDialogueService
+internal sealed class DialogueService(
+    ISqlSugarClient context,
+    IChannelService _channelService) : BaseService<Dialogue>(context), IDialogueService
 {
     public async Task RecordMessage(Message message)
     {
@@ -45,8 +50,15 @@ internal sealed class DialogueService(ISqlSugarClient context) : BaseService<Dia
 
     public Task<List<Dialogue>> FetchUserGroupMessages(Users user, int startId = 0, int takeCount = 30)
     {
+        var groupIds = new List<long>{
+             _channelService.SubGroup.Id,
+             _channelService.CommentGroup.Id,
+             _channelService.ReviewGroup.Id,
+             _channelService.SecondCommentGroup?.Id ?? -1,
+        }.ToHashSet();
+
         return Queryable()
-            .Where(x => x.UserID == user.UserID && x.ChatID <= -1000000000000 && x.Id < startId)
+            .Where(x => x.UserID == user.UserID && groupIds.Contains(x.ChatID))
             .WhereIF(startId != 0, x => x.Id < startId)
             .OrderByDescending(x => x.Id)
             .Take(takeCount)

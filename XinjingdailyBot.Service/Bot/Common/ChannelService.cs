@@ -21,7 +21,7 @@ internal class ChannelService : IChannelService
     public Chat? LogChannel { get; private set; }
     public Chat CommentGroup { get; private set; } = new();
     public Chat SubGroup { get; private set; } = new();
-    public Chat SecondCommentGroup { get; private set; } = new();
+    public Chat? SecondCommentGroup { get; private set; }
     public Chat AcceptChannel { get; private set; } = new();
     public Chat? SecondChannel { get; private set; }
     public Chat RejectChannel { get; private set; } = new();
