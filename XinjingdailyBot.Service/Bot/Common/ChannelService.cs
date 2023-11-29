@@ -175,7 +175,7 @@ internal class ChannelService : IChannelService
 
     public bool IsGroupMessage(long chatId)
     {
-        return chatId == SubGroup.Id || chatId == CommentGroup.Id || chatId == SecondCommentGroup.Id;
+        return chatId == SubGroup.Id || chatId == CommentGroup.Id || chatId == SecondCommentGroup?.Id;
     }
     public bool IsGroupMessage(Chat chat)
     {
@@ -222,7 +222,7 @@ internal class ChannelService : IChannelService
         {
             UpdateChatTitle(chat, SubGroup);
         }
-        else if (chat.Id == SecondCommentGroup.Id)
+        else if (chat.Id == SecondCommentGroup?.Id)
         {
             UpdateChatTitle(chat, SecondCommentGroup);
         }
