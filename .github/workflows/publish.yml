@@ -44,8 +44,8 @@ jobs:
       - name: Prepare for publishing ${{ env.PROJECT_NAME }}
         shell: pwsh
         run: |
-          dotnet restore
-          dotnet build ${{ env.PROJECT_NAME }} -c "$env:CONFIGURATION" -p:ContinuousIntegrationBuild=true -p:TargetLatestRuntimePatch=false -p:UseAppHost=false --no-restore --nologo
+          dotnet restore ${{ env.PROJECT_NAME }}
+          dotnet build ${{ env.PROJECT_NAME }} -c ${{ env.CONFIGURATION }} -p:ContinuousIntegrationBuild=true -p:TargetLatestRuntimePatch=false -p:UseAppHost=false --no-restore --nologo
 
       - name: Publish ${{ env.PROJECT_NAME }} ${{ matrix.arch }}
         shell: pwsh
@@ -56,8 +56,8 @@ jobs:
 
           $buildArgs = '-r', "$variant", '-p:PublishSingleFile=true', '-p:IncludeNativeLibrariesForSelfExtract=true'
 
-          dotnet publish ${{ env.PROJECT_NAME }} -c "$env:CONFIGURATION" -o "./tmp/${{ env.PROJECT_NAME }}-fde" --self-contained=true -p:XJBVariant="$variant" -p:ContinuousIntegrationBuild=true --no-restore --nologo $commonArgs $buildArgs
-          dotnet publish ${{ env.PROJECT_NAME }} -c "$env:CONFIGURATION" -o "./tmp/${{ env.PROJECT_NAME }}" --self-contained=false -p:XJBVariant="$variant" -p:ContinuousIntegrationBuild=true --no-restore --nologo $commonArgs $buildArgs
+          dotnet publish ${{ env.PROJECT_NAME }} -c ${{ env.CONFIGURATION }} -o "./tmp/${{ env.PROJECT_NAME }}-fde" --self-contained=true -p:XJBVariant="$variant" -p:ContinuousIntegrationBuild=true --no-restore --nologo $commonArgs $buildArgs
+          dotnet publish ${{ env.PROJECT_NAME }} -c ${{ env.CONFIGURATION }} -o "./tmp/${{ env.PROJECT_NAME }}" --self-contained=false -p:XJBVariant="$variant" -p:ContinuousIntegrationBuild=true --no-restore --nologo $commonArgs $buildArgs
 
       - name: Clean Xmls
         shell: pwsh
