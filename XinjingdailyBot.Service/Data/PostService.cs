@@ -36,6 +36,7 @@ internal sealed class PostService(
     ISqlSugarClient _context) : BaseService<NewPosts>(_context), IPostService
 {
     private readonly OptionsSetting.PostOption _postOption = options.Value.Post;
+    private readonly bool _enableWebPagePreview = options.Value.Bot.EnableWebPagePreview;
 
     public async Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null)
     {
@@ -704,7 +705,7 @@ internal sealed class PostService(
                 Message? postMessage = null;
                 if (post.PostType == MessageType.Text)
                 {
-                    postMessage = await _botClient.SendTextMessageAsync(acceptChannel, postText, parseMode: ParseMode.Html, disableWebPagePreview: true);
+                    postMessage = await _botClient.SendTextMessageAsync(acceptChannel, postText, parseMode: ParseMode.Html, disableWebPagePreview: !_enableWebPagePreview);
                 }
                 else
                 {
@@ -792,7 +793,7 @@ internal sealed class PostService(
         else // 直接投稿, 在审核群留档
         {
             string reviewMsg = _textHelperService.MakeReviewMessage(poster, post.Anonymous, second, publicMsg);
-            var msg = await _botClient.SendTextMessageAsync(_channelService.ReviewGroup.Id, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
+            var msg = await _botClient.SendTextMessageAsync(_channelService.ReviewGroup.Id, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: !_enableWebPagePreview);
             post.ReviewMsgID = msg.MessageId;
         }
 
