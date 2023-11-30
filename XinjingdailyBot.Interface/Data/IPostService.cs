@@ -273,6 +273,17 @@ public interface IPostService : IBaseService<NewPosts>
     /// <param name="post"></param>
     /// <returns></returns>
     Task<int> CreateNewPosts(NewPosts post);
+    /// <summary>
+    /// 获取过期稿件列表
+    /// </summary>
+    /// <param name="beforeTime"></param>
+    /// <returns></returns>
     Task<List<NewPosts>> GetExpiredPosts(DateTime beforeTime);
+    /// <summary>
+    /// 获取过期稿件列表
+    /// </summary>
+    /// <param name="userID"></param>
+    /// <param name="beforeTime"></param>
+    /// <returns></returns>
     Task<List<NewPosts>> GetExpiredPosts(long userID, DateTime beforeTime);
 }
