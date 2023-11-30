@@ -82,39 +82,11 @@ public interface IBaseRepository<T> : ISimpleClient<T> where T : BaseModel, new(
     #endregion delete
 
     #region query
-    /// <summary>
-    /// 根据条件查询分页数据
-    /// </summary>
-    /// <param name="where"></param>
-    /// <param name="parm"></param>
-    /// <returns></returns>
-    [Obsolete("重构")]
-    PagedInfo<T> GetPages(Expression<Func<T, bool>> where, PagerInfo parm);
-
-    [Obsolete("重构")]
-    PagedInfo<T> GetPages(Expression<Func<T, bool>> where, PagerInfo parm, Expression<Func<T, object>> order, OrderByType orderEnum = OrderByType.Asc);
-    [Obsolete("重构")]
-    PagedInfo<T> GetPages(Expression<Func<T, bool>> where, PagerInfo parm, Expression<Func<T, object>> order, string orderByType);
-
     [Obsolete("重构")]
     bool Any(Expression<Func<T, bool>> expression);
 
     [Obsolete("重构")]
     ISugarQueryable<T> Queryable();
-    [Obsolete("重构")]
-    List<T> GetAll(bool useCache = false, int cacheSecond = 3600);
-
-    [Obsolete("重构")]
-    (List<T>, int) QueryableToPage(Expression<Func<T, bool>> expression, int pageIndex = 0, int pageSize = 10);
-
-    [Obsolete("重构")]
-    (List<T>, int) QueryableToPage(Expression<Func<T, bool>> expression, string order, int pageIndex = 0, int pageSize = 10);
-
-    [Obsolete("重构")]
-    (List<T>, int) QueryableToPage(Expression<Func<T, bool>> expression, Expression<Func<T, object>> orderFiled, string orderBy, int pageIndex = 0, int pageSize = 10);
-
-    [Obsolete("重构")]
-    List<T> SqlQueryToList(string sql, object? obj);
 
     [Obsolete("重构")]
     T GetId(object pkValue);

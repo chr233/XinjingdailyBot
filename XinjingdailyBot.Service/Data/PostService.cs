@@ -1153,4 +1153,18 @@ internal sealed class PostService(
     {
         return Insertable(post).ExecuteReturnIdentityAsync();
     }
+
+    public Task<List<NewPosts>> GetExpiredPosts(DateTime beforeTime)
+    {
+        return Queryable()
+            .Where(x => (x.Status == EPostStatus.Padding || x.Status == EPostStatus.Reviewing) && x.ModifyAt < beforeTime)
+            .ToListAsync();
+    }
+
+    public Task<List<NewPosts>> GetExpiredPosts(long userID, DateTime beforeTime)
+    {
+        return Queryable()
+            .Where(x => x.PosterUID == userID && (x.Status == EPostStatus.Padding || x.Status == EPostStatus.Reviewing) && x.ModifyAt < beforeTime)
+            .ToListAsync();
+    }
 }

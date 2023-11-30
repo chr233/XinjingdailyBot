@@ -273,4 +273,6 @@ public interface IPostService : IBaseService<NewPosts>
     /// <param name="post"></param>
     /// <returns></returns>
     Task<int> CreateNewPosts(NewPosts post);
+    Task<List<NewPosts>> GetExpiredPosts(DateTime beforeTime);
+    Task<List<NewPosts>> GetExpiredPosts(long userID, DateTime beforeTime);
 }

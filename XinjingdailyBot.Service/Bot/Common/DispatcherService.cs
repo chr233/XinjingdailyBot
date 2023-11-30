@@ -13,42 +13,18 @@ namespace XinjingdailyBot.Service.Bot.Common;
 
 /// <inheritdoc cref="IDispatcherService"/>
 [AppService(typeof(IDispatcherService), LifeTime.Scoped)]
-internal class DispatcherService : IDispatcherService
+internal class DispatcherService(
+        ILogger<DispatcherService> _logger,
+        IMessageHandler _messageHandler,
+        ICommandHandler _commandHandler,
+        IChannelPostHandler _channelPostHandler,
+        IChannelService _channelService,
+        ITelegramBotClient _botClient,
+        IJoinRequestHandler _joinRequestHandler,
+        IInlineQueryHandler _inlineQueryHandler,
+        IDialogueService _dialogueService,
+        TagRepository _tagRepository) : IDispatcherService
 {
-    private readonly ILogger<DispatcherService> _logger;
-    private readonly IMessageHandler _messageHandler;
-    private readonly ICommandHandler _commandHandler;
-    private readonly IChannelPostHandler _channelPostHandler;
-    private readonly IChannelService _channelService;
-    private readonly ITelegramBotClient _botClient;
-    private readonly IJoinRequestHandler _joinRequestHandler;
-    private readonly IInlineQueryHandler _inlineQueryHandler;
-    private readonly IDialogueService _dialogueService;
-    private readonly TagRepository _tagRepository;
-
-    public DispatcherService(
-        ILogger<DispatcherService> logger,
-        IMessageHandler messageHandler,
-        ICommandHandler commandHandler,
-        IChannelPostHandler channelPostHandler,
-        IChannelService channelService,
-        ITelegramBotClient botClient,
-        IJoinRequestHandler joinRequestHandler,
-        IInlineQueryHandler inlineQueryHandler,
-        IDialogueService dialogueService,
-        TagRepository tagRepository)
-    {
-        _logger = logger;
-        _messageHandler = messageHandler;
-        _commandHandler = commandHandler;
-        _channelPostHandler = channelPostHandler;
-        _channelService = channelService;
-        _botClient = botClient;
-        _joinRequestHandler = joinRequestHandler;
-        _inlineQueryHandler = inlineQueryHandler;
-        _dialogueService = dialogueService;
-        _tagRepository = tagRepository;
-    }
 
     /// <summary>
     /// 删除子频道中的NSFW消息以及取消置顶其他消息
@@ -87,7 +63,7 @@ internal class DispatcherService : IDispatcherService
             }
         }
 
-        if (message.Type == MessageType.Text && message.Text!.StartsWith("/"))
+        if (message.Type == MessageType.Text && message.Text!.StartsWith('/'))
         {
             //处理命令
             await _commandHandler.OnCommandReceived(dbUser, message);
