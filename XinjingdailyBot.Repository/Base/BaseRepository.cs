@@ -78,24 +78,6 @@ public abstract class BaseRepository<T> : SimpleClient<T>, IBaseRepository<T> wh
     }
 
     /// <summary>
-    ///
-    /// </summary>
-    /// <param name="entity"></param>
-    /// <param name="list"></param>
-    /// <param name="isNull">默认为true</param>
-    /// <returns></returns>
-    public int Update(T entity, List<string>? list = null, bool isNull = true)
-    {
-        list ??= new List<string>
-        {
-        "Create_By",
-        "Create_time"
-    };
-
-        return Context.CopyNew().Updateable(entity).IgnoreColumns(isNull).IgnoreColumns(list.ToArray()).ExecuteCommand();
-    }
-
-    /// <summary>
     /// 更新指定列 eg：Update(w => w.NoticeId == model.NoticeId, it => new SysNotice(){ Update_time = DateTime.Now, Title = "通知标题" });
     /// </summary>
     /// <param name="where"></param>
@@ -196,42 +178,7 @@ public abstract class BaseRepository<T> : SimpleClient<T>, IBaseRepository<T> wh
     {
         return Context.CopyNew().Queryable<T>();
     }
-
-    public (List<T>, int) QueryableToPage(Expression<Func<T, bool>> expression, int pageIndex = 0, int pageSize = 10)
-    {
-        int totalNumber = 0;
-        var list = Context.CopyNew().Queryable<T>().Where(expression).ToPageList(pageIndex, pageSize, ref totalNumber);
-        return (list, totalNumber);
-    }
-
-    public (List<T>, int) QueryableToPage(Expression<Func<T, bool>> expression, string order, int pageIndex = 0, int pageSize = 10)
-    {
-        int totalNumber = 0;
-        var list = Context.CopyNew().Queryable<T>().Where(expression).OrderBy(order).ToPageList(pageIndex, pageSize, ref totalNumber);
-        return (list, totalNumber);
-    }
-
-    public (List<T>, int) QueryableToPage(Expression<Func<T, bool>> expression, Expression<Func<T, object>> orderFiled, string orderBy, int pageIndex = 0, int pageSize = 10)
-    {
-        int totalNumber = 0;
-
-        if (orderBy.Equals("DESC", StringComparison.OrdinalIgnoreCase))
-        {
-            var list = Context.CopyNew().Queryable<T>().Where(expression).OrderBy(orderFiled, OrderByType.Desc).ToPageList(pageIndex, pageSize, ref totalNumber);
-            return (list, totalNumber);
-        }
-        else
-        {
-            var list = Context.CopyNew().Queryable<T>().Where(expression).OrderBy(orderFiled, OrderByType.Asc).ToPageList(pageIndex, pageSize, ref totalNumber);
-            return (list, totalNumber);
-        }
-    }
-
-    public List<T> SqlQueryToList(string sql, object? obj = null)
-    {
-        return Context.CopyNew().Ado.SqlQuery<T>(sql, obj);
-    }
-
+    
     /// <summary>
     /// 根据主值查询单条数据
     /// </summary>
@@ -240,39 +187,6 @@ public abstract class BaseRepository<T> : SimpleClient<T>, IBaseRepository<T> wh
     public T GetId(object pkValue)
     {
         return Context.CopyNew().Queryable<T>().InSingle(pkValue);
-    }
-    /// <summary>
-    /// 根据条件查询分页数据
-    /// </summary>
-    /// <param name="where"></param>
-    /// <param name="parm"></param>
-    /// <returns></returns>
-    public PagedInfo<T> GetPages(Expression<Func<T, bool>> where, PagerInfo parm)
-    {
-        var source = Context.CopyNew().Queryable<T>().Where(where);
-
-        return source.ToPage(parm);
-    }
-
-    public PagedInfo<T> GetPages(Expression<Func<T, bool>> where, PagerInfo parm, Expression<Func<T, object>> order, OrderByType orderEnum = OrderByType.Asc)
-    {
-        var source = Context.CopyNew().Queryable<T>().Where(where).OrderByIF(orderEnum == OrderByType.Asc, order, OrderByType.Asc).OrderByIF(orderEnum == OrderByType.Desc, order, OrderByType.Desc);
-
-        return source.ToPage(parm);
-    }
-
-    public PagedInfo<T> GetPages(Expression<Func<T, bool>> where, PagerInfo parm, Expression<Func<T, object>> order, string orderByType)
-    {
-        return GetPages(where, parm, order, orderByType == "desc" ? OrderByType.Desc : OrderByType.Asc);
-    }
-
-    /// <summary>
-    /// 查询所有数据(无分页,请慎用)
-    /// </summary>
-    /// <returns></returns>
-    public List<T> GetAll(bool useCache = false, int cacheSecond = 3600)
-    {
-        return Context.CopyNew().Queryable<T>().WithCacheIF(useCache, cacheSecond).ToList();
     }
 
     #endregion query
@@ -301,28 +215,3 @@ public abstract class BaseRepository<T> : SimpleClient<T>, IBaseRepository<T> wh
     }
 }
 
-/// <summary>
-/// 分页查询扩展
-/// </summary>
-public static class QueryableExtension
-{
-    /// <summary>
-    /// 读取列表
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="source">查询表单式</param>
-    /// <param name="parm">分页参数</param>
-    /// <returns></returns>
-    public static PagedInfo<T> ToPage<T>(this ISugarQueryable<T> source, PagerInfo parm)
-    {
-        var page = new PagedInfo<T>();
-        var total = 0;
-        page.PageSize = parm.PageSize;
-        page.PageIndex = parm.PageNum;
-
-        page.Result = source.OrderByIF(!string.IsNullOrEmpty(parm.Sort), $"{parm.Sort} {(parm.SortType.Contains("desc") ? "desc" : "asc")}")
-            .ToPageList(parm.PageNum, parm.PageSize, ref total);
-        page.TotalNum = total;
-        return page;
-    }
-}

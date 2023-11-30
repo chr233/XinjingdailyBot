@@ -272,7 +272,7 @@ public sealed record OptionsSetting
         /// <summary>
         /// 任务计划
         /// </summary>
-        public Dictionary<string, string> Cron { get; set; } = new();
+        public Dictionary<string, string> Cron { get; set; } = [];
     }
 
     /// <summary>

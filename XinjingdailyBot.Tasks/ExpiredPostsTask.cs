@@ -39,9 +39,8 @@ internal class ExpiredPostsTask(
         var expiredDate = DateTime.Now - PostExpiredTime;
 
         //获取有过期稿件的用户
-        var userIDList = await _postService.Queryable()
-            .Where(x => (x.Status == EPostStatus.Padding || x.Status == EPostStatus.Reviewing) && x.ModifyAt < expiredDate)
-            .Distinct().Select(x => x.PosterUID).ToListAsync();
+        var expiredPosts = await _postService.GetExpiredPosts(expiredDate);
+        var userIDList = expiredPosts.Select(x => x.PosterUID).Distinct().ToList();
 
         if (userIDList.Count == 0)
         {
@@ -54,9 +53,7 @@ internal class ExpiredPostsTask(
         foreach (var userID in userIDList)
         {
             //获取过期投稿
-            var paddingPosts = await _postService.Queryable()
-                .Where(x => x.PosterUID == userID && (x.Status == EPostStatus.Padding || x.Status == EPostStatus.Reviewing) && x.ModifyAt < expiredDate)
-                .ToListAsync();
+            var paddingPosts = await _postService.GetExpiredPosts(userID,expiredDate);
 
             if (paddingPosts.Count == 0)
             {
@@ -124,14 +121,9 @@ internal class ExpiredPostsTask(
                 }
 
                 user.ExpiredPostCount += rTmout;
-                user.ModifyAt = DateTime.Now;
 
                 //更新用户表
-                await _userService.Updateable(user).UpdateColumns(static x => new {
-                    x.PrivateChatID,
-                    x.ExpiredPostCount,
-                    x.ModifyAt
-                }).ExecuteCommandAsync();
+                await _userService.UpdateUserPostCount(user);
             }
         }
     }

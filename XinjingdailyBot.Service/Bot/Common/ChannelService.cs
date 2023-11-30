@@ -11,11 +11,12 @@ namespace XinjingdailyBot.Service.Bot.Common;
 
 [AppService(typeof(IChannelService), LifeTime.Singleton)]
 
-internal class ChannelService : IChannelService
+internal class ChannelService(
+        ILogger<ChannelService> _logger,
+        ITelegramBotClient _botClient,
+        IOptions<OptionsSetting> _options) : IChannelService
 {
-    private readonly ITelegramBotClient _botClient;
-    private readonly OptionsSetting _optionsSetting;
-    private readonly ILogger<ChannelService> _logger;
+    private readonly OptionsSetting _optionsSetting = _options.Value;
 
     public Chat ReviewGroup { get; private set; } = new();
     public Chat? LogChannel { get; private set; }
@@ -26,16 +27,6 @@ internal class ChannelService : IChannelService
     public Chat? SecondChannel { get; private set; }
     public Chat RejectChannel { get; private set; } = new();
     public User BotUser { get; private set; } = new();
-
-    public ChannelService(
-        ILogger<ChannelService> logger,
-        ITelegramBotClient botClient,
-        IOptions<OptionsSetting> optionsSetting)
-    {
-        _logger = logger;
-        _botClient = botClient;
-        _optionsSetting = optionsSetting.Value;
-    }
 
     public async Task InitChannelInfo()
     {
