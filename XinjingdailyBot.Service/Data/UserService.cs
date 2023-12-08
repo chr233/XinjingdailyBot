@@ -501,11 +501,11 @@ internal sealed class UserService(
             return null;
         }
 
-        if (target.StartsWith('@'))
+        if (target.StartsWith("https://t.me/") || target.StartsWith('@'))
         {
-            return await FetchUserByUserName(target[1..]);
+            target = target.Replace("https://t.me/", "").Replace("@", "");
+            return await FetchUserByUserName(target);
         }
-
 
         if (long.TryParse(target, out var userID))
         {
