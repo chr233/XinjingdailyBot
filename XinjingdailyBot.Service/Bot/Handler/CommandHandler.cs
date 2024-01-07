@@ -52,20 +52,22 @@ internal class CommandHandler : ICommandHandler
     /// <summary>
     /// 指令方法名映射
     /// </summary>
-    private readonly Dictionary<Type, Dictionary<string, AssemblyMethod>> _commandClass = new();
+    private readonly Dictionary<Type, Dictionary<string, AssemblyMethod>> _commandClass = [];
     /// <summary>
     /// 指令别名
     /// </summary>
-    private readonly Dictionary<Type, Dictionary<string, string>> _commandAlias = new();
+    private readonly Dictionary<Type, Dictionary<string, string>> _commandAlias = [];
 
     /// <summary>
     /// Query指令方法名映射
     /// </summary>
-    private readonly Dictionary<Type, Dictionary<string, AssemblyMethod>> _queryCommandClass = new();
+    private readonly Dictionary<Type, Dictionary<string, AssemblyMethod>> _queryCommandClass = [];
     /// <summary>
     /// Query指令别名
     /// </summary>
-    private readonly Dictionary<Type, Dictionary<string, string>> _queryCommandAlias = new();
+    private readonly Dictionary<Type, Dictionary<string, string>> _queryCommandAlias = [];
+
+    private static readonly char[] separator = [','];
 
     [RequiresUnreferencedCode("不兼容剪裁")]
     public void InstallCommands()
@@ -101,15 +103,21 @@ internal class CommandHandler : ICommandHandler
                 var alias = textAttribute.Alias?.ToUpperInvariant();
                 var description = textAttribute.Description;
                 var rights = textAttribute.Rights;
-                commands.Add(command, new AssemblyMethod(method, description, rights));
+                if (!commands.TryAdd(command, new AssemblyMethod(method, description, rights)))
+                {
+                    _logger.LogWarning("注册命令 {cmd} 失败, 命令名称重复", command);
+                }
 
                 //添加别名
                 if (!string.IsNullOrEmpty(alias))
                 {
-                    var splitedAlias = alias.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    var splitedAlias = alias.Split(separator, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var split in splitedAlias)
                     {
-                        commandAlias.Add(split, command);
+                        if (!commandAlias.TryAdd(split, command))
+                        {
+                            _logger.LogWarning("注册命令 {cmd} 别名 {alias} 失败, 命令别名重复", command, split);
+                        }
                     }
                 }
             }
@@ -123,15 +131,21 @@ internal class CommandHandler : ICommandHandler
                 var alias = queryAttribute.Alias?.ToUpperInvariant();
                 var description = queryAttribute.Description;
                 var rights = queryAttribute.Rights;
-                queryCommands.Add(command, new AssemblyMethod(method, description, rights));
+                if (!queryCommands.TryAdd(command, new AssemblyMethod(method, description, rights)))
+                {
+                    _logger.LogWarning("注册Query命令 {cmd} 失败, 命令名称重复", command);
+                }
 
                 //添加别名
                 if (!string.IsNullOrEmpty(alias))
                 {
-                    var splitedAlias = alias.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    var splitedAlias = alias.Split(separator, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var split in splitedAlias)
                     {
-                        queryAlias.Add(split, command);
+                        if (!queryAlias.TryAdd(split, command))
+                        {
+                            _logger.LogWarning("注册Query命令 {cmd} 别名 {split} 失败, 命令别名重复", command, split);
+                        }
                     }
                 }
             }
@@ -430,7 +444,10 @@ internal class CommandHandler : ICommandHandler
                 {
                     if (!string.IsNullOrEmpty(method.Description))
                     {
-                        cmds.Add(cmd.ToLowerInvariant(), method.Description);
+                        if (!cmds.TryAdd(cmd.ToLowerInvariant(), method.Description))
+                        {
+                            _logger.LogWarning("命令 {cmd} 重复, 请检查代码逻辑", cmd);
+                        }
                     }
                 }
             }
