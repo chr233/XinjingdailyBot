@@ -30,6 +30,8 @@ internal class ChannelService(
 
     public async Task InitChannelInfo()
     {
+        _botClient.DeleteWebhookAsync(false);
+
         BotUser = await _botClient.GetMeAsync();
 
         _logger.LogInformation("机器人信息: {Id} {nickName} @{userName}", BotUser.Id, BotUser.FullName(), BotUser.Username);
