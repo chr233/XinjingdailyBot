@@ -326,6 +326,7 @@ internal sealed class PostService(
     /// mediaGroupID字典
     /// </summary>
     private ConcurrentDictionary<string, int> MediaGroupIDs { get; } = new();
+    private ConcurrentDictionary<string, DateTime> MediaGroupIDsLastUpdate { get; } = new();
 
     public async Task HandleMediaGroupPosts(Users dbUser, Message message)
     {
@@ -387,6 +388,12 @@ internal sealed class PostService(
 
                 var actionMsg = await _botClient.SendTextMessageAsync(message.Chat, "处理中, 请稍后", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
 
+                // 图片清晰度检测
+                if (message.Photo != null)
+                {
+                    
+                }
+
                 //生成数据库实体
                 var newPost = new NewPosts {
                     OriginChatID = message.Chat.Id,
@@ -436,10 +443,15 @@ internal sealed class PostService(
                 postID = await Insertable(newPost).ExecuteReturnIdentityAsync();
 
                 MediaGroupIDs[mediaGroupId] = postID;
+                MediaGroupIDsLastUpdate[mediaGroupId] = DateTime.Now;
 
                 //两秒后停止接收媒体组消息
                 _ = Task.Run(async () => {
-                    await Task.Delay(1500);
+                    while (DateTime.Now - MediaGroupIDsLastUpdate[mediaGroupId] < TimeSpan.FromSeconds(.3))
+                    {
+                        await Task.Delay(60);
+                    }
+
                     MediaGroupIDs.Remove(mediaGroupId, out _);
 
                     await _botClient.EditMessageTextAsync(actionMsg, postText, replyMarkup: keyboard);
@@ -449,6 +461,7 @@ internal sealed class PostService(
 
         if (postID > 0)
         {
+            MediaGroupIDsLastUpdate[mediaGroupId] = DateTime.Now;
             //更新附件
             var attachment = _attachmentService.GenerateAttachment(message, postID);
             if (attachment != null)

@@ -102,7 +102,6 @@ public sealed record NewPosts : BaseModel, IModifyAt, ICreateAt
     /// <summary>
     /// 来源频道链接
     /// </summary>
-    [SugarColumn(OldColumnName = "ChannelMsgId")]
     public long ChannelMsgID { get; set; } = -1;
     /// <summary>
     /// 是否为频道转发
