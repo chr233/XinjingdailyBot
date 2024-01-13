@@ -613,6 +613,36 @@ internal sealed class PostService(
             {
                 // 纯链接检测
                 var linkParser = new Regex(@"\b(?:https?://|www\.)\S+\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                foreach (Match m in linkParser.Matches(msg.Text))
+                {
+                    var uri = new Uri(m.Value);
+                    var dict = new Dictionary<string, string> {
+                        {"b23.tv", "@bilifeedbot"},
+                        {"bilibili.com", "@bilifeedbot"},
+                        {"twitter.com", "@TwPicBot"},
+                        {"x.com", "@TwPicBot" },
+                        {"fxtwitter.com", "@TwPicBot" },
+                        {"fixupx.com", "@TwPicBot" },
+                        {"fixvx.com", "@TwPicBot" },
+                        {"twittpr.com","@TwPicBot" },
+                        {"weibo.com", "@web2album_bot" },
+                        {"xiaohongshu.com", "@web2album_bot" },
+                        {"douyin.com", "@icbcbot" },
+                        {"youtube.com", "@icbcbot" },
+                        {"youtu.be", "@icbcbot" },
+                        {"pixiv.net", "@Pixiv_bot" },
+                        {"pximg.net", "@Pixiv_bot" }
+                    };
+
+                    foreach(var host in dict)
+                    {
+                        if(uri.Host.EndsWith(host.Key))
+                        {
+                            await _botClient.SendTextMessageAsync(msg.Chat, $"检测到来自 {host.Key} 的纯链接投稿，请先将链接发送至 {host.Value} 进行处理后再投稿。", replyToMessageId: msg.MessageId);
+                            return false;
+                        }
+                    }
+                }
             }
         }
 
