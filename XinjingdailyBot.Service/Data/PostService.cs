@@ -2,6 +2,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SqlSugar;
 using System.Collections.Concurrent;
+using System.Drawing;
+using System.IO;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -165,6 +167,11 @@ internal sealed class PostService(
         var keyboard = directPost ? _markupHelperService.DirectPostKeyboard(anonymous, newTags, null) : _markupHelperService.PostKeyboard(anonymous);
         string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
+        if (!await ProcessMessage(message))
+        {
+            return;
+        }
+
         //生成数据库实体
         var newPost = new NewPosts {
             Anonymous = anonymous,
@@ -264,6 +271,11 @@ internal sealed class PostService(
             _markupHelperService.PostKeyboard(anonymous);
         string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
+        if (!await ProcessMessage(message))
+        {
+            return;
+        }
+
         //生成数据库实体
         var newPost = new NewPosts {
             Anonymous = anonymous,
@@ -322,11 +334,17 @@ internal sealed class PostService(
         }
     }
 
+    class MediaGroupData
+    {
+        public int id = -1;
+        public DateTime lastActive = DateTime.Now;
+        public bool cancelled = false;
+    }
+
     /// <summary>
     /// mediaGroupID字典
     /// </summary>
-    private ConcurrentDictionary<string, int> MediaGroupIDs { get; } = new();
-    private ConcurrentDictionary<string, DateTime> MediaGroupIDsLastUpdate { get; } = new();
+    private ConcurrentDictionary<string, MediaGroupData> MediaGroupIDs { get; } = new();
 
     public async Task HandleMediaGroupPosts(Users dbUser, Message message)
     {
@@ -342,9 +360,10 @@ internal sealed class PostService(
         }
 
         string mediaGroupId = message.MediaGroupId!;
-        if (!MediaGroupIDs.TryGetValue(mediaGroupId, out int postID)) //如果mediaGroupId不存在则创建新Post
+        if (!MediaGroupIDs.TryGetValue(mediaGroupId, out var post)) //如果mediaGroupId不存在则创建新Post
         {
-            MediaGroupIDs.TryAdd(mediaGroupId, -1);
+            MediaGroupIDs.TryAdd(mediaGroupId, new MediaGroupData());
+            post = MediaGroupIDs[mediaGroupId];
 
             bool exists = await Queryable().AnyAsync(x => x.OriginMediaGroupID == mediaGroupId);
             if (!exists)
@@ -388,10 +407,11 @@ internal sealed class PostService(
 
                 var actionMsg = await _botClient.SendTextMessageAsync(message.Chat, "处理中, 请稍后", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
 
-                // 图片清晰度检测
-                if (message.Photo != null)
+
+                if (!await ProcessMessage(message))
                 {
-                    
+                    await _botClient.DeleteMessageAsync(actionMsg.Chat, actionMsg.MessageId);
+                    return;
                 }
 
                 //生成数据库实体
@@ -440,38 +460,151 @@ internal sealed class PostService(
                     newPost.ReviewMediaGroupID = mediaGroupId;
                 }
 
-                postID = await Insertable(newPost).ExecuteReturnIdentityAsync();
+                post.id = await Insertable(newPost).ExecuteReturnIdentityAsync();
+                post.lastActive = DateTime.Now;
+                MediaGroupIDs[mediaGroupId] = post;
 
-                MediaGroupIDs[mediaGroupId] = postID;
-                MediaGroupIDsLastUpdate[mediaGroupId] = DateTime.Now;
-
-                //两秒后停止接收媒体组消息
+                // 0.3 秒无新消息则停止接收媒体组消息
                 _ = Task.Run(async () => {
-                    while (DateTime.Now - MediaGroupIDsLastUpdate[mediaGroupId] < TimeSpan.FromSeconds(.3))
+                    while (!MediaGroupIDs[mediaGroupId].cancelled && DateTime.Now - MediaGroupIDs[mediaGroupId].lastActive < TimeSpan.FromSeconds(.3))
                     {
                         await Task.Delay(60);
                     }
 
-                    MediaGroupIDs.Remove(mediaGroupId, out _);
-
-                    await _botClient.EditMessageTextAsync(actionMsg, postText, replyMarkup: keyboard);
+                    MediaGroupIDs.Remove(mediaGroupId, out var group);
+                    if (group.cancelled)
+                    {
+                        await _botClient.DeleteMessageAsync(actionMsg.Chat, actionMsg.MessageId);
+                    } else
+                    {
+                        MediaGroupIDs.Remove(mediaGroupId, out _);
+                        await _botClient.EditMessageTextAsync(actionMsg, postText, replyMarkup: keyboard);
+                    }
                 });
             }
         }
 
-        if (postID > 0)
+        if (post != null)
         {
-            MediaGroupIDsLastUpdate[mediaGroupId] = DateTime.Now;
-            //更新附件
-            var attachment = _attachmentService.GenerateAttachment(message, postID);
-            if (attachment != null)
-            {
-                await _attachmentService.CreateAttachment(attachment);
-            }
+            post.lastActive = DateTime.Now;
 
-            //记录媒体组
-            await _mediaGroupService.AddPostMediaGroup(message);
+            if(await ProcessMessage(message))
+            {
+                //更新附件
+                var attachment = _attachmentService.GenerateAttachment(message, post.id);
+                if (attachment != null)
+                {
+                    await _attachmentService.CreateAttachment(attachment);
+                }
+
+                //记录媒体组
+                await _mediaGroupService.AddPostMediaGroup(message);
+            } else
+            {
+                post.cancelled = true;
+            }
         }
+    }
+
+    private async Task<Boolean> ProcessMessage(Message msg)
+    {
+        if (msg.Photo != null)
+        {
+            var size = msg.Photo.Last();
+            double ratio = ((double)size.Width) / size.Height;
+            if (ratio < 0.3)
+            {
+                await _botClient.SendTextMessageAsync(msg.Chat, "长图清晰度过低，请先以文件发送，以切分此图片。\n\n在 PC 客户端上，拖入图片后取消 “压缩图片” 或 “图片格式” 选项即可以文件格式发送\n在 安卓 客户端上，长按发送按钮，点击文件图标即可以文件格式发送。", replyToMessageId: msg.MessageId);
+                return false;
+            }
+        }
+
+        if(msg.Document != null)
+        {
+            if(msg.Document.MimeType.StartsWith("image/"))
+            {
+                var tipsMsg = await _botClient.SendTextMessageAsync(msg.Chat, "正在处理，请稍候……", replyToMessageId: msg.MessageId);
+                // 切分图像
+                Stream fileStream = new MemoryStream();
+                await _botClient.GetInfoAndDownloadFileAsync(msg.Document.FileId, fileStream);
+                var originImg = new Bitmap(Image.FromStream(fileStream));
+                var imgs = new List<IAlbumInputMedia>();
+                const int splitMidHeight = 900; // 每张高度（实际高度 midHeight + scanHeight * k, k∈[-1, 1]）
+                const int splitPadding = 100; // 每张上下重复高度
+                const int splitScanHeight = 10; // 上下扫描切分点高度
+                const int splicScanHorizontal = 2; // 横向扫描距离
+
+                int currentY = 0;
+                while(currentY < originImg.Height)
+                {
+                    int scanStartY = Math.Max(1, currentY + splitMidHeight - splitScanHeight);
+                    int scanEndY = Math.Min((int)originImg.Height, (currentY + splitMidHeight + splitScanHeight));
+
+                    int maxDiffY = 0;
+                    double maxDiff = 0;
+                    
+
+                    for(int y = scanStartY; y < scanEndY; y++)
+                    {
+                        double diff = 0;
+
+                        for(int x=0; x<originImg.Width; x++)
+                        {
+                            var p1 = originImg.GetPixel(x, y);
+
+                            double minDiffPixel = 99999;
+                            for(int qx=Math.Max(0, x - splicScanHorizontal); qx < Math.Min(x + splicScanHorizontal, originImg.Width - 1); qx++)
+                            {
+                                var p2 = originImg.GetPixel(qx, y - 1);
+                                double diffPixel = Math.Sqrt(
+                                    Math.Pow(p1.R - p2.R, 2) +
+                                    Math.Pow(p1.G - p2.G, 2) +
+                                    Math.Pow(p1.B - p2.B, 2)
+                                    );
+
+                                minDiffPixel = Math.Min(minDiffPixel, diffPixel);
+                            }
+
+                            diff += minDiffPixel;
+                        }
+
+                        if(diff >  maxDiff)
+                        {
+                            maxDiff = diff;
+                            maxDiffY = y;
+                        }
+                    }
+
+                    var img = new Bitmap(originImg.Width, Math.Min(maxDiffY - currentY + splitPadding, originImg.Height - currentY));
+                    Graphics g = Graphics.FromImage(img);
+                    g.Clear(System.Drawing.Color.White);
+                    g.DrawImage(originImg, new Point(0, Math.Max(-currentY, -currentY - splitPadding)));
+                    g.Dispose();
+
+                    var memoryStream = new MemoryStream();
+                    img.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
+                    memoryStream.Position = 0;
+                    imgs.Add(new InputMediaPhoto(new InputFileStream(memoryStream, $"image{imgs.Count}.png")));
+
+                    currentY = maxDiffY;
+                }
+
+                for(int i = 0; i < Math.Ceiling((double)imgs.Count / 9); i++)
+                {
+                    await _botClient.SendMediaGroupAsync(msg.Chat, imgs.Slice(i * 9, Math.Min(9, imgs.Count - i * 9)), replyToMessageId: msg.MessageId);
+                } 
+
+                fileStream.Close();
+                originImg.Dispose();
+
+                await _botClient.DeleteMessageAsync(tipsMsg.Chat, tipsMsg.MessageId);
+                await _botClient.SendTextMessageAsync(msg.Chat, "图片切分处理完成，请选择要投稿的图片并转发给机器人。", replyToMessageId: msg.MessageId);
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public async Task SetPostTag(NewPosts post, int tagId, CallbackQuery callbackQuery)
