@@ -515,7 +515,7 @@ internal sealed class PostService(
             double ratio = ((double)size.Width) / size.Height;
             if (ratio < 0.3)
             {
-                await _botClient.SendTextMessageAsync(msg.Chat, "长图清晰度过低，请先以文件发送，以切分此图片。\n\n在 PC 客户端上，拖入图片后取消 “压缩图片” 或 “图片格式” 选项即可以文件格式发送\n在 安卓 客户端上，长按发送按钮，点击文件图标即可以文件格式发送。", replyToMessageId: msg.MessageId);
+                await _botClient.SendTextMessageAsync(msg.Chat, "长图清晰度过低，请将其以文件模式发送，以切分此图片。\n\n在 PC 客户端上，拖入图片后取消 “压缩图片” 或 “图片格式” 选项即可以文件格式发送\n在 安卓 客户端上，长按发送按钮，点击文件图标即可以文件格式发送。", replyToMessageId: msg.MessageId);
                 return false;
             }
         }
