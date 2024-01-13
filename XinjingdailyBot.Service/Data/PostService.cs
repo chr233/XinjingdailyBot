@@ -4,6 +4,7 @@ using SqlSugar;
 using System.Collections.Concurrent;
 using System.Drawing;
 using System.IO;
+using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -529,10 +530,11 @@ internal sealed class PostService(
                 await _botClient.GetInfoAndDownloadFileAsync(msg.Document.FileId, fileStream);
                 var originImg = new Bitmap(Image.FromStream(fileStream));
                 var imgs = new List<IAlbumInputMedia>();
-                const int splitMidHeight = 900; // 每张高度（实际高度 midHeight + scanHeight * k, k∈[-1, 1]）
-                const int splitPadding = 100; // 每张上下重复高度
-                const int splitScanHeight = 10; // 上下扫描切分点高度
+                const double splitTargetRatio = 9.0 / 16.0; // 目标宽高比
+                const int splitPadding = 60; // 每张上下重复高度
+                const int splitScanHeight = 100; // 上下扫描切分点高度
                 const int splicScanHorizontal = 2; // 横向扫描距离
+                int splitMidHeight = (int)Math.Round(originImg.Width / splitTargetRatio); // 每张高度（实际高度 midHeight + scanHeight * k, k∈[-1, 1]）
 
                 int currentY = 0;
                 while(currentY < originImg.Height)
@@ -541,44 +543,46 @@ internal sealed class PostService(
                     int scanEndY = Math.Min((int)originImg.Height, (currentY + splitMidHeight + splitScanHeight));
 
                     int maxDiffY = 0;
-                    double maxDiff = 0;
-                    
+                    double maxDiff = -100;
 
-                    for(int y = scanStartY; y < scanEndY; y++)
-                    {
-                        double diff = 0;
-
-                        for(int x=0; x<originImg.Width; x++)
+                    if (originImg.Height - currentY - splitPadding - splitScanHeight - splitMidHeight > 0)
+                        for (int y = scanStartY; y < scanEndY; y++)
                         {
-                            var p1 = originImg.GetPixel(x, y);
+                            double diff = 0;
 
-                            double minDiffPixel = 99999;
-                            for(int qx=Math.Max(0, x - splicScanHorizontal); qx < Math.Min(x + splicScanHorizontal, originImg.Width - 1); qx++)
+                            for (int x = 0; x < originImg.Width; x++)
                             {
-                                var p2 = originImg.GetPixel(qx, y - 1);
-                                double diffPixel = Math.Sqrt(
-                                    Math.Pow(p1.R - p2.R, 2) +
-                                    Math.Pow(p1.G - p2.G, 2) +
-                                    Math.Pow(p1.B - p2.B, 2)
-                                    );
+                                var p1 = originImg.GetPixel(x, y);
 
-                                minDiffPixel = Math.Min(minDiffPixel, diffPixel);
+                                double minDiffPixel = 99999;
+                                for (int qx = Math.Max(0, x - splicScanHorizontal); qx < Math.Min(x + splicScanHorizontal, originImg.Width - 1); qx++)
+                                {
+                                    var p2 = originImg.GetPixel(qx, y - 1);
+                                    double diffPixel = Math.Sqrt(
+                                        Math.Pow(p1.R - p2.R, 2) +
+                                        Math.Pow(p1.G - p2.G, 2) +
+                                        Math.Pow(p1.B - p2.B, 2)
+                                        );
+
+                                    minDiffPixel = Math.Min(minDiffPixel, diffPixel);
+                                }
+
+                                diff += minDiffPixel;
                             }
 
-                            diff += minDiffPixel;
+                            if (diff > maxDiff)
+                            {
+                                maxDiff = diff;
+                                maxDiffY = y;
+                            }
                         }
+                    else maxDiffY = originImg.Height;
+                    var height = Math.Min(maxDiffY - currentY + splitPadding * 2, originImg.Height - currentY);
 
-                        if(diff >  maxDiff)
-                        {
-                            maxDiff = diff;
-                            maxDiffY = y;
-                        }
-                    }
-
-                    var img = new Bitmap(originImg.Width, Math.Min(maxDiffY - currentY + splitPadding, originImg.Height - currentY));
+                    var img = new Bitmap(originImg.Width, height);
                     Graphics g = Graphics.FromImage(img);
                     g.Clear(System.Drawing.Color.White);
-                    g.DrawImage(originImg, new Point(0, Math.Max(-currentY, -currentY - splitPadding)));
+                    g.DrawImage(originImg, new Point(0, Math.Max(-currentY, -currentY + splitPadding)));
                     g.Dispose();
 
                     var memoryStream = new MemoryStream();
@@ -592,7 +596,7 @@ internal sealed class PostService(
                 for(int i = 0; i < Math.Ceiling((double)imgs.Count / 9); i++)
                 {
                     await _botClient.SendMediaGroupAsync(msg.Chat, imgs.Slice(i * 9, Math.Min(9, imgs.Count - i * 9)), replyToMessageId: msg.MessageId);
-                } 
+                }
 
                 fileStream.Close();
                 originImg.Dispose();
@@ -601,6 +605,14 @@ internal sealed class PostService(
                 await _botClient.SendTextMessageAsync(msg.Chat, "图片切分处理完成，请选择要投稿的图片并转发给机器人。", replyToMessageId: msg.MessageId);
 
                 return false;
+            }
+        }
+
+        if(msg.Text != null) {
+            if(msg.Document == null && msg.Photo == null && msg.Audio == null && msg.Video == null)
+            {
+                // 纯链接检测
+                var linkParser = new Regex(@"\b(?:https?://|www\.)\S+\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             }
         }
 
