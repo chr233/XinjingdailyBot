@@ -530,11 +530,11 @@ internal sealed class PostService(
                 await _botClient.GetInfoAndDownloadFileAsync(msg.Document.FileId, fileStream);
                 var originImg = new Bitmap(Image.FromStream(fileStream));
                 var imgs = new List<IAlbumInputMedia>();
-                const double splitTargetRatio = 9.0 / 16.0; // 目标宽高比
-                const int splitPadding = 60; // 每张上下重复高度
-                const int splitScanHeight = 100; // 上下扫描切分点高度
-                const int splicScanHorizontal = 2; // 横向扫描距离
+                const double splitTargetRatio = 9.0 / 12.0; // 目标宽高比
                 int splitMidHeight = (int)Math.Round(originImg.Width / splitTargetRatio); // 每张高度（实际高度 midHeight + scanHeight * k, k∈[-1, 1]）
+                int splitPadding = (int)(0.05 * splitMidHeight); // 每张上下重复高度
+                int splitScanHeight = (int)(0.3 * splitMidHeight); // 上下扫描切分点高度
+                int splicScanHorizontal = (int)(0.01 * originImg.Width); // 横向扫描距离
 
                 int currentY = 0;
                 while(currentY < originImg.Height)
@@ -577,16 +577,18 @@ internal sealed class PostService(
                             }
                         }
                     else maxDiffY = originImg.Height;
-                    var height = Math.Min(maxDiffY - currentY + splitPadding * 2, originImg.Height - currentY);
+                    var height = Math.Min(maxDiffY - currentY + splitPadding * (currentY == 0 ? 1 : 2), originImg.Height - currentY + splitPadding);
+
 
                     var img = new Bitmap(originImg.Width, height);
                     Graphics g = Graphics.FromImage(img);
                     g.Clear(System.Drawing.Color.White);
-                    g.DrawImage(originImg, new Point(0, Math.Max(-currentY, -currentY + splitPadding)));
+                    g.DrawImage(originImg, new Point(0, (currentY == 0 ? 0 : -currentY + splitPadding)));
                     g.Dispose();
 
                     var memoryStream = new MemoryStream();
                     img.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
+                    img.Dispose();
                     memoryStream.Position = 0;
                     imgs.Add(new InputMediaPhoto(new InputFileStream(memoryStream, $"image{imgs.Count}.png")));
 
