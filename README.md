@@ -48,7 +48,9 @@
 
 ## 安装与使用
 
-从 [Releases](https://github.com/chr233/XinjingdailyBot/releases) 下载编译好的文件以后, 直接运行 XinjingDailyBot.WebAPI 即可
+1. 从 [Releases](https://github.com/chr233/XinjingdailyBot/releases) 下载编译好的文件, 并解压
+2. 参考 [配置说明](#配置说明) 修改机器人配置文件 `appsettings.json`, 首次启动需要配置 `BotToken`, `AcceptChannel`, `RejectChannel` 项, 其余可选
+3. 运行 `XinjingDailyBot.WebAPI`
 
 ### 升级注意
 
