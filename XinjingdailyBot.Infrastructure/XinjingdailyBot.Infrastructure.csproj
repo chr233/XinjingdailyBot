@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
@@ -12,6 +12,15 @@
 
 	<ItemGroup>
 		<None Include="..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\XinjingdailyBot.BaseInfrastructure\XinjingdailyBot.BaseInfrastructure.csproj">
+	    <PrivateAssets></PrivateAssets>
+	    <ReferenceOutputAssembly></ReferenceOutputAssembly>
+	    <EmbedInteropTypes></EmbedInteropTypes>
+	    <CopyLocalSatelliteAssemblies></CopyLocalSatelliteAssemblies>
+	  </ProjectReference>
 	</ItemGroup>
 
 	<ItemGroup>

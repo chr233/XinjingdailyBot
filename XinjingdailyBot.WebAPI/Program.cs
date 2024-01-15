@@ -9,7 +9,7 @@ namespace XinjingdailyBot.WebAPI;
 /// <summary>
 /// 根程序集
 /// </summary>
-public static class Program
+public partial class Program
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
@@ -20,6 +20,8 @@ public static class Program
     [RequiresUnreferencedCode("不兼容剪裁")]
     public static void Main(string[] args)
     {
+        HelloFrom("Generated Code");
+
         _logger.Info(Langs.Line);
         _logger.Info("欢迎使用 XinjingdailyBot");
         _logger.Info(Langs.Version, Utils.Version, BuildInfo.Variant);
@@ -91,4 +93,7 @@ public static class Program
             }
         }
     }
+
+
+    static partial void HelloFrom(string name);
 }

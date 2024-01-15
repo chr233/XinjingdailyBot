@@ -1,6 +1,8 @@
 <Project>
   <ItemGroup>
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="7.0.13" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="8.0.0" />
@@ -16,6 +18,8 @@
     <PackageVersion Include="SqlSugarCore" Version="5.1.4.127-preview21" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
+    <PackageVersion Include="System.CodeDom" Version="8.0.0" />
     <PackageVersion Include="Telegram.Bot" Version="20.0.0-alpha.1" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.8.0" />
   </ItemGroup>
 </Project>

@@ -9,24 +9,17 @@ namespace XinjingdailyBot.Repository;
 /// <summary>
 /// 用户等级仓储类
 /// </summary>
+/// <remarks>
+/// 用户等级仓储类
+/// </remarks>
+/// <param name="_logger"></param>
+/// <param name="context"></param>
 [AppService(LifeTime.Singleton)]
-public class LevelRepository : BaseRepository<Levels>
+public class LevelRepository(
+    ILogger<LevelRepository> _logger,
+    ISqlSugarClient context) : BaseRepository<Levels>(context)
 {
-    private readonly ILogger<LevelRepository> _logger;
-
-    /// <summary>
-    /// 用户等级仓储类
-    /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="context"></param>
-    public LevelRepository(
-        ILogger<LevelRepository> logger,
-        ISqlSugarClient context) : base(context)
-    {
-        _logger = logger;
-    }
-
-    private Dictionary<int, Levels> LevelCache { get; } = new();
+    private Dictionary<int, Levels> LevelCache { get; } = [];
 
     /// <summary>
     /// 初始化缓存
@@ -42,7 +35,7 @@ public class LevelRepository : BaseRepository<Levels>
         }
 
         var levels = await GetListAsync();
-        if (levels.Any())
+        if (levels.Count != 0)
         {
             LevelCache.Clear();
             foreach (var level in levels)
