@@ -1,12 +1,11 @@
-using System;
-using System.Collections.Immutable;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using System.Collections.Immutable;
+using System.Drawing;
+using System.Reflection;
+using System.Text;
 using XinjingdailyBot.Infrastructure.Attribute;
 
 namespace XinjingdailyBot.Generator;
@@ -14,76 +13,156 @@ namespace XinjingdailyBot.Generator;
 /// <summary>
 /// 服务注册生成器
 /// </summary>
+//[Generator]
+//public class AppServiceGenerator : ISourceGenerator
+//{
+//    private readonly Dictionary<Type, LifeTime> ServiceDict = [];
+
+//    /// <inheritdoc />
+//    public void Execute(GeneratorExecutionContext context)
+//    {
+//        var rx = (SyntaxReceiver)context.SyntaxContextReceiver!;
+//        foreach ((string name, string template, string hash) in rx.TemplateInfo)
+//        {
+//            //string source = SourceFileFromMustachePath(name, template, hash);
+//            //context.AddSource($"Mustache{name}.g.cs", source);
+//        }
+//    }
+//    static string SourceFileFromMustachePath(string name, string template, string hash)
+//    {
+//        //        Func<object, string> tree = HandlebarsDotNet.Handlebars.Compile(template);
+//        //        object? @object = Newtonsoft.Json.JsonConvert.DeserializeObject(hash);
+//        //        if (@object is null)
+//        //        {
+//        //            return string.Empty;
+//        //        }
+
+//        //        string mustacheText = tree(@object);
+
+//        //        var sb = new StringBuilder();
+//        //        sb.Append($@"
+//        //namespace Mustache {{
+
+//        //    public static partial class Constants {{
+
+//        //        public const string {name} = @""{mustacheText.Replace("\"", "\"\"")}"";
+//        //    }}
+//        //}}
+//        //");
+//        //        return sb.ToString();
+
+//        return "";
+//    }
+
+//    /// <inheritdoc />
+//    public void Initialize(GeneratorInitializationContext context)
+//    {
+//        context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
+//    }
+
+//    class SyntaxReceiver : ISyntaxContextReceiver
+//    {
+//        public List<(string name, string template, string hash)> TemplateInfo = new List<(string name, string template, string hash)>();
+
+//        public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
+//        {
+//            if (context.Node is AttributeSyntax attrib)
+//            {
+//                Console.WriteLine(context.SemanticModel.GetTypeInfo(attrib).Type?.ToDisplayString());
+//            }
+//            else
+//            {
+//                Console.WriteLine(context.Node);
+//            }
+//            // find all valid mustache attributes
+//            //if (context.Node is AttributeSyntax attrib
+//            //    && attrib.ArgumentList?.Arguments.Count == 3
+//            //    && context.SemanticModel.GetTypeInfo(attrib).Type?.ToDisplayString() == "MustacheAttribute")
+//            //{
+//            //    string name = context.SemanticModel.GetConstantValue(attrib.ArgumentList.Arguments[0].Expression).ToString();
+//            //    string template = context.SemanticModel.GetConstantValue(attrib.ArgumentList.Arguments[1].Expression).ToString();
+//            //    string hash = context.SemanticModel.GetConstantValue(attrib.ArgumentList.Arguments[2].Expression).ToString();
+
+//            //    TemplateInfo.Add((name, template, hash));
+//            //}
+//        }
+//    }
+//}
+
+
+
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
+using System.Collections.Generic;
+
+using System.Linq;
+using System.Text;
+
 [Generator]
 public class AppServiceGenerator : ISourceGenerator
 {
-    private readonly Dictionary<Type, LifeTime> ServiceDict = [];
-
-    private void GetAllTypes(GeneratorExecutionContext context)
-    {
-        // 获取当前程序集的所有引用
-        var referencedAssemblies = context.Compilation.ReferencedAssemblyNames;
-
-        // 获取当前程序集的所有类型
-        var allTypes = new List<Type>();
-
-        // 获取当前程序集中的所有类型
-        foreach (var syntaxTree in context.Compilation.SyntaxTrees)
-        {
-            var semanticModel = context.Compilation.GetSemanticModel(syntaxTree);
-            var root = syntaxTree.GetRoot();
-
-            Console.WriteLine(root.ToString());
-
-            // 使用语法树的语义模型获取类型
-            var typesInSyntaxTree = root.DescendantNodes().OfType<ClassDeclarationSyntax>()
-                .Select(classSyntax => semanticModel.GetDeclaredSymbol(classSyntax))
-                .Where(symbol => symbol is not null && symbol is ITypeSymbol)
-                .Select(symbol => (ITypeSymbol?)symbol);
-
-            //var x = typesInSyntaxTree.Select(typeSymbol => typeSymbol?.IsType == true);
-
-
-            var controllers = context.Compilation
-                    .SyntaxTrees
-                    .SelectMany(syntaxTree => syntaxTree.GetRoot().DescendantNodes())
-                    .Where(x => x is ClassDeclarationSyntax)
-                    .Cast<ClassDeclarationSyntax>()
-                    .Where(c => c.Identifier.ValueText.EndsWith("Controller", StringComparison.OrdinalIgnoreCase))
-                    .ToImmutableList();
-
-
-        }
-
-        // 获取所有引用程序集中的类型
-        foreach (var referencedAssembly in referencedAssemblies)
-        {
-            //var referencedAssemblySymbol = context.Compilation.GetAssemblyOrModuleSymbol(referencedAssembly);
-            //var typesInReferencedAssembly = referencedAssemblySymbol?.GlobalNamespace.GetNamespaceMembers()
-            //    .SelectMany(namespaceSymbol => namespaceSymbol.GetTypeMembers())
-            //    .Where(typeSymbol => typeSymbol is not null && typeSymbol is ITypeSymbol)
-            //    .Select(typeSymbol => (ITypeSymbol)typeSymbol);
-
-            //allTypes.AddRange(typesInReferencedAssembly.Select(typeSymbol => typeSymbol.ToType()));
-        }
-    }
-
-    /// <inheritdoc />
     public void Initialize(GeneratorInitializationContext context)
     {
-#if DEBUGGENERATOR
-        if (!Debugger.IsAttached)
-        {
-            Debugger.Launch();
-        }
-#endif
+        // 初始化逻辑
+        context.RegisterForSyntaxNotifications(() => new ControllerFinder());
     }
 
-    /// <inheritdoc />
     public void Execute(GeneratorExecutionContext context)
     {
-        GetAllTypes(context);
+        foreach (var symbol in context.Compilation.SourceModule.ReferencedAssemblySymbols)
+        {
+            foreach(var x in symbol.gets)
+            Console.WriteLine(syntaxTree.FilePath);
+        }
+    }
 
-        Console.WriteLine(context.ToString());
+    private bool HasAppServiceAttribute(INamedTypeSymbol typeSymbol)
+    {
+        return typeSymbol.GetAttributes().Any(attribute => attribute.AttributeClass?.Name == "AppServiceAttribute");
+    }
+
+    private string GenerateCode(List<INamedTypeSymbol> appServiceClasses)
+    {
+        var stringBuilder = new StringBuilder();
+
+        stringBuilder.AppendLine("using Microsoft.Extensions.DependencyInjection;");
+        stringBuilder.AppendLine();
+        stringBuilder.AppendLine("namespace YourNamespace");
+        stringBuilder.AppendLine("{");
+        stringBuilder.AppendLine("    public static class ServiceRegistration");
+        stringBuilder.AppendLine("    {");
+        stringBuilder.AppendLine("        public static void RegisterServices(IServiceCollection services)");
+        stringBuilder.AppendLine("        {");
+
+        foreach (var appServiceClass in appServiceClasses)
+        {
+            stringBuilder.AppendLine($"            services.AddScoped<{appServiceClass.ToDisplayString()}>();");
+        }
+
+        stringBuilder.AppendLine("        }");
+        stringBuilder.AppendLine("    }");
+        stringBuilder.AppendLine("}");
+
+        return stringBuilder.ToString();
+    }
+
+
+    public class ControllerFinder : ISyntaxReceiver
+    {
+        public List<ClassDeclarationSyntax> Controllers { get; }
+            = new();
+
+        public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
+        {
+            if (syntaxNode is ClassDeclarationSyntax controller)
+            {
+                //if (controller.Identifier.ValueText.StartsWith("Xinjingdaily"))
+                //{
+                Controllers.Add(controller);
+                //}
+            }
+        }
     }
 }

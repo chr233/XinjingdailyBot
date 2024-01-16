@@ -22,7 +22,6 @@ public static class AppServiceExtensions
             "XinjingdailyBot.Repository",
             "XinjingdailyBot.Service",
             "XinjingdailyBot.Command",
-            "XinjingdailyBot.WebAPI",
         };
 
         foreach (var item in cls)
@@ -41,7 +40,7 @@ public static class AppServiceExtensions
     private static void Register(IServiceCollection services, Assembly assembly)
     {
         string? name = assembly.GetName().Name;
-        _logger.Debug($"===== 注册 {name} 中的服务 =====");
+        _logger.Debug("===== 注册 {name} 中的服务 =====", name);
         uint count = 0;
         foreach (var type in assembly.GetTypes())
         {
@@ -78,9 +77,9 @@ public static class AppServiceExtensions
                         break;
                 }
 
-                _logger.Debug($"{lifetime} - {serviceType}");
+                _logger.Debug("{lifetime} - {serviceType}", lifetime, serviceType);
             }
         }
-        _logger.Debug($"===== 注册了 {count} 个服务 =====");
+        _logger.Debug("===== 注册了 {count} 个服务 =====", count);
     }
 }
