@@ -15,15 +15,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\XinjingdailyBot.BaseInfrastructure\XinjingdailyBot.BaseInfrastructure.csproj">
-	    <PrivateAssets></PrivateAssets>
-	    <ReferenceOutputAssembly></ReferenceOutputAssembly>
-	    <EmbedInteropTypes></EmbedInteropTypes>
-	    <CopyLocalSatelliteAssemblies></CopyLocalSatelliteAssemblies>
-	  </ProjectReference>
-	</ItemGroup>
-
-	<ItemGroup>
 		<Compile Update="Localization\Emojis.Designer.cs">
 			<DependentUpon>Emojis.resx</DependentUpon>
 			<DesignTime>True</DesignTime>

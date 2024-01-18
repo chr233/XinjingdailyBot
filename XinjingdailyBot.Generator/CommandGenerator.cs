@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
-using XinjingdailyBot.Infrastructure.Attribute;
 
 namespace XinjingdailyBot.Generator;
 
