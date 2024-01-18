@@ -5,71 +5,99 @@ using XinjingdailyBot.Infrastructure.Attribute;
 
 namespace XinjingdailyBot.Generator;
 
-/// <summary>
-/// 服务注册生成器
-/// </summary>
+using System;
+using System.Collections.Generic;
+using System.Text;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
+
 //[Generator]
-//public class CommandGenerator : ISourceGenerator
+//public class ServiceRegistrationGenerator : ISourceGenerator
 //{
-//    private readonly Dictionary<Type, LifeTime> ServiceDict = [];
-
-//    private void GetAllTypes(GeneratorExecutionContext 
-//        context)
-//    {
-//        // 获取当前程序集的所有引用
-//        var referencedAssemblies = context.Compilation.ReferencedAssemblyNames;
-
-//        // 获取当前程序集的所有类型
-//        var allTypes = new List<Type>();
-
-//        // 获取当前程序集中的所有类型
-//        foreach (var syntaxTree in context.Compilation.SyntaxTrees)
-//        {
-//            var semanticModel = context.Compilation.GetSemanticModel(syntaxTree);
-//            var root = syntaxTree.GetRoot();
-
-//            Console.WriteLine(root.ToString());
-
-//            var classes = context.Compilation
-//                    .SyntaxTrees
-//                    .SelectMany(syntaxTree => syntaxTree.GetRoot().DescendantNodes())
-//                    .Where(x => x is ClassDeclarationSyntax)
-//                    .Cast<ClassDeclarationSyntax>()
-//                    .ToImmutableList();
-
-//            var types = classes.Select(static x => x.GetType());
-
-//        }
-
-//        // 获取所有引用程序集中的类型
-//        foreach (var referencedAssembly in referencedAssemblies)
-//        {
-//            //var referencedAssemblySymbol = context.Compilation.GetAssemblyOrModuleSymbol(referencedAssembly);
-//            //var typesInReferencedAssembly = referencedAssemblySymbol?.GlobalNamespace.GetNamespaceMembers()
-//            //    .SelectMany(namespaceSymbol => namespaceSymbol.GetTypeMembers())
-//            //    .Where(typeSymbol => typeSymbol is not null && typeSymbol is ITypeSymbol)
-//            //    .Select(typeSymbol => (ITypeSymbol)typeSymbol);
-
-//            //allTypes.AddRange(typesInReferencedAssembly.Select(typeSymbol => typeSymbol.ToType()));
-//        }
-//    }
-
-//    /// <inheritdoc />
 //    public void Initialize(GeneratorInitializationContext context)
 //    {
-//#if DEBUGGENERATOR
-//        if (!Debugger.IsAttached)
-//        {
-//            Debugger.Launch();
-//        }
-//#endif
+//        // 注册对应的属性
+//        context.RegisterForSyntaxNotifications(() => new AppServiceSyntaxReceiver());
 //    }
 
-//    /// <inheritdoc />
 //    public void Execute(GeneratorExecutionContext context)
 //    {
-//        //GetAllTypes(context);
+//        // 获取属性接收器
+//        if (!(context.SyntaxReceiver is AppServiceSyntaxReceiver syntaxReceiver))
+//            return;
 
-//        //Console.WriteLine(context.ToString());
+//        // 生成服务注册代码
+//        var code = GenerateServiceRegistrationCode(syntaxReceiver.CandidateAttributes);
+
+//        // 将生成的代码添加到输出
+//        context.AddSource("ServiceRegistration.Generated.cs", SourceText.From(code, Encoding.UTF8));
+//    }
+
+//    private string GenerateServiceRegistrationCode(List<AttributeSyntax> attributes)
+//    {
+//        // 生成的代码的命名空间、类名等信息
+//        var namespaceName = "Generated";
+//        var className = "ServiceRegistration";
+
+//        // 生成类的代码
+//        var classDeclaration = SyntaxFactory.ClassDeclaration(className)
+//            .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
+//            .AddMembers((MemberDeclarationSyntax)GenerateServiceRegistrationMethods(attributes));
+
+//        // 生成命名空间的代码
+//        var namespaceDeclaration = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(namespaceName))
+//            .AddMembers(classDeclaration);
+
+//        // 生成整个文件的代码
+//        var compilationUnit = SyntaxFactory.CompilationUnit()
+//            .AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("Microsoft.Extensions.DependencyInjection")))
+//            .AddMembers(namespaceDeclaration);
+
+//        // 转换为字符串
+//        var syntaxTree = SyntaxFactory.SyntaxTree(compilationUnit);
+//        var formattedCode = syntaxTree.GetRoot().NormalizeWhitespace().ToFullString();
+
+//        return formattedCode;
+//    }
+
+//    private IEnumerable<MemberDeclarationSyntax> GenerateServiceRegistrationMethods(List<AttributeSyntax> attributes)
+//    {
+//        // 生成注册服务的方法
+//        foreach (var attribute in attributes)
+//        {
+//            // 解析属性的信息，根据需要生成注册代码
+//            // 这里假设 AppServiceAttribute 有一个 Name 属性，表示服务的名称
+//            var serviceName = attribute.ArgumentList.Arguments.First().Expression.ToString();
+
+//            // 生成注册代码
+//            var method = SyntaxFactory.MethodDeclaration(SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)), "RegisterServices")
+//                .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
+//                .AddAttributeLists(SyntaxFactory.AttributeList(SyntaxFactory.SingletonSeparatedList(attribute)))
+//                .AddBodyStatements(
+//                    SyntaxFactory.ExpressionStatement(
+//                        SyntaxFactory.ParseExpression($"services.AddTransient<{serviceName}>();")
+//                    )
+//                );
+
+//            yield return method;
+//        }
+//    }
+//}
+
+//// 用于接收带有 AppServiceAttribute 的语法节点
+//internal class AppServiceSyntaxReceiver : ISyntaxReceiver
+//{
+//    public List<AttributeSyntax> CandidateAttributes { get; } = new List<AttributeSyntax>();
+
+//    public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
+//    {
+//        // 检查语法节点是否包含 AppServiceAttribute
+//        if (syntaxNode is AttributeSyntax attributeSyntax
+//            && attributeSyntax.Name.ToString() == "AppServiceAttribute")
+//        {
+//            CandidateAttributes.Add(attributeSyntax);
+//        }
 //    }
 //}
