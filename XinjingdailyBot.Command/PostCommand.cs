@@ -16,7 +16,7 @@ namespace XinjingdailyBot.Command;
 /// 投稿命令
 /// </summary>
 [AppService(LifeTime.Scoped)]
-internal class PostCommand(
+public sealed class PostCommand(
     ITelegramBotClient _botClient,
     IUserService _userService,
     IChannelService _channelService,

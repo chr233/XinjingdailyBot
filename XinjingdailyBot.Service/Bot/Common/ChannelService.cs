@@ -11,7 +11,7 @@ namespace XinjingdailyBot.Service.Bot.Common;
 
 [AppService(typeof(IChannelService), LifeTime.Singleton)]
 
-internal class ChannelService(
+public sealed class ChannelService(
         ILogger<ChannelService> _logger,
         ITelegramBotClient _botClient,
         IOptions<OptionsSetting> _options) : IChannelService

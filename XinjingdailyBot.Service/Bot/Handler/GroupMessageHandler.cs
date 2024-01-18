@@ -13,7 +13,7 @@ using XinjingdailyBot.Model.Models;
 namespace XinjingdailyBot.Service.Bot.Handler;
 
 [AppService(typeof(IGroupMessageHandler), LifeTime.Singleton)]
-internal class GroupMessageHandler : IGroupMessageHandler
+public sealed class GroupMessageHandler : IGroupMessageHandler
 {
     private readonly IChannelService _channelService;
     private readonly ITelegramBotClient _botClient;

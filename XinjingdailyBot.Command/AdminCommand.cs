@@ -23,7 +23,7 @@ namespace XinjingdailyBot.Command;
 /// 管理员命令
 /// </summary>
 [AppService(LifeTime.Scoped)]
-internal class AdminCommand(
+public sealed class AdminCommand(
     ILogger<AdminCommand> _logger,
     ITelegramBotClient _botClient,
     IUserService _userService,

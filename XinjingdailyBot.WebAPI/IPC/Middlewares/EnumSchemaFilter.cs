@@ -6,7 +6,7 @@ using System.Globalization;
 
 namespace XinjingdailyBot.WebAPI.IPC.Middlewares;
 
-internal sealed class EnumSchemaFilter : ISchemaFilter
+public sealed class EnumSchemaFilter : ISchemaFilter
 {
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {

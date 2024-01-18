@@ -13,7 +13,7 @@ namespace XinjingdailyBot.Service.Bot.Common;
 
 /// <inheritdoc cref="IDispatcherService"/>
 [AppService(typeof(IDispatcherService), LifeTime.Scoped)]
-internal class DispatcherService(
+public sealed class DispatcherService(
         ILogger<DispatcherService> _logger,
         IMessageHandler _messageHandler,
         ICommandHandler _commandHandler,

@@ -14,7 +14,7 @@ namespace XinjingdailyBot.Tasks;
 /// 定期发布审核状态通知
 /// </summary>
 [Job("0 * * * * ?")]
-internal class ReviewStatusTask(
+public sealed class ReviewStatusTask(
     ILogger<ReviewStatusTask> _logger,
     IPostService _postService,
     ITelegramBotClient _botClient,

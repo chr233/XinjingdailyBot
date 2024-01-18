@@ -14,7 +14,7 @@ namespace XinjingdailyBot.Service.Helper;
 
 /// <inheritdoc cref="IMarkupHelperService"/>
 [AppService(typeof(IMarkupHelperService), LifeTime.Transient)]
-internal sealed class MarkupHelperService : IMarkupHelperService
+public sealed class MarkupHelperService : IMarkupHelperService
 {
     private readonly GroupRepository _groupRepository;
     private readonly IChannelService _channelService;

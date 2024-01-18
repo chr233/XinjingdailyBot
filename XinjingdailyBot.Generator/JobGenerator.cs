@@ -4,22 +4,30 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using System.Xml.Linq;
 using XinjingdailyBot.Generator.Data;
 
 namespace XinjingdailyBot.Generator;
 
 [Generator]
-internal class AppServiceGenerator : ISourceGenerator
+internal class JobGenerator : ISourceGenerator
 {
-    const string InputFileName = "appService.json";
-    const string OutoutFileName = "GeneratedAppServiceExtensions.g.cs";
+    const string InputFileName = "task.json";
+    const string OutoutFileName = "GeneratedJobExtensions.g.cs";
 
     /// <inheritdoc/>
     public void Initialize(GeneratorInitializationContext context)
     {
+#if DEBUG
+        if (!Debugger.IsAttached)
+        {
+            Debugger.Launch();
+        }
+#endif 
     }
 
     /// <inheritdoc/>
@@ -27,16 +35,15 @@ internal class AppServiceGenerator : ISourceGenerator
     {
         try
         {
-            var fileText = context.AdditionalFiles.Where(static x => x.Path.EndsWith(InputFileName)).FirstOrDefault()
-                ?? throw new FileNotFoundException("缺少配置文件, 请使用 scan_service.ps1 生成");
+            var fileText = context.AdditionalFiles.Where(static x => x.Path.EndsWith(InputFileName)).FirstOrDefault() ?? throw new FileNotFoundException("缺少配置文件, 请使用 scan_service.ps1 生成");
 
             ProcessSettingsFile(fileText, context);
         }
-        catch (Exception e)
+        catch (IOException e)
         {
             context.ReportDiagnostic(
              Diagnostic.Create(
-                 "XJB_01",
+                 "XJB_02",
                  nameof(AppServiceGenerator),
                  $"生成注入代码失败，{e.Message}",
                  defaultSeverity: DiagnosticSeverity.Error,
@@ -54,42 +61,32 @@ internal class AppServiceGenerator : ISourceGenerator
     private void ProcessSettingsFile(AdditionalText xmlFile, GeneratorExecutionContext context)
     {
         var text = xmlFile.GetText(context.CancellationToken)?.ToString() ?? throw new FileLoadException("文件读取失败");
-        var json = JsonConvert.DeserializeObject<AppServiceData>(text) ?? throw new FileLoadException("文件读取失败");
+        var json = JsonConvert.DeserializeObject<JobData>(text) ?? throw new FileLoadException("文件读取失败");
 
         var sb = new StringBuilder();
-        sb.AppendLine(Static.AppServiceHeader);
+        sb.AppendLine(Static.JobHeader);
 
         foreach (var kv in json)
         {
             var entry = kv.Value;
 
-            var lifeTime = entry.LifeTime?.ToLowerInvariant() switch {
-                "singleton" or
-                "scoped" or
-                "transient" => entry.LifeTime,
-                _ => null,
-            };
+            var name = kv.Key;
+            var schedule = entry.Schedule;
+            var className = entry.Class;
 
-            if (string.IsNullOrEmpty(lifeTime))
+            if (string.IsNullOrEmpty(schedule) || string.IsNullOrEmpty(className))
             {
                 continue;
             }
 
-            if (!string.IsNullOrEmpty(entry.Class))
-            {
-                if (string.IsNullOrEmpty(entry.Interface))
-                {
-                    sb.AppendLine(string.Format(Static.AppServiceContent1, lifeTime, entry.Class));
-                }
-                else
-                {
-                    sb.AppendLine(string.Format(Static.AppServiceContent2, lifeTime, entry.Interface, entry.Class));
-                }
-            }
+            sb.AppendLine(string.Format(Static.JobContent, name, schedule, className));
         }
-        sb.AppendLine(Static.AppServiceFooter);
+        sb.AppendLine(Static.JobFooter);
+
+        Console.WriteLine(sb.ToString());
 
         context.AddSource(OutoutFileName, SourceText.From(sb.ToString(), Encoding.UTF8));
     }
+
 }
 

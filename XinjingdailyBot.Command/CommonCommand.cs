@@ -19,7 +19,7 @@ namespace XinjingdailyBot.Command;
 /// 通用命令
 /// </summary>
 [AppService(LifeTime.Scoped)]
-internal class CommonCommand(
+public sealed class CommonCommand(
         ITelegramBotClient _botClient,
         IOptions<OptionsSetting> _configuration,
         IBanRecordService _banRecordService,

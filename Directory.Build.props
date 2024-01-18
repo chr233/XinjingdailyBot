@@ -18,7 +18,7 @@
 		<NeutralLanguage>zh-cn</NeutralLanguage>
 		<Nullable>enable</Nullable>
 		<PackageIcon>$(ApplicationIcon)</PackageIcon>
-		<PackageLicenseExpression>AGPL-3.0</PackageLicenseExpression>
+		<PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
 		<PackageProjectUrl>https://github.com/chr233/XinjingdailyBot</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageReleaseNotes>$(PackageProjectUrl)/releases</PackageReleaseNotes>
@@ -35,8 +35,8 @@
 		<DebugType>portable</DebugType>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<OpenApiGenerateDocuments>true</OpenApiGenerateDocuments>
-		<IsAotCompatible>True</IsAotCompatible>
-		<IsTrimmable>True</IsTrimmable>
+		<IsAotCompatible>false</IsAotCompatible>
+		<IsTrimmable>false</IsTrimmable>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">

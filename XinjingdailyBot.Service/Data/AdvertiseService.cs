@@ -10,7 +10,7 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IAdvertiseService"/>
 [AppService(typeof(IAdvertiseService), LifeTime.Transient)]
-internal sealed class AdvertiseService : BaseService<Advertises>, IAdvertiseService
+public sealed class AdvertiseService : BaseService<Advertises>, IAdvertiseService
 {
     private readonly IAdvertisePostService _advertisePostService;
 

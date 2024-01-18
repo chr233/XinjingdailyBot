@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Extensions;
@@ -10,7 +10,7 @@ namespace XinjingdailyBot.Tasks;
 /// 拒稿存档频道置顶
 /// </summary>
 [Job("0 0 0 * * ?")]
-internal class RejectChannelTask : IJob
+public sealed class RejectChannelTask : IJob
 {
     private readonly ILogger<RejectChannelTask> _logger;
     private readonly IChannelService _channelService;

@@ -19,7 +19,7 @@ namespace XinjingdailyBot.Command;
 /// 通用命令
 /// </summary>
 [AppService(LifeTime.Scoped)]
-internal class NormalCommand(
+public sealed class NormalCommand(
     ILogger<NormalCommand> _logger,
     ITelegramBotClient _botClient,
     IUserService _userService,

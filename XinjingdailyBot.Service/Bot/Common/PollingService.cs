@@ -16,7 +16,7 @@ namespace XinjingdailyBot.Service.Bot.Common;
 /// <summary>
 /// 消息接收服务
 /// </summary>
-public class PollingService(
+public sealed class PollingService(
         IServiceProvider _serviceProvider,
         ILogger<PollingService> _logger,
         IChannelService _channelService,

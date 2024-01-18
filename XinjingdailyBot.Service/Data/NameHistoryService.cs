@@ -8,7 +8,7 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="INameHistoryService"/>
 [AppService(typeof(INameHistoryService), LifeTime.Singleton)]
-internal sealed class NameHistoryService : BaseService<NameHistory>, INameHistoryService
+public sealed class NameHistoryService : BaseService<NameHistory>, INameHistoryService
 {
     public NameHistoryService(ISqlSugarClient context) : base(context)
     {

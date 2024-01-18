@@ -20,7 +20,7 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IUserService"/>
 [AppService(typeof(IUserService), LifeTime.Singleton)]
-internal sealed class UserService(
+public sealed class UserService(
         ILogger<UserService> _logger,
         IOptions<OptionsSetting> _configuration,
         GroupRepository _groupRepository,

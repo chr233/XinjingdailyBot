@@ -9,7 +9,7 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IUserTokenService"/>
 [AppService(typeof(IUserTokenService), LifeTime.Singleton)]
-internal sealed class UserTokenService : BaseService<UserTokens>, IUserTokenService
+public sealed class UserTokenService : BaseService<UserTokens>, IUserTokenService
 {
     private readonly ILogger<UserTokenService> _logger;
 

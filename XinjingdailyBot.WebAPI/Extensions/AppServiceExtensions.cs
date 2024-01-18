@@ -16,6 +16,7 @@ public static class AppServiceExtensions
     /// </summary>
     /// <param name="services"></param>
     [RequiresUnreferencedCode("不兼容剪裁")]
+    [Obsolete("使用生成器代替此方法")]
     public static void AddAppService(this IServiceCollection services)
     {
         var cls = new string[] {

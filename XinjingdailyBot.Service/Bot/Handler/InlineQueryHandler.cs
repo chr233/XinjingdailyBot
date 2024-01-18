@@ -12,7 +12,7 @@ using XinjingdailyBot.Model.Models;
 namespace XinjingdailyBot.Service.Bot.Handler;
 
 [AppService(typeof(IInlineQueryHandler), LifeTime.Singleton)]
-internal class InlineQueryHandler(
+public sealed class InlineQueryHandler(
         ITelegramBotClient _botClient,
         IAttachmentService _attachmentService,
         IPostService _postService,

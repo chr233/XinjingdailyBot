@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Tasks;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
@@ -20,10 +21,11 @@ public static class TaskExtension
     /// <param name="services"></param>
     /// <param name="configuration"></param>
     [RequiresUnreferencedCode("不兼容剪裁")]
+    [RequiresDynamicCode("不兼容剪裁")]
     public static void AddQuartzSetup(this IServiceCollection services, IConfiguration configuration)
     {
         var scheduleConfig = configuration.GetSection("Schedule").Get<OptionsSetting.ScheduleOption>();
-        var cron = scheduleConfig?.Cron ?? new Dictionary<string, string>();
+        var cron = scheduleConfig?.Cron ?? [];
 
         var tasks = Assembly.Load("XinjingdailyBot.Tasks").GetTypes();
         if (tasks == null)
@@ -46,7 +48,7 @@ public static class TaskExtension
                 var jobAttribute = jobType.GetCustomAttribute<JobAttribute>();
                 if (jobAttribute != null)
                 {
-                    var group = jobAttribute.Group ?? "DEFAULT";
+                    const string group = "DEFAULT";
                     var jobKey = new JobKey(jobType.Name, group);
                     var tiggerKey = new TriggerKey(jobType.Name + "-Tigger", group);
 

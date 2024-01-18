@@ -8,7 +8,7 @@ using XinjingdailyBot.Model.Models;
 namespace XinjingdailyBot.Service.Bot.Handler;
 
 [AppService(typeof(IJoinRequestHandler), LifeTime.Scoped)]
-internal class JoinRequestHandler : IJoinRequestHandler
+public sealed class JoinRequestHandler : IJoinRequestHandler
 {
     private readonly ILogger<JoinRequestHandler> _logger;
     private readonly ITelegramBotClient _botClient;

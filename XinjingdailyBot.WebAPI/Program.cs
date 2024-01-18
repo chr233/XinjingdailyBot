@@ -52,7 +52,8 @@ public partial class Program
         services.AddSqlSugarSetup(builder.Configuration);
 
         // 添加服务
-        services.AddAppService();
+        //services.AddAppService();
+        services.AddAppServiceGenerated();
 
         // 注册HttpClient
         services.AddHttpClients();
@@ -61,7 +62,8 @@ public partial class Program
         services.AddTelegramBotClient();
 
         // 定时任务
-        services.AddQuartzSetup(builder.Configuration);
+        //services.AddQuartzSetup(builder.Configuration);
+        services.AddQuartzSetupGenerated(builder.Configuration);
 
         // Web API
         services.AddWebAPI(builder.WebHost);

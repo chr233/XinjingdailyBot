@@ -27,7 +27,7 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IPostService"/>
 [AppService(typeof(IPostService), LifeTime.Singleton)]
-internal sealed class PostService(
+public sealed class PostService(
     ILogger<PostService> _logger,
     IAttachmentService _attachmentService,
     IChannelService _channelService,

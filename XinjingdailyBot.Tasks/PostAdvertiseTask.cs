@@ -14,7 +14,7 @@ namespace XinjingdailyBot.Tasks;
 /// 发布广告
 /// </summary>
 [Job("0 0 10 * * ?")]
-internal class PostAdvertiseTask : IJob
+public sealed class PostAdvertiseTask : IJob
 {
     private readonly ILogger<PostAdvertiseTask> _logger;
     private readonly IServiceProvider _serviceProvider;

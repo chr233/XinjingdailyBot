@@ -9,7 +9,7 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IMediaGroupService"/>
 [AppService(typeof(IMediaGroupService), LifeTime.Singleton)]
-internal sealed class MediaGroupService : BaseService<MediaGroups>, IMediaGroupService
+public sealed class MediaGroupService : BaseService<MediaGroups>, IMediaGroupService
 {
     public MediaGroupService(ISqlSugarClient context) : base(context)
     {

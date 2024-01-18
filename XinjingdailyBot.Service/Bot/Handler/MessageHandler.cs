@@ -10,7 +10,7 @@ using XinjingdailyBot.Model.Models;
 namespace XinjingdailyBot.Service.Bot.Handler;
 
 [AppService(typeof(IMessageHandler), LifeTime.Singleton)]
-internal class MessageHandler : IMessageHandler
+public sealed class MessageHandler : IMessageHandler
 {
     private readonly IPostService _postService;
     private readonly IGroupMessageHandler _groupMessageHandler;

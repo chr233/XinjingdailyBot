@@ -22,7 +22,7 @@ namespace XinjingdailyBot.Command;
 /// 超级管理员命令
 /// </summary>
 [AppService(LifeTime.Scoped)]
-internal class SuperCommand(
+public sealed class SuperCommand(
         ILogger<SuperCommand> _logger,
         ITelegramBotClient _botClient,
         IPostService _postService,

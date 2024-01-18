@@ -11,7 +11,7 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IReviewStatusService"/>
 [AppService(typeof(IReviewStatusService), LifeTime.Transient)]
-internal sealed class ReviewStatusService : BaseService<ReviewStatus>, IReviewStatusService
+public sealed class ReviewStatusService : BaseService<ReviewStatus>, IReviewStatusService
 {
     private readonly ILogger<ReviewStatusService> _logger;
     private readonly ITelegramBotClient _botClient;

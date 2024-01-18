@@ -10,7 +10,7 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IAttachmentService"/>
 [AppService(typeof(IAttachmentService), LifeTime.Transient)]
-internal sealed class AttachmentService(ISqlSugarClient context) : BaseService<Attachments>(context), IAttachmentService
+public sealed class AttachmentService(ISqlSugarClient context) : BaseService<Attachments>(context), IAttachmentService
 {
     public Attachments? GenerateAttachment(Message message, long postID)
     {

@@ -8,7 +8,7 @@ namespace XinjingdailyBot.Tasks;
 /// 定期发布稿件处理
 /// </summary>
 [Job("0 0 0 * * ?")]
-internal class PlanedPostsTask(
+public sealed class PlanedPostsTask(
     ILogger<PlanedPostsTask> _logger,
     IPostService _postService) : IJob
 {

@@ -11,7 +11,7 @@ namespace XinjingdailyBot.Service.Bot.Common;
 /// <summary>
 /// 消息接收服务
 /// </summary>
-public class DbInitService : BackgroundService
+public sealed class DbInitService : BackgroundService
 {
     private readonly ILogger<DbInitService> _logger;
     private readonly OptionsSetting.DatabaseOption _option;
