@@ -158,7 +158,7 @@ foreach ($libName in $libNames) {
 
     # 读取Service信息和类命名空间;
     foreach ($filePath in $filePaths) {
-        $fileContent = Get-Content -Path $filePath -Raw;
+        $fileContent = Get-Content -Path $filePath.FullName -Raw;
 
         $namespace = GetNameSpace -Content $fileContent;
         if ($null -eq $namespace -or $namespace -eq "" ) {
