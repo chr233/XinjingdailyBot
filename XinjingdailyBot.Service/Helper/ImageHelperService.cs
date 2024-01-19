@@ -1,24 +1,12 @@
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using SqlSugar;
-using System;
-using System.Collections.Generic;
-using System.Drawing.Imaging;
 using System.Drawing;
-using System.Linq;
+using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Interface.Bot.Common;
-using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
-using XinjingdailyBot.Repository;
-using XinjingdailyBot.Service.Data;
 
 namespace XinjingdailyBot.Service.Helper;
 

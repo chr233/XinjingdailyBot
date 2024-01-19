@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Tasks;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 

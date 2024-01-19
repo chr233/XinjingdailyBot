@@ -53,7 +53,7 @@ public sealed class ExpiredPostsTask(
         foreach (var userID in userIDList)
         {
             //获取过期投稿
-            var paddingPosts = await _postService.GetExpiredPosts(userID,expiredDate);
+            var paddingPosts = await _postService.GetExpiredPosts(userID, expiredDate);
 
             if (paddingPosts.Count == 0)
             {

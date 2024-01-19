@@ -1,12 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml;
 using XinjingdailyBot.Generator.Data;
 
 namespace XinjingdailyBot.Generator;
