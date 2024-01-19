@@ -52,7 +52,7 @@ internal class TaskGenerator : ISourceGenerator
         var json = JsonConvert.DeserializeObject<JobData>(text) ?? throw new FileLoadException("文件读取失败");
 
         var sb = new StringBuilder();
-        sb.AppendLine(Static.JobHeader);
+        sb.AppendLine(Templates.JobHeader);
 
         foreach (var kv in json)
         {
@@ -67,9 +67,9 @@ internal class TaskGenerator : ISourceGenerator
                 continue;
             }
 
-            sb.AppendLine(string.Format(Static.JobContent, name, schedule, className));
+            sb.AppendLine(string.Format(Templates.JobContent, name, schedule, className));
         }
-        sb.AppendLine(Static.JobFooter);
+        sb.AppendLine(Templates.JobFooter);
 
         Console.WriteLine(sb.ToString());
 

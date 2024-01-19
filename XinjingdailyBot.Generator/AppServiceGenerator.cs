@@ -53,7 +53,7 @@ internal class AppServiceGenerator : ISourceGenerator
         var json = JsonConvert.DeserializeObject<AppServiceData>(text) ?? throw new FileLoadException("文件读取失败");
 
         var sb = new StringBuilder();
-        sb.AppendLine(Static.AppServiceHeader);
+        sb.AppendLine(Templates.AppServiceHeader);
 
         foreach (var kv in json)
         {
@@ -75,15 +75,15 @@ internal class AppServiceGenerator : ISourceGenerator
             {
                 if (string.IsNullOrEmpty(entry.Interface))
                 {
-                    sb.AppendLine(string.Format(Static.AppServiceContent1, lifeTime, entry.Class));
+                    sb.AppendLine(string.Format(Templates.AppServiceContent1, lifeTime, entry.Class));
                 }
                 else
                 {
-                    sb.AppendLine(string.Format(Static.AppServiceContent2, lifeTime, entry.Interface, entry.Class));
+                    sb.AppendLine(string.Format(Templates.AppServiceContent2, lifeTime, entry.Interface, entry.Class));
                 }
             }
         }
-        sb.AppendLine(Static.AppServiceFooter);
+        sb.AppendLine(Templates.AppServiceFooter);
 
         context.AddSource(OutoutFileName, SourceText.From(sb.ToString(), Encoding.UTF8));
     }
