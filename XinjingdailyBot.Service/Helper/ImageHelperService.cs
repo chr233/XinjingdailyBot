@@ -23,7 +23,7 @@ public sealed class ImageHelperService(
         if (msg.Photo != null)
         {
             var size = msg.Photo.Last();
-            double ratio = ((double)size.Width) / size.Height;
+            var ratio = ((double)size.Width) / size.Height;
             if (ratio < 0.3)
             {
                 await _botClient.SendTextMessageAsync(msg.Chat, "长图清晰度过低，请将其以文件模式发送，以切分此图片。\n\n在 PC 客户端上，拖入图片后取消 “压缩图片” 或 “图片格式” 选项即可以文件格式发送\n在 安卓 客户端上，长按发送按钮，点击文件图标即可以文件格式发送。", replyToMessageId: msg.MessageId);
@@ -51,34 +51,34 @@ public sealed class ImageHelperService(
                     // split image
                     var imgs = new List<IAlbumInputMedia>();
                     const double splitTargetRatio = 9.0 / 12.0; // 目标宽高比
-                    int splitMidHeight = (int)Math.Round(originImg.Width / splitTargetRatio); // 每张高度（实际高度 midHeight + scanHeight * k, k∈[-1, 1]）
-                    int splitPadding = (int)(0.05 * splitMidHeight); // 每张上下重复高度
-                    int splitScanHeight = (int)(0.3 * splitMidHeight); // 上下扫描切分点高度
-                    int splicScanHorizontal = (int)(0.01 * originImg.Width); // 横向扫描距离
+                    var splitMidHeight = (int)Math.Round(originImg.Width / splitTargetRatio); // 每张高度（实际高度 midHeight + scanHeight * k, k∈[-1, 1]）
+                    var splitPadding = (int)(0.05 * splitMidHeight); // 每张上下重复高度
+                    var splitScanHeight = (int)(0.3 * splitMidHeight); // 上下扫描切分点高度
+                    var splicScanHorizontal = (int)(0.01 * originImg.Width); // 横向扫描距离
 
-                    int currentY = 0;
+                    var currentY = 0;
                     while (currentY < originImg.Height)
                     {
-                        int scanStartY = Math.Max(1, currentY + splitMidHeight - splitScanHeight);
-                        int scanEndY = Math.Min((int)originImg.Height, (currentY + splitMidHeight + splitScanHeight));
+                        var scanStartY = Math.Max(1, currentY + splitMidHeight - splitScanHeight);
+                        var scanEndY = Math.Min((int)originImg.Height, (currentY + splitMidHeight + splitScanHeight));
 
-                        int maxDiffY = 0;
+                        var maxDiffY = 0;
                         double maxDiff = -100;
 
                         if (originImg.Height - currentY - splitPadding - splitScanHeight - splitMidHeight > 0)
-                            for (int y = scanStartY; y < scanEndY; y++)
+                            for (var y = scanStartY; y < scanEndY; y++)
                             {
                                 double diff = 0;
 
-                                for (int x = 0; x < originImg.Width; x++)
+                                for (var x = 0; x < originImg.Width; x++)
                                 {
                                     var p1 = originImg.GetPixel(x, y);
 
                                     double minDiffPixel = 99999;
-                                    for (int qx = Math.Max(0, x - splicScanHorizontal); qx < Math.Min(x + splicScanHorizontal, originImg.Width - 1); qx++)
+                                    for (var qx = Math.Max(0, x - splicScanHorizontal); qx < Math.Min(x + splicScanHorizontal, originImg.Width - 1); qx++)
                                     {
                                         var p2 = originImg.GetPixel(qx, y - 1);
-                                        double diffPixel = Math.Sqrt(
+                                        var diffPixel = Math.Sqrt(
                                             Math.Pow(p1.R - p2.R, 2) +
                                             Math.Pow(p1.G - p2.G, 2) +
                                             Math.Pow(p1.B - p2.B, 2)
@@ -101,7 +101,7 @@ public sealed class ImageHelperService(
 
 
                         var img = new Bitmap(originImg.Width, height);
-                        Graphics g = Graphics.FromImage(img);
+                        var g = Graphics.FromImage(img);
                         g.Clear(System.Drawing.Color.White);
                         g.DrawImage(originImg, new Point(0, (currentY == 0 ? 0 : -currentY + splitPadding)));
                         g.Dispose();
@@ -115,7 +115,7 @@ public sealed class ImageHelperService(
                         currentY = maxDiffY;
                     }
 
-                    for (int i = 0; i < Math.Ceiling((double)imgs.Count / 9); i++)
+                    for (var i = 0; i < Math.Ceiling((double)imgs.Count / 9); i++)
                     {
                         await _botClient.SendMediaGroupAsync(msg.Chat, imgs.Slice(i * 9, Math.Min(9, imgs.Count - i * 9)), replyToMessageId: msg.MessageId);
                     }
@@ -129,11 +129,11 @@ public sealed class ImageHelperService(
                 else if (originRatio > 2)
                 {
                     const double splitTargetRatio = 2; // 目标宽高比
-                    int targetHeight = (int)(originImg.Width / splitTargetRatio);
-                    int paintY = (int)(targetHeight / 2 - originImg.Height / 2);
+                    var targetHeight = (int)(originImg.Width / splitTargetRatio);
+                    var paintY = (int)(targetHeight / 2 - originImg.Height / 2);
 
                     var img = new Bitmap(originImg.Width, targetHeight);
-                    Graphics g = Graphics.FromImage(img);
+                    var g = Graphics.FromImage(img);
                     g.Clear(System.Drawing.Color.White);
                     var imgBlurred = ConvolutionFilter(originImg, new double[,]
                 { {  2, 04, 05, 04, 2 },
@@ -208,36 +208,44 @@ public sealed class ImageHelperService(
     }
 
     // Taken from https://softwarebydefault.com/2013/06/09/image-blur-filters/
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sourceBitmap"></param>
+    /// <param name="filterMatrix"></param>
+    /// <param name="factor"></param>
+    /// <param name="bias"></param>
+    /// <returns></returns>
     public static Bitmap ConvolutionFilter(Bitmap sourceBitmap, double[,] filterMatrix, double factor = 1, int bias = 0)
     {
-        BitmapData sourceData = sourceBitmap.LockBits(new Rectangle(0, 0,
+        var sourceData = sourceBitmap.LockBits(new Rectangle(0, 0,
                                  sourceBitmap.Width, sourceBitmap.Height),
                                                    ImageLockMode.ReadOnly,
                                              System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
 
-        byte[] pixelBuffer = new byte[sourceData.Stride * sourceData.Height];
-        byte[] resultBuffer = new byte[sourceData.Stride * sourceData.Height];
+        var pixelBuffer = new byte[sourceData.Stride * sourceData.Height];
+        var resultBuffer = new byte[sourceData.Stride * sourceData.Height];
 
 
         Marshal.Copy(sourceData.Scan0, pixelBuffer, 0, pixelBuffer.Length);
         sourceBitmap.UnlockBits(sourceData);
 
-        double blue = 0.0;
-        double green = 0.0;
-        double red = 0.0;
+        var blue = 0.0;
+        var green = 0.0;
+        var red = 0.0;
 
-        int filterWidth = filterMatrix.GetLength(1);
-        int filterHeight = filterMatrix.GetLength(0);
+        var filterWidth = filterMatrix.GetLength(1);
+        var filterHeight = filterMatrix.GetLength(0);
 
-        int filterOffset = (filterWidth - 1) / 2;
-        int calcOffset = 0;
+        var filterOffset = (filterWidth - 1) / 2;
+        var calcOffset = 0;
 
-        int byteOffset = 0;
+        var byteOffset = 0;
 
-        for (int offsetY = filterOffset; offsetY < sourceBitmap.Height - filterOffset; offsetY++)
+        for (var offsetY = filterOffset; offsetY < sourceBitmap.Height - filterOffset; offsetY++)
         {
-            for (int offsetX = filterOffset; offsetX < sourceBitmap.Width - filterOffset; offsetX++)
+            for (var offsetX = filterOffset; offsetX < sourceBitmap.Width - filterOffset; offsetX++)
             {
                 blue = 0;
                 green = 0;
@@ -245,9 +253,9 @@ public sealed class ImageHelperService(
 
                 byteOffset = offsetY * sourceData.Stride + offsetX * 4;
 
-                for (int filterY = -filterOffset; filterY <= filterOffset; filterY++)
+                for (var filterY = -filterOffset; filterY <= filterOffset; filterY++)
                 {
-                    for (int filterX = -filterOffset; filterX <= filterOffset; filterX++)
+                    for (var filterX = -filterOffset; filterX <= filterOffset; filterX++)
                     {
                         calcOffset = byteOffset +
                                      (filterX * 4) +
@@ -287,9 +295,9 @@ public sealed class ImageHelperService(
             }
         }
 
-        Bitmap resultBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height);
+        var resultBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height);
 
-        BitmapData resultData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly,
+        var resultData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly,
                                              System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
         Marshal.Copy(resultBuffer, 0, resultData.Scan0, resultBuffer.Length);

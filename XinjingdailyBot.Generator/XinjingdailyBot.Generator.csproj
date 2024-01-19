@@ -29,17 +29,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Update="Static.Designer.cs">
+		<Compile Update="Templates.Designer.cs">
 			<DesignTime>True</DesignTime>
 			<AutoGen>True</AutoGen>
-			<DependentUpon>Static.resx</DependentUpon>
+			<DependentUpon>Templates.resx</DependentUpon>
 		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Update="Static.resx">
+		<EmbeddedResource Update="Templates.resx">
 			<Generator>ResXFileCodeGenerator</Generator>
-			<LastGenOutput>Static.Designer.cs</LastGenOutput>
+			<LastGenOutput>Templates.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 	</ItemGroup>
 

@@ -15,6 +15,7 @@ internal class AppServiceGenerator : ISourceGenerator
     /// <inheritdoc/>
     public void Initialize(GeneratorInitializationContext context)
     {
+        // 无需处理
     }
 
     /// <inheritdoc/>

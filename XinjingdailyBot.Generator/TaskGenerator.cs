@@ -1,27 +1,21 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Newtonsoft.Json;
-using System.Diagnostics;
 using System.Text;
 using XinjingdailyBot.Generator.Data;
 
 namespace XinjingdailyBot.Generator;
 
 [Generator]
-internal class JobGenerator : ISourceGenerator
+internal class TaskGenerator : ISourceGenerator
 {
     const string InputFileName = "task.json";
-    const string OutoutFileName = "GeneratedJobExtensions.g.cs";
+    const string OutoutFileName = "GeneratedTaskExtensions.g.cs";
 
     /// <inheritdoc/>
     public void Initialize(GeneratorInitializationContext context)
     {
-#if DEBUG
-        if (!Debugger.IsAttached)
-        {
-            Debugger.Launch();
-        }
-#endif 
+        // 无需处理
     }
 
     /// <inheritdoc/>
