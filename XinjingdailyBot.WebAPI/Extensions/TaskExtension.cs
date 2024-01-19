@@ -22,6 +22,7 @@ public static class TaskExtension
     /// <param name="configuration"></param>
     [RequiresUnreferencedCode("不兼容剪裁")]
     [RequiresDynamicCode("不兼容剪裁")]
+    [Obsolete("使用生成器代替此方法")]
     public static void AddQuartzSetup(this IServiceCollection services, IConfiguration configuration)
     {
         var scheduleConfig = configuration.GetSection("Schedule").Get<OptionsSetting.ScheduleOption>();

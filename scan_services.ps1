@@ -8,6 +8,7 @@
 
 # 工作目录
 $workDir = (Get-Location).Path;
+$aaa= $PSScriptRoot
 # 包名列表
 $libNames = "XinjingdailyBot.Repository",
 "XinjingdailyBot.Interface",
@@ -47,6 +48,8 @@ function GetSourceFileList {
     foreach ($file in $files) {
         $result += $file
     }
+
+    Write-Output $result
 
     $result;
 }

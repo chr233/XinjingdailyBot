@@ -1,14 +1,6 @@
 {
-  "PostAdvertiseTask": {
-    "Class": "XinjingdailyBot.Tasks.PostAdvertiseTask",
-    "Schedule": "0 0 10 * * ?"
-  },
   "RejectChannelTask": {
     "Class": "XinjingdailyBot.Tasks.RejectChannelTask",
-    "Schedule": "0 0 0 * * ?"
-  },
-  "PlanedPostsTask": {
-    "Class": "XinjingdailyBot.Tasks.PlanedPostsTask",
     "Schedule": "0 0 0 * * ?"
   },
   "ReviewStatusTask": {
@@ -17,6 +9,14 @@
   },
   "ExpiredPostsTask": {
     "Class": "XinjingdailyBot.Tasks.ExpiredPostsTask",
+    "Schedule": "0 0 0 * * ?"
+  },
+  "PostAdvertiseTask": {
+    "Class": "XinjingdailyBot.Tasks.PostAdvertiseTask",
+    "Schedule": "0 0 10 * * ?"
+  },
+  "PlanedPostsTask": {
+    "Class": "XinjingdailyBot.Tasks.PlanedPostsTask",
     "Schedule": "0 0 0 * * ?"
   }
 }
