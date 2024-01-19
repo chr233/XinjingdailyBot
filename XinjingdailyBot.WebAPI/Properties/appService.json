@@ -132,7 +132,7 @@
   },
   "ImageHelperService": {
     "LifeTime": "Transient",
-    "Interface": "XinjingdailyBot.Interface.Helper.IImageHelperSErvice",
+    "Interface": "XinjingdailyBot.Interface.Helper.IImageHelperService",
     "Class": "XinjingdailyBot.Service.Helper.ImageHelperService"
   },
   "GroupRepository": {

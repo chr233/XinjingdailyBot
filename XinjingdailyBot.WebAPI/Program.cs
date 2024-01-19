@@ -49,8 +49,9 @@ public static class Program
         // SqlSugar
         services.AddSqlSugarSetup(builder.Configuration);
 
-        // 添加服务
+        // 添加服务 (反射)
         //services.AddAppService();
+        // 添加服务 (自动生成)
         services.AddAppServiceGenerated();
 
         // 注册HttpClient
@@ -59,8 +60,9 @@ public static class Program
         // Telegram
         services.AddTelegramBotClient();
 
-        // 定时任务
+        // 添加定时任务 (反射)
         //services.AddQuartzSetup(builder.Configuration);
+        // 添加定时任务 (自动生成)
         services.AddQuartzSetupGenerated(builder.Configuration);
 
         // Web API
