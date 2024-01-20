@@ -1,5 +1,6 @@
 using Microsoft.Data.Sqlite;
 using MySqlConnector;
+using Npgsql;
 using SqlSugar;
 using System.Diagnostics.CodeAnalysis;
 using XinjingdailyBot.Infrastructure;
@@ -33,10 +34,26 @@ public static class DatabaseExtension
             Environment.Exit(1);
         }
 
-        _logger.Info("数据库驱动: {0}", config.UseMySQL ? "MySQL" : "SQLite");
+        var dbType = config.DbType.ToLowerInvariant() switch {
+            "sqlite" => DbType.Sqlite,
+            "mysql" => DbType.MySql,
+            "postgresql" or
+            "pgsql" => DbType.PostgreSQL,
+            _ => DbType.Custom,
+        };
 
-        var connStr = config.UseMySQL ?
-            new MySqlConnectionStringBuilder {
+        if (dbType == DbType.Custom)
+        {
+            _logger.Warn("UseMySQL已弃用, 请使用 DbType 配置数据库类型 MySql, Sqlite, PostgreSql");
+#pragma warning disable CS0618 // 类型或成员已过时
+            dbType = config.UseMySQL ? DbType.MySql : DbType.Sqlite;
+#pragma warning restore CS0618 // 类型或成员已过时
+        }
+
+        _logger.Info("数据库驱动: {0}", dbType);
+
+        var connStr = dbType switch {
+            DbType.MySql => new MySqlConnectionStringBuilder {
                 Server = config.DbHost,
                 Port = config.DbPort,
                 Database = config.DbName,
@@ -44,15 +61,24 @@ public static class DatabaseExtension
                 Password = config.DbPassword,
                 CharacterSet = "utf8mb4",
                 AllowZeroDateTime = true,
-            }.ToString() :
-            new SqliteConnectionStringBuilder {
+            }.ToString(),
+            DbType.Sqlite => new SqliteConnectionStringBuilder {
                 DataSource = $"{config.DbName}.db",
-            }.ToString();
+            }.ToString(),
+            DbType.PostgreSQL => new NpgsqlConnectionStringBuilder {
+                Host = config.DbHost,
+                Port = (int)config.DbPort,
+                Database = config.DbName,
+                Username = config.DbUser,
+                Password = config.DbPassword,
+            }.ToString(),
+            _ => throw new NotSupportedException("不支持的数据库类型"),
+        };
 
         services.AddSingleton<ISqlSugarClient>(s => {
             var sqlSugar = new SqlSugarScope(new ConnectionConfig {
                 ConnectionString = connStr,
-                DbType = config.UseMySQL ? DbType.MySql : DbType.Sqlite,
+                DbType = dbType,
                 IsAutoCloseConnection = true,
             },
             db => {

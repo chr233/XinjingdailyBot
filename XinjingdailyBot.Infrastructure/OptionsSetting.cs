@@ -167,7 +167,12 @@ public sealed record OptionsSetting
         /// <summary>
         /// 是否使用MySQL数据库, true:MySQL, false:SQLite
         /// </summary>
+        [Obsolete("使用DbType代替")]
         public bool UseMySQL { get; set; }
+        /// <summary>
+        /// 数据库类型
+        /// </summary>
+        public string DbType { get; set; } = "mysql";
         /// <summary>
         /// 打印SQL日志
         /// </summary>
