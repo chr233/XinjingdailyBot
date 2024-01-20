@@ -15,6 +15,7 @@ public sealed class DialogueService(
     ISqlSugarClient context,
     IChannelService _channelService) : BaseService<Dialogue>(context), IDialogueService
 {
+    /// <inheritdoc/>
     public async Task RecordMessage(Message message)
     {
         string? content = message.Type switch {
@@ -46,6 +47,7 @@ public sealed class DialogueService(
         await InsertAsync(dialogue);
     }
 
+    /// <inheritdoc/>
     public Task<List<Dialogue>> FetchUserGroupMessages(Users user, int startId = 0, int takeCount = 30)
     {
         var groupIds = new List<long>{

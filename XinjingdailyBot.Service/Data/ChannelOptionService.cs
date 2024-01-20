@@ -10,12 +10,9 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IChannelOptionService"/>
 [AppService(typeof(IChannelOptionService), LifeTime.Transient)]
-public sealed class ChannelOptionService : BaseService<ChannelOptions>, IChannelOptionService
+public sealed class ChannelOptionService(ISqlSugarClient context) : BaseService<ChannelOptions>(context), IChannelOptionService
 {
-    public ChannelOptionService(ISqlSugarClient context) : base(context)
-    {
-    }
-
+    /// <inheritdoc/>
     public async Task<EChannelOption> FetchChannelOption(Chat channelChat)
     {
         var chatId = channelChat.Id;
@@ -82,24 +79,28 @@ public sealed class ChannelOptionService : BaseService<ChannelOptions>, IChannel
         return channel.Option;
     }
 
+    /// <inheritdoc/>
     public async Task<ChannelOptions?> FetchChannelByTitle(string channelTitle)
     {
         var channel = await Queryable().Where(x => x.ChannelTitle == channelTitle).FirstAsync();
         return channel;
     }
 
+    /// <inheritdoc/>
     public async Task<ChannelOptions?> FetchChannelByNameOrTitle(string channelName, string channelTitle)
     {
         var channel = await Queryable().Where(x => x.ChannelName == channelName || x.ChannelTitle == channelTitle).FirstAsync();
         return channel;
     }
 
+    /// <inheritdoc/>
     public async Task<ChannelOptions?> FetchChannelByChannelId(long channelId)
     {
         var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync();
         return channel;
     }
 
+    /// <inheritdoc/>
     public async Task<ChannelOptions?> UpdateChannelOptionById(long channelId, EChannelOption channelOption)
     {
         var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync();
@@ -112,6 +113,7 @@ public sealed class ChannelOptionService : BaseService<ChannelOptions>, IChannel
         return channel;
     }
 
+    /// <inheritdoc/>
     public Task<int> ChannelCount()
     {
         return Queryable().CountAsync();

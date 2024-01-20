@@ -11,6 +11,7 @@ namespace XinjingdailyBot.Service.Data;
 [AppService(typeof(IBanRecordService), LifeTime.Transient)]
 public sealed class BanRecordService(ISqlSugarClient context) : BaseService<BanRecords>(context), IBanRecordService
 {
+    /// <inheritdoc/>
     public async Task AddBanRecord(Users targetUser, Users operatorUser, EBanType banType, string reason)
     {
         var record = new BanRecords {
@@ -24,6 +25,7 @@ public sealed class BanRecordService(ISqlSugarClient context) : BaseService<BanR
         await Insertable(record).ExecuteCommandAsync();
     }
 
+    /// <inheritdoc/>
     public async Task<int> GetWarnCount(Users targetUser)
     {
         //获取最近一条解封记录
@@ -39,6 +41,7 @@ public sealed class BanRecordService(ISqlSugarClient context) : BaseService<BanR
         return warnCount;
     }
 
+    /// <inheritdoc/>
     public Task<List<BanRecords>> GetBanRecores(Users targetUser)
     {
         return Queryable()
@@ -46,6 +49,7 @@ public sealed class BanRecordService(ISqlSugarClient context) : BaseService<BanR
          .OrderByDescending(static x => new { x.BanTime }).ToListAsync();
     }
 
+    /// <inheritdoc/>
     public Task<List<BanRecords>> GetBanRecores(Users targetUser, DateTime expireTime)
     {
         return Queryable()
@@ -53,6 +57,7 @@ public sealed class BanRecordService(ISqlSugarClient context) : BaseService<BanR
             .ToListAsync();
     }
 
+    /// <inheritdoc/>
     public async Task<BanRecords?> GetLatestBanRecord(long userId)
     {
         return await Queryable()

@@ -14,31 +14,15 @@ namespace XinjingdailyBot.Tasks;
 /// 发布广告
 /// </summary>
 [Job("0 0 10 * * ?")]
-public sealed class PostAdvertiseTask : IJob
+public sealed class PostAdvertiseTask(
+        ILogger<PostAdvertiseTask> _logger,
+        IServiceProvider _serviceProvider,
+        ITelegramBotClient _botClient,
+        IAdvertiseService _advertisesService,
+        IAdvertisePostService _advertisePostService,
+        IMarkupHelperService _markupHelperService) : IJob
 {
-    private readonly ILogger<PostAdvertiseTask> _logger;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly ITelegramBotClient _botClient;
-    private readonly IAdvertiseService _advertisesService;
-    private readonly IAdvertisePostService _advertisePostService;
-    private readonly IMarkupHelperService _markupHelperService;
-
-    public PostAdvertiseTask(
-        ILogger<PostAdvertiseTask> logger,
-        IServiceProvider serviceProvider,
-        ITelegramBotClient botClient,
-        IAdvertiseService advertisesService,
-        IAdvertisePostService advertisePostService,
-        IMarkupHelperService markupHelperService)
-    {
-        _logger = logger;
-        _serviceProvider = serviceProvider;
-        _botClient = botClient;
-        _advertisesService = advertisesService;
-        _advertisePostService = advertisePostService;
-        _markupHelperService = markupHelperService;
-    }
-
+    /// <inheritdoc/>
     public async Task Execute(IJobExecutionContext context)
     {
         _logger.LogInformation("开始定时任务, 发布广告");

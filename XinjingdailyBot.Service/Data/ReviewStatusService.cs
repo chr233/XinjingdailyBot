@@ -11,26 +11,19 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IReviewStatusService"/>
 [AppService(typeof(IReviewStatusService), LifeTime.Transient)]
-public sealed class ReviewStatusService : BaseService<ReviewStatus>, IReviewStatusService
+public sealed class ReviewStatusService(
+    ILogger<ReviewStatusService> _logger,
+    ITelegramBotClient _botClient,
+    ISqlSugarClient context) : BaseService<ReviewStatus>(context), IReviewStatusService
 {
-    private readonly ILogger<ReviewStatusService> _logger;
-    private readonly ITelegramBotClient _botClient;
-
-    public ReviewStatusService(
-        ILogger<ReviewStatusService> logger,
-        ITelegramBotClient botClient,
-        ISqlSugarClient context) : base(context)
-    {
-        _logger = logger;
-        _botClient = botClient;
-    }
-
+    /// <inheritdoc/>
     public async Task<ReviewStatus?> GetOldReviewStatu()
     {
         var oldPost = await Queryable().FirstAsync(static x => !x.Deleted);
         return oldPost;
     }
 
+    /// <inheritdoc/>
     public async Task DeleteOldReviewStatus()
     {
         var oldPosts = await Queryable()
@@ -59,6 +52,7 @@ public sealed class ReviewStatusService : BaseService<ReviewStatus>, IReviewStat
         }
     }
 
+    /// <inheritdoc/>
     public Task CreateNewReviewStatus(Message message)
     {
         var reviewStatus = new ReviewStatus {
@@ -72,6 +66,7 @@ public sealed class ReviewStatusService : BaseService<ReviewStatus>, IReviewStat
         return Insertable(reviewStatus).ExecuteCommandAsync();
     }
 
+    /// <inheritdoc/>
     public Task DeleteReviewStatus(ReviewStatus reviewStatus)
     {
         reviewStatus.Deleted = true;

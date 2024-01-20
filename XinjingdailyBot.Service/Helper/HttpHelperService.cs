@@ -96,6 +96,7 @@ public sealed class HttpHelperService : IHttpHelperService, IDisposable
         }
     }
 
+    /// <inheritdoc/>
     public async Task<GitHubReleaseResponse?> GetLatestRelease()
     {
         var request = new HttpRequestMessage(HttpMethod.Get, "/XinjingdailyBot/releases/latest");
@@ -108,6 +109,7 @@ public sealed class HttpHelperService : IHttpHelperService, IDisposable
         return response;
     }
 
+    /// <inheritdoc/>
     public async Task<Stream?> DownloadRelease(string? downloadUrl)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, downloadUrl);
@@ -115,6 +117,7 @@ public sealed class HttpHelperService : IHttpHelperService, IDisposable
         return rawResponse;
     }
 
+    /// <inheritdoc/>
     public async Task<IpInfoResponse?> GetIpInformation(IPAddress ip)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"/{ip}");
@@ -127,7 +130,9 @@ public sealed class HttpHelperService : IHttpHelperService, IDisposable
         return response;
     }
 
+    /// <inheritdoc/>
     public HttpClient CreateClient(string name) => _httpClientFactory.CreateClient(name);
 
+    /// <inheritdoc/>
     public void Dispose() => StatisticTimer?.Dispose();
 }

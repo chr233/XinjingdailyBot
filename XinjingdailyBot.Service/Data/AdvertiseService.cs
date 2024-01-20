@@ -10,17 +10,11 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IAdvertiseService"/>
 [AppService(typeof(IAdvertiseService), LifeTime.Transient)]
-public sealed class AdvertiseService : BaseService<Advertises>, IAdvertiseService
+public sealed class AdvertiseService(
+    IAdvertisePostService _advertisePostService,
+    ISqlSugarClient context) : BaseService<Advertises>(context), IAdvertiseService
 {
-    private readonly IAdvertisePostService _advertisePostService;
-
-    public AdvertiseService(
-        IAdvertisePostService advertisePostService,
-        ISqlSugarClient context) : base(context)
-    {
-        _advertisePostService = advertisePostService;
-    }
-
+    /// <inheritdoc/>
     public Task CreateAdvertise(Message message)
     {
         var newAd = new Advertises {
@@ -42,6 +36,7 @@ public sealed class AdvertiseService : BaseService<Advertises>, IAdvertiseServic
         return Insertable(newAd).ExecuteCommandAsync();
     }
 
+    /// <inheritdoc/>
     public async Task<Advertises?> GetPostableAdvertise()
     {
         var ads = await Queryable()
@@ -88,6 +83,7 @@ public sealed class AdvertiseService : BaseService<Advertises>, IAdvertiseServic
         return randomAd;
     }
 
+    /// <inheritdoc/>
     public Task UpdateAdvertiseStatistics(Advertises ad)
     {
         return Updateable(ad).UpdateColumns(static x => new {

@@ -42,6 +42,7 @@ public sealed class UserService(
     /// </summary>
     private static readonly TimeSpan UpdatePeriod = TimeSpan.FromDays(14);
 
+    /// <inheritdoc/>
     public async Task<Users?> FetchUserFromUpdate(Update update)
     {
         var msgChat = update.Type switch {
@@ -303,6 +304,7 @@ public sealed class UserService(
         return dbUser;
     }
 
+    /// <inheritdoc/>
     public async Task<Users?> QueryUserByUserId(long UserId)
     {
         var user = await Queryable().FirstAsync(x => x.UserID == UserId);
@@ -377,12 +379,14 @@ public sealed class UserService(
         }
     }
 
+    /// <inheritdoc/>
     public async Task<Users?> FetchUserByUserID(long userID)
     {
         var dbUser = await Queryable().FirstAsync(x => x.UserID == userID);
         return dbUser;
     }
 
+    /// <inheritdoc/>
     public async Task<Users?> FetchUserByUserName(string? userName)
     {
         if (string.IsNullOrEmpty(userName))
@@ -396,6 +400,7 @@ public sealed class UserService(
         }
     }
 
+    /// <inheritdoc/>
     public async Task<Users?> FetchTargetUser(Message message)
     {
         if (message.ReplyToMessage == null)
@@ -455,6 +460,7 @@ public sealed class UserService(
         return await FetchUserByUserID(replyToMsg.From.Id);
     }
 
+    /// <inheritdoc/>
     public async Task<Users?> FetchTargetUser(long chatId, int msgId)
     {
         //在审核群内
@@ -494,6 +500,7 @@ public sealed class UserService(
         return null;
     }
 
+    /// <inheritdoc/>
     public async Task<Users?> FetchUserByUserNameOrUserID(string? target)
     {
         if (string.IsNullOrEmpty(target))
@@ -517,6 +524,7 @@ public sealed class UserService(
         }
     }
 
+    /// <inheritdoc/>
     public async Task<(string, InlineKeyboardMarkup?)> QueryUserList(Users dbUser, string query, int page)
     {
         //每页数量
@@ -601,6 +609,7 @@ public sealed class UserService(
         return (sb.ToString(), keyboard);
     }
 
+    /// <inheritdoc/>
     public async Task<(string, InlineKeyboardMarkup?)> QueryAllUserList(Users dbUser, string query, int page)
     {
         //每页数量
@@ -683,6 +692,7 @@ public sealed class UserService(
         return (sb.ToString(), keyboard);
     }
 
+    /// <inheritdoc/>
     public string GetUserBasicInfo(Users dbUser)
     {
         var userNick = dbUser.FullName.EscapeHtml();
@@ -715,6 +725,7 @@ public sealed class UserService(
     /// </summary>
     private const int MiniumRankPost = 10;
 
+    /// <inheritdoc/>
     public async Task<string> GetUserRank(Users dbUser)
     {
         var now = DateTime.Now;
@@ -759,6 +770,7 @@ public sealed class UserService(
         return sb.ToString();
     }
 
+    /// <inheritdoc/>
     public async Task BanUser(Users targetUser, bool isBan)
     {
         targetUser.IsBan = isBan;
@@ -782,6 +794,7 @@ public sealed class UserService(
         return Convert.ToUInt64(exp);
     }
 
+    /// <inheritdoc/>
     public async Task UpdateUserPostCount(Users targerUser)
     {
         targerUser.Experience = CalcUserExp(targerUser);
@@ -801,36 +814,43 @@ public sealed class UserService(
         }).ExecuteCommandAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountUser()
     {
         return Queryable().CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountRecentlyUpdateUser(DateTime afterDate)
     {
         return Queryable().Where(x => x.ModifyAt >= afterDate).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountUnBannedUser()
     {
         return Queryable().Where(static x => !x.IsBan).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountPostedUser()
     {
         return Queryable().Where(static x => x.PostCount > 0).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<List<Users>> GetUserList(IEnumerable<long> userIds)
     {
         return Queryable().Where(x => userIds.Contains(x.UserID)).Distinct().ToListAsync();
     }
 
+    /// <inheritdoc/>
     public Task<List<Users>> GetUserListAfterId(int startId, int count)
     {
         return Queryable().Where(x => x.Id >= startId).Take(count).ToListAsync();
     }
 
+    /// <inheritdoc/>
     public Task<List<Users>> GetUserAcceptCountRankList(int miniumPost, DateTime miniumPostTime, int takeCount)
     {
         return Queryable()
@@ -838,6 +858,7 @@ public sealed class UserService(
             .OrderByDescending(static x => x.AcceptCount).Take(takeCount).ToListAsync();
     }
 
+    /// <inheritdoc/>
     public Task<List<Users>> GetAdminUserAcceptCountRankList(int miniumPost, DateTime miniumPostTime, int takeCount)
     {
         return Queryable()
@@ -845,6 +866,7 @@ public sealed class UserService(
             .OrderByDescending(static x => x.AcceptCount).Take(takeCount).ToListAsync();
     }
 
+    /// <inheritdoc/>
     public Task<List<Users>> GetAdminUserReviewCountRankList(int miniumPost, DateTime miniumPostTime, int takeCount)
     {
         return Queryable()
@@ -852,6 +874,7 @@ public sealed class UserService(
             .OrderByDescending(static x => x.ReviewCount).Take(takeCount).ToListAsync();
     }
 
+    /// <inheritdoc/>
     public Task UpdateUserGroupId(Users user, int groupId)
     {
         user.GroupID = groupId;
@@ -859,6 +882,7 @@ public sealed class UserService(
         return Updateable(user).UpdateColumns(static x => new { x.GroupID, x.ModifyAt }).ExecuteCommandAsync();
     }
 
+    /// <inheritdoc/>
     public Task SetUserNotification(Users user, bool notification)
     {
         user.Notification = notification;
@@ -866,6 +890,7 @@ public sealed class UserService(
         return Updateable(user).UpdateColumns(static x => new { x.Notification, x.ModifyAt }).ExecuteCommandAsync();
     }
 
+    /// <inheritdoc/>
     public Task SetUserPreferAnonymous(Users user, bool preferAnonymous)
     {
         user.PreferAnonymous = preferAnonymous;

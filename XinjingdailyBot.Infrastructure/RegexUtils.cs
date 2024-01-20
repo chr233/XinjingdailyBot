@@ -19,4 +19,11 @@ public static partial class RegexUtils
     /// <returns></returns>
     [GeneratedRegex("^\\s*$")]
     public static partial Regex MatchBlankLine();
+
+    /// <summary>
+    /// 匹配纯链接
+    /// </summary>
+    /// <returns></returns>
+    [GeneratedRegex(@"\b(?:https?://|www\.)\S+\b", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    public static partial Regex MatchHttpLink();
 }

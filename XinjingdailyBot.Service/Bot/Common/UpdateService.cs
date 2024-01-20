@@ -10,6 +10,7 @@ using XinjingdailyBot.Interface.Data;
 
 namespace XinjingdailyBot.Service.Bot.Common;
 
+/// <inheritdoc cref="IUpdateService"/>
 [AppService(typeof(IUpdateService), LifeTime.Scoped)]
 public sealed class UpdateService(
      ILogger<UpdateService> _logger,
@@ -19,6 +20,7 @@ public sealed class UpdateService(
 {
     private int LastUpdateId { get; set; } = 0;
 
+    /// <inheritdoc/>
     public async Task HandleUpdateAsync(ITelegramBotClient _, Update update, CancellationToken cancellationToken)
     {
         _logger.LogUpdate(update);
@@ -66,6 +68,7 @@ public sealed class UpdateService(
         }
     }
 
+    /// <inheritdoc/>
     public async Task HandlePollingErrorAsync(ITelegramBotClient _, Exception exception, CancellationToken cancellationToken)
     {
         _logger.LogError(exception, "处理轮询出错");

@@ -9,12 +9,9 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IMediaGroupService"/>
 [AppService(typeof(IMediaGroupService), LifeTime.Singleton)]
-public sealed class MediaGroupService : BaseService<MediaGroups>, IMediaGroupService
+public sealed class MediaGroupService(ISqlSugarClient context) : BaseService<MediaGroups>(context), IMediaGroupService
 {
-    public MediaGroupService(ISqlSugarClient context) : base(context)
-    {
-    }
-
+    /// <inheritdoc/>
     public async Task AddPostMediaGroup(Message message)
     {
         if (string.IsNullOrEmpty(message.MediaGroupId))
@@ -32,6 +29,7 @@ public sealed class MediaGroupService : BaseService<MediaGroups>, IMediaGroupSer
         await Insertable(postGeoup).ExecuteCommandAsync();
     }
 
+    /// <inheritdoc/>
     public async Task AddPostMediaGroup(IEnumerable<Message> messages)
     {
         if (messages.Any(x => string.IsNullOrEmpty(x.MediaGroupId)))
@@ -50,24 +48,28 @@ public sealed class MediaGroupService : BaseService<MediaGroups>, IMediaGroupSer
         await Storageable(postGeoups).ExecuteCommandAsync();
     }
 
+    /// <inheritdoc/>
     public async Task<MediaGroups?> QueryMediaGroup(Message message)
     {
         var mediaGroup = await Queryable().FirstAsync(x => x.ChatID == message.Chat.Id && x.MessageID == message.MessageId);
         return mediaGroup;
     }
 
+    /// <inheritdoc/>
     public async Task<List<MediaGroups>> QueryMediaGroup(string? mediaGroupId)
     {
         var mediaGroups = await Queryable().Where(x => x.MediaGroupID == mediaGroupId).ToListAsync();
         return mediaGroups;
     }
 
+    /// <inheritdoc/>
     public async Task<MediaGroups?> QueryMediaGroup(Chat chat, long msgId)
     {
         var mediaGroup = await Queryable().FirstAsync(x => x.ChatID == chat.Id && x.MessageID == msgId);
         return mediaGroup;
     }
 
+    /// <inheritdoc/>
     public async Task<MediaGroups?> QueryMediaGroup(long chatId, int msgId)
     {
         var mediaGroup = await Queryable().FirstAsync(x => x.ChatID == chatId && x.MessageID == msgId);

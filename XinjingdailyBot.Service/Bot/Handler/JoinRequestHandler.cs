@@ -7,20 +7,13 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Handler;
 
+/// <inheritdoc cref="IJoinRequestHandler"/>
 [AppService(typeof(IJoinRequestHandler), LifeTime.Scoped)]
-public sealed class JoinRequestHandler : IJoinRequestHandler
+public sealed class JoinRequestHandler(
+        ILogger<JoinRequestHandler> _logger,
+        ITelegramBotClient _botClient) : IJoinRequestHandler
 {
-    private readonly ILogger<JoinRequestHandler> _logger;
-    private readonly ITelegramBotClient _botClient;
-
-    public JoinRequestHandler(
-        ILogger<JoinRequestHandler> logger,
-        ITelegramBotClient botClient)
-    {
-        _logger = logger;
-        _botClient = botClient;
-    }
-
+    /// <inheritdoc/>
     public async Task OnJoinRequestReceived(Users dbUser, ChatJoinRequest request)
     {
         if (dbUser.AcceptCount >= IJoinRequestHandler.AutoApproveLimit)

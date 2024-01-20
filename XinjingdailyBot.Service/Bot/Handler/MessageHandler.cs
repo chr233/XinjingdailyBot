@@ -9,26 +9,15 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Handler;
 
+/// <inheritdoc/>
 [AppService(typeof(IMessageHandler), LifeTime.Singleton)]
-public sealed class MessageHandler : IMessageHandler
+public sealed class MessageHandler(
+        IPostService _postService,
+        IGroupMessageHandler _groupMessageHandler,
+        ITelegramBotClient _botClient,
+        IForwardMessageHandler _forwardMessageHandler) : IMessageHandler
 {
-    private readonly IPostService _postService;
-    private readonly IGroupMessageHandler _groupMessageHandler;
-    private readonly ITelegramBotClient _botClient;
-    private readonly IForwardMessageHandler _forwardMessageHandler;
-
-    public MessageHandler(
-        IPostService postService,
-        IGroupMessageHandler groupMessageHandler,
-        ITelegramBotClient botClient,
-        IForwardMessageHandler forwardMessageHandler)
-    {
-        _postService = postService;
-        _groupMessageHandler = groupMessageHandler;
-        _botClient = botClient;
-        _forwardMessageHandler = forwardMessageHandler;
-    }
-
+    /// <inheritdoc/>
     public async Task OnTextMessageReceived(Users dbUser, Message message)
     {
         if (dbUser.IsBan)
@@ -57,6 +46,7 @@ public sealed class MessageHandler : IMessageHandler
         }
     }
 
+    /// <inheritdoc/>
     public async Task OnMediaMessageReceived(Users dbUser, Message message)
     {
         if (dbUser.IsBan)

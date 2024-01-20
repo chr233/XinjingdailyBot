@@ -14,6 +14,7 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Bot.Handler;
 
+/// <inheritdoc cref="IChannelPostHandler"/>
 [AppService(typeof(IChannelPostHandler), LifeTime.Singleton)]
 public sealed class ChannelPostHandler(
         ILogger<ChannelPostHandler> _logger,
@@ -27,7 +28,7 @@ public sealed class ChannelPostHandler(
         IMediaGroupService _mediaGroupService,
         IChannelService _channelService) : IChannelPostHandler
 {
-
+    /// <inheritdoc/>
     public async Task OnTextChannelPostReceived(Users dbUser, Message message)
     {
         if (string.IsNullOrEmpty(message.Text))
@@ -90,6 +91,7 @@ public sealed class ChannelPostHandler(
         await _userService.UpdateUserPostCount(dbUser);
     }
 
+    /// <inheritdoc/>
     public async Task OnMediaChannelPostReceived(Users dbUser, Message message)
     {
         var second = message.Chat.Id == _channelService.SecondChannel?.Id;
@@ -155,6 +157,7 @@ public sealed class ChannelPostHandler(
     /// </summary>
     private ConcurrentDictionary<string, long> MediaGroupIDs { get; } = new();
 
+    /// <inheritdoc/>
     public async Task OnMediaGroupChannelPostReceived(Users dbUser, Message message)
     {
         string mediaGroupId = message.MediaGroupId!;

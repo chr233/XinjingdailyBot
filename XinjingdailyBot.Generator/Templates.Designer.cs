@@ -165,7 +165,7 @@ namespace XinjingdailyBot.Generator {
         ///namespace XinjingdailyBot.WebAPI.Extensions;
         ///
         ////// &lt;summary&gt;
-        ////// Telegram扩展
+        ////// 定时任务扩展
         ////// &lt;/summary&gt;
         ///public static class GeneratedTaskExtensions
         ///{    
@@ -176,7 +176,7 @@ namespace XinjingdailyBot.Generator {
         ///    /// &lt;/summary&gt;
         ///    /// &lt;param name=&quot;services&quot;&gt;&lt;/param&gt;
         ///    /// &lt;param name=&quot;configuration&quot;&gt;&lt;/param&gt;
-        ///    public static void AddQuartzSetupGenerated( [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///    public static void AddQuartzSetupGenerated(this [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string JobHeader {
             get {

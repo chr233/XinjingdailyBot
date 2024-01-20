@@ -7,7 +7,7 @@ using XinjingdailyBot.Generator.Data;
 namespace XinjingdailyBot.Generator;
 
 [Generator]
-internal class TaskGenerator : ISourceGenerator
+internal sealed class TaskGenerator : ISourceGenerator
 {
     const string InputFileName = "task.json";
     const string OutoutFileName = "GeneratedTaskExtensions.g.cs";

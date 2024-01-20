@@ -21,12 +21,12 @@ public sealed class ExpiredPostsTask(
         ITelegramBotClient _botClient,
         IOptions<OptionsSetting> _options) : IJob
 {
-
     /// <summary>
     /// 稿件过期时间
     /// </summary>
     private readonly TimeSpan PostExpiredTime = _options.Value.Post.PostExpiredTime > 0 ? TimeSpan.FromDays(_options.Value.Post.PostExpiredTime) : TimeSpan.Zero;
 
+    /// <inheritdoc/>
     public async Task Execute(IJobExecutionContext context)
     {
         if (PostExpiredTime.TotalDays == 0)

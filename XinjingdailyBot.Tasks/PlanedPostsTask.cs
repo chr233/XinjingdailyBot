@@ -12,7 +12,7 @@ public sealed class PlanedPostsTask(
     ILogger<PlanedPostsTask> _logger,
     IPostService _postService) : IJob
 {
-
+    /// <inheritdoc/>
     public async Task Execute(IJobExecutionContext context)
     {
         _logger.LogInformation("开始定时任务, 发布定时稿件");

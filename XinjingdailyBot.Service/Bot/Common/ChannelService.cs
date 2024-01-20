@@ -9,8 +9,8 @@ using XinjingdailyBot.Interface.Bot.Common;
 
 namespace XinjingdailyBot.Service.Bot.Common;
 
+/// <inheritdoc cref="IChannelService"/>
 [AppService(typeof(IChannelService), LifeTime.Singleton)]
-
 public sealed class ChannelService(
         ILogger<ChannelService> _logger,
         ITelegramBotClient _botClient,
@@ -18,19 +18,29 @@ public sealed class ChannelService(
 {
     private readonly OptionsSetting _optionsSetting = _options.Value;
 
+    /// <inheritdoc/>
     public Chat ReviewGroup { get; private set; } = new();
+    /// <inheritdoc/>
     public Chat? LogChannel { get; private set; }
+    /// <inheritdoc/>
     public Chat CommentGroup { get; private set; } = new();
+    /// <inheritdoc/>
     public Chat SubGroup { get; private set; } = new();
+    /// <inheritdoc/>
     public Chat? SecondCommentGroup { get; private set; }
+    /// <inheritdoc/>
     public Chat AcceptChannel { get; private set; } = new();
+    /// <inheritdoc/>
     public Chat? SecondChannel { get; private set; }
+    /// <inheritdoc/>
     public Chat RejectChannel { get; private set; } = new();
+    /// <inheritdoc/>
     public User BotUser { get; private set; } = new();
 
+    /// <inheritdoc/>
     public async Task InitChannelInfo()
     {
-        _botClient.DeleteWebhookAsync(false);
+        await _botClient.DeleteWebhookAsync(false);
 
         BotUser = await _botClient.GetMeAsync();
 
@@ -157,32 +167,39 @@ public sealed class ChannelService(
         }
     }
 
+    /// <inheritdoc/>
     public bool IsChannelMessage(long chatId)
     {
         return chatId == AcceptChannel.Id || chatId == SecondChannel?.Id || chatId == RejectChannel.Id;
     }
+    /// <inheritdoc/>
     public bool IsChannelMessage(Chat chat)
     {
         return IsChannelMessage(chat.Id);
     }
 
+    /// <inheritdoc/>
     public bool IsGroupMessage(long chatId)
     {
         return chatId == SubGroup.Id || chatId == CommentGroup.Id || chatId == SecondCommentGroup?.Id;
     }
+    /// <inheritdoc/>
     public bool IsGroupMessage(Chat chat)
     {
         return IsGroupMessage(chat.Id);
     }
 
+    /// <inheritdoc/>
     public bool IsReviewMessage(long chatId)
     {
         return chatId == ReviewGroup.Id;
     }
+    /// <inheritdoc/>
     public bool IsReviewMessage(Chat chat)
     {
         return IsReviewMessage(chat.Id);
     }
+    /// <inheritdoc/>
     public bool HasSecondChannel => SecondChannel != null;
 
     private static void UpdateChatTitle(Chat originChat, Chat targetChat)
@@ -193,6 +210,7 @@ public sealed class ChannelService(
         targetChat.LastName = originChat.LastName;
     }
 
+    /// <inheritdoc/>
     public void OnChatTitleChanged(Chat chat, string? newChatTitle)
     {
         if (chat.Id == AcceptChannel.Id)

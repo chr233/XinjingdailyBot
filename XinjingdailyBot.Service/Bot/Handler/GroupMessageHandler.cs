@@ -12,23 +12,14 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Handler;
 
+/// <inheritdoc cref="IGroupMessageHandler"/>
 [AppService(typeof(IGroupMessageHandler), LifeTime.Singleton)]
-public sealed class GroupMessageHandler : IGroupMessageHandler
+public sealed class GroupMessageHandler(
+        ITelegramBotClient _botClient,
+        IChannelService _channelService,
+        ILogger<GroupMessageHandler> _logger) : IGroupMessageHandler
 {
-    private readonly IChannelService _channelService;
-    private readonly ITelegramBotClient _botClient;
-    private readonly ILogger<GroupMessageHandler> _logger;
-
-    public GroupMessageHandler(
-        ITelegramBotClient botClient,
-        IChannelService channelService,
-        ILogger<GroupMessageHandler> logger)
-    {
-        _botClient = botClient;
-        _channelService = channelService;
-        _logger = logger;
-    }
-
+    /// <inheritdoc/>
     public async Task OnGroupTextMessageReceived(Users dbUser, Message message)
     {
         var replyMessage = message.ReplyToMessage;

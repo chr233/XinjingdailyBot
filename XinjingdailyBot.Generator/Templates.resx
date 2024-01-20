@@ -119,13 +119,16 @@
   </resheader>
   <data name="AppServiceContent1" xml:space="preserve">
     <value>services.Add{0}&lt;{1}&gt;();</value>
+    <comment>服务注册文件内容</comment>
   </data>
   <data name="AppServiceContent2" xml:space="preserve">
     <value>services.Add{0}&lt;{1}, {2}&gt;();</value>
+    <comment>服务注册文件内容</comment>
   </data>
   <data name="AppServiceFooter" xml:space="preserve">
     <value>}
 }</value>
+    <comment>服务注册文件尾</comment>
   </data>
   <data name="AppServiceHeader" xml:space="preserve">
     <value>using Microsoft.Extensions.DependencyInjection;
@@ -145,6 +148,7 @@ public static class GeneratedAppServiceExtensions
     /// &lt;param name="services"&gt;&lt;/param&gt;
     public static void AddAppServiceGenerated(this IServiceCollection services)
     {</value>
+    <comment>服务注册文件头</comment>
   </data>
   <data name="JobContent" xml:space="preserve">
     <value>try
@@ -167,6 +171,7 @@ catch (Exception ex)
 {{
     _logger.Error(ex, "{1} - {0} 注册失败");
 }}</value>
+    <comment>定时任务文件内容</comment>
   </data>
   <data name="JobFooter" xml:space="preserve">
     <value>});
@@ -178,6 +183,7 @@ catch (Exception ex)
         });
     }
 }</value>
+    <comment>定时任务文件尾</comment>
   </data>
   <data name="JobHeader" xml:space="preserve">
     <value>using Quartz;
@@ -187,7 +193,7 @@ using XinjingdailyBot.Infrastructure;
 namespace XinjingdailyBot.WebAPI.Extensions;
 
 /// &lt;summary&gt;
-/// Telegram扩展
+/// 定时任务扩展
 /// &lt;/summary&gt;
 public static class GeneratedTaskExtensions
 {    
@@ -210,5 +216,6 @@ public static class GeneratedTaskExtensions
 
         services.AddQuartz(qz =&gt; {
             _logger.Debug("===== 注册定时任务 =====");</value>
+    <comment>定时任务文件头</comment>
   </data>
 </root>

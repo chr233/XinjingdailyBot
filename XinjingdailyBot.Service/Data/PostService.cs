@@ -30,32 +30,33 @@ public sealed class PostService(
     IMarkupHelperService _markupHelperService,
     ITelegramBotClient _botClient,
     IUserService _userService,
-    IOptions<OptionsSetting> options,
+    IOptions<OptionsSetting> _options,
     TagRepository _tagRepository,
     IMediaGroupService _mediaGroupService,
     IImageHelperService _imageHelperService,
     ISqlSugarClient _context) : BaseService<NewPosts>(_context), IPostService
 {
-    private readonly OptionsSetting.PostOption _postOption = options.Value.Post;
-    private readonly bool _enableWebPagePreview = options.Value.Bot.EnableWebPagePreview;
+    private readonly bool _enableWebPagePreview = _options.Value.Bot.EnableWebPagePreview;
 
     /// <inheritdoc/>
     public async Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null)
     {
+        var postOption = _options.Value.Post;
+
         //未开启限制或者用户为管理员时不受限制
-        if ((dbUser.AcceptCount > 0 && !_postOption.EnablePostLimit) || dbUser.Right.HasFlag(EUserRights.Admin))
+        if ((dbUser.AcceptCount > 0 && !postOption.EnablePostLimit) || dbUser.Right.HasFlag(EUserRights.Admin))
         {
             return true;
         }
 
         //待定确认稿件上限
-        int paddingLimit = _postOption.DailyPaddingLimit;
+        int paddingLimit = postOption.DailyPaddingLimit;
         //上限基数
-        int baseRatio = Math.Min(dbUser.AcceptCount / _postOption.RatioDivisor + 1, _postOption.MaxRatio);
+        int baseRatio = Math.Min(dbUser.AcceptCount / postOption.RatioDivisor + 1, postOption.MaxRatio);
         //审核中稿件上限
-        int reviewLimit = baseRatio * _postOption.DailyReviewLimit;
+        int reviewLimit = baseRatio * postOption.DailyReviewLimit;
         //每日投稿上限
-        int dailyLimit = baseRatio * _postOption.DailyPostLimit;
+        int dailyLimit = baseRatio * postOption.DailyPostLimit;
 
         //没有通过稿件的用户收到更严格的限制
         if (dbUser.AcceptCount == 0)

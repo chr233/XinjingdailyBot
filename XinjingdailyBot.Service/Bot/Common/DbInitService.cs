@@ -11,28 +11,11 @@ namespace XinjingdailyBot.Service.Bot.Common;
 /// <summary>
 /// 消息接收服务
 /// </summary>
-public sealed class DbInitService : BackgroundService
+public sealed class DbInitService(
+        ILogger<DbInitService> _logger,
+        IOptions<OptionsSetting> _options,
+        ISqlSugarClient _dbClient) : BackgroundService
 {
-    private readonly ILogger<DbInitService> _logger;
-    private readonly OptionsSetting.DatabaseOption _option;
-    private readonly ISqlSugarClient _dbClient;
-
-    /// <summary>
-    /// 消息接收服务
-    /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="options"></param>
-    /// <param name="dbClient"></param>
-    public DbInitService(
-        ILogger<DbInitService> logger,
-        IOptions<OptionsSetting> options,
-        ISqlSugarClient dbClient)
-    {
-        _logger = logger;
-        _option = options.Value.Database;
-        _dbClient = dbClient;
-    }
-
     /// <summary>
     /// 执行
     /// </summary>
@@ -41,13 +24,14 @@ public sealed class DbInitService : BackgroundService
     [RequiresUnreferencedCode("不兼容剪裁")]
     protected override Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        if (_option.Generate)
+        var dbCotion = _options.Value.Database;
+        if (dbCotion.Generate)
         {
             _logger.LogInformation("开始生成数据库结构");
             //创建数据库
             try
             {
-                _dbClient.DbMaintenance.CreateDatabase(_option.DbName);
+                _dbClient.DbMaintenance.CreateDatabase(dbCotion.DbName);
             }
             catch (Exception ex)
             {

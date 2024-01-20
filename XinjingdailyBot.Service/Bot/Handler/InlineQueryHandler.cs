@@ -11,6 +11,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Handler;
 
+/// <inheritdoc cref="IInlineQueryHandler"/>
 [AppService(typeof(IInlineQueryHandler), LifeTime.Singleton)]
 public sealed class InlineQueryHandler(
         ITelegramBotClient _botClient,
@@ -18,7 +19,7 @@ public sealed class InlineQueryHandler(
         IPostService _postService,
         IMarkupHelperService _markupHelperService) : IInlineQueryHandler
 {
-
+    /// <inheritdoc/>
     public async Task OnInlineQueryReceived(Users dbUser, InlineQuery query)
     {
         if (dbUser.Right.HasFlag(EUserRights.AdminCmd))

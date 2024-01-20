@@ -9,12 +9,9 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="ICmdRecordService"/>
 [AppService(typeof(ICmdRecordService), LifeTime.Transient)]
-public sealed class CmdRecordService : BaseService<CmdRecords>, ICmdRecordService
+public sealed class CmdRecordService(ISqlSugarClient context) : BaseService<CmdRecords>(context), ICmdRecordService
 {
-    public CmdRecordService(ISqlSugarClient context) : base(context)
-    {
-    }
-
+    /// <inheritdoc/>
     public async Task AddCmdRecord(Message message, Users dbUser, bool handled, bool isQuery, string? exception)
     {
         bool error = !string.IsNullOrEmpty(exception);
@@ -40,6 +37,7 @@ public sealed class CmdRecordService : BaseService<CmdRecords>, ICmdRecordServic
         await Insertable(record).ExecuteCommandAsync();
     }
 
+    /// <inheritdoc/>
     public async Task AddCmdRecord(CallbackQuery query, Users dbUser, bool handled, bool isQuery, string? exception)
     {
         bool error = !string.IsNullOrEmpty(exception);
@@ -66,21 +64,25 @@ public sealed class CmdRecordService : BaseService<CmdRecords>, ICmdRecordServic
         await Insertable(record).ExecuteCommandAsync();
     }
 
+    /// <inheritdoc/>
     public Task<CmdRecords> FetchCmdRecordByMessageId(int msgId)
     {
         return Queryable().FirstAsync(x => x.MessageID == msgId);
     }
 
+    /// <inheritdoc/>
     public Task<int> GetErrorCmdCount(DateTime startTime)
     {
         return Queryable().Where(x => x.Error && x.Handled && x.ExecuteAt >= startTime).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> GetQueryCmdCount(DateTime startTime)
     {
         return Queryable().Where(x => x.IsQuery && x.Handled && x.ExecuteAt >= startTime).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> GetTextCmdCount(DateTime startTime)
     {
         return Queryable().Where(x => !x.IsQuery && x.Handled && x.ExecuteAt >= startTime).CountAsync();

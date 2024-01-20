@@ -28,7 +28,6 @@ public sealed class PollingService(
         ITelegramBotClient _botClient,
         IOptions<OptionsSetting> options) : BackgroundService
 {
-
     private readonly bool _throwPendingUpdates = options.Value.Bot.ThrowPendingUpdates;
 
     /// <summary>

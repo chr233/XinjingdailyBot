@@ -22,7 +22,7 @@ public sealed class ReviewStatusTask(
     IReviewStatusService _reviewStatusService,
     IMarkupHelperService _markupHelperService) : IJob
 {
-
+    /// <inheritdoc/>
     public async Task Execute(IJobExecutionContext context)
     {
         _logger.LogInformation("开始定时任务, 更新投稿状态显示");

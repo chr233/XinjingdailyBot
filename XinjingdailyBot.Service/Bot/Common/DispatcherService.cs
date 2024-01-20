@@ -25,7 +25,6 @@ public sealed class DispatcherService(
         IDialogueService _dialogueService,
         TagRepository _tagRepository) : IDispatcherService
 {
-
     /// <summary>
     /// 删除子频道中的NSFW消息以及取消置顶其他消息
     /// </summary>
@@ -50,6 +49,7 @@ public sealed class DispatcherService(
         }
     }
 
+    /// <inheritdoc/>
     public async Task OnMessageReceived(Users dbUser, Message message)
     {
         await _dialogueService.RecordMessage(message);
@@ -80,6 +80,7 @@ public sealed class DispatcherService(
         }
     }
 
+    /// <inheritdoc/>
     public async Task OnChannalPostReceived(Users dbUser, Message message)
     {
         //仅监听发布频道的消息
@@ -104,11 +105,13 @@ public sealed class DispatcherService(
         }
     }
 
+    /// <inheritdoc/>
     public async Task OnCallbackQueryReceived(Users dbUser, CallbackQuery query)
     {
         await _commandHandler.OnQueryCommandReceived(dbUser, query);
     }
 
+    /// <inheritdoc/>
     public async Task OnJoinRequestReceived(Users dbUser, ChatJoinRequest request)
     {
         if (_channelService.IsGroupMessage(request.Chat.Id))
@@ -117,11 +120,13 @@ public sealed class DispatcherService(
         }
     }
 
+    /// <inheritdoc/>
     public async Task OnInlineQueryReceived(Users dbUser, InlineQuery query)
     {
         await _inlineQueryHandler.OnInlineQueryReceived(dbUser, query);
     }
 
+    /// <inheritdoc/>
     public Task OnOtherUpdateReceived(Users dbUser, Update update)
     {
         _logger.LogInformation("收到未知消息类型的消息, [{type}]", update.Type);

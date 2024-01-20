@@ -7,7 +7,7 @@ using XinjingdailyBot.Generator.Data;
 namespace XinjingdailyBot.Generator;
 
 [Generator]
-internal class AppServiceGenerator : ISourceGenerator
+internal sealed class AppServiceGenerator : ISourceGenerator
 {
     const string InputFileName = "appService.json";
     const string OutoutFileName = "GeneratedAppServiceExtensions.g.cs";

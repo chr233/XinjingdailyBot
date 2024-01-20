@@ -10,22 +10,12 @@ namespace XinjingdailyBot.Tasks;
 /// 拒稿存档频道置顶
 /// </summary>
 [Job("0 0 0 * * ?")]
-public sealed class RejectChannelTask : IJob
+public sealed class RejectChannelTask(
+    ILogger<RejectChannelTask> _logger,
+    IChannelService _channelService,
+    ITelegramBotClient _botClient) : IJob
 {
-    private readonly ILogger<RejectChannelTask> _logger;
-    private readonly IChannelService _channelService;
-    private readonly ITelegramBotClient _botClient;
-
-    public RejectChannelTask(
-        ILogger<RejectChannelTask> logger,
-        IChannelService channelService,
-        ITelegramBotClient botClient)
-    {
-        _logger = logger;
-        _channelService = channelService;
-        _botClient = botClient;
-    }
-
+    /// <inheritdoc/>
     public async Task Execute(IJobExecutionContext context)
     {
         _logger.LogInformation("开始定时任务, 置顶拒稿频道通知");

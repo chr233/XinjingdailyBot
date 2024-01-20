@@ -20,34 +20,19 @@ using XinjingdailyBot.Model.Models;
 namespace XinjingdailyBot.Service.Bot.Handler;
 
 
-/// <summary>
-/// 命令处理器
-/// </summary>
+/// <inheritdoc cref="ICommandHandler"/>
 [AppService(typeof(ICommandHandler), LifeTime.Singleton)]
-public sealed class CommandHandler : ICommandHandler
+public sealed class CommandHandler(
+        ILogger<CommandHandler> _logger,
+        IChannelService _channelService,
+        IServiceProvider _serviceProvider,
+        ITelegramBotClient _botClient,
+        ICmdRecordService _cmdRecordService,
+        IOptions<OptionsSetting> _options) : ICommandHandler
 {
-    private readonly ILogger<CommandHandler> _logger;
-    private readonly IChannelService _channelService;
-    private readonly ITelegramBotClient _botClient;
-    private readonly IServiceScope _serviceScope;
-    private readonly ICmdRecordService _cmdRecordService;
-    private readonly OptionsSetting _optionsSetting;
+    private readonly OptionsSetting _optionsSetting = _options.Value;
 
-    public CommandHandler(
-        ILogger<CommandHandler> logger,
-        IChannelService channelService,
-        IServiceProvider serviceProvider,
-        ITelegramBotClient botClient,
-        ICmdRecordService cmdRecordService,
-        IOptions<OptionsSetting> options)
-    {
-        _logger = logger;
-        _channelService = channelService;
-        _serviceScope = serviceProvider.CreateScope();
-        _botClient = botClient;
-        _cmdRecordService = cmdRecordService;
-        _optionsSetting = options.Value;
-    }
+    private readonly IServiceScope _serviceScope = _serviceProvider.CreateScope();
 
     /// <summary>
     /// 指令方法名映射
@@ -69,6 +54,7 @@ public sealed class CommandHandler : ICommandHandler
 
     private static readonly char[] separator = [','];
 
+    /// <inheritdoc/>
     [RequiresUnreferencedCode("不兼容剪裁")]
     public void InstallCommands()
     {
@@ -164,6 +150,7 @@ public sealed class CommandHandler : ICommandHandler
         }
     }
 
+    /// <inheritdoc/>
     public async Task OnCommandReceived(Users dbUser, Message message)
     {
         if (string.IsNullOrEmpty(message.Text))
@@ -291,12 +278,13 @@ public sealed class CommandHandler : ICommandHandler
             }
         }
         //调用方法
-        if (method.Invoke(service, methodParameters.ToArray()) is Task task)
+        if (method.Invoke(service, [.. methodParameters]) is Task task)
         {
             await task;
         }
     }
 
+    /// <inheritdoc/>
     public async Task OnQueryCommandReceived(Users dbUser, CallbackQuery query)
     {
         var message = query.Message;
@@ -423,12 +411,13 @@ public sealed class CommandHandler : ICommandHandler
             }
         }
         //调用方法
-        if (method.Invoke(service, methodParameters.ToArray()) is Task task)
+        if (method.Invoke(service, [.. methodParameters]) is Task task)
         {
             await task;
         }
     }
 
+    /// <inheritdoc/>
     public string GetAvilabeCommands(Users dbUser)
     {
         var cmds = new Dictionary<string, string>();
@@ -505,6 +494,7 @@ public sealed class CommandHandler : ICommandHandler
         return true;
     }
 
+    /// <inheritdoc/>
     public async Task<bool> ClearCommandsMenu()
     {
         var cmds = new List<BotCommand>();

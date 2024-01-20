@@ -2,9 +2,9 @@ using Microsoft.Extensions.Logging;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Helper;
 
@@ -18,6 +18,7 @@ public sealed class ImageHelperService(
     ) : IImageHelperService
 {
 
+    /// <inheritdoc/>
     public async Task<bool> ProcessMessage(Message msg)
     {
         if (msg.Photo != null)
@@ -170,8 +171,8 @@ public sealed class ImageHelperService(
             if (msg.Document == null && msg.Photo == null && msg.Audio == null && msg.Video == null)
             {
                 // 纯链接检测
-                var linkParser = new Regex(@"\b(?:https?://|www\.)\S+\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                foreach (Match m in linkParser.Matches(msg.Text))
+                var linkParser = RegexUtils.MatchHttpLink();
+                foreach (var m in linkParser.Matches(msg.Text).ToList())
                 {
                     var uri = new Uri(m.Value);
                     var dict = new Dictionary<string, string> {

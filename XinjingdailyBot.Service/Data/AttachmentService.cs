@@ -12,6 +12,7 @@ namespace XinjingdailyBot.Service.Data;
 [AppService(typeof(IAttachmentService), LifeTime.Transient)]
 public sealed class AttachmentService(ISqlSugarClient context) : BaseService<Attachments>(context), IAttachmentService
 {
+    /// <inheritdoc/>
     public Attachments? GenerateAttachment(Message message, long postID)
     {
         string? fileID, fileName, fileUid, mimeType;
@@ -112,26 +113,31 @@ public sealed class AttachmentService(ISqlSugarClient context) : BaseService<Att
         return result;
     }
 
+    /// <inheritdoc/>
     public Task CreateAttachment(Attachments attachment)
     {
         return Insertable(attachment).ExecuteCommandAsync();
     }
 
+    /// <inheritdoc/>
     public Task CreateAttachments(List<Attachments> attachments)
     {
         return Storageable(attachments).ExecuteCommandAsync();
     }
 
+    /// <inheritdoc/>
     public Task<Attachments> FetchAttachmentByPostId(long postId)
     {
         return Queryable().FirstAsync(x => x.PostID == postId);
     }
 
+    /// <inheritdoc/>
     public Task<List<Attachments>> FetchAttachmentsByPostId(long postId)
     {
         return Queryable().Where(x => x.PostID == postId).ToListAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> GetAttachmentCount()
     {
         return Queryable().CountAsync();

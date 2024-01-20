@@ -6,8 +6,12 @@ using System.Globalization;
 
 namespace XinjingdailyBot.WebAPI.IPC.Middlewares;
 
+/// <summary>
+/// 枚举类
+/// </summary>
 public sealed class EnumSchemaFilter : ISchemaFilter
 {
+    /// <inheritdoc/>
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {
         ArgumentNullException.ThrowIfNull(schema);
@@ -23,7 +27,7 @@ public sealed class EnumSchemaFilter : ISchemaFilter
             schema.Format = "flags";
         }
 
-        OpenApiObject definition = new();
+        var definition = new OpenApiObject();
 
         foreach (object? enumValue in context.Type.GetEnumValues())
         {

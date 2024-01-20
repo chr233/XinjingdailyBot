@@ -8,15 +8,9 @@ namespace XinjingdailyBot.Repository;
 /// <summary>
 /// 旧稿件表仓储类
 /// </summary>
+/// <param name="context"></param>
 [AppService(LifeTime.Transient)]
 [Obsolete("废弃的仓储类")]
-public class OldPostRepository : BaseRepository<OldPosts>
+public class OldPostRepository(ISqlSugarClient context) : BaseRepository<OldPosts>(context)
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="context"></param>
-    public OldPostRepository(ISqlSugarClient context) : base(context)
-    {
-    }
 }

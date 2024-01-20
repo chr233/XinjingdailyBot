@@ -89,6 +89,10 @@ public sealed record OptionsSetting
         /// 文本稿件发布时是否启用链接预览
         /// </summary>
         public bool EnableWebPagePreview { get; set; }
+        /// <summary>
+        /// 禁止纯链接投稿
+        /// </summary>
+        public bool DisableRawLinkPost { get; set; }
     }
 
     /// <summary>
