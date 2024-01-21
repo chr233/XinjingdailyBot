@@ -391,3 +391,9 @@
 | DefaultRight | 群组内用户权限值 |
 
 > 用户组 ID 大的用户可以修改用户组 ID 小的用户的用户组
+
+## 衍生项目
+
+- [PagerMaid xinjingdailybot_ipc 插件](https://github.com/chr233/PagerMaid_Plugins_Pyro/tree/v2/xinjingdailybot_ipc) 使用 PagerMaid 自动转载频道投稿
+
+- [Mars Bot](https://github.com/MicroCBer/MarsBot) 图片/视频查重机器人
