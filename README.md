@@ -24,7 +24,18 @@
 
 > v3.0 开发中
 
-### 安装/配置/使用文档已迁移至 [Wiki](https://github.com/chr233/XinjingdailyBot/wiki/Customization.md)
+## 使用文档
+
+> 使用文档已迁移至 [Wiki](https://github.com/chr233/XinjingdailyBot/wiki/Customization.md)
+
+- 基础
+  - [首页](https://github.com/chr233/XinjingdailyBot/wiki/Home)
+  - [安装](https://github.com/chr233/XinjingdailyBot/wiki/Install)
+  - [配置](https://github.com/chr233/XinjingdailyBot/wiki/Configuration)
+- 进阶
+  - [自定义](https://github.com/chr233/XinjingdailyBot/wiki/Customizatio)
+- 信息
+  - [改动历史](https://github.com/chr233/XinjingdailyBot/wiki/ChangeLog)
 
 ## 功能特性
 
