@@ -92,7 +92,7 @@ public sealed record OptionsSetting
         /// <summary>
         /// 禁止纯链接投稿
         /// </summary>
-        public bool DisableRawLinkPost { get; set; }
+        public bool RejectRawLinkPost { get; set; }
     }
 
     /// <summary>
