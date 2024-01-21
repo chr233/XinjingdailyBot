@@ -97,6 +97,15 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         }
         
         /// <summary>
+        ///   查找类似 忽略警告, 继续投稿 的本地化字符串。
+        /// </summary>
+        public static string IgnoreWarn {
+            get {
+                return ResourceManager.GetString("IgnoreWarn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 ========================================================== 的本地化字符串。
         /// </summary>
         public static string Line {
@@ -147,6 +156,15 @@ namespace XinjingdailyBot.Infrastructure.Localization {
         public static string PostConfirm {
             get {
                 return ResourceManager.GetString("PostConfirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 ⚠️我已知晓, 继续投稿 的本地化字符串。
+        /// </summary>
+        public static string PostDismissWarning {
+            get {
+                return ResourceManager.GetString("PostDismissWarning", resourceCulture);
             }
         }
         

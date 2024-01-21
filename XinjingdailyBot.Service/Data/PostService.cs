@@ -135,32 +135,27 @@ public sealed class PostService(
     /// <summary>
     /// 判断是否为纯链接
     /// </summary>
-    /// <param name="message"></param>
     /// <param name="msgText"></param>
     /// <returns></returns>
-    public async Task<bool> CheckIfRawLink(Message message, string msgText)
+    private string? CheckIfRawLink(string msgText)
     {
-        if (!_options.Value.Bot.RejectRawLinkPost)
+        if (_options.Value.Bot.WarnRawLinkPost)
         {
-            return true;
-        }
-
-        var regex = RegexUtils.MatchHttpLink();
-        foreach (var m in regex.Matches(msgText).ToList())
-        {
-            var uri = new Uri(m.Value);
-
-            foreach (var (host, botName) in LinkParserBotDict)
+            var matches = RegexUtils.MatchUrlHost().Matches(msgText).ToList();
+            foreach (var match in matches)
             {
-                if (uri.Host.EndsWith(host))
+                string? urlHost = match.Groups[1].Value.ToLowerInvariant();
+                foreach (var (host, botName) in LinkParserBotDict)
                 {
-                    await _botClient.AutoReplyAsync($"检测到来自 {host} 的纯链接投稿，请先将链接发送至 {botName} 进行处理后再投稿", message);
-                    return false;
+                    if (urlHost.EndsWith(host))
+                    {
+                        return $"检测到来自 {host} 的纯链接投稿，建议先将链接发送至 {botName} 进行处理后再投稿";
+                    }
                 }
             }
         }
 
-        return true;
+        return null;
     }
 
     /// <inheritdoc/>
@@ -251,6 +246,14 @@ public sealed class PostService(
             default:
                 _logger.LogError("未知的频道选项 {channelOption}", channelOption);
                 return;
+        }
+
+        //如果是纯链接消息显示警告
+        var warnMsg = CheckIfRawLink(text);
+        if (!string.IsNullOrEmpty(warnMsg))
+        {
+            postText += "\n\n" + warnMsg;
+            keyboard = _markupHelperService.PostWarningKeyboard(directPost);
         }
 
         var actionMsg = await _botClient.SendTextMessageAsync(message.Chat, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
@@ -387,7 +390,7 @@ public sealed class PostService(
     /// <summary>
     /// mediaGroupID字典
     /// </summary>
-    private ConcurrentDictionary<string, MediaGroupData> MediaGroupCache { get; } = new();
+    private ConcurrentDictionary<string, MediaGroupCache> MediaGroupCache { get; } = new();
 
     /// <summary>
     /// 缓存Ttl控制定时器
@@ -446,7 +449,7 @@ public sealed class PostService(
         if (!MediaGroupCache.TryGetValue(mediaGroupId, out var mgCache))
         {
             //添加媒体组缓存信息
-            mgCache = new MediaGroupData();
+            mgCache = new MediaGroupCache();
             MediaGroupCache.TryAdd(mediaGroupId, mgCache);
 
             bool exists = await Queryable().AnyAsync(x => x.OriginMediaGroupID == mediaGroupId);
@@ -504,7 +507,6 @@ public sealed class PostService(
                         //清空状态量, 将不进行后续操作
                         mgCache.PostText = null;
                         mgCache.Keyboard = null;
-                        mgCache.ActionMessage = null;
                         break;
                     default:
                         _logger.LogError("未知的频道选项 {channelOption}", channelOption);
@@ -524,7 +526,9 @@ public sealed class PostService(
                     RawText = message.Text ?? "",
                     ChannelID = channelId,
                     ChannelMsgID = channelMsgId,
-                    Status = directPost ? EPostStatus.Reviewing : EPostStatus.Padding,
+                    Status = channelOption == EChannelOption.AutoReject ?
+                        EPostStatus.Rejected :
+                        (directPost ? EPostStatus.Reviewing : EPostStatus.Padding),
                     PostType = message.Type,
                     OriginMediaGroupID = mediaGroupId,
                     Tags = newTags,
@@ -1312,7 +1316,10 @@ public sealed class PostService(
     public void Dispose() => MediaGroupTtlTimer?.Dispose();
 }
 
-internal sealed record MediaGroupData
+/// <summary>
+/// 媒体组缓存
+/// </summary>
+internal sealed record MediaGroupCache
 {
     public int PostId { get; set; } = -1;
     public DateTime ExpireAt { get; set; }
@@ -1320,7 +1327,7 @@ internal sealed record MediaGroupData
     public InlineKeyboardMarkup? Keyboard { get; set; }
     public Message? ActionMessage { get; set; }
 
-    public MediaGroupData()
+    public MediaGroupCache()
     {
         RenewTtl();
     }

@@ -90,9 +90,9 @@ public sealed record OptionsSetting
         /// </summary>
         public bool EnableWebPagePreview { get; set; }
         /// <summary>
-        /// 禁止纯链接投稿
+        /// 纯链接投稿显示警告
         /// </summary>
-        public bool RejectRawLinkPost { get; set; }
+        public bool WarnRawLinkPost { get; set; }
     }
 
     /// <summary>

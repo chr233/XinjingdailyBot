@@ -18,6 +18,11 @@ public sealed class TextHelperService : ITextHelperService
 {
     private readonly TagRepository _tagRepository;
 
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="options"></param>
+    /// <param name="tagRepository"></param>
     public TextHelperService(
         IOptions<OptionsSetting> options,
         TagRepository tagRepository)

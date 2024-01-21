@@ -42,6 +42,22 @@ public sealed class MarkupHelperService(
     }
 
     /// <inheritdoc/>
+    public InlineKeyboardMarkup PostWarningKeyboard(bool isDirectPost)
+    {
+        var keyboard = new InlineKeyboardMarkup(new[]
+        {
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "post cancel"),
+                isDirectPost ?
+                    InlineKeyboardButton.WithCallbackData(Langs.PostDismissWarning, "review dismisswarning") :
+                    InlineKeyboardButton.WithCallbackData(Langs.PostDismissWarning, $"post dismisswarning"),
+            },
+        });
+        return keyboard;
+    }
+
+    /// <inheritdoc/>
     public InlineKeyboardMarkup DirectPostKeyboard(bool anymouse, int tagNum, bool? hasSpoiler)
     {
         var tags = _tagRepository.GetTagsPayload(tagNum);

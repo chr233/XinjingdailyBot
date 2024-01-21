@@ -212,6 +212,10 @@ public sealed class ReviewCommand(
                 await CancelPost(post, query);
                 break;
 
+            case "review dismisswarning":
+                await DismissWarning(post, dbUser, query);
+                break;
+
             default:
                 if (data.StartsWith("review tag"))
                 {
@@ -335,5 +339,24 @@ public sealed class ReviewCommand(
             _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
 
         await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, keyboard);
+    }
+
+    /// <summary>
+    /// 忽略警告继续投稿
+    /// </summary>
+    /// <param name="post"></param>
+    /// <param name="dbUser"></param>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    private async Task DismissWarning(NewPosts post, Users dbUser, CallbackQuery query)
+    {
+        bool anonymous = dbUser.PreferAnonymous;
+
+        //发送确认消息
+        var keyboard = _markupHelperService.DirectPostKeyboard(anonymous, post.Tags, post.HasSpoiler);
+
+        await _botClient.EditMessageReplyMarkupAsync(query.Message!, replyMarkup: keyboard);
+
+        await _botClient.AutoReplyAsync(Langs.IgnoreWarn, query);
     }
 }

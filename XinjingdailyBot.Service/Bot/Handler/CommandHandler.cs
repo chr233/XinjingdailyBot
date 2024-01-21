@@ -457,6 +457,7 @@ public sealed class CommandHandler(
         }
     }
 
+    /// <inheritdoc/>
     public async Task<bool> SetCommandsMenu()
     {
         var cmds = new List<BotCommand>();

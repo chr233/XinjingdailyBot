@@ -25,5 +25,5 @@ public static partial class RegexUtils
     /// </summary>
     /// <returns></returns>
     [GeneratedRegex(@"((:?https?:\/\/)?(:?[^/\s.#?]+(:?\.[^/\s.#?]+)+))", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
-    public static partial Regex MatchHttpLink();
+    public static partial Regex MatchUrlHost();
 }

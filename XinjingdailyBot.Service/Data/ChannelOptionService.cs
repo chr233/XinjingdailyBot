@@ -48,6 +48,7 @@ public sealed class ChannelOptionService(ISqlSugarClient context) : BaseService<
         return channel.Option;
     }
 
+    /// <inheritdoc/>
     public async Task<EChannelOption> FetchChannelOption(long chatId, string chatTitle, string chatUserName)
     {
         var channel = await Queryable().Where(x => x.ChannelID == chatId).FirstAsync();

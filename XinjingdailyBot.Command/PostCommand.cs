@@ -1,3 +1,4 @@
+using SqlSugar.Extensions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -77,6 +78,9 @@ public sealed class PostCommand(
                 break;
             case "post confirm":
                 await ConfirmPost(post, dbUser, query);
+                break;
+            case "post dismisswarning":
+                await DismissWarning(dbUser, query);
                 break;
             default:
                 break;
@@ -202,5 +206,23 @@ public sealed class PostCommand(
 
         dbUser.PostCount++;
         await _userService.UpdateUserPostCount(dbUser);
+    }
+
+    /// <summary>
+    /// 忽略警告继续投稿
+    /// </summary>
+    /// <param name="dbUser"></param>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    private async Task DismissWarning(Users dbUser, CallbackQuery query)
+    {
+        bool anonymous = dbUser.PreferAnonymous;
+
+        //发送确认消息
+        var keyboard = _markupHelperService.PostKeyboard(anonymous);
+
+        await _botClient.EditMessageReplyMarkupAsync(query.Message!, replyMarkup: keyboard);
+
+        await _botClient.AutoReplyAsync(Langs.IgnoreWarn, query);
     }
 }

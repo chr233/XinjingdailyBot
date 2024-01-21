@@ -243,4 +243,10 @@
   <data name="ReviewAcceptSecondFull" xml:space="preserve">
     <value>✅第二频道采用</value>
   </data>
+  <data name="PostDismissWarning" xml:space="preserve">
+    <value>⚠️我已知晓, 继续投稿</value>
+  </data>
+  <data name="IgnoreWarn" xml:space="preserve">
+    <value>忽略警告, 继续投稿</value>
+  </data>
 </root>

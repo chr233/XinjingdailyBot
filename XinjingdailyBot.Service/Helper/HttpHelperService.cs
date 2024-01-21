@@ -16,6 +16,12 @@ public sealed class HttpHelperService : IHttpHelperService, IDisposable
     private readonly ILogger<HttpHelperService> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
 
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="logger"></param>
+    /// <param name="httpClientFactory"></param>
+    /// <param name="options"></param>
     public HttpHelperService(
         ILogger<HttpHelperService> logger,
         IHttpClientFactory httpClientFactory,

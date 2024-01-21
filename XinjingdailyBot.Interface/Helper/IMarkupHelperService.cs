@@ -53,13 +53,18 @@ public interface IMarkupHelperService
     /// <param name="reason"></param>
     /// <returns></returns>
     InlineKeyboardMarkup NukeMenuKeyboard(Users dbUser, Users targetUser, string reason);
-
     /// <summary>
     /// 投稿键盘
     /// </summary>
     /// <param name="anymouse"></param>
     /// <returns></returns>
     InlineKeyboardMarkup PostKeyboard(bool anymouse);
+    /// <summary>
+    /// 投稿警告键盘
+    /// </summary>
+    /// <param name="isDirectPost"></param>
+    /// <returns></returns>
+    InlineKeyboardMarkup PostWarningKeyboard(bool isDirectPost);
     /// <summary>
     /// 查询稿件信息
     /// </summary>
