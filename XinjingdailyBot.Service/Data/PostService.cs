@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
@@ -34,10 +35,8 @@ public sealed class PostService(
     TagRepository _tagRepository,
     IMediaGroupService _mediaGroupService,
     IImageHelperService _imageHelperService,
-    ISqlSugarClient _context) : BaseService<NewPosts>(_context), IPostService
+    ISqlSugarClient _context) : BaseService<NewPosts>(_context), IPostService, IDisposable
 {
-    private readonly bool _enableWebPagePreview = _options.Value.Bot.EnableWebPagePreview;
-
     /// <inheritdoc/>
     public async Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null)
     {
@@ -111,6 +110,59 @@ public sealed class PostService(
         return true;
     }
 
+    /// <summary>
+    /// 纯链接解析机器人字典
+    /// </summary>
+    private readonly Dictionary<string, string> LinkParserBotDict = new() {
+        { "b23.tv", "@bilifeedbot" },
+        { "bilibili.cn", "@bilifeedbot" },
+        { "bilibili.com", "@bilifeedbot" },
+        { "twitter.com", "@TwPicBot" },
+        { "x.com", "@TwPicBot" },
+        { "fxtwitter.com", "@TwPicBot" },
+        { "fixupx.com", "@TwPicBot" },
+        { "fixvx.com", "@TwPicBot" },
+        { "twittpr.com","@TwPicBot" },
+        { "weibo.com", "@web2album_bot" },
+        { "xiaohongshu.com", "@web2album_bot" },
+        { "douyin.com", "@icbcbot" },
+        { "youtube.com", "@icbcbot" },
+        { "youtu.be", "@icbcbot" },
+        { "pixiv.net", "@Pixiv_bot" },
+        { "pximg.net", "@Pixiv_bot" },
+    };
+
+    /// <summary>
+    /// 判断是否为纯链接
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="msgText"></param>
+    /// <returns></returns>
+    public async Task<bool> CheckIfRawLink(Message message, string msgText)
+    {
+        if (!_options.Value.Bot.RejectRawLinkPost)
+        {
+            return true;
+        }
+
+        var regex = RegexUtils.MatchHttpLink();
+        foreach (var m in regex.Matches(msgText).ToList())
+        {
+            var uri = new Uri(m.Value);
+
+            foreach (var (host, botName) in LinkParserBotDict)
+            {
+                if (uri.Host.EndsWith(host))
+                {
+                    await _botClient.AutoReplyAsync($"检测到来自 {host} 的纯链接投稿，请先将链接发送至 {botName} 进行处理后再投稿", message);
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     /// <inheritdoc/>
     public async Task HandleTextPosts(Users dbUser, Message message)
     {
@@ -168,11 +220,6 @@ public sealed class PostService(
         //发送确认消息
         var keyboard = directPost ? _markupHelperService.DirectPostKeyboard(anonymous, newTags, null) : _markupHelperService.PostKeyboard(anonymous);
         string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
-
-        if (!await _imageHelperService.ProcessMessage(message))
-        {
-            return;
-        }
 
         //生成数据库实体
         var newPost = new NewPosts {
@@ -337,17 +384,48 @@ public sealed class PostService(
         }
     }
 
-    private sealed record MediaGroupData
-    {
-        public int id = -1;
-        public DateTime ExpireAt = DateTime.Now;
-        public bool cancelled = false;
-    }
-
     /// <summary>
     /// mediaGroupID字典
     /// </summary>
-    private ConcurrentDictionary<string, MediaGroupData> MediaGroupIDs { get; } = new();
+    private ConcurrentDictionary<string, MediaGroupData> MediaGroupCache { get; } = new();
+
+    /// <summary>
+    /// 缓存Ttl控制定时器
+    /// </summary>
+    private Timer? MediaGroupTtlTimer { get; set; }
+
+    /// <inheritdoc/>
+    public void InitTtlTimer()
+    {
+        MediaGroupTtlTimer = new Timer(CheckMediaGroupTtl, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+    }
+
+    /// <summary>
+    /// 检查媒体组缓存是否到期
+    /// </summary>
+    /// <param name="_"></param>
+    private async void CheckMediaGroupTtl(object? _)
+    {
+        var keys = MediaGroupCache.Keys.ToList();
+        foreach (var key in keys)
+        {
+            if (MediaGroupCache.TryGetValue(key, out var cache))
+            {
+                if (cache.PostId > 0 && cache.ExpireAt <= DateTime.Now)
+                {
+                    //移除缓存媒体组
+                    MediaGroupCache.TryRemove(key, out var _);
+
+                    if (string.IsNullOrEmpty(cache.PostText) || cache.Keyboard == null || cache.ActionMessage == null)
+                    {
+                        continue;
+                    }
+
+                    await _botClient.EditMessageTextAsync(cache.ActionMessage, cache.PostText, replyMarkup: cache.Keyboard);
+                }
+            }
+        }
+    }
 
     /// <inheritdoc/>
     public async Task HandleMediaGroupPosts(Users dbUser, Message message)
@@ -363,11 +441,13 @@ public sealed class PostService(
             return;
         }
 
-        string mediaGroupId = message.MediaGroupId!;
-        if (!MediaGroupIDs.TryGetValue(mediaGroupId, out var post)) //如果mediaGroupId不存在则创建新Post
+        var mediaGroupId = message.MediaGroupId!;
+        //如果mediaGroupId不存在则创建新Post
+        if (!MediaGroupCache.TryGetValue(mediaGroupId, out var mgCache))
         {
-            MediaGroupIDs.TryAdd(mediaGroupId, new MediaGroupData());
-            post = MediaGroupIDs[mediaGroupId];
+            //添加媒体组缓存信息
+            mgCache = new MediaGroupData();
+            MediaGroupCache.TryAdd(mediaGroupId, mgCache);
 
             bool exists = await Queryable().AnyAsync(x => x.OriginMediaGroupID == mediaGroupId);
             if (!exists)
@@ -404,26 +484,41 @@ public sealed class PostService(
                 bool? hasSpoiler = message.CanSpoiler() ? message.HasMediaSpoiler ?? false : null;
 
                 //发送确认消息
-                var keyboard = directPost ?
+                mgCache.Keyboard = directPost ?
                     _markupHelperService.DirectPostKeyboard(anonymous, newTags, hasSpoiler) :
                     _markupHelperService.PostKeyboard(anonymous);
-                string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
+                mgCache.PostText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
-                var actionMsg = await _botClient.SendTextMessageAsync(message.Chat, "处理中, 请稍后", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
-
-
-                if (!await _imageHelperService.ProcessMessage(message))
+                string processText = "处理中, 请稍后";
+                //套用频道设定
+                switch (channelOption)
                 {
-                    await _botClient.DeleteMessageAsync(actionMsg.Chat, actionMsg.MessageId);
-                    return;
+                    case EChannelOption.Normal:
+                        break;
+                    case EChannelOption.PurgeOrigin:
+                        processText += "\n由于系统设定, 来自该频道的投稿将不会显示来源";
+                        mgCache.PostText += "\n由于系统设定, 来自该频道的投稿将不会显示来源";
+                        break;
+                    case EChannelOption.AutoReject:
+                        processText = "由于系统设定, 暂不接受来自此频道的投稿";
+                        //清空状态量, 将不进行后续操作
+                        mgCache.PostText = null;
+                        mgCache.Keyboard = null;
+                        mgCache.ActionMessage = null;
+                        break;
+                    default:
+                        _logger.LogError("未知的频道选项 {channelOption}", channelOption);
+                        return;
                 }
+
+                mgCache.ActionMessage = await _botClient.SendTextMessageAsync(message.Chat, processText, replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
 
                 //生成数据库实体
                 var newPost = new NewPosts {
                     OriginChatID = message.Chat.Id,
                     OriginMsgID = message.MessageId,
-                    OriginActionChatID = actionMsg.Chat.Id,
-                    OriginActionMsgID = actionMsg.MessageId,
+                    OriginActionChatID = mgCache.ActionMessage.Chat.Id,
+                    OriginActionMsgID = mgCache.ActionMessage.MessageId,
                     Anonymous = anonymous,
                     Text = text,
                     RawText = message.Text ?? "",
@@ -437,24 +532,6 @@ public sealed class PostService(
                     PosterUID = dbUser.UserID,
                 };
 
-                //套用频道设定
-                switch (channelOption)
-                {
-                    case EChannelOption.Normal:
-                        break;
-                    case EChannelOption.PurgeOrigin:
-                        postText += "\n由于系统设定, 来自该频道的投稿将不会显示来源";
-                        break;
-                    case EChannelOption.AutoReject:
-                        postText = "由于系统设定, 暂不接受来自此频道的投稿";
-                        keyboard = null;
-                        newPost.Status = EPostStatus.Rejected;
-                        break;
-                    default:
-                        _logger.LogError("未知的频道选项 {channelOption}", channelOption);
-                        return;
-                }
-
                 if (directPost)
                 {
                     newPost.ReviewChatID = newPost.OriginChatID;
@@ -464,51 +541,26 @@ public sealed class PostService(
                     newPost.ReviewMediaGroupID = mediaGroupId;
                 }
 
-                post.id = await Insertable(newPost).ExecuteReturnIdentityAsync();
-                post.ExpireAt = DateTime.Now;
-                MediaGroupIDs[mediaGroupId] = post;
-
-                // 0.3 秒无新消息则停止接收媒体组消息
-                _ = Task.Run(async () => {
-                    while (!MediaGroupIDs[mediaGroupId].cancelled && DateTime.Now - MediaGroupIDs[mediaGroupId].ExpireAt < TimeSpan.FromSeconds(.3))
-                    {
-                        await Task.Delay(60);
-                    }
-
-                    MediaGroupIDs.Remove(mediaGroupId, out var group);
-                    if (group.cancelled)
-                    {
-                        await _botClient.DeleteMessageAsync(actionMsg.Chat, actionMsg.MessageId);
-                    }
-                    else
-                    {
-                        MediaGroupIDs.Remove(mediaGroupId, out _);
-                        await _botClient.EditMessageTextAsync(actionMsg, postText, replyMarkup: keyboard);
-                    }
-                });
+                mgCache.PostId = await Insertable(newPost).ExecuteReturnIdentityAsync();
             }
         }
-
-        if (post != null)
+        else
         {
-            post.ExpireAt = DateTime.Now;
+            mgCache.RenewTtl();
+        }
 
-            if (await _imageHelperService.ProcessMessage(message))
+        //储存多媒体信息
+        if (mgCache.PostId > 0)
+        {
+            //更新附件
+            var attachment = _attachmentService.GenerateAttachment(message, mgCache.PostId);
+            if (attachment != null)
             {
-                //更新附件
-                var attachment = _attachmentService.GenerateAttachment(message, post.id);
-                if (attachment != null)
-                {
-                    await _attachmentService.CreateAttachment(attachment);
-                }
+                await _attachmentService.CreateAttachment(attachment);
+            }
 
-                //记录媒体组
-                await _mediaGroupService.AddPostMediaGroup(message);
-            }
-            else
-            {
-                post.cancelled = true;
-            }
+            //记录媒体组
+            await _mediaGroupService.AddPostMediaGroup(message);
         }
     }
 
@@ -760,7 +812,7 @@ public sealed class PostService(
                 Message? postMessage = null;
                 if (post.PostType == MessageType.Text)
                 {
-                    postMessage = await _botClient.SendTextMessageAsync(acceptChannel, postText, parseMode: ParseMode.Html, disableWebPagePreview: !_enableWebPagePreview);
+                    postMessage = await _botClient.SendTextMessageAsync(acceptChannel, postText, parseMode: ParseMode.Html, disableWebPagePreview: !_options.Value.Bot.EnableWebPagePreview);
                 }
                 else
                 {
@@ -848,7 +900,7 @@ public sealed class PostService(
         else // 直接投稿, 在审核群留档
         {
             string reviewMsg = _textHelperService.MakeReviewMessage(poster, post.Anonymous, second, publicMsg);
-            var msg = await _botClient.SendTextMessageAsync(_channelService.ReviewGroup.Id, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: !_enableWebPagePreview);
+            var msg = await _botClient.SendTextMessageAsync(_channelService.ReviewGroup.Id, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: !_options.Value.Bot.EnableWebPagePreview);
             post.ReviewMsgID = msg.MessageId;
         }
 
@@ -1254,5 +1306,27 @@ public sealed class PostService(
         return Queryable()
             .Where(x => x.PosterUID == userID && (x.Status == EPostStatus.Padding || x.Status == EPostStatus.Reviewing) && x.ModifyAt < beforeTime)
             .ToListAsync();
+    }
+
+    /// <inheritdoc/>
+    public void Dispose() => MediaGroupTtlTimer?.Dispose();
+}
+
+internal sealed record MediaGroupData
+{
+    public int PostId { get; set; } = -1;
+    public DateTime ExpireAt { get; set; }
+    public string? PostText { get; set; }
+    public InlineKeyboardMarkup? Keyboard { get; set; }
+    public Message? ActionMessage { get; set; }
+
+    public MediaGroupData()
+    {
+        RenewTtl();
+    }
+
+    public void RenewTtl()
+    {
+        ExpireAt = DateTime.Now.AddSeconds(IPostService.MediaGroupReceiveTtl);
     }
 }

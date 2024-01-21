@@ -9,6 +9,7 @@ using Telegram.Bot.Polling;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
+using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Bot.Common;
@@ -26,6 +27,7 @@ public sealed class PollingService(
         TagRepository _tagRepository,
         RejectReasonRepository _rejectReasonRepository,
         ITelegramBotClient _botClient,
+        IPostService _postService,
         IOptions<OptionsSetting> options) : BackgroundService
 {
     private readonly bool _throwPendingUpdates = options.Value.Bot.ThrowPendingUpdates;
@@ -38,6 +40,8 @@ public sealed class PollingService(
     [RequiresUnreferencedCode("不兼容剪裁")]
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        _postService.InitTtlTimer();
+
         _logger.LogDebug("注册可用命令");
         _commandHandler.InstallCommands();
 

@@ -11,9 +11,13 @@ namespace XinjingdailyBot.Interface.Data;
 public interface IPostService : IBaseService<NewPosts>
 {
     /// <summary>
+    /// 收到媒体组第一条消息后过多久停止接收该媒体组并进行后续投稿操作, 单位ms
+    /// </summary>
+    public const double MediaGroupReceiveTtl = 1.5f;
+    /// <summary>
     /// 文字投稿长度上限
     /// </summary>
-    public static int MaxPostText { get; } = 2000;
+    public const int MaxPostText = 2000;
 
     /// <summary>
     /// 接受投稿
@@ -286,4 +290,5 @@ public interface IPostService : IBaseService<NewPosts>
     /// <param name="beforeTime"></param>
     /// <returns></returns>
     Task<List<NewPosts>> GetExpiredPosts(long userID, DateTime beforeTime);
+    void InitTtlTimer();
 }
