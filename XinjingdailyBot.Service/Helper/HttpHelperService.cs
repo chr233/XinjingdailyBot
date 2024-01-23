@@ -2,6 +2,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Net;
 using System.Text.Json;
+using Telegram.Bot.Requests.Abstractions;
+using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Model;
@@ -11,53 +13,29 @@ namespace XinjingdailyBot.Service.Helper;
 
 /// <inheritdoc cref="IHttpHelperService"/>
 [AppService(typeof(IHttpHelperService), LifeTime.Transient)]
-public sealed class HttpHelperService : IHttpHelperService, IDisposable
+public sealed class HttpHelperService(
+    ILogger<HttpHelperService> _logger,
+    IHttpClientFactory _httpClientFactory,
+    IOptions<OptionsSetting> _options) : IHttpHelperService
 {
-    private readonly ILogger<HttpHelperService> _logger;
-    private readonly IHttpClientFactory _httpClientFactory;
 
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="httpClientFactory"></param>
-    /// <param name="options"></param>
-    public HttpHelperService(
-        ILogger<HttpHelperService> logger,
-        IHttpClientFactory httpClientFactory,
-        IOptions<OptionsSetting> options)
+    /// <inheritdoc/>
+    public HttpClient CreateClient(string name) => _httpClientFactory.CreateClient(name);
+
+    /// <inheritdoc/>
+    public Task SendStatistic()
     {
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-
-        //统计
-        if (options.Value.Statistic)
+        try
         {
             var client = _httpClientFactory.CreateClient("Statistic");
-
-            StatisticTimer = new Timer(
-                async (_) => {
-                    try
-                    {
-                        await client.GetAsync("/XinjingdailyBot");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "统计信息出错");
-                    }
-                },
-                null,
-                TimeSpan.FromSeconds(30),
-                TimeSpan.FromHours(24)
-            );
+            return client.GetAsync("/XinjingdailyBot");
         }
-
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "统计信息出错");
+            return Task.CompletedTask;
+        }
     }
-
-    /// <summary>
-    /// 统计Timer
-    /// </summary>
-    private Timer? StatisticTimer { get; init; }
 
     /// <summary>
     /// 发送网络请求
@@ -137,8 +115,14 @@ public sealed class HttpHelperService : IHttpHelperService, IDisposable
     }
 
     /// <inheritdoc/>
-    public HttpClient CreateClient(string name) => _httpClientFactory.CreateClient(name);
+    public async Task<Stream?> GetTelegramFileHeader(Telegram.Bot.Types.File tgFile, int length)
+    {
+        var token = _options.Value.Bot.BotToken;
+        var filePath = tgFile.FilePath;
 
-    /// <inheritdoc/>
-    public void Dispose() => StatisticTimer?.Dispose();
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/file/bot{token}/{filePath}");
+        request.Headers.Add("Range", $"bytes=0-{length}");
+        var rawStream = await SendRequestToStream("Telegram", request);
+        return rawStream;
+    }
 }

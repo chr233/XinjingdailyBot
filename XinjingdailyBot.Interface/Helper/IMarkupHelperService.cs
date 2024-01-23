@@ -11,11 +11,11 @@ public interface IMarkupHelperService
     /// <summary>
     /// 一行显示的字数
     /// </summary>
-    public static readonly int MaxLineCharsTag = 10;
+    public const int MaxLineCharsTag = 10;
     /// <summary>
     /// 一行显示的字数
     /// </summary>
-    public static readonly int MaxLineCharsReason = 8;
+    public const int MaxLineCharsReason = 8;
 
     /// <summary>
     /// 广告按钮设置
@@ -59,6 +59,8 @@ public interface IMarkupHelperService
     /// <param name="anymouse"></param>
     /// <returns></returns>
     InlineKeyboardMarkup PostKeyboard(bool anymouse);
+    InlineKeyboardMarkup PostQieTuKeyboard(bool anymouse);
+
     /// <summary>
     /// 投稿警告键盘
     /// </summary>

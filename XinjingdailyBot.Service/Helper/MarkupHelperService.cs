@@ -42,6 +42,28 @@ public sealed class MarkupHelperService(
     }
 
     /// <inheritdoc/>
+    public InlineKeyboardMarkup PostQieTuKeyboard(bool anymouse)
+    {
+        var keyboard = new InlineKeyboardMarkup(new[]
+        {
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData(anymouse? Langs.AnymouseOn: Langs.AnymouseOff, "post anymouse"),
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData(Langs.PostSplitImage, "post splitimage"),
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "post cancel"),
+                InlineKeyboardButton.WithCallbackData(Langs.PostConfirm, "post confirm"),
+            },
+        });
+        return keyboard;
+    }
+
+    /// <inheritdoc/>
     public InlineKeyboardMarkup PostWarningKeyboard(bool isDirectPost)
     {
         var keyboard = new InlineKeyboardMarkup(new[]

@@ -14,33 +14,10 @@ namespace XinjingdailyBot.Service.Helper;
 
 /// <inheritdoc cref="ITextHelperService"/>
 [AppService(typeof(ITextHelperService), LifeTime.Transient)]
-public sealed class TextHelperService : ITextHelperService
+public sealed class TextHelperService(
+        IOptions<OptionsSetting> _options,
+        TagRepository _tagRepository) : ITextHelperService
 {
-    private readonly TagRepository _tagRepository;
-
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    /// <param name="options"></param>
-    /// <param name="tagRepository"></param>
-    public TextHelperService(
-        IOptions<OptionsSetting> options,
-        TagRepository tagRepository)
-    {
-        _tagRepository = tagRepository;
-
-        var postOption = options.Value.Post;
-        PureWords = postOption.PureWords.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
-        PureReturns = postOption.PureReturns;
-        PureHashTag = postOption.PureHashTag;
-    }
-
-    private string[] PureWords { get; init; }
-    private bool PureReturns { get; init; }
-    private bool PureHashTag { get; init; }
-
-    private static readonly char[] Separator = ['|'];
-
     /// <inheritdoc/>
     public string PureText(string? text)
     {
@@ -49,13 +26,14 @@ public sealed class TextHelperService : ITextHelperService
             return "";
         }
 
-        if (PureHashTag)
+        var option = _options.Value.Post;
+        if (option.PureHashTag)
         {
             //过滤HashTag
             text = RegexUtils.MatchHashTag().Replace(text, "");
         }
 
-        if (PureReturns)
+        if (option.PureReturns)
         {
             var matchSpace = RegexUtils.MatchBlankLine();
             //过滤连续换行
@@ -112,7 +90,8 @@ public sealed class TextHelperService : ITextHelperService
                 .Replace("<", "＜")
                 .Replace(">", "＞")
                 .Replace("&", "＆");
-            foreach (var item in PureWords)
+
+            foreach (var item in _options.Value.Post.PureWordsList)
             {
                 escapedText = escapedText.Replace(item, "");
             }
@@ -211,7 +190,7 @@ public sealed class TextHelperService : ITextHelperService
         {
             if (post.Anonymous)
             {
-                return $"<i>via</i> 匿名";
+                return "<i>via</i> 匿名";
             }
             else
             {
