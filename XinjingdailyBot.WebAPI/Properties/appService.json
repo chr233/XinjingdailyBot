@@ -1,189 +1,189 @@
 {
-  "DialogueService": {
+  "OldPostRepository": {
     "LifeTime": "Transient",
-    "Interface": "XinjingdailyBot.Interface.Data.IDialogueService",
-    "Class": "XinjingdailyBot.Service.Data.DialogueService"
-  },
-  "SuperCommand": {
-    "Class": "XinjingdailyBot.Command.SuperCommand",
-    "LifeTime": "Scoped"
-  },
-  "ChannelPostHandler": {
-    "LifeTime": "Singleton",
-    "Interface": "XinjingdailyBot.Interface.Bot.Handler.IChannelPostHandler",
-    "Class": "XinjingdailyBot.Service.Bot.Handler.ChannelPostHandler"
+    "Class": "XinjingdailyBot.Repository.OldPostRepository"
   },
   "DispatcherService": {
     "LifeTime": "Scoped",
-    "Interface": "XinjingdailyBot.Interface.Bot.Common.IDispatcherService",
-    "Class": "XinjingdailyBot.Service.Bot.Common.DispatcherService"
-  },
-  "InlineQueryHandler": {
-    "LifeTime": "Singleton",
-    "Interface": "XinjingdailyBot.Interface.Bot.Handler.IInlineQueryHandler",
-    "Class": "XinjingdailyBot.Service.Bot.Handler.InlineQueryHandler"
-  },
-  "ChannelOptionService": {
-    "LifeTime": "Transient",
-    "Interface": "XinjingdailyBot.Interface.Data.IChannelOptionService",
-    "Class": "XinjingdailyBot.Service.Data.ChannelOptionService"
-  },
-  "MediaGroupService": {
-    "LifeTime": "Singleton",
-    "Interface": "XinjingdailyBot.Interface.Data.IMediaGroupService",
-    "Class": "XinjingdailyBot.Service.Data.MediaGroupService"
-  },
-  "NameHistoryService": {
-    "LifeTime": "Singleton",
-    "Interface": "XinjingdailyBot.Interface.Data.INameHistoryService",
-    "Class": "XinjingdailyBot.Service.Data.NameHistoryService"
-  },
-  "BanRecordService": {
-    "LifeTime": "Transient",
-    "Interface": "XinjingdailyBot.Interface.Data.IBanRecordService",
-    "Class": "XinjingdailyBot.Service.Data.BanRecordService"
-  },
-  "OldPostRepository": {
-    "Class": "XinjingdailyBot.Repository.OldPostRepository",
-    "LifeTime": "Transient"
-  },
-  "PostRepository": {
-    "Class": "XinjingdailyBot.Repository.PostRepository",
-    "LifeTime": "Transient"
-  },
-  "ObsoleteCommand": {
-    "Class": "XinjingdailyBot.Command.ObsoleteCommand",
-    "LifeTime": "Scoped"
-  },
-  "PostService": {
-    "LifeTime": "Singleton",
-    "Interface": "XinjingdailyBot.Interface.Data.IPostService",
-    "Class": "XinjingdailyBot.Service.Data.PostService"
-  },
-  "AdvertisePostsService": {
-    "LifeTime": "Transient",
-    "Interface": "XinjingdailyBot.Interface.Data.IAdvertisePostService",
-    "Class": "XinjingdailyBot.Service.Data.AdvertisePostsService"
-  },
-  "CommandHandler": {
-    "LifeTime": "Singleton",
-    "Interface": "XinjingdailyBot.Interface.Bot.Handler.ICommandHandler",
-    "Class": "XinjingdailyBot.Service.Bot.Handler.CommandHandler"
-  },
-  "GroupMessageHandler": {
-    "LifeTime": "Singleton",
-    "Interface": "XinjingdailyBot.Interface.Bot.Handler.IGroupMessageHandler",
-    "Class": "XinjingdailyBot.Service.Bot.Handler.GroupMessageHandler"
-  },
-  "TextHelperService": {
-    "LifeTime": "Transient",
-    "Interface": "XinjingdailyBot.Interface.Helper.ITextHelperService",
-    "Class": "XinjingdailyBot.Service.Helper.TextHelperService"
-  },
-  "CommonCommand": {
-    "Class": "XinjingdailyBot.Command.CommonCommand",
-    "LifeTime": "Scoped"
-  },
-  "UpdateService": {
-    "LifeTime": "Scoped",
-    "Interface": "XinjingdailyBot.Interface.Bot.Common.IUpdateService",
-    "Class": "XinjingdailyBot.Service.Bot.Common.UpdateService"
-  },
-  "RejectReasonRepository": {
-    "Class": "XinjingdailyBot.Repository.RejectReasonRepository",
-    "LifeTime": "Singleton"
-  },
-  "LevelRepository": {
-    "Class": "XinjingdailyBot.Repository.LevelRepository",
-    "LifeTime": "Singleton"
-  },
-  "AdvertiseService": {
-    "LifeTime": "Transient",
-    "Interface": "XinjingdailyBot.Interface.Data.IAdvertiseService",
-    "Class": "XinjingdailyBot.Service.Data.AdvertiseService"
-  },
-  "ReviewStatusService": {
-    "LifeTime": "Transient",
-    "Interface": "XinjingdailyBot.Interface.Data.IReviewStatusService",
-    "Class": "XinjingdailyBot.Service.Data.ReviewStatusService"
-  },
-  "NormalCommand": {
-    "Class": "XinjingdailyBot.Command.NormalCommand",
-    "LifeTime": "Scoped"
-  },
-  "MarkupHelperService": {
-    "LifeTime": "Transient",
-    "Interface": "XinjingdailyBot.Interface.Helper.IMarkupHelperService",
-    "Class": "XinjingdailyBot.Service.Helper.MarkupHelperService"
-  },
-  "AdminCommand": {
-    "Class": "XinjingdailyBot.Command.AdminCommand",
-    "LifeTime": "Scoped"
-  },
-  "HttpHelperService": {
-    "LifeTime": "Transient",
-    "Interface": "XinjingdailyBot.Interface.Helper.IHttpHelperService",
-    "Class": "XinjingdailyBot.Service.Helper.HttpHelperService"
-  },
-  "CmdRecordService": {
-    "LifeTime": "Transient",
-    "Interface": "XinjingdailyBot.Interface.Data.ICmdRecordService",
-    "Class": "XinjingdailyBot.Service.Data.CmdRecordService"
-  },
-  "ImageHelperService": {
-    "LifeTime": "Transient",
-    "Interface": "XinjingdailyBot.Interface.Helper.IImageHelperService",
-    "Class": "XinjingdailyBot.Service.Helper.ImageHelperService"
-  },
-  "GroupRepository": {
-    "Class": "XinjingdailyBot.Repository.GroupRepository",
-    "LifeTime": "Singleton"
-  },
-  "MessageHandler": {
-    "LifeTime": "Singleton",
-    "Interface": "XinjingdailyBot.Interface.Bot.Handler.IMessageHandler",
-    "Class": "XinjingdailyBot.Service.Bot.Handler.MessageHandler"
-  },
-  "JoinRequestHandler": {
-    "LifeTime": "Scoped",
-    "Interface": "XinjingdailyBot.Interface.Bot.Handler.IJoinRequestHandler",
-    "Class": "XinjingdailyBot.Service.Bot.Handler.JoinRequestHandler"
+    "Class": "XinjingdailyBot.Service.Bot.Common.DispatcherService",
+    "Interface": "XinjingdailyBot.Interface.Bot.Common.IDispatcherService"
   },
   "TagRepository": {
-    "Class": "XinjingdailyBot.Repository.TagRepository",
-    "LifeTime": "Singleton"
-  },
-  "PostCommand": {
-    "Class": "XinjingdailyBot.Command.PostCommand",
-    "LifeTime": "Scoped"
-  },
-  "ReviewCommand": {
-    "Class": "XinjingdailyBot.Command.ReviewCommand",
-    "LifeTime": "Scoped"
-  },
-  "AttachmentService": {
-    "LifeTime": "Transient",
-    "Interface": "XinjingdailyBot.Interface.Data.IAttachmentService",
-    "Class": "XinjingdailyBot.Service.Data.AttachmentService"
-  },
-  "ForwardMessageHandler": {
     "LifeTime": "Singleton",
-    "Interface": "XinjingdailyBot.Interface.Bot.Handler.IForwardMessageHandler",
-    "Class": "XinjingdailyBot.Service.Bot.Handler.ForwardMessageHandler"
+    "Class": "XinjingdailyBot.Repository.TagRepository"
   },
   "ChannelService": {
     "LifeTime": "Singleton",
-    "Interface": "XinjingdailyBot.Interface.Bot.Common.IChannelService",
-    "Class": "XinjingdailyBot.Service.Bot.Common.ChannelService"
+    "Class": "XinjingdailyBot.Service.Bot.Common.ChannelService",
+    "Interface": "XinjingdailyBot.Interface.Bot.Common.IChannelService"
+  },
+  "AttachmentService": {
+    "LifeTime": "Transient",
+    "Class": "XinjingdailyBot.Service.Data.AttachmentService",
+    "Interface": "XinjingdailyBot.Interface.Data.IAttachmentService"
+  },
+  "ReviewCommand": {
+    "LifeTime": "Scoped",
+    "Class": "XinjingdailyBot.Command.ReviewCommand"
+  },
+  "JoinRequestHandler": {
+    "LifeTime": "Scoped",
+    "Class": "XinjingdailyBot.Service.Bot.Handler.JoinRequestHandler",
+    "Interface": "XinjingdailyBot.Interface.Bot.Handler.IJoinRequestHandler"
+  },
+  "BanRecordService": {
+    "LifeTime": "Transient",
+    "Class": "XinjingdailyBot.Service.Data.BanRecordService",
+    "Interface": "XinjingdailyBot.Interface.Data.IBanRecordService"
+  },
+  "RejectReasonRepository": {
+    "LifeTime": "Singleton",
+    "Class": "XinjingdailyBot.Repository.RejectReasonRepository"
+  },
+  "UpdateService": {
+    "LifeTime": "Scoped",
+    "Class": "XinjingdailyBot.Service.Bot.Common.UpdateService",
+    "Interface": "XinjingdailyBot.Interface.Bot.Common.IUpdateService"
+  },
+  "ForwardMessageHandler": {
+    "LifeTime": "Singleton",
+    "Class": "XinjingdailyBot.Service.Bot.Handler.ForwardMessageHandler",
+    "Interface": "XinjingdailyBot.Interface.Bot.Handler.IForwardMessageHandler"
+  },
+  "CommonCommand": {
+    "LifeTime": "Scoped",
+    "Class": "XinjingdailyBot.Command.CommonCommand"
+  },
+  "LevelRepository": {
+    "LifeTime": "Singleton",
+    "Class": "XinjingdailyBot.Repository.LevelRepository"
+  },
+  "CommandHandler": {
+    "LifeTime": "Singleton",
+    "Class": "XinjingdailyBot.Service.Bot.Handler.CommandHandler",
+    "Interface": "XinjingdailyBot.Interface.Bot.Handler.ICommandHandler"
+  },
+  "DialogueService": {
+    "LifeTime": "Transient",
+    "Class": "XinjingdailyBot.Service.Data.DialogueService",
+    "Interface": "XinjingdailyBot.Interface.Data.IDialogueService"
+  },
+  "PostService": {
+    "LifeTime": "Singleton",
+    "Class": "XinjingdailyBot.Service.Data.PostService",
+    "Interface": "XinjingdailyBot.Interface.Data.IPostService"
+  },
+  "ChannelOptionService": {
+    "LifeTime": "Transient",
+    "Class": "XinjingdailyBot.Service.Data.ChannelOptionService",
+    "Interface": "XinjingdailyBot.Interface.Data.IChannelOptionService"
+  },
+  "ChannelPostHandler": {
+    "LifeTime": "Singleton",
+    "Class": "XinjingdailyBot.Service.Bot.Handler.ChannelPostHandler",
+    "Interface": "XinjingdailyBot.Interface.Bot.Handler.IChannelPostHandler"
   },
   "UserService": {
     "LifeTime": "Singleton",
-    "Interface": "XinjingdailyBot.Interface.Data.IUserService",
-    "Class": "XinjingdailyBot.Service.Data.UserService"
+    "Class": "XinjingdailyBot.Service.Data.UserService",
+    "Interface": "XinjingdailyBot.Interface.Data.IUserService"
+  },
+  "ImageHelperService": {
+    "LifeTime": "Transient",
+    "Class": "XinjingdailyBot.Service.Helper.ImageHelperService",
+    "Interface": "XinjingdailyBot.Interface.Helper.IImageHelperService"
+  },
+  "NameHistoryService": {
+    "LifeTime": "Singleton",
+    "Class": "XinjingdailyBot.Service.Data.NameHistoryService",
+    "Interface": "XinjingdailyBot.Interface.Data.INameHistoryService"
+  },
+  "NormalCommand": {
+    "LifeTime": "Scoped",
+    "Class": "XinjingdailyBot.Command.NormalCommand"
+  },
+  "MediaGroupService": {
+    "LifeTime": "Singleton",
+    "Class": "XinjingdailyBot.Service.Data.MediaGroupService",
+    "Interface": "XinjingdailyBot.Interface.Data.IMediaGroupService"
+  },
+  "ObsoleteCommand": {
+    "LifeTime": "Scoped",
+    "Class": "XinjingdailyBot.Command.ObsoleteCommand"
+  },
+  "PostCommand": {
+    "LifeTime": "Scoped",
+    "Class": "XinjingdailyBot.Command.PostCommand"
+  },
+  "AdvertisePostsService": {
+    "LifeTime": "Transient",
+    "Class": "XinjingdailyBot.Service.Data.AdvertisePostsService",
+    "Interface": "XinjingdailyBot.Interface.Data.IAdvertisePostService"
+  },
+  "AdvertiseService": {
+    "LifeTime": "Transient",
+    "Class": "XinjingdailyBot.Service.Data.AdvertiseService",
+    "Interface": "XinjingdailyBot.Interface.Data.IAdvertiseService"
+  },
+  "GroupRepository": {
+    "LifeTime": "Singleton",
+    "Class": "XinjingdailyBot.Repository.GroupRepository"
+  },
+  "HttpHelperService": {
+    "LifeTime": "Transient",
+    "Class": "XinjingdailyBot.Service.Helper.HttpHelperService",
+    "Interface": "XinjingdailyBot.Interface.Helper.IHttpHelperService"
+  },
+  "TextHelperService": {
+    "LifeTime": "Transient",
+    "Class": "XinjingdailyBot.Service.Helper.TextHelperService",
+    "Interface": "XinjingdailyBot.Interface.Helper.ITextHelperService"
+  },
+  "MessageHandler": {
+    "LifeTime": "Singleton",
+    "Class": "XinjingdailyBot.Service.Bot.Handler.MessageHandler",
+    "Interface": "XinjingdailyBot.Interface.Bot.Handler.IMessageHandler"
+  },
+  "CmdRecordService": {
+    "LifeTime": "Transient",
+    "Class": "XinjingdailyBot.Service.Data.CmdRecordService",
+    "Interface": "XinjingdailyBot.Interface.Data.ICmdRecordService"
+  },
+  "InlineQueryHandler": {
+    "LifeTime": "Singleton",
+    "Class": "XinjingdailyBot.Service.Bot.Handler.InlineQueryHandler",
+    "Interface": "XinjingdailyBot.Interface.Bot.Handler.IInlineQueryHandler"
+  },
+  "PostRepository": {
+    "LifeTime": "Transient",
+    "Class": "XinjingdailyBot.Repository.PostRepository"
   },
   "UserTokenService": {
     "LifeTime": "Singleton",
-    "Interface": "XinjingdailyBot.Interface.Data.IUserTokenService",
-    "Class": "XinjingdailyBot.Service.Data.UserTokenService"
+    "Class": "XinjingdailyBot.Service.Data.UserTokenService",
+    "Interface": "XinjingdailyBot.Interface.Data.IUserTokenService"
+  },
+  "MarkupHelperService": {
+    "LifeTime": "Transient",
+    "Class": "XinjingdailyBot.Service.Helper.MarkupHelperService",
+    "Interface": "XinjingdailyBot.Interface.Helper.IMarkupHelperService"
+  },
+  "AdminCommand": {
+    "LifeTime": "Scoped",
+    "Class": "XinjingdailyBot.Command.AdminCommand"
+  },
+  "SuperCommand": {
+    "LifeTime": "Scoped",
+    "Class": "XinjingdailyBot.Command.SuperCommand"
+  },
+  "ReviewStatusService": {
+    "LifeTime": "Transient",
+    "Class": "XinjingdailyBot.Service.Data.ReviewStatusService",
+    "Interface": "XinjingdailyBot.Interface.Data.IReviewStatusService"
+  },
+  "GroupMessageHandler": {
+    "LifeTime": "Singleton",
+    "Class": "XinjingdailyBot.Service.Bot.Handler.GroupMessageHandler",
+    "Interface": "XinjingdailyBot.Interface.Bot.Handler.IGroupMessageHandler"
   }
 }

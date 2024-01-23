@@ -176,7 +176,7 @@ public sealed record OptionsSetting
         /// <summary>
         /// 数据库类型
         /// </summary>
-        public string DbType { get; set; } = "mysql";
+        public string? DbType { get; set; }
         /// <summary>
         /// 打印SQL日志
         /// </summary>
@@ -244,7 +244,11 @@ public sealed record OptionsSetting
         /// <summary>
         /// 过滤字符串
         /// </summary>
-        public string PureWords { get; set; } = Emojis.PureStrings;
+        public string? PureWords { get; set; }
+        /// <summary>
+        /// 过滤字符串
+        /// </summary>
+        public List<string> PureWordsList { get; set; } = [];
         /// <summary>
         /// 稿件自动过期时间
         /// </summary>

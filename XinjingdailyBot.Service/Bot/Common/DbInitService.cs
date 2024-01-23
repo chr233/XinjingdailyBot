@@ -2,7 +2,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SqlSugar;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using XinjingdailyBot.Infrastructure;
 
@@ -11,6 +10,7 @@ namespace XinjingdailyBot.Service.Bot.Common;
 /// <summary>
 /// 消息接收服务
 /// </summary>
+[Obsolete("使用生成器方法替代")]
 public sealed class DbInitService(
         ILogger<DbInitService> _logger,
         IOptions<OptionsSetting> _options,
@@ -21,7 +21,6 @@ public sealed class DbInitService(
     /// </summary>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    [RequiresUnreferencedCode("不兼容剪裁")]
     protected override Task ExecuteAsync(CancellationToken cancellationToken)
     {
         var dbCotion = _options.Value.Database;

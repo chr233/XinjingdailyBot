@@ -4,7 +4,7 @@ namespace XinjingdailyBot.Infrastructure.Attribute;
 /// 标记定时任务
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-public sealed class JobAttribute : System.Attribute
+public sealed class ScheduleAttribute : System.Attribute
 {
     /// <summary>
     /// Cron表达式
@@ -15,7 +15,7 @@ public sealed class JobAttribute : System.Attribute
     /// 标记定时任务
     /// </summary>
     /// <param name="schedule">Cron表达式</param>
-    public JobAttribute(string schedule)
+    public ScheduleAttribute(string schedule)
     {
         Schedule = schedule;
     }

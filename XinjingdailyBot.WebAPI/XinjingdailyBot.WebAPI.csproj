@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
@@ -9,7 +9,9 @@
 	<ItemGroup>
 	  <Content Remove="appService.json" />
 	  <Content Remove="Properties\appService.json" />
+	  <Content Remove="Properties\dbtable.json" />
 	  <Content Remove="Properties\job.json" />
+	  <Content Remove="Properties\schedule.json" />
 	  <Content Remove="Properties\task.json" />
 	</ItemGroup>
 
@@ -17,7 +19,8 @@
 	  <AdditionalFiles Include="Properties\appService.json">
 	    <CopyToOutputDirectory></CopyToOutputDirectory>
 	  </AdditionalFiles>
-	  <AdditionalFiles Include="Properties\task.json" />
+	  <AdditionalFiles Include="Properties\dbtable.json" />
+	  <AdditionalFiles Include="Properties\schedule.json" />
 	</ItemGroup>
 
 	<ItemGroup>

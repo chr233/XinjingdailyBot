@@ -114,29 +114,71 @@ namespace XinjingdailyBot.Generator {
         }
         
         /// <summary>
-        ///   查找类似 try
-        ///{{
-        ///    const string group = &quot;DEFAULT&quot;;
-        ///    var jobKey = new JobKey(&quot;{0}&quot;, group);
-        ///    var tiggerKey = new TriggerKey(&quot;{0}-Tigger&quot;, group);
-        ///    var schedule = cron.GetValueOrDefault(&quot;{0}&quot;, &quot;{1}&quot;);
-        ///
-        ///    qz.AddJob&lt;{2}&gt;(jobKey, opts =&gt; opts.WithIdentity(jobKey));
-        ///    qz.AddTrigger(opts =&gt; opts
-        ///        .ForJob(jobKey)
-        ///        .WithIdentity(tiggerKey)
-        ///        .WithCronSchedule(&quot;{1}&quot;)
-        ///    );
-        ///
-        ///    _logger.Debug(&quot;{1} - {0} 注册成功&quot;);
-        ///}}
-        ///catch (Exception ex)
-        ///{{
-        ///    _logger.Error(ex, &quot;{1} - {0} 注册失败 [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///   查找类似 _logger.LogInformation(&quot;开始创建 {0} 表&quot;);
+        ///_dbClient.CodeFirst.InitTables&lt;{1}&gt;(); 的本地化字符串。
         /// </summary>
-        internal static string JobContent {
+        internal static string DbTableContent {
             get {
-                return ResourceManager.GetString("JobContent", resourceCulture);
+                return ResourceManager.GetString("DbTableContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 _logger.LogWarning(&quot;数据库结构生成完毕, 建议禁用 Database.Generate 来加快启动速度&quot;);
+        ///        }
+        ///
+        ///        return Task.CompletedTask;
+        ///    }
+        ///
+        ///    /// &lt;summary&gt;
+        ///    /// 销毁
+        ///    /// &lt;/summary&gt;
+        ///    public override void Dispose()
+        ///    {
+        ///        GC.SuppressFinalize(this);
+        ///    }
+        ///} 的本地化字符串。
+        /// </summary>
+        internal static string DbTableFooter {
+            get {
+                return ResourceManager.GetString("DbTableFooter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 using Microsoft.Extensions.Hosting;
+        ///using Microsoft.Extensions.Logging;
+        ///using Microsoft.Extensions.Options;
+        ///using SqlSugar;
+        ///using XinjingdailyBot.Infrastructure;
+        ///
+        ///namespace XinjingdailyBot.WebAPI.Extensions;
+        ///
+        ////// &lt;summary&gt;
+        ////// 消息接收服务
+        ////// &lt;/summary&gt;
+        ///public sealed class GeneratedDbInitService(
+        ///        ILogger&lt;GeneratedDbInitService&gt; _logger,
+        ///        IOptions&lt;OptionsSetting&gt; _options,
+        ///        ISqlSugarClient _dbClient) : BackgroundService
+        ///{
+        ///    /// &lt;summary&gt;
+        ///    /// 执行
+        ///    /// &lt;/summary&gt;
+        ///    [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string DbTableHeader {
+            get {
+                return ResourceManager.GetString("DbTableHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 qz.RegisterNewJob&lt;{2}&gt;(&quot;{0}&quot;, &quot;{1}&quot;, cron); 的本地化字符串。
+        /// </summary>
+        internal static string ScheduleContent {
+            get {
+                return ResourceManager.GetString("ScheduleContent", resourceCulture);
             }
         }
         
@@ -149,11 +191,21 @@ namespace XinjingdailyBot.Generator {
         ///            op.WaitForJobsToComplete = true;
         ///        });
         ///    }
-        ///} 的本地化字符串。
+        ///
+        ///    private const string DefaultGroupName = &quot;DEFAULT&quot;;
+        ///
+        ///    /// &lt;summary&gt;
+        ///    /// 注册定时任务
+        ///    /// &lt;/summary&gt;
+        ///    /// &lt;typeparam name=&quot;T&quot;&gt;&lt;/typeparam&gt;
+        ///    /// &lt;param name=&quot;qz&quot;&gt;&lt;/param&gt;
+        ///    /// &lt;param name=&quot;jobName&quot;&gt;&lt;/param&gt;
+        ///    /// &lt;param name=&quot;defSchedule&quot;&gt;&lt;/param&gt;
+        ///    /// &lt;param nam [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
-        internal static string JobFooter {
+        internal static string ScheduleFooter {
             get {
-                return ResourceManager.GetString("JobFooter", resourceCulture);
+                return ResourceManager.GetString("ScheduleFooter", resourceCulture);
             }
         }
         
@@ -178,9 +230,9 @@ namespace XinjingdailyBot.Generator {
         ///    /// &lt;param name=&quot;configuration&quot;&gt;&lt;/param&gt;
         ///    public static void AddQuartzSetupGenerated(this [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
-        internal static string JobHeader {
+        internal static string ScheduleHeader {
             get {
-                return ResourceManager.GetString("JobHeader", resourceCulture);
+                return ResourceManager.GetString("ScheduleHeader", resourceCulture);
             }
         }
     }

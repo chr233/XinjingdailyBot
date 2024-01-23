@@ -34,7 +34,7 @@ public static class DatabaseExtension
             Environment.Exit(1);
         }
 
-        var dbType = config.DbType.ToLowerInvariant() switch {
+        var dbType = config.DbType?.ToLowerInvariant() switch {
             "sqlite" => DbType.Sqlite,
             "mysql" => DbType.MySql,
             "postgresql" or
@@ -114,7 +114,7 @@ public static class DatabaseExtension
 
         if (config.Generate)
         {
-            services.AddHostedService<DbInitService>();
+            services.AddHostedService<GeneratedDbInitService>();
         }
     }
 }

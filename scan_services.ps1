@@ -8,18 +8,21 @@
 
 # 工作目录
 $workDir = (Get-Location).Path;
-$aaa= $PSScriptRoot
+$outputPath = Join-Path -Path (Join-Path -Path $workDir -ChildPath "XinjingdailyBot.WebAPI") -ChildPath "Properties";
+
 # 包名列表
-$libNames = "XinjingdailyBot.Repository",
+$libNames = 
+"XinjingdailyBot.Model",
+"XinjingdailyBot.Repository",
 "XinjingdailyBot.Interface",
 "XinjingdailyBot.Service",
 "XinjingdailyBot.Tasks",
 "XinjingdailyBot.Command";
+
 # 输出路径
-$outputPath = Join-Path -Path $workDir -ChildPath "XinjingdailyBot.WebAPI";
-$outputPath = Join-Path -Path $outputPath -ChildPath "Properties";
 $appServicePath = Join-Path -Path $outputPath -ChildPath "appService.json";
-$taskPath = Join-Path -Path $outputPath -ChildPath "task.json";
+$taskPath = Join-Path -Path $outputPath -ChildPath "schedule.json";
+$tablePath = Join-Path -Path $outputPath -ChildPath "dbtable.json";
 
 # 扫描源文件列表
 function GetSourceFileList {
@@ -71,7 +74,7 @@ function GetClassName {
         [string] $Content
     )
 
-    if ($Content -match "(?:class|interface)\s+([^({:\s]+)") {
+    if ($Content -match "(?:class|interface|record)\s+([^({:\s]+)") {
         $Matches[1];
     }
 }
@@ -106,14 +109,22 @@ function ScanAppServiceAttribute {
 }
 
 # 扫描JobAttribute
-function ScanJobAttribute {
+function ScanScheduleAttribute {
     param (
         [string] $Content
     )
 
-    if ($Content -match "\[Job(?:Attribute)?\(""([^\]]+)""\)\]") {
+    if ($Content -match "\[Schedule(?:Attribute)?\(""([^\]]+)""\)\]") {
         $Matches[1];
     }
+}
+
+function ScanSugarTableAttribute {
+    param (
+        [string] $Content
+    )
+
+    $Content -match "\[SugarTable(?:Attribute)?\(([^\]]+)\)\]";
 }
 
 # 扫描QueryCmdAttribute ToDo
@@ -148,7 +159,8 @@ function ScanJobAttribute {
 # 类全名表
 $clsNamespaces = @{};
 $appServiceAttributes = @{};
-$taskAttributes = @{};
+$scheduleAttributes = @{};
+$sugarTableAttributes = @{};
 
 foreach ($libName in $libNames) {
     # 库文件路径
@@ -177,9 +189,13 @@ foreach ($libName in $libNames) {
             $appServiceAttributes[$clsName] = $appService;
         }
 
-        $task = ScanJobAttribute -Content $fileContent;
+        $task = ScanScheduleAttribute -Content $fileContent;
         if ($null -ne $task) {
-            $taskAttributes[$clsName] = $task;
+            $scheduleAttributes[$clsName] = $task;
+        }
+
+        if (ScanSugarTableAttribute -Content $fileContent) {
+            $sugarTableAttributes[$clsName] = $null;
         }
     }
 }
@@ -201,25 +217,36 @@ foreach ($service in $services.Keys) {
     $appServiceAttributes[$service] = $serviceInfo;
 }
 
-$tasks = $taskAttributes.Clone();
+$tasks = $scheduleAttributes.Clone();
 # 生成服务信息
 foreach ($task in $tasks.Keys) {
-    $schedule = $taskAttributes[$task];
+    $schedule = $scheduleAttributes[$task];
     $namespace = $clsNamespaces[$task];
 
     $clsName = "$namespace.$task";
 
-    $taskAttributes[$task] = @{
+    $scheduleAttributes[$task] = @{
         "Class"    = $clsName 
         "Schedule" = $schedule
     };
 }
 
+$tables = $sugarTableAttributes.Clone();
+# 生成数据表信息
+foreach($table in $tables.Keys){
+    $namespace = $clsNamespaces[$table];
+    $clsName = "$namespace.$table";
+    $sugarTableAttributes[$table] = $clsName
+}
 
 Write-Output "扫描到 $($appServiceAttributes.Count) 个服务";
 $appServiceAttributes | ConvertTo-Json | Out-File -FilePath $appServicePath
 Write-Output "文件保存至 $appServicePath"
 
-Write-Output "扫描到 $($taskAttributes.Count) 个定时任务";
-$taskAttributes | ConvertTo-Json | Out-File -FilePath $taskPath
+Write-Output "扫描到 $($scheduleAttributes.Count) 个定时任务";
+$scheduleAttributes | ConvertTo-Json | Out-File -FilePath $taskPath
 Write-Output "文件保存至 $taskPath"
+
+Write-Output "扫描到 $($sugarTableAttributes.Count) 个数据表";
+$sugarTableAttributes | ConvertTo-Json | Out-File -FilePath $tablePath
+Write-Output "文件保存至 $tablePath"

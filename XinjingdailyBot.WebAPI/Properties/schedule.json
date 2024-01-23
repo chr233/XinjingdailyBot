@@ -1,0 +1,22 @@
+{
+  "ReviewStatusTask": {
+    "Schedule": "0 * * * * ?",
+    "Class": "XinjingdailyBot.Tasks.ReviewStatusTask"
+  },
+  "RejectChannelTask": {
+    "Schedule": "0 0 0 * * ?",
+    "Class": "XinjingdailyBot.Tasks.RejectChannelTask"
+  },
+  "PostAdvertiseTask": {
+    "Schedule": "0 0 10 * * ?",
+    "Class": "XinjingdailyBot.Tasks.PostAdvertiseTask"
+  },
+  "ExpiredPostsTask": {
+    "Schedule": "0 0 0 * * ?",
+    "Class": "XinjingdailyBot.Tasks.ExpiredPostsTask"
+  },
+  "PlanedPostsTask": {
+    "Schedule": "0 0 0 * * ?",
+    "Class": "XinjingdailyBot.Tasks.PlanedPostsTask"
+  }
+}

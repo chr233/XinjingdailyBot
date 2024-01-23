@@ -7,10 +7,10 @@ using XinjingdailyBot.Generator.Data;
 namespace XinjingdailyBot.Generator;
 
 [Generator]
-internal sealed class TaskGenerator : ISourceGenerator
+internal sealed class DbTableGenerator : ISourceGenerator
 {
-    const string InputFileName = "task.json";
-    const string OutoutFileName = "GeneratedTaskExtensions.g.cs";
+    const string InputFileName = "dbtable.json";
+    const string OutoutFileName = "GeneratedDbTableExtensions.g.cs";
 
     /// <inheritdoc/>
     public void Initialize(GeneratorInitializationContext context)
@@ -31,7 +31,7 @@ internal sealed class TaskGenerator : ISourceGenerator
         {
             context.ReportDiagnostic(
              Diagnostic.Create(
-                 "XJB_02",
+                 "XJB_03",
                  nameof(AppServiceGenerator),
                  $"生成注入代码失败，{e.Message}",
                  defaultSeverity: DiagnosticSeverity.Error,
@@ -49,27 +49,24 @@ internal sealed class TaskGenerator : ISourceGenerator
     private void ProcessSettingsFile(AdditionalText xmlFile, GeneratorExecutionContext context)
     {
         var text = xmlFile.GetText(context.CancellationToken)?.ToString() ?? throw new FileLoadException("文件读取失败");
-        var json = JsonConvert.DeserializeObject<JobData>(text) ?? throw new FileLoadException("文件读取失败");
+        var json = JsonConvert.DeserializeObject<DbTableData>(text) ?? throw new FileLoadException("文件读取失败");
 
         var sb = new StringBuilder();
-        sb.AppendLine(Templates.JobHeader);
+        sb.AppendLine(Templates.DbTableHeader);
 
         foreach (var kv in json)
         {
-            var entry = kv.Value;
-
             var name = kv.Key;
-            var schedule = entry.Schedule;
-            var className = entry.Class;
+            var className = kv.Value;
 
-            if (string.IsNullOrEmpty(schedule) || string.IsNullOrEmpty(className))
+            if (string.IsNullOrEmpty(className))
             {
                 continue;
             }
 
-            sb.AppendLine(string.Format(Templates.JobContent, name, schedule, className));
+            sb.AppendLine(string.Format(Templates.DbTableContent, name, className));
         }
-        sb.AppendLine(Templates.JobFooter);
+        sb.AppendLine(Templates.DbTableFooter);
 
         Console.WriteLine(sb.ToString());
 

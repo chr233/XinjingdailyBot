@@ -45,7 +45,7 @@ public static class TaskExtension
             uint count = 0;
             foreach (var jobType in tasks)
             {
-                var jobAttribute = jobType.GetCustomAttribute<JobAttribute>();
+                var jobAttribute = jobType.GetCustomAttribute<ScheduleAttribute>();
                 if (jobAttribute != null)
                 {
                     const string group = "DEFAULT";

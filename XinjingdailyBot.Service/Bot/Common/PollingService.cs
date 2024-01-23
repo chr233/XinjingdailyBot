@@ -28,18 +28,22 @@ public sealed class PollingService(
         RejectReasonRepository _rejectReasonRepository,
         ITelegramBotClient _botClient,
         IPostService _postService,
-        IOptions<OptionsSetting> options) : BackgroundService
+        IOptions<OptionsSetting> _options) : BackgroundService
 {
-    private readonly bool _throwPendingUpdates = options.Value.Bot.ThrowPendingUpdates;
+    private static readonly char[] Separator = ['|'];
 
-    /// <summary>
-    /// 执行
-    /// </summary>
-    /// <param name="stoppingToken"></param>
-    /// <returns></returns>
-    [RequiresUnreferencedCode("不兼容剪裁")]
+    /// <inheritdoc/>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        var option = _options.Value.Post;
+        if (!string.IsNullOrEmpty(option.PureWords))
+        {
+            _logger.LogWarning("PureWords 字段已启用, 请使用 PureWordsList 字段");
+            foreach (var word in option.PureWords.Split(Separator, StringSplitOptions.RemoveEmptyEntries))
+            {
+                option.PureWordsList.Add(word);
+            }
+        }
         _postService.InitTtlTimer();
 
         _logger.LogDebug("注册可用命令");
@@ -69,7 +73,7 @@ public sealed class PollingService(
             {
                 var receiverOptions = new ReceiverOptions {
                     AllowedUpdates = [],
-                    ThrowPendingUpdates = _throwPendingUpdates,
+                    ThrowPendingUpdates = _options.Value.Bot.ThrowPendingUpdates,
                     Limit = 100,
                 };
 

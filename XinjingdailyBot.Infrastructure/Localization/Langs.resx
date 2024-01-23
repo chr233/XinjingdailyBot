@@ -249,4 +249,7 @@
   <data name="IgnoreWarn" xml:space="preserve">
     <value>忽略警告, 继续投稿</value>
   </data>
+  <data name="PostSplitImage" xml:space="preserve">
+    <value>长图切割</value>
+  </data>
 </root>
