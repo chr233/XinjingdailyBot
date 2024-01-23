@@ -9,7 +9,7 @@ namespace XinjingdailyBot.Tasks;
 /// <summary>
 /// 拒稿存档频道置顶
 /// </summary>
-[Job("0 0 0 * * ?")]
+[Schedule("0 0 0 * * ?")]
 public sealed class RejectChannelTask(
     ILogger<RejectChannelTask> _logger,
     IChannelService _channelService,

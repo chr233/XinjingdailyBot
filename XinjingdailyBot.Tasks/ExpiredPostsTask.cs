@@ -13,7 +13,7 @@ namespace XinjingdailyBot.Tasks;
 /// <summary>
 /// 过期稿件处理
 /// </summary>
-[Job("0 0 0 * * ?")]
+[Schedule("0 0 0 * * ?")]
 public sealed class ExpiredPostsTask(
         ILogger<ExpiredPostsTask> _logger,
         IPostService _postService,

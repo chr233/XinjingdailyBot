@@ -13,7 +13,7 @@ namespace XinjingdailyBot.Tasks;
 /// <summary>
 /// 发布广告
 /// </summary>
-[Job("0 0 10 * * ?")]
+[Schedule("0 0 10 * * ?")]
 public sealed class PostAdvertiseTask(
         ILogger<PostAdvertiseTask> _logger,
         IServiceProvider _serviceProvider,

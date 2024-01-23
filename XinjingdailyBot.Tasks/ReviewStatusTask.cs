@@ -13,7 +13,7 @@ namespace XinjingdailyBot.Tasks;
 /// <summary>
 /// 定期发布审核状态通知
 /// </summary>
-[Job("0 * * * * ?")]
+[Schedule("0 * * * * ?")]
 public sealed class ReviewStatusTask(
     ILogger<ReviewStatusTask> _logger,
     IPostService _postService,
