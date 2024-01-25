@@ -42,7 +42,7 @@ public sealed class MarkupHelperService(
     }
 
     /// <inheritdoc/>
-    public InlineKeyboardMarkup PostQieTuKeyboard(bool anymouse)
+    public InlineKeyboardMarkup PostFuzzyWarningKeyboard(bool anymouse)
     {
         var keyboard = new InlineKeyboardMarkup(new[]
         {
@@ -73,7 +73,7 @@ public sealed class MarkupHelperService(
                 InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "post cancel"),
                 isDirectPost ?
                     InlineKeyboardButton.WithCallbackData(Langs.PostDismissWarning, "review dismisswarning") :
-                    InlineKeyboardButton.WithCallbackData(Langs.PostDismissWarning, $"post dismisswarning"),
+                    InlineKeyboardButton.WithCallbackData(Langs.PostDismissWarning, "post dismisswarning"),
             },
         });
         return keyboard;

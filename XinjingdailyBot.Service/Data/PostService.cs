@@ -248,7 +248,7 @@ public sealed class PostService(
                 return;
         }
 
-        //如果是纯链接消息显示警告
+        //如果是纯链接消息则显示警告
         var warnMsg = CheckIfRawLink(text);
         if (!string.IsNullOrEmpty(warnMsg))
         {
@@ -324,11 +324,6 @@ public sealed class PostService(
             _markupHelperService.PostKeyboard(anonymous);
         string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
-        if (!await _imageHelperService.ProcessMessage(message))
-        {
-            return;
-        }
-
         //生成数据库实体
         var newPost = new NewPosts {
             Anonymous = anonymous,
@@ -359,6 +354,14 @@ public sealed class PostService(
             default:
                 _logger.LogError("未知的频道选项 {channelOption}", channelOption);
                 return;
+        }
+
+        //如果图片比例有问题容易模糊则显示警告
+        var warnMsg = await _imageHelperService.FuzzyImageCheck(message);
+        if (!string.IsNullOrEmpty(warnMsg))
+        {
+            postText += "\n\n" + warnMsg;
+            keyboard = _markupHelperService.PostWarningKeyboard(directPost);
         }
 
         var actionMsg = await _botClient.SendTextMessageAsync(message.Chat, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
@@ -409,23 +412,25 @@ public sealed class PostService(
     /// <param name="_"></param>
     private async void CheckMediaGroupTtl(object? _)
     {
-        var keys = MediaGroupCache.Keys.ToList();
-        foreach (var key in keys)
+        var keys = MediaGroupCache.ToList();
+        foreach (var (key, cache) in keys)
         {
-            if (MediaGroupCache.TryGetValue(key, out var cache))
+            if (cache.PostId > 0 && cache.ExpireAt <= DateTime.Now)
             {
-                if (cache.PostId > 0 && cache.ExpireAt <= DateTime.Now)
+                //移除缓存媒体组
+                MediaGroupCache.TryRemove(key, out var _);
+
+                if (string.IsNullOrEmpty(cache.PostText) || cache.Keyboard == null || cache.ActionMessage == null)
                 {
-                    //移除缓存媒体组
-                    MediaGroupCache.TryRemove(key, out var _);
-
-                    if (string.IsNullOrEmpty(cache.PostText) || cache.Keyboard == null || cache.ActionMessage == null)
-                    {
-                        continue;
-                    }
-
-                    await _botClient.EditMessageTextAsync(cache.ActionMessage, cache.PostText, replyMarkup: cache.Keyboard);
+                    continue;
                 }
+
+                if (!string.IsNullOrEmpty(cache.WarnMsg))
+                {
+                    cache.PostText += "\n\n" + cache.WarnMsg;
+                }
+
+                await _botClient.EditMessageTextAsync(cache.ActionMessage, cache.PostText, replyMarkup: cache.Keyboard);
             }
         }
     }
@@ -561,6 +566,12 @@ public sealed class PostService(
             if (attachment != null)
             {
                 await _attachmentService.CreateAttachment(attachment);
+            }
+
+            //检查每张图片是否模糊
+            if (string.IsNullOrEmpty(mgCache.WarnMsg))
+            {
+                mgCache.WarnMsg = await _imageHelperService.FuzzyImageCheck(message);
             }
 
             //记录媒体组
@@ -1326,6 +1337,8 @@ internal sealed record MediaGroupCache
     public string? PostText { get; set; }
     public InlineKeyboardMarkup? Keyboard { get; set; }
     public Message? ActionMessage { get; set; }
+
+    public string? WarnMsg { get; set; }
 
     public MediaGroupCache()
     {

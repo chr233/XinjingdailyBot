@@ -59,8 +59,6 @@ public interface IMarkupHelperService
     /// <param name="anymouse"></param>
     /// <returns></returns>
     InlineKeyboardMarkup PostKeyboard(bool anymouse);
-    InlineKeyboardMarkup PostQieTuKeyboard(bool anymouse);
-
     /// <summary>
     /// 投稿警告键盘
     /// </summary>

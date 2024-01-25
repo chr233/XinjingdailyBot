@@ -55,6 +55,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0. 杂项文件", "0. 杂�
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 		README.md = README.md
+		scan_services.ps1 = scan_services.ps1
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XinjingdailyBot.Command", "XinjingdailyBot.Command\XinjingdailyBot.Command.csproj", "{617EC3CE-8307-41BC-A4A5-D437CCA261AB}"

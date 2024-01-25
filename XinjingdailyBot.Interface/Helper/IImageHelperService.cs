@@ -7,5 +7,5 @@ namespace XinjingdailyBot.Interface.Helper;
 /// </summary>
 public interface IImageHelperService
 {
-    Task<bool> ProcessMessage(Message msg);
+    Task<string?> FuzzyImageCheck(Message message);
 }
