@@ -173,9 +173,7 @@ _dbClient.CodeFirst.InitTables&lt;{1}&gt;();</value>
     <comment>数据库文件尾</comment>
   </data>
   <data name="DbTableHeader" xml:space="preserve">
-    <value>using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+    <value>using Microsoft.Extensions.Options;
 using SqlSugar;
 using XinjingdailyBot.Infrastructure;
 

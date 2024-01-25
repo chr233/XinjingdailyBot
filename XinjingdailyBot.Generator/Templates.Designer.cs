@@ -146,9 +146,7 @@ namespace XinjingdailyBot.Generator {
         }
         
         /// <summary>
-        ///   查找类似 using Microsoft.Extensions.Hosting;
-        ///using Microsoft.Extensions.Logging;
-        ///using Microsoft.Extensions.Options;
+        ///   查找类似 using Microsoft.Extensions.Options;
         ///using SqlSugar;
         ///using XinjingdailyBot.Infrastructure;
         ///
@@ -165,7 +163,8 @@ namespace XinjingdailyBot.Generator {
         ///    /// &lt;summary&gt;
         ///    /// 执行
         ///    /// &lt;/summary&gt;
-        ///    [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///    /// &lt;param name=&quot;cancellationToken&quot;&gt;&lt;/param&gt;
+        ///    /// &lt;returns&gt;&lt;/returns&gt; [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string DbTableHeader {
             get {
