@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using SkiaSharp;
 using System.Drawing;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -7,7 +6,6 @@ using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Interface.Helper;
-using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Helper;
 
@@ -95,35 +93,29 @@ public sealed class ImageHelperService(
 
         var fileReader = new BinaryReader(fileSteam);
 
-
-        using var inputMs = new MemoryStream();
-
-        //var file = await _botClient.GetInfoAndDownloadFileAsync(document.FileId, inputMs);
-
-        using var inputImgMs = new SKManagedStream(inputMs);
-        var originBitmap = SKBitmap.Decode(inputImgMs);
-        var originRatio = 1.0 * originBitmap.Width / originBitmap.Height;
-
-
-        var handler = document.MimeType switch {
-            "image/gif" => Task.FromResult(0.0),
-            "image/jpeg" => Task.FromResult(0.0),
-            "image/png" or "image/apng" => Task.FromResult(0.0),
-            "image/webp" => Task.FromResult(0.0),
-            "image/avif" => Task.FromResult(0.0),
-            "image/svg+xml" => Task.FromResult(0.0),
-            "image/bmp" => Task.FromResult(0.0),
-            "image/tiff" => Task.FromResult(0.0),
-            "image/x-icon" => Task.FromResult(0.0),
+        var size = document.MimeType switch {
+            "image/gif" => DecodeGif(fileReader),
+            "image/jpeg" => DecodeJfif(fileReader),
+            "image/png" or
+            "image/apng" => ParsePngFileHeader(fileReader),
+            "image/webp" => null,
+            "image/avif" => null,
+            "image/svg+xml" => null,
+            "image/bmp" => DecodeBitmap(fileReader),
+            "image/tiff" => null,
+            "image/x-icon" => null,
             _ => null,
         };
 
-        if (handler == null)
+        if (size == null)
         {
             return null;
         }
 
-        return await handler;
+        _logger.LogWarning("{type} 高度 {h} 宽度 {w}", document.MimeType, size.Value.Height, size.Value.Width);
+
+        var ratio = 1.0 * size.Value.Width / size.Value.Height;
+        return ratio;
     }
 
 
@@ -404,39 +396,25 @@ public sealed class ImageHelperService(
     //}
 
 
-    private static short ReadLittleEndianInt16(BinaryReader binaryReader)
+    private Size? ParsePngFileHeader(BinaryReader reader)
     {
-        byte[] bytes = new byte[sizeof(short)];
-
-        for (int i = 0; i < sizeof(short); i += 1)
+        // File header - check for the PNG signature.
+        if (reader.ReadByte() != 0x89)
         {
-            bytes[sizeof(short) - 1 - i] = binaryReader.ReadByte();
+            _logger.LogWarning("Png 文件头错误");
+            return null;
         }
-        return BitConverter.ToInt16(bytes, 0);
+
+        // Skip the remaining header to reach the first chunk.
+        _ = reader.ReadBytes(15);
+
+        int width = reader.ReadInt32BE();
+        int height = reader.ReadInt32BE();
+
+        return new Size(width, height);
     }
 
-    private static ushort ReadLittleEndianUInt16(BinaryReader binaryReader)
-    {
-        byte[] bytes = new byte[sizeof(ushort)];
-
-        for (int i = 0; i < sizeof(ushort); i += 1)
-        {
-            bytes[sizeof(ushort) - 1 - i] = binaryReader.ReadByte();
-        }
-        return BitConverter.ToUInt16(bytes, 0);
-    }
-
-    private static int ReadLittleEndianInt32(BinaryReader binaryReader)
-    {
-        byte[] bytes = new byte[sizeof(int)];
-        for (int i = 0; i < sizeof(int); i += 1)
-        {
-            bytes[sizeof(int) - 1 - i] = binaryReader.ReadByte();
-        }
-        return BitConverter.ToInt32(bytes, 0);
-    }
-
-    private static Size DecodeBitmap(BinaryReader binaryReader)
+    private Size DecodeBitmap(BinaryReader binaryReader)
     {
         binaryReader.ReadBytes(16);
         int width = binaryReader.ReadInt32();
@@ -444,32 +422,24 @@ public sealed class ImageHelperService(
         return new Size(width, height);
     }
 
-    private static Size DecodeGif(BinaryReader binaryReader)
+    private Size DecodeGif(BinaryReader binaryReader)
     {
         int width = binaryReader.ReadInt16();
         int height = binaryReader.ReadInt16();
         return new Size(width, height);
     }
 
-    private static Size DecodePng(BinaryReader binaryReader)
-    {
-        binaryReader.ReadBytes(8);
-        int width = ReadLittleEndianInt32(binaryReader);
-        int height = ReadLittleEndianInt32(binaryReader);
-        return new Size(width, height);
-    }
-
-    private static Size DecodeJfif(BinaryReader binaryReader)
+    private Size DecodeJfif(BinaryReader binaryReader)
     {
         while (binaryReader.ReadByte() == 0xff)
         {
             byte marker = binaryReader.ReadByte();
-            short chunkLength = ReadLittleEndianInt16(binaryReader);
+            short chunkLength = binaryReader.ReadInt16();
             if (marker == 0xc0)
             {
                 binaryReader.ReadByte();
-                int height = ReadLittleEndianInt16(binaryReader);
-                int width = ReadLittleEndianInt16(binaryReader);
+                int height = binaryReader.ReadInt16();
+                int width = binaryReader.ReadInt16();
                 return new Size(width, height);
             }
 
@@ -484,6 +454,6 @@ public sealed class ImageHelperService(
             }
         }
 
-        throw new ArgumentException(nameof(binaryReader));
+        throw new ArgumentException(null, nameof(binaryReader));
     }
 }

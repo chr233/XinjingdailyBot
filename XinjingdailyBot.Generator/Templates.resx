@@ -250,11 +250,11 @@ public sealed class GeneratedDbInitService(
                 .WithCronSchedule(schedule)
             );
 
-            _logger.Debug("[{cron}] - PlanedPostsTask 注册成功", schedule);
+            _logger.Debug("[{cron}] - {name} 注册成功", schedule, jobName);
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, "[{cron}] - PlanedPostsTask 注册失败", schedule);
+            _logger.Error(ex, "[{cron}] - {name} 注册失败", schedule, jobName);
         }
     }
 }</value>
