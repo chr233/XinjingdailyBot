@@ -126,6 +126,41 @@ public sealed class AttachmentService(ISqlSugarClient context) : BaseService<Att
     }
 
     /// <inheritdoc/>
+    public Task<int> CreateAttachment(Message message, int postId)
+    {
+        var attachment = GenerateAttachment(message, postId);
+
+        if (attachment == null)
+        {
+            return Task.FromResult(-1);
+        }
+
+        return Insertable(attachment).ExecuteCommandAsync();
+    }
+
+    /// <inheritdoc/>
+    public Task<int> CreateAttachments(Message[] messages, int postId)
+    {
+        var attachments = new List<Attachments>();
+
+        foreach (var message in messages)
+        {
+            var attachment = GenerateAttachment(message, postId);
+            if (attachment != null)
+            {
+                attachments.Add(attachment);
+            }
+        }
+
+        if (attachments.Count == 0)
+        {
+            return Task.FromResult(-1);
+        }
+
+        return Storageable(attachments).ExecuteCommandAsync();
+    }
+
+    /// <inheritdoc/>
     public Task<Attachments> FetchAttachmentByPostId(long postId)
     {
         return Queryable().FirstAsync(x => x.PostID == postId);

@@ -10,30 +10,18 @@ namespace XinjingdailyBot.Repository;
 /// 拒绝理由仓储类
 /// </summary>
 [AppService(LifeTime.Singleton)]
-public class RejectReasonRepository : BaseRepository<RejectReasons>
+public class RejectReasonRepository(
+    ILogger<RejectReasonRepository> _logger,
+    ISqlSugarClient context) : BaseRepository<RejectReasons>(context)
 {
-    private readonly ILogger<RejectReasonRepository> _logger;
-
-    /// <summary>
-    /// 拒绝理由仓储类
-    /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="context"></param>
-    public RejectReasonRepository(
-        ILogger<RejectReasonRepository> logger,
-        ISqlSugarClient context) : base(context)
-    {
-        _logger = logger;
-    }
-
     /// <summary>
     /// 拒绝理由缓存, Key=Id
     /// </summary>
-    private Dictionary<int, RejectReasons> RejectReasonCache { get; } = new();
+    private Dictionary<int, RejectReasons> RejectReasonCache { get; } = [];
     /// <summary>
     /// 标签缓存, Key=Payload
     /// </summary>
-    private Dictionary<string, RejectReasons> RejectReasonPayloadCache { get; } = new();
+    private Dictionary<string, RejectReasons> RejectReasonPayloadCache { get; } = [];
 
     /// <summary>
     /// 初始化缓存
@@ -49,7 +37,7 @@ public class RejectReasonRepository : BaseRepository<RejectReasons>
         }
 
         var reasons = await GetListAsync();
-        if (reasons.Any())
+        if (reasons.Count != 0)
         {
             RejectReasonCache.Clear();
             RejectReasonPayloadCache.Clear();

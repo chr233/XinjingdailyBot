@@ -15,12 +15,16 @@ public interface IAttachmentService : IBaseService<Attachments>
     /// <param name="attachment"></param>
     /// <returns></returns>
     Task CreateAttachment(Attachments attachment);
+    Task<int> CreateAttachment(Message message, int postId);
+
     /// <summary>
     /// 创建多条附件
     /// </summary>
     /// <param name="attachments"></param>
     /// <returns></returns>
     Task CreateAttachments(List<Attachments> attachments);
+    Task<int> CreateAttachments(Message[] messages, int postId);
+
     /// <summary>
     /// 根据稿件ID获取附件
     /// </summary>
@@ -40,6 +44,7 @@ public interface IAttachmentService : IBaseService<Attachments>
     /// <param name="message"></param>
     /// <param name="postID"></param>
     /// <returns></returns>
+    [Obsolete("过时方法")]
     Attachments? GenerateAttachment(Message message, long postID);
     /// <summary>
     /// 获取附件个数

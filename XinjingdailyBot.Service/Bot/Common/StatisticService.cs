@@ -34,5 +34,5 @@ public sealed class StatisticService(
     }
 
     /// <inheritdoc/>
-    public void Dispose() => StatisticTimer?.Dispose();
+    public override void Dispose() => StatisticTimer?.Dispose();
 }

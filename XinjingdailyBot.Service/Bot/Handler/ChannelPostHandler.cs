@@ -140,12 +140,8 @@ public sealed class ChannelPostHandler(
 
         var postID = await _postService.CreateNewPosts(newPost);
 
-        var attachment = _attachmentService.GenerateAttachment(message, postID);
-
-        if (attachment != null)
-        {
-            await _attachmentService.CreateAttachment(attachment);
-        }
+        //添加附件
+        await _attachmentService.CreateAttachment(message, postID);
 
         //增加通过数量
         dbUser.AcceptCount++;
@@ -155,13 +151,13 @@ public sealed class ChannelPostHandler(
     /// <summary>
     /// mediaGroupID字典
     /// </summary>
-    private ConcurrentDictionary<string, long> MediaGroupIDs { get; } = new();
+    private ConcurrentDictionary<string, int> MediaGroupIDs { get; } = new();
 
     /// <inheritdoc/>
     public async Task OnMediaGroupChannelPostReceived(Users dbUser, Message message)
     {
         string mediaGroupId = message.MediaGroupId!;
-        if (!MediaGroupIDs.TryGetValue(mediaGroupId, out long postID)) //如果mediaGroupId不存在则创建新Post
+        if (!MediaGroupIDs.TryGetValue(mediaGroupId, out var postID)) //如果mediaGroupId不存在则创建新Post
         {
             var second = message.Chat.Id == _channelService.SecondChannel?.Id;
 
@@ -233,11 +229,7 @@ public sealed class ChannelPostHandler(
         if (postID > 0)
         {
             //更新附件
-            var attachment = _attachmentService.GenerateAttachment(message, postID);
-            if (attachment != null)
-            {
-                await _attachmentService.CreateAttachment(attachment);
-            }
+            await _attachmentService.CreateAttachment(message, postID);
 
             //记录媒体组
             await _mediaGroupService.AddPostMediaGroup(message);

@@ -13,7 +13,7 @@ public sealed record TagObjct
     /// <param name="content"></param>
     public TagObjct(string content)
     {
-        Content = new List<string> { content };
+        Content = [content];
     }
 
     /// <summary>

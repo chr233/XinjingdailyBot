@@ -45,7 +45,7 @@ public sealed record GitHubReleaseResponse
 
     /// <inheritdoc cref="GitHubAssetsData"/>
     [JsonPropertyName("assets")]
-    public HashSet<GitHubAssetsData> Assets { get; set; } = new();
+    public HashSet<GitHubAssetsData> Assets { get; set; } = [];
 
     /// <summary>
     /// Asset数据

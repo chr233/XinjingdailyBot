@@ -380,14 +380,9 @@ public sealed class PostService(
             newPost.ReviewActionMsgID = newPost.OriginActionMsgID;
         }
 
-        long postID = await Insertable(newPost).ExecuteReturnBigIdentityAsync();
+        var postID = await Insertable(newPost).ExecuteCommandAsync();
 
-        var attachment = _attachmentService.GenerateAttachment(message, postID);
-
-        if (attachment != null)
-        {
-            await _attachmentService.CreateAttachment(attachment);
-        }
+        await _attachmentService.CreateAttachment(message, postID);
     }
 
     /// <summary>
@@ -562,11 +557,7 @@ public sealed class PostService(
         if (mgCache.PostId > 0)
         {
             //更新附件
-            var attachment = _attachmentService.GenerateAttachment(message, mgCache.PostId);
-            if (attachment != null)
-            {
-                await _attachmentService.CreateAttachment(attachment);
-            }
+            await _attachmentService.CreateAttachment(message, mgCache.PostId);
 
             //检查每张图片是否模糊
             if (string.IsNullOrEmpty(mgCache.WarnMsg))

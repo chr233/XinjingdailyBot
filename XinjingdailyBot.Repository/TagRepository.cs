@@ -11,38 +11,26 @@ namespace XinjingdailyBot.Repository;
 /// 标签仓储类
 /// </summary>
 [AppService(LifeTime.Singleton)]
-public class TagRepository : BaseRepository<Tags>
+public class TagRepository(
+    ILogger<GroupRepository> _logger,
+    ISqlSugarClient context) : BaseRepository<Tags>(context)
 {
-    private readonly ILogger<GroupRepository> _logger;
-
-    /// <summary>
-    /// 标签仓储类
-    /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="context"></param>
-    public TagRepository(
-        ILogger<GroupRepository> logger,
-        ISqlSugarClient context) : base(context)
-    {
-        _logger = logger;
-    }
-
     /// <summary>
     /// 标签缓存, Key=Id
     /// </summary>
-    private Dictionary<int, Tags> TagCache { get; } = new();
+    private Dictionary<int, Tags> TagCache { get; } = [];
     /// <summary>
     /// 标签缓存, Key=Payload
     /// </summary>
-    private Dictionary<string, Tags> TagPayloadCache { get; } = new();
+    private Dictionary<string, Tags> TagPayloadCache { get; } = [];
     /// <summary>
     /// 标签缓存, Key=Id
     /// </summary>
-    private Dictionary<int, string[]> TagKeywords { get; } = new();
+    private Dictionary<int, string[]> TagKeywords { get; } = [];
     /// <summary>
     /// 警告文本缓存
     /// </summary>
-    private List<string> WarnTexts { get; } = new();
+    private List<string> WarnTexts { get; } = [];
 
     /// <summary>
     /// 初始化缓存
@@ -58,7 +46,7 @@ public class TagRepository : BaseRepository<Tags>
         }
 
         var tags = await GetListAsync(x => x.Id > 0 && x.Id < 32);
-        if (tags.Any())
+        if (tags.Count != 0)
         {
             TagCache.Clear();
             TagPayloadCache.Clear();

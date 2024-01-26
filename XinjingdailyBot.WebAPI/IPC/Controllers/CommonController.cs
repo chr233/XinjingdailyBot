@@ -10,19 +10,9 @@ namespace XinjingdailyBot.WebAPI.IPC.Controllers;
 /// <summary>
 /// 主页控制器
 /// </summary>
-public sealed class CommonController : XjbController
+public sealed class CommonControllerCommonController(
+        IOptions<OptionsSetting> _options) : XjbController
 {
-    private readonly bool _debug;
-
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    public CommonController(
-        IOptions<OptionsSetting> options)
-    {
-        _debug = options.Value.Debug;
-    }
-
     /// <summary>
     /// 首页
     /// </summary>
@@ -49,7 +39,7 @@ public sealed class CommonController : XjbController
             Success = false,
         };
 
-        if (_debug)
+        if (_options.Value.Debug)
         {
             var exception = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
             response.Message = exception?.ToString() ?? "null";

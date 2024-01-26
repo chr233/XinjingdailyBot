@@ -11,23 +11,11 @@ namespace XinjingdailyBot.Repository;
 /// 用户组仓储类
 /// </summary>
 [AppService(LifeTime.Singleton)]
-public class GroupRepository : BaseRepository<Groups>
+public class GroupRepository(
+    ILogger<GroupRepository> _logger,
+    ISqlSugarClient context) : BaseRepository<Groups>(context)
 {
-    private readonly ILogger<GroupRepository> _logger;
-
-    /// <summary>
-    /// 用户组仓储类
-    /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="context"></param>
-    public GroupRepository(
-        ILogger<GroupRepository> logger,
-        ISqlSugarClient context) : base(context)
-    {
-        _logger = logger;
-    }
-
-    private readonly Dictionary<int, Groups> _groupCache = new();
+    private readonly Dictionary<int, Groups> _groupCache = [];
 
     /// <summary>
     /// 初始化缓存
@@ -43,7 +31,7 @@ public class GroupRepository : BaseRepository<Groups>
         }
 
         var groups = await GetListAsync();
-        if (groups.Any())
+        if (groups.Count != 0)
         {
             _groupCache.Clear();
             foreach (var group in groups)
