@@ -92,8 +92,9 @@ public interface IMarkupHelperService
     /// </summary>
     /// <param name="tagNum"></param>
     /// <param name="hasSpoiler"></param>
+    /// <param name="anonymous"></param>
     /// <returns></returns>
-    InlineKeyboardMarkup ReviewKeyboardA(int tagNum, bool? hasSpoiler);
+    InlineKeyboardMarkup ReviewKeyboardA(int tagNum, bool? hasSpoiler, bool? anonymous);
     /// <summary>
     /// 审核键盘B(选择拒绝理由)
     /// </summary>

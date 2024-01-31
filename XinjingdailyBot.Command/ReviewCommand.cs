@@ -203,7 +203,10 @@ public sealed class ReviewCommand(
             case "review accept second":
                 await _postService.AcceptPost(post, dbUser, false, true, query);
                 break;
-
+            case "review forceAnymouse":
+                await _postService.SetPostForceAnonymous(post, !post.ForceAnonymous);
+                await UpdateKeyboard(post, query);
+                break;
             case "review anymouse":
                 await SetAnonymous(post, query);
                 break;
@@ -280,7 +283,21 @@ public sealed class ReviewCommand(
 
         var keyboard = post.IsDirectPost ?
             _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags, hasSpoiler) :
-            _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
+            _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler, post.Anonymous ? null : post.ForceAnonymous);
+        await _botClient.EditMessageReplyMarkupAsync(query.Message!, keyboard);
+    }
+
+    /// <summary>
+    /// 更新键盘
+    /// </summary>
+    /// <param name="post"></param>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    private async Task UpdateKeyboard(NewPosts post, CallbackQuery query)
+    {
+        var keyboard = post.IsDirectPost ?
+            _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags, post.HasSpoiler) :
+            _markupHelperService.ReviewKeyboardA(post.Tags, post.CanSpoiler ? post.HasSpoiler : null, post.Anonymous ? null : post.ForceAnonymous);
         await _botClient.EditMessageReplyMarkupAsync(query.Message!, keyboard);
     }
 
@@ -336,7 +353,7 @@ public sealed class ReviewCommand(
 
         var keyboard = rejectMode ?
             _markupHelperService.ReviewKeyboardB() :
-            _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
+            _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler, post.Anonymous ? null : post.ForceAnonymous);
 
         await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, keyboard);
     }

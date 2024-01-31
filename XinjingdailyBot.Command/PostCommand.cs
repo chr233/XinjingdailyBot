@@ -181,7 +181,7 @@ public sealed class PostCommand(
         string msg = _textHelperService.MakeReviewMessage(dbUser, post.Anonymous);
 
         bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
-        var keyboard = _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
+        var keyboard = _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler, post.Anonymous ? null : post.ForceAnonymous);
 
         var manageMsg = await _botClient.SendTextMessageAsync(_channelService.ReviewGroup, msg, parseMode: ParseMode.Html, disableWebPagePreview: true, replyToMessageId: reviewMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 

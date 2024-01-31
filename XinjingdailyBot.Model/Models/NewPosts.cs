@@ -85,6 +85,11 @@ public sealed record NewPosts : BaseModel, IModifyAt, ICreateAt
     public bool Anonymous { get; set; }
 
     /// <summary>
+    /// 强制匿名
+    /// </summary>
+    public bool ForceAnonymous { get; set; }
+
+    /// <summary>
     /// 投稿描述(过滤#标签和链接)
     /// </summary>
     [SugarColumn(Length = 2000)]

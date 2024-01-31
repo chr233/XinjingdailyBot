@@ -206,6 +206,13 @@ public interface IPostService : IBaseService<NewPosts>
     /// <returns></returns>
     Task SetPostAnonymous(NewPosts post, bool anonymous);
     /// <summary>
+    /// 设置稿件强制匿名
+    /// </summary>
+    /// <param name="post"></param>
+    /// <param name="anonymous"></param>
+    /// <returns></returns>
+    Task SetPostForceAnonymous(NewPosts post, bool anonymous);
+    /// <summary>
     /// 设置稿件遮罩
     /// </summary>
     /// <param name="post"></param>

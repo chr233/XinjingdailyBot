@@ -142,7 +142,7 @@ public sealed class MarkupHelperService(
     }
 
     /// <inheritdoc/>
-    public InlineKeyboardMarkup ReviewKeyboardA(int tagNum, bool? hasSpoiler)
+    public InlineKeyboardMarkup ReviewKeyboardA(int tagNum, bool? hasSpoiler, bool? anymouse)
     {
         var tags = _tagRepository.GetTagsPayload(tagNum);
 
@@ -174,6 +174,12 @@ public sealed class MarkupHelperService(
                  InlineKeyboardButton.WithCallbackData(hasSpoiler.Value? Langs.TagSpoilerOn: Langs.TagSpoilerOff, "review spoiler"),
             });
         }
+
+        if (anymouse.HasValue)
+            btns.Add(new[]
+               {
+                     InlineKeyboardButton.WithCallbackData(anymouse.Value ? Langs.AnymouseOn: Langs.AnymouseOff, "review forceAnymouse"),
+                });
 
         if (!_botOption.PostSecondMenu)
         {

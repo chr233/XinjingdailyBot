@@ -198,7 +198,7 @@ public sealed class TextHelperService(
         }
         else
         {
-            if (post.Anonymous)
+            if (post.Anonymous || post.ForceAnonymous)
             {
                 return "<i>via</i> 匿名";
             }

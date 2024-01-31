@@ -258,7 +258,7 @@ public sealed class PostController(
             });
         }
 
-        var keyboard = _markupHelperService.ReviewKeyboardA(newTags, post.HasSpoiler);
+        var keyboard = _markupHelperService.ReviewKeyboardA(newTags, post.HasSpoiler, newPost.Anonymous ? null : newPost.ForceAnonymous);
         string msg = _textHelperService.MakeReviewMessage(dbUser, newPost.Anonymous);
 
         var actionMsg = await _botClient.SendTextMessageAsync(userChatId, msg, parseMode: ParseMode.Html, disableWebPagePreview: true, replyToMessageId: originMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
@@ -491,7 +491,7 @@ public sealed class PostController(
             });
         }
 
-        var keyboard = _markupHelperService.ReviewKeyboardA(newTags, post.HasSpoiler);
+        var keyboard = _markupHelperService.ReviewKeyboardA(newTags, post.HasSpoiler, newPost.Anonymous ? null : newPost.ForceAnonymous);
         string msg = _textHelperService.MakeReviewMessage(dbUser, newPost.Anonymous);
 
         var actionMsg = await _botClient.SendTextMessageAsync(userChatId, msg, parseMode: ParseMode.Html, disableWebPagePreview: true, replyToMessageId: originMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);

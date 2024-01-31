@@ -599,7 +599,7 @@ public sealed class PostService(
 
         var keyboard = post.IsDirectPost ?
             _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags, hasSpoiler) :
-            _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
+            _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler, post.Anonymous ? null : post.ForceAnonymous);
         await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, keyboard);
     }
 
@@ -1254,6 +1254,14 @@ public sealed class PostService(
         post.Anonymous = anonymous;
         post.ModifyAt = DateTime.Now;
         return Updateable(post).UpdateColumns(static x => new { x.Anonymous, x.ModifyAt }).ExecuteCommandAsync();
+    }
+
+    /// <inheritdoc/>
+    public Task SetPostForceAnonymous(NewPosts post, bool anonymous)
+    {
+        post.ForceAnonymous = anonymous;
+        post.ModifyAt = DateTime.Now;
+        return Updateable(post).UpdateColumns(static x => new { x.ForceAnonymous, x.ModifyAt }).ExecuteCommandAsync();
     }
 
     /// <inheritdoc/>
