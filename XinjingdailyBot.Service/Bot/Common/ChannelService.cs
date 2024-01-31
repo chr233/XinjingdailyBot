@@ -35,6 +35,8 @@ public sealed class ChannelService(
     /// <inheritdoc/>
     public Chat RejectChannel { get; private set; } = new();
     /// <inheritdoc/>
+    public Chat AdminLogChannel { get; private set; } = new();
+    /// <inheritdoc/>
     public User BotUser { get; private set; } = new();
 
     /// <inheritdoc/>
@@ -154,6 +156,24 @@ public sealed class ChannelService(
         catch
         {
             _logger.LogError("未找到指定的闲聊群组, 可以使用 /groupinfo 命令获取群组信息");
+            SecondCommentGroup = new Chat { Id = -1 };
+        }
+
+        try
+        {
+            if (long.TryParse(channelOption.AdminLogChannel, out var adminLogChannelId))
+            {
+                AdminLogChannel = await _botClient.GetChatAsync(adminLogChannelId);
+            }
+            else
+            {
+                AdminLogChannel = await _botClient.GetChatAsync(channelOption.AdminLogChannel);
+            }
+            _logger.LogInformation("管理日志频道: {chatProfile}", AdminLogChannel.ChatProfile());
+        }
+        catch
+        {
+            _logger.LogError("未找到指定的管理日志频道, 可以使用 /groupinfo 命令获取群组信息");
             SecondCommentGroup = new Chat { Id = -1 };
         }
 

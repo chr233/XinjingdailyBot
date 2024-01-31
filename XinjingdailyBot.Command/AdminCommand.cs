@@ -206,6 +206,8 @@ public sealed class AdminCommand(
                 {
                     _logger.LogError(ex, "发送私聊消息失败");
                 }
+                
+                await _botClient.SendTextMessageAsync(channelService.AdminLogChannel, textHelperService.MakeAdminLogText(dbUser, targetUser, EBanType.Ban, reason, message), parseMode: ParseMode.Html);
 
                 var sb = new StringBuilder();
                 sb.AppendLine($"成功封禁 {targetUser.HtmlUserLink()}");
@@ -295,6 +297,9 @@ public sealed class AdminCommand(
                     _logger.LogError(ex, "发送私聊消息失败");
                 }
 
+                await _botClient.SendTextMessageAsync(channelService.AdminLogChannel, textHelperService.MakeAdminLogText(dbUser, targetUser, EBanType.UnBan, reason, message), parseMode: ParseMode.Html);
+
+                
                 var sb = new StringBuilder();
                 sb.AppendLine($"成功解封 {targetUser.HtmlUserLink()}");
                 sb.AppendLine($"操作员 {dbUser.HtmlUserLink()}");
@@ -409,6 +414,8 @@ public sealed class AdminCommand(
                 {
                     _logger.LogError(ex, "发送私聊消息失败");
                 }
+                
+                await _botClient.SendTextMessageAsync(channelService.AdminLogChannel, textHelperService.MakeAdminLogText(dbUser, targetUser, EBanType.Warning, reason, message), parseMode: ParseMode.Html);
 
                 return sb.ToString();
             }
@@ -1384,6 +1391,7 @@ public sealed class AdminCommand(
 
                 await _botClient.AutoReplyAsync("操作执行成功", callbackQuery, true);
                 await _botClient.EditMessageTextAsync(callbackQuery.Message!, $"成功 {action} 了用户 {targetUser.EscapedFullName()}", replyMarkup: null);
+                await _botClient.SendTextMessageAsync(channelService.AdminLogChannel, textHelperService.MakeAdminLogText(dbUser, targetUser, banType, reason, callbackQuery.Message!), parseMode: ParseMode.Html);
             }
         }
     }

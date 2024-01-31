@@ -1,4 +1,5 @@
 using Telegram.Bot.Types;
+using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Interface.Helper;
@@ -108,6 +109,12 @@ public interface ITextHelperService
     /// <param name="rejectReason"></param>
     /// <returns></returns>
     string MakeReviewMessage(Users poster, Users reviewer, bool anymouse, string rejectReason);
+
+    /// <param name="admin">操作管理员</param>
+    /// <param name="target">目标用户</param>
+    /// <param name="type">封禁类型</param>
+    /// <returns></returns>
+    string MakeAdminLogText(Users admin, Users target, EBanType type, string reason, Message? responseMessage);
     /// <summary>
     /// 根据Message.Enetities的字段格式生成HTML文本, 自动过滤无用HashTag
     /// </summary>

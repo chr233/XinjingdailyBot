@@ -4,6 +4,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Model;
 using XinjingdailyBot.Interface.Helper;
@@ -75,6 +76,15 @@ public sealed class TextHelperService(
     public string HtmlMessageLink(long messageID, string chatName, string linkName)
     {
         return $"<a href=\"https://t.me/{chatName}/{messageID}\">{linkName}</a>";
+    }
+    
+    public string HtmlMessageLink(long messageID, long chatId, string linkName)
+    {
+        if (chatId < 0)
+        {
+            chatId = -1000000000000L - chatId;
+        }
+        return $"<a href=\"https://t.me/c/{chatId}/{messageID}\">{linkName}</a>";
     }
 
     /// <inheritdoc/>
@@ -224,6 +234,45 @@ public sealed class TextHelperService(
             sb.AppendLine();
         }
         sb.AppendLine(from);
+
+        return sb.ToString();
+    }
+    
+    /// <param name="admin">操作管理员</param>
+    /// <param name="target">目标用户</param>
+    /// <param name="type">封禁类型</param>
+    /// <returns></returns>
+    public string MakeAdminLogText(Users admin, Users target, EBanType type, String reason , Message? responseMessage)
+    {
+        var sb = new StringBuilder();
+        switch (type)
+        {
+            case EBanType.Ban:
+            case EBanType.GlobalBan:
+                sb.AppendLine("#BAN");
+                break;
+            case EBanType.GlobalMute:
+                sb.AppendLine("#MUTE");
+                break;
+            case EBanType.UnBan: 
+            case EBanType.GlobalUnBan: 
+                sb.AppendLine("#UNBAN");
+                break;
+            case EBanType.GlobalUnMute:
+                sb.AppendLine("#UNMUTE");
+                break;
+            case EBanType.Warning: 
+                sb.AppendLine("#WARN");
+                break;
+        }
+
+        sb.AppendLine($"<b>User</b>: {HtmlUserLink(target)} (<code>{target.UserID}</code>)");
+        sb.AppendLine($"<b>Admin</b>: {HtmlUserLink(admin)} (<code>{admin.UserID}</code>)");
+        sb.AppendLine($"<b>Reason</b>: {reason}");
+        if (responseMessage != null)
+        {
+            sb.AppendLine($"<b>Message Link</b>: {HtmlMessageLink(responseMessage.MessageId, responseMessage.Chat.Id, "link")}");
+        }
 
         return sb.ToString();
     }

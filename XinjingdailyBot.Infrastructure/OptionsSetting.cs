@@ -138,6 +138,11 @@ public sealed record OptionsSetting
         /// 拒稿频道
         /// </summary>
         public string RejectChannel { get; set; } = "";
+        /// <summary>
+        /// 管理日志频道
+        /// 用于存储封禁/解封日志
+        /// </summary>
+        public string AdminLogChannel { get; set; } = "";
     }
 
     /// <summary>

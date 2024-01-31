@@ -40,6 +40,11 @@ public interface IChannelService
     /// </summary>
     Chat RejectChannel { get; }
     /// <summary>
+    /// 管理日志频道
+    /// 用于存储封禁/解封日志
+    /// </summary>
+    Chat AdminLogChannel { get;  }
+    /// <summary>
     /// 机器人用户
     /// </summary>
     User BotUser { get; }
