@@ -24,6 +24,10 @@
 
 > v3.0 开发中
 
+## 环境需求
+
+请使用 MySQL 8.0, 3.0.0 版本将会改善数据库兼容性, 将会支持 PgSql 以及修复 Sqlite 和 MySql 5.x 版本的兼容性问题
+
 ## 使用文档
 
 > 使用文档已迁移至 [Wiki](https://github.com/chr233/XinjingdailyBot/wiki/Customization.md)
@@ -32,6 +36,7 @@
   - [首页](https://github.com/chr233/XinjingdailyBot/wiki/Home)
   - [安装](https://github.com/chr233/XinjingdailyBot/wiki/Install)
   - [配置](https://github.com/chr233/XinjingdailyBot/wiki/Configuration)
+  - [命令说明](https://github.com/chr233/XinjingdailyBot/wiki/Configuration)
 - 进阶
   - [自定义](https://github.com/chr233/XinjingdailyBot/wiki/Customizatio)
 - 信息
