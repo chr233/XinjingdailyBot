@@ -124,7 +124,16 @@ namespace XinjingdailyBot.Generator {
         }
         
         /// <summary>
-        ///   查找类似 _logger.LogWarning(&quot;数据库结构生成完毕, 建议禁用 Database.Generate 来加快启动速度&quot;);
+        ///   查找类似 }
+        ///            catch (Exception ex)
+        ///            {
+        ///                _logger.LogError(ex, &quot;创建数据库失败, 可能没有权限&quot;);
+        ///                _logger.LogInformation(&quot;按任意键退出...&quot;);
+        ///                Console.ReadKey();
+        ///                Environment.Exit(1);
+        ///            }
+        ///
+        ///            _logger.LogWarning(&quot;数据库结构生成完毕, 建议禁用 Database.Generate 来加快启动速度&quot;);
         ///        }
         ///
         ///        return Task.CompletedTask;
@@ -135,9 +144,7 @@ namespace XinjingdailyBot.Generator {
         ///    /// &lt;/summary&gt;
         ///    public override void Dispose()
         ///    {
-        ///        GC.SuppressFinalize(this);
-        ///    }
-        ///} 的本地化字符串。
+        ///        GC.SuppressFinalize [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string DbTableFooter {
             get {
@@ -149,6 +156,7 @@ namespace XinjingdailyBot.Generator {
         ///   查找类似 using Microsoft.Extensions.Options;
         ///using SqlSugar;
         ///using XinjingdailyBot.Infrastructure;
+        ///using XinjingdailyBot.Model.Models;
         ///
         ///namespace XinjingdailyBot.WebAPI.Extensions;
         ///
@@ -163,8 +171,7 @@ namespace XinjingdailyBot.Generator {
         ///    /// &lt;summary&gt;
         ///    /// 执行
         ///    /// &lt;/summary&gt;
-        ///    /// &lt;param name=&quot;cancellationToken&quot;&gt;&lt;/param&gt;
-        ///    /// &lt;returns&gt;&lt;/returns&gt; [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///    /// &lt;param name=&quot;cancellationToken&quot;&gt; [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string DbTableHeader {
             get {

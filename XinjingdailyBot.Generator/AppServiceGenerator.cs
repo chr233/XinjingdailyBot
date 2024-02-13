@@ -17,10 +17,6 @@ internal sealed class AppServiceGenerator : ISourceGenerator
     public void Initialize(GeneratorInitializationContext context)
     {
         // 无需处理
-        if (!Debugger.IsAttached)
-        {
-            Debugger.Launch();
-        }
     }
 
     /// <inheritdoc/>
