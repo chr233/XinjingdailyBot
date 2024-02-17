@@ -8,7 +8,7 @@ namespace XinjingdailyBot.Interface.Data;
 /// <summary>
 /// 投稿服务
 /// </summary>
-public interface IPostService : IBaseService<NewPosts>
+public interface IPostService : IBaseService<Posts>
 {
     /// <summary>
     /// 收到媒体组第一条消息后过多久停止接收该媒体组并进行后续投稿操作, 单位ms
@@ -28,13 +28,13 @@ public interface IPostService : IBaseService<NewPosts>
     /// <param name="second"></param>
     /// <param name="callbackQuery"></param>
     /// <returns></returns>
-    Task AcceptPost(NewPosts post, Users dbUser, bool inPlan, bool second, CallbackQuery callbackQuery);
+    Task AcceptPost(Posts post, Users dbUser, bool inPlan, bool second, CallbackQuery callbackQuery);
     /// <summary>
     /// 取消投稿
     /// </summary>
     /// <param name="post"></param>
     /// <returns></returns>
-    Task CancelPost(NewPosts post);
+    Task CancelPost(Posts post);
 
     /// <summary>
     /// 检查用户是否达到每日投稿上限
@@ -112,7 +112,7 @@ public interface IPostService : IBaseService<NewPosts>
     /// <param name="post"></param>
     /// <param name="text"></param>
     /// <returns></returns>
-    Task EditPostText(NewPosts post, string text);
+    Task EditPostText(Posts post, string text);
     /// <summary>
     /// 是否存在指定媒体组ID的稿件
     /// </summary>
@@ -125,35 +125,35 @@ public interface IPostService : IBaseService<NewPosts>
     /// </summary>
     /// <param name="message"></param>
     /// <returns></returns>
-    Task<NewPosts?> FetchPostFromCallbackQuery(CallbackQuery message);
+    Task<Posts?> FetchPostFromCallbackQuery(CallbackQuery message);
     /// <summary>
     /// 从回复的消息获取稿件
     /// </summary>
     /// <param name="message"></param>
     /// <returns></returns>
-    Task<NewPosts?> FetchPostFromReplyToMessage(Message message);
+    Task<Posts?> FetchPostFromReplyToMessage(Message message);
     /// <summary>
     /// 获取计划发布的投稿
     /// </summary>
     /// <returns></returns>
-    Task<NewPosts> GetInPlanPost();
+    Task<Posts> GetInPlanPost();
 
     /// <summary>
     /// 获取最新未审核稿件
     /// </summary>
     /// <returns></returns>
-    Task<NewPosts?> GetLatestReviewingPostLink();
+    Task<Posts?> GetLatestReviewingPostLink();
     /// <summary>
     /// 获取稿件
     /// </summary>
     /// <param name="postId"></param>
     /// <returns></returns>
-    Task<NewPosts?> GetPostByPostId(int postId);
+    Task<Posts?> GetPostByPostId(int postId);
     /// <summary>
     /// 获取随机稿件
     /// </summary>
     /// <returns></returns>
-    Task<NewPosts?> GetRandomPost();
+    Task<Posts?> GetRandomPost();
 
     /// <summary>
     /// 处理多媒体投稿(mediaGroup)
@@ -181,7 +181,7 @@ public interface IPostService : IBaseService<NewPosts>
     /// </summary>
     /// <param name="post"></param>
     /// <returns></returns>
-    Task<bool> PublicInPlanPost(NewPosts post);
+    Task<bool> PublicInPlanPost(Posts post);
 
     /// <summary>
     /// 拒绝投稿
@@ -191,34 +191,34 @@ public interface IPostService : IBaseService<NewPosts>
     /// <param name="rejectReason"></param>
     /// <param name="htmlRejectMessage"></param>
     /// <returns></returns>
-    Task RejectPost(NewPosts post, Users dbUser, RejectReasons rejectReason, string? htmlRejectMessage);
+    Task RejectPost(Posts post, Users dbUser, RejectReasons rejectReason, string? htmlRejectMessage);
     /// <summary>
     /// 撤回稿件
     /// </summary>
     /// <param name="post"></param>
     /// <returns></returns>
-    Task RevocationPost(NewPosts post);
+    Task RevocationPost(Posts post);
     /// <summary>
     /// 设置稿件匿名
     /// </summary>
     /// <param name="post"></param>
     /// <param name="anonymous"></param>
     /// <returns></returns>
-    Task SetPostAnonymous(NewPosts post, bool anonymous);
+    Task SetPostAnonymous(Posts post, bool anonymous);
     /// <summary>
     /// 设置稿件强制匿名
     /// </summary>
     /// <param name="post"></param>
     /// <param name="anonymous"></param>
     /// <returns></returns>
-    Task SetPostForceAnonymous(NewPosts post, bool anonymous);
+    Task SetPostForceAnonymous(Posts post, bool anonymous);
     /// <summary>
     /// 设置稿件遮罩
     /// </summary>
     /// <param name="post"></param>
     /// <param name="spoiler"></param>
     /// <returns></returns>
-    Task SetPostSpoiler(NewPosts post, bool spoiler);
+    Task SetPostSpoiler(Posts post, bool spoiler);
 
     /// <summary>
     /// 设置稿件Tag
@@ -227,7 +227,7 @@ public interface IPostService : IBaseService<NewPosts>
     /// <param name="tagId"></param>
     /// <param name="callbackQuery"></param>
     /// <returns></returns>
-    Task SetPostTag(NewPosts post, int tagId, CallbackQuery callbackQuery);
+    Task SetPostTag(Posts post, int tagId, CallbackQuery callbackQuery);
     /// <summary>
     /// 设置稿件Tag
     /// </summary>
@@ -235,7 +235,7 @@ public interface IPostService : IBaseService<NewPosts>
     /// <param name="payload"></param>
     /// <param name="callbackQuery"></param>
     /// <returns></returns>
-    Task SetPostTag(NewPosts post, string payload, CallbackQuery callbackQuery);
+    Task SetPostTag(Posts post, string payload, CallbackQuery callbackQuery);
     /// <summary>
     /// 统计全部稿件
     /// </summary>
@@ -277,25 +277,25 @@ public interface IPostService : IBaseService<NewPosts>
     /// <param name="post"></param>
     /// <param name="status"></param>
     /// <returns></returns>
-    Task UpdatePostStatus(NewPosts post, EPostStatus status);
+    Task UpdatePostStatus(Posts post, EPostStatus status);
     /// <summary>
     /// 创建稿件
     /// </summary>
     /// <param name="post"></param>
     /// <returns></returns>
-    Task<int> CreateNewPosts(NewPosts post);
+    Task<int> CreateNewPosts(Posts post);
     /// <summary>
     /// 获取过期稿件列表
     /// </summary>
     /// <param name="beforeTime"></param>
     /// <returns></returns>
-    Task<List<NewPosts>> GetExpiredPosts(DateTime beforeTime);
+    Task<List<Posts>> GetExpiredPosts(DateTime beforeTime);
     /// <summary>
     /// 获取过期稿件列表
     /// </summary>
     /// <param name="userID"></param>
     /// <param name="beforeTime"></param>
     /// <returns></returns>
-    Task<List<NewPosts>> GetExpiredPosts(long userID, DateTime beforeTime);
+    Task<List<Posts>> GetExpiredPosts(long userID, DateTime beforeTime);
     void InitTtlTimer();
 }

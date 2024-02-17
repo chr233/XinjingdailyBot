@@ -93,7 +93,7 @@ public sealed class PostCommand(
     /// <param name="post"></param>
     /// <param name="query"></param>
     /// <returns></returns>
-    private async Task SetAnymouse(NewPosts post, CallbackQuery query)
+    private async Task SetAnymouse(Posts post, CallbackQuery query)
     {
         await _botClient.AutoReplyAsync("可以使用命令 /anonymous 切换默认匿名投稿", query);
 
@@ -110,7 +110,7 @@ public sealed class PostCommand(
     /// <param name="post"></param>
     /// <param name="query"></param>
     /// <returns></returns>
-    private async Task CancelPost(NewPosts post, CallbackQuery query)
+    private async Task CancelPost(Posts post, CallbackQuery query)
     {
         await _postService.CancelPost(post);
 
@@ -126,7 +126,7 @@ public sealed class PostCommand(
     /// <param name="post"></param>
     /// <param name="query"></param>
     /// <returns></returns>
-    private async Task ConfirmPost(NewPosts post, Users dbUser, CallbackQuery query)
+    private async Task ConfirmPost(Posts post, Users dbUser, CallbackQuery query)
     {
         if (await _postService.CheckPostLimit(dbUser, null, query) == false)
         {

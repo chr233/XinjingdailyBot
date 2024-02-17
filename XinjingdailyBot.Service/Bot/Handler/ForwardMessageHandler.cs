@@ -35,7 +35,7 @@ public sealed class ForwardMessageHandler(
             if (forwardChatId != -1 && foreardMsgId != -1 &&
                (_channelService.IsChannelMessage(forwardChatId) || _channelService.IsGroupMessage(forwardChatId)))
             {
-                NewPosts? post = null;
+                Posts? post = null;
 
                 var mediaGroup = await _mediaGroupService.QueryMediaGroup(forwardChatId, foreardMsgId);
                 if (mediaGroup == null)

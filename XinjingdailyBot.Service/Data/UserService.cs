@@ -424,7 +424,7 @@ public sealed class UserService(
             //在审核群内
             if (chatId == _channelService.ReviewGroup.Id)
             {
-                NewPosts? post;
+                Posts? post;
 
                 var mediaGroup = await _mediaGroupService.QueryMediaGroup(chatId, msgId);
                 if (mediaGroup == null)//单条稿件
@@ -466,7 +466,7 @@ public sealed class UserService(
         //在审核群内
         if (chatId == _channelService.ReviewGroup.Id)
         {
-            NewPosts? post;
+            Posts? post;
 
             var mediaGroup = await _mediaGroupService.QueryMediaGroup(chatId, msgId);
             if (mediaGroup == null)//单条稿件

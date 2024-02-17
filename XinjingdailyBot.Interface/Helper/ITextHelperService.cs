@@ -65,7 +65,7 @@ public interface ITextHelperService
     /// <param name="poster"></param>
     /// <param name="channel"></param>
     /// <returns></returns>
-    string MakePoster(NewPosts post, Users poster, ChannelOptions? channel);
+    string MakePoster(Posts post, Users poster, ChannelOptions? channel);
     /// <summary>
     /// 生成稿件
     /// </summary>
@@ -73,7 +73,7 @@ public interface ITextHelperService
     /// <param name="poster"></param>
     /// <param name="channel"></param>
     /// <returns></returns>
-    string MakePostText(NewPosts post, Users poster, ChannelOptions? channel);
+    string MakePostText(Posts post, Users poster, ChannelOptions? channel);
     /// <summary>
     /// 生成审核消息(待审核)
     /// </summary>

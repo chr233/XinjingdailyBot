@@ -180,7 +180,7 @@ public sealed class TextHelperService(
     }
 
     /// <inheritdoc/>
-    public string MakePoster(NewPosts post, Users poster, ChannelOptions? channel)
+    public string MakePoster(Posts post, Users poster, ChannelOptions? channel)
     {
         var user = HtmlUserLink(poster);
 
@@ -210,7 +210,7 @@ public sealed class TextHelperService(
     }
 
     /// <inheritdoc/>
-    public string MakePostText(NewPosts post, Users poster, ChannelOptions? channel)
+    public string MakePostText(Posts post, Users poster, ChannelOptions? channel)
     {
         var tag = _tagRepository.GetActiviedHashTags(post.Tags);
 

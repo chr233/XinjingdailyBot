@@ -1433,7 +1433,7 @@ public sealed class AdminCommand(
                 return "参数有误";
             }
 
-            NewPosts? post = null;
+            Posts? post = null;
 
             if (int.TryParse(args[1], out int postId))
             {

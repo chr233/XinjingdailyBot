@@ -62,7 +62,7 @@ public sealed class ChannelPostHandler(
         string text = _textHelperService.ParseMessage(message);
 
         //生成数据库实体
-        var newPost = new NewPosts {
+        var newPost = new Posts {
             OriginChatID = message.Chat.Id,
             OriginMsgID = message.MessageId,
             OriginActionChatID = 0,
@@ -115,7 +115,7 @@ public sealed class ChannelPostHandler(
         string text = _textHelperService.ParseMessage(message);
 
         //生成数据库实体
-        var newPost = new NewPosts {
+        var newPost = new Posts {
             OriginChatID = message.Chat.Id,
             OriginMsgID = message.MessageId,
             OriginActionChatID = 0,
@@ -186,7 +186,7 @@ public sealed class ChannelPostHandler(
                 string text = _textHelperService.ParseMessage(message);
 
                 //生成数据库实体
-                var newPost = new NewPosts {
+                var newPost = new Posts {
                     OriginChatID = message.Chat.Id,
                     OriginMsgID = message.MessageId,
                     OriginActionChatID = 0,

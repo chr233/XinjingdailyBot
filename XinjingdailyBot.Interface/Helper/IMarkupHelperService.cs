@@ -38,7 +38,7 @@ public interface IMarkupHelperService
     /// </summary>
     /// <param name="post"></param>
     /// <returns></returns>
-    InlineKeyboardMarkup? LinkToOriginPostKeyboard(NewPosts post);
+    InlineKeyboardMarkup? LinkToOriginPostKeyboard(Posts post);
     /// <summary>
     /// 跳转链接键盘
     /// </summary>
@@ -71,7 +71,7 @@ public interface IMarkupHelperService
     /// <param name="dbUser"></param>
     /// <param name="post"></param>
     /// <returns></returns>
-    InlineKeyboardMarkup QueryPostMenuKeyboard(Users dbUser, NewPosts post);
+    InlineKeyboardMarkup QueryPostMenuKeyboard(Users dbUser, Posts post);
     /// <summary>
     /// 获取随机投稿键盘
     /// </summary>
@@ -86,7 +86,7 @@ public interface IMarkupHelperService
     /// 获取随机投稿键盘
     /// </summary>
     /// <returns></returns>
-    InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, NewPosts post, int tagId, string postType);
+    InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, Posts post, int tagId, string postType);
     /// <summary>
     /// 审核键盘A(选择稿件Tag)
     /// </summary>
@@ -105,7 +105,7 @@ public interface IMarkupHelperService
     /// </summary>
     /// <param name="post"></param>
     /// <returns></returns>
-    InlineKeyboardMarkup ReviewStatusButton(NewPosts? post);
+    InlineKeyboardMarkup ReviewStatusButton(Posts? post);
 
     /// <summary>
     /// 频道选项键盘

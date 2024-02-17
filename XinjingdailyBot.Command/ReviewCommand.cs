@@ -248,7 +248,7 @@ public sealed class ReviewCommand(
     /// <param name="post"></param>
     /// <param name="query"></param>
     /// <returns></returns>
-    private async Task SetAnonymous(NewPosts post, CallbackQuery query)
+    private async Task SetAnonymous(Posts post, CallbackQuery query)
     {
         await _botClient.AutoReplyAsync("可以使用命令 /anonymous 切换默认匿名投稿", query);
 
@@ -267,7 +267,7 @@ public sealed class ReviewCommand(
     /// <param name="post"></param>
     /// <param name="query"></param>
     /// <returns></returns>
-    private async Task SetSpoiler(NewPosts post, CallbackQuery query)
+    private async Task SetSpoiler(Posts post, CallbackQuery query)
     {
         if (!post.CanSpoiler)
         {
@@ -293,7 +293,7 @@ public sealed class ReviewCommand(
     /// <param name="post"></param>
     /// <param name="query"></param>
     /// <returns></returns>
-    private async Task UpdateKeyboard(NewPosts post, CallbackQuery query)
+    private async Task UpdateKeyboard(Posts post, CallbackQuery query)
     {
         var keyboard = post.IsDirectPost ?
             _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags, post.HasSpoiler) :
@@ -307,7 +307,7 @@ public sealed class ReviewCommand(
     /// <param name="post"></param>
     /// <param name="query"></param>
     /// <returns></returns>
-    private async Task CancelPost(NewPosts post, CallbackQuery query)
+    private async Task CancelPost(Posts post, CallbackQuery query)
     {
         await _postService.CancelPost(post);
 
@@ -324,7 +324,7 @@ public sealed class ReviewCommand(
     /// <param name="query"></param>
     /// <param name="payload"></param>
     /// <returns></returns>
-    private async Task RejectPostHelper(NewPosts post, Users dbUser, CallbackQuery query, string payload)
+    private async Task RejectPostHelper(Posts post, Users dbUser, CallbackQuery query, string payload)
     {
         var reason = _rejectReasonRepository.GetReasonByPayload(payload);
         if (reason == null)
@@ -342,7 +342,7 @@ public sealed class ReviewCommand(
     /// <param name="post"></param>
     /// <param name="callbackQuery"></param>
     /// <returns></returns>
-    private async Task SwitchKeyboard(bool rejectMode, NewPosts post, CallbackQuery callbackQuery)
+    private async Task SwitchKeyboard(bool rejectMode, Posts post, CallbackQuery callbackQuery)
     {
         if (rejectMode)
         {
@@ -365,7 +365,7 @@ public sealed class ReviewCommand(
     /// <param name="dbUser"></param>
     /// <param name="query"></param>
     /// <returns></returns>
-    private async Task DismissWarning(NewPosts post, Users dbUser, CallbackQuery query)
+    private async Task DismissWarning(Posts post, Users dbUser, CallbackQuery query)
     {
         bool anonymous = dbUser.PreferAnonymous;
 

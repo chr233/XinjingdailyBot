@@ -65,7 +65,7 @@ public sealed class PostController(
     /// <param name="post"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ActionResult<GenericResponse<NewPosts>>> CreatePost([FromForm] CreatePostRequest post)
+    public async Task<ActionResult<GenericResponse<Posts>>> CreatePost([FromForm] CreatePostRequest post)
     {
         var dbUser = _httpContextAccessor.GetUser();
         if (!dbUser.Right.HasFlag(EUserRights.DirectPost))
@@ -141,7 +141,7 @@ public sealed class PostController(
         var postText = _textHelperService.PureText(post.Text);
         int newTags = _tagRepository.FetchTags(post.Text);
 
-        var newPost = new NewPosts {
+        var newPost = new Posts {
             OriginChatID = userChatId,
             OriginActionChatID = userChatId,
             ReviewChatID = userChatId,
@@ -282,7 +282,7 @@ public sealed class PostController(
         dbUser.PostCount++;
         await _userService.UpdateUserPostCount(dbUser);
 
-        var response = new GenericResponse<NewPosts> {
+        var response = new GenericResponse<Posts> {
             Code = HttpStatusCode.OK,
             Message = "成功",
             Success = true,
@@ -298,7 +298,7 @@ public sealed class PostController(
     /// <param name="post"></param>
     /// <returns></returns>
     [HttpPut]
-    public async Task<ActionResult<GenericResponse<NewPosts>>> EditReviewMessage([FromForm] CreatePostRequest post)
+    public async Task<ActionResult<GenericResponse<Posts>>> EditReviewMessage([FromForm] CreatePostRequest post)
     {
         var dbUser = _httpContextAccessor.GetUser();
         if (!dbUser.Right.HasFlag(EUserRights.DirectPost))
@@ -374,7 +374,7 @@ public sealed class PostController(
         var postText = _textHelperService.PureText(post.Text);
         int newTags = _tagRepository.FetchTags(post.Text);
 
-        var newPost = new NewPosts {
+        var newPost = new Posts {
             OriginChatID = userChatId,
             OriginActionChatID = userChatId,
             ReviewChatID = userChatId,
@@ -515,7 +515,7 @@ public sealed class PostController(
         dbUser.PostCount++;
         await _userService.UpdateUserPostCount(dbUser);
 
-        var response = new GenericResponse<NewPosts> {
+        var response = new GenericResponse<Posts> {
             Code = HttpStatusCode.OK,
             Message = "成功",
             Success = true,

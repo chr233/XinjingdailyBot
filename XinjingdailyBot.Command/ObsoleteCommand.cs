@@ -16,7 +16,7 @@ namespace XinjingdailyBot.Command;
 /// 超级管理员命令
 /// </summary>
 [Obsolete("迁移使用")]
-[AppService(LifeTime.Scoped)]
+//[AppService(LifeTime.Scoped)]
 public sealed class ObsoleteCommand(
         ILogger<SuperCommand> _logger,
         ITelegramBotClient _botClient,
@@ -184,7 +184,7 @@ public sealed class ObsoleteCommand(
 
                 bool countReject = oldPost.Status == EPostStatus.Rejected && (oldPost.Reason != ERejectReason.Fuzzy && oldPost.Reason != ERejectReason.Duplicate);
 
-                var post = new NewPosts {
+                var post = new Posts {
                     Id = oldPost.Id,
                     OriginChatID = oldPost.OriginChatID,
                     OriginMsgID = oldPost.OriginMsgID,

@@ -35,7 +35,7 @@ public sealed class PostService(
     TagRepository _tagRepository,
     IMediaGroupService _mediaGroupService,
     IImageHelperService _imageHelperService,
-    ISqlSugarClient _context) : BaseService<NewPosts>(_context), IPostService, IDisposable
+    ISqlSugarClient _context) : BaseService<Posts>(_context), IPostService, IDisposable
 {
     /// <inheritdoc/>
     public async Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null)
@@ -217,7 +217,7 @@ public sealed class PostService(
         string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
         //生成数据库实体
-        var newPost = new NewPosts {
+        var newPost = new Posts {
             Anonymous = anonymous,
             Text = text,
             RawText = message.Text ?? "",
@@ -325,7 +325,7 @@ public sealed class PostService(
         string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
         //生成数据库实体
-        var newPost = new NewPosts {
+        var newPost = new Posts {
             Anonymous = anonymous,
             Text = text,
             RawText = message.Text ?? "",
@@ -516,7 +516,7 @@ public sealed class PostService(
                 mgCache.ActionMessage = await _botClient.SendTextMessageAsync(message.Chat, processText, replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
 
                 //生成数据库实体
-                var newPost = new NewPosts {
+                var newPost = new Posts {
                     OriginChatID = message.Chat.Id,
                     OriginMsgID = message.MessageId,
                     OriginActionChatID = mgCache.ActionMessage.Chat.Id,
@@ -571,7 +571,7 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public async Task SetPostTag(NewPosts post, int tagId, CallbackQuery callbackQuery)
+    public async Task SetPostTag(Posts post, int tagId, CallbackQuery callbackQuery)
     {
         var tag = _tagRepository.GetTagById(tagId);
         if (tag == null)
@@ -604,7 +604,7 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public async Task SetPostTag(NewPosts post, string payload, CallbackQuery callbackQuery)
+    public async Task SetPostTag(Posts post, string payload, CallbackQuery callbackQuery)
     {
         payload = payload.ToLowerInvariant();
         var tag = _tagRepository.GetTagByPayload(payload);
@@ -615,7 +615,7 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public async Task RejectPost(NewPosts post, Users dbUser, RejectReasons rejectReason, string? htmlRejectMessage)
+    public async Task RejectPost(Posts post, Users dbUser, RejectReasons rejectReason, string? htmlRejectMessage)
     {
         var poster = await _userService.FetchUserByUserID(post.PosterUID);
 
@@ -743,7 +743,7 @@ public sealed class PostService(
     /// <param name="reviewer"></param>
     /// <param name="callbackQuery"></param>
     /// <returns></returns>
-    private async Task RejectIfBan(NewPosts post, Users poster, Users reviewer, CallbackQuery? callbackQuery)
+    private async Task RejectIfBan(Posts post, Users poster, Users reviewer, CallbackQuery? callbackQuery)
     {
         post.RejectReason = "封禁自动拒绝";
         post.CountReject = true;
@@ -768,7 +768,7 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public async Task AcceptPost(NewPosts post, Users dbUser, bool inPlan, bool second, CallbackQuery callbackQuery)
+    public async Task AcceptPost(Posts post, Users dbUser, bool inPlan, bool second, CallbackQuery callbackQuery)
     {
         var poster = await _userService.FetchUserByUserID(post.PosterUID);
 
@@ -954,7 +954,7 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public async Task<bool> PublicInPlanPost(NewPosts post)
+    public async Task<bool> PublicInPlanPost(Posts post)
     {
         var poster = await _userService.FetchUserByUserID(post.PosterUID);
 
@@ -1072,7 +1072,7 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public async Task<NewPosts?> FetchPostFromReplyToMessage(Message message)
+    public async Task<Posts?> FetchPostFromReplyToMessage(Message message)
     {
         var replyMessage = message.ReplyToMessage;
         if (replyMessage == null)
@@ -1080,7 +1080,7 @@ public sealed class PostService(
             return null;
         }
 
-        NewPosts? post;
+        Posts? post;
 
         var msgGroupId = message.MediaGroupId;
         if (string.IsNullOrEmpty(msgGroupId))
@@ -1102,7 +1102,7 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public async Task<NewPosts?> FetchPostFromCallbackQuery(CallbackQuery query)
+    public async Task<Posts?> FetchPostFromCallbackQuery(CallbackQuery query)
     {
         if (query.Message == null)
         {
@@ -1113,7 +1113,7 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public async Task<NewPosts?> GetLatestReviewingPostLink()
+    public async Task<Posts?> GetLatestReviewingPostLink()
     {
         var now = DateTime.Now;
         var today = now.AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
@@ -1123,7 +1123,7 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public async Task<NewPosts?> GetPostByPostId(int postId)
+    public async Task<Posts?> GetPostByPostId(int postId)
     {
         return await Queryable().FirstAsync(x => x.Id == postId);
     }
@@ -1225,7 +1225,7 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public Task RevocationPost(NewPosts post)
+    public Task RevocationPost(Posts post)
     {
         post.Status = EPostStatus.Revocation;
         post.ModifyAt = DateTime.Now;
@@ -1233,7 +1233,7 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public Task CancelPost(NewPosts post)
+    public Task CancelPost(Posts post)
     {
         post.Status = EPostStatus.Cancel;
         post.ModifyAt = DateTime.Now;
@@ -1241,7 +1241,7 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public Task EditPostText(NewPosts post, string text)
+    public Task EditPostText(Posts post, string text)
     {
         post.Text = text;
         post.ModifyAt = DateTime.Now;
@@ -1249,7 +1249,7 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public Task SetPostAnonymous(NewPosts post, bool anonymous)
+    public Task SetPostAnonymous(Posts post, bool anonymous)
     {
         post.Anonymous = anonymous;
         post.ModifyAt = DateTime.Now;
@@ -1257,7 +1257,7 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public Task SetPostForceAnonymous(NewPosts post, bool anonymous)
+    public Task SetPostForceAnonymous(Posts post, bool anonymous)
     {
         post.ForceAnonymous = anonymous;
         post.ModifyAt = DateTime.Now;
@@ -1265,7 +1265,7 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public Task SetPostSpoiler(NewPosts post, bool spoiler)
+    public Task SetPostSpoiler(Posts post, bool spoiler)
     {
         post.HasSpoiler = spoiler;
         post.ModifyAt = DateTime.Now;
@@ -1279,7 +1279,7 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public async Task<NewPosts?> GetRandomPost()
+    public async Task<Posts?> GetRandomPost()
     {
         return await Queryable()
                     .Where(static x => x.Status == EPostStatus.Accepted && x.PostType == MessageType.Photo)
@@ -1287,13 +1287,13 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public Task<NewPosts> GetInPlanPost()
+    public Task<Posts> GetInPlanPost()
     {
         return Queryable().Where(static x => x.Status == EPostStatus.InPlan).FirstAsync();
     }
 
     /// <inheritdoc/>
-    public Task UpdatePostStatus(NewPosts post, EPostStatus status)
+    public Task UpdatePostStatus(Posts post, EPostStatus status)
     {
         post.Status = status;
         post.ModifyAt = DateTime.Now;
@@ -1301,13 +1301,13 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public Task<int> CreateNewPosts(NewPosts post)
+    public Task<int> CreateNewPosts(Posts post)
     {
         return Insertable(post).ExecuteReturnIdentityAsync();
     }
 
     /// <inheritdoc/>
-    public Task<List<NewPosts>> GetExpiredPosts(DateTime beforeTime)
+    public Task<List<Posts>> GetExpiredPosts(DateTime beforeTime)
     {
         return Queryable()
             .Where(x => (x.Status == EPostStatus.Padding || x.Status == EPostStatus.Reviewing) && x.ModifyAt < beforeTime)
@@ -1315,7 +1315,7 @@ public sealed class PostService(
     }
 
     /// <inheritdoc/>
-    public Task<List<NewPosts>> GetExpiredPosts(long userID, DateTime beforeTime)
+    public Task<List<Posts>> GetExpiredPosts(long userID, DateTime beforeTime)
     {
         return Queryable()
             .Where(x => x.PosterUID == userID && (x.Status == EPostStatus.Padding || x.Status == EPostStatus.Reviewing) && x.ModifyAt < beforeTime)
