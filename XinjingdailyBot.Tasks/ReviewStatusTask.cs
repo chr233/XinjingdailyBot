@@ -32,13 +32,13 @@ public sealed class ReviewStatusTask(
 
 
         var todayPost = await _postService.CountAllPosts(today);
-        var todayAcceptPost = await _postService.CountAcceptedPosts(today);
-        var todayRejectPost = await _postService.CountRejectedPosts(today);
-        var todayPaddingPost = await _postService.CountReviewingPosts(today);
+        var todayAcceptPost = await _postService.CountAcceptedPosts(today).ConfigureAwait(false);
+        var todayRejectPost = await _postService.CountRejectedPosts(today).ConfigureAwait(false);
+        var todayPaddingPost = await _postService.CountReviewingPosts(today).ConfigureAwait(false);
 
         if (_channelService.HasSecondChannel)
         {
-            var todayAcceptSecondPost = await _postService.CountAcceptedSecondPosts(today);
+            var todayAcceptSecondPost = await _postService.CountAcceptedSecondPosts(today).ConfigureAwait(false);
             todayAcceptPost += todayAcceptSecondPost;
         }
 
@@ -123,9 +123,9 @@ public sealed class ReviewStatusTask(
 
         if (statusMsg == null)
         {
-            statusMsg = await _botClient.SendTextMessageAsync(reviewGroup, sb.ToString(), parseMode: ParseMode.Html, replyMarkup: kbd);
-            await _botClient.PinChatMessageAsync(reviewGroup, statusMsg.MessageId);
-            await _reviewStatusService.CreateNewReviewStatus(statusMsg);
+            statusMsg = await _botClient.SendTextMessageAsync(reviewGroup, sb.ToString(), parseMode: ParseMode.Html, replyMarkup: kbd).ConfigureAwait(false);
+            await _botClient.PinChatMessageAsync(reviewGroup, statusMsg.MessageId).ConfigureAwait(false);
+            await _reviewStatusService.CreateNewReviewStatus(statusMsg).ConfigureAwait(false);
         }
     }
 }
