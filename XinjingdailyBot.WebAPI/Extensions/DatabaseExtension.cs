@@ -75,6 +75,8 @@ public static class DatabaseExtension
             _ => throw new NotSupportedException("不支持的数据库类型"),
         };
 
+        _logger.Info(connStr);
+
         services.AddSingleton<ISqlSugarClient>(s => {
             var sqlSugar = new SqlSugarScope(new ConnectionConfig {
                 ConnectionString = connStr,

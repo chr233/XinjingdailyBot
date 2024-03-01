@@ -109,7 +109,9 @@ public interface ITextHelperService
     /// <param name="rejectReason"></param>
     /// <returns></returns>
     string MakeReviewMessage(Users poster, Users reviewer, bool anymouse, string rejectReason);
-
+    /// <summary>
+    /// 生成管理员操作日志消息
+    /// </summary>
     /// <param name="admin">操作管理员</param>
     /// <param name="target">目标用户</param>
     /// <param name="type">封禁类型</param>

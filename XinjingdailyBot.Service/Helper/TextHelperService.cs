@@ -77,7 +77,8 @@ public sealed class TextHelperService(
     {
         return $"<a href=\"https://t.me/{chatName}/{messageID}\">{linkName}</a>";
     }
-    
+
+    /// <inheritdoc/>
     public string HtmlMessageLink(long messageID, long chatId, string linkName)
     {
         if (chatId < 0)
@@ -237,12 +238,9 @@ public sealed class TextHelperService(
 
         return sb.ToString();
     }
-    
-    /// <param name="admin">操作管理员</param>
-    /// <param name="target">目标用户</param>
-    /// <param name="type">封禁类型</param>
-    /// <returns></returns>
-    public string MakeAdminLogText(Users admin, Users target, EBanType type, String reason , Message? responseMessage)
+
+    /// <inheritdoc/>
+    public string MakeAdminLogText(Users admin, Users target, EBanType type, string reason, Message? responseMessage)
     {
         var sb = new StringBuilder();
         switch (type)
@@ -254,14 +252,14 @@ public sealed class TextHelperService(
             case EBanType.GlobalMute:
                 sb.AppendLine("#MUTE");
                 break;
-            case EBanType.UnBan: 
-            case EBanType.GlobalUnBan: 
+            case EBanType.UnBan:
+            case EBanType.GlobalUnBan:
                 sb.AppendLine("#UNBAN");
                 break;
             case EBanType.GlobalUnMute:
                 sb.AppendLine("#UNMUTE");
                 break;
-            case EBanType.Warning: 
+            case EBanType.Warning:
                 sb.AppendLine("#WARN");
                 break;
         }
