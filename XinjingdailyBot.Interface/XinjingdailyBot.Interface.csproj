@@ -1,8 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\XinjingdailyBot.Infrastructure\XinjingdailyBot.Infrastructure.csproj" />

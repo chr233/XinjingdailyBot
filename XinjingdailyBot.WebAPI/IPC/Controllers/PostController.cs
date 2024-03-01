@@ -432,7 +432,7 @@ public sealed class PostController(
                 });
             }
 
-            originMsg = await handler;
+            originMsg = await handler.ConfigureAwait(false);
 
             // 记录Attachment
             var attachmentId = await _attachmentService.CreateAttachment(originMsg, newPostId);

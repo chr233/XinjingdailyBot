@@ -8,6 +8,7 @@
 		<PackageReference Include="Microsoft.Extensions.Logging" />
 		<PackageReference Include="NLog" />
 		<PackageReference Include="Telegram.Bot" />
+		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
 	</ItemGroup>
 
 	<ItemGroup>

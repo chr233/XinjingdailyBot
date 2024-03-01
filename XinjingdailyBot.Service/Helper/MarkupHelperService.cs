@@ -169,17 +169,17 @@ public sealed class MarkupHelperService(
 
         if (hasSpoiler.HasValue)
         {
-            btns.Add(new[]
-            {
+            btns.Add(
+            [
                  InlineKeyboardButton.WithCallbackData(hasSpoiler.Value? Langs.TagSpoilerOn: Langs.TagSpoilerOff, "review spoiler"),
-            });
+            ]);
         }
 
         if (anymouse.HasValue)
-            btns.Add(new[]
-               {
+            btns.Add(
+               [
                      InlineKeyboardButton.WithCallbackData(anymouse.Value ? Langs.AnymouseOn: Langs.AnymouseOff, "review forceAnymouse"),
-                });
+                ]);
 
         if (!_botOption.PostSecondMenu)
         {
