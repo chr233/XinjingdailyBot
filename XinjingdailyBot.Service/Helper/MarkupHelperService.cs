@@ -169,17 +169,17 @@ public sealed class MarkupHelperService(
 
         if (hasSpoiler.HasValue)
         {
-            btns.Add(
-            [
+            btns.Add(new[]
+            {
                  InlineKeyboardButton.WithCallbackData(hasSpoiler.Value? Langs.TagSpoilerOn: Langs.TagSpoilerOff, "review spoiler"),
-            ]);
+            });
         }
 
         if (anymouse.HasValue)
-            btns.Add(
-               [
+            btns.Add(new[]
+               {
                      InlineKeyboardButton.WithCallbackData(anymouse.Value ? Langs.AnymouseOn: Langs.AnymouseOff, "review forceAnymouse"),
-                ]);
+                });
 
         if (!_botOption.PostSecondMenu)
         {
@@ -271,7 +271,7 @@ public sealed class MarkupHelperService(
     /// <inheritdoc/>
     public async Task<InlineKeyboardMarkup?> SetUserGroupKeyboard(Users dbUser, Users targetUser)
     {
-        var groups = await _groupRepository.Queryable().Where(x => x.Id > 0 && x.Id < dbUser.GroupID).ToListAsync();
+        var groups = await _groupRepository.Queryable().Where(x => x.Id > 0 && x.Id < dbUser.GroupID).ToListAsync().ConfigureAwait(false);
 
         if (groups.Count == 0)
         {

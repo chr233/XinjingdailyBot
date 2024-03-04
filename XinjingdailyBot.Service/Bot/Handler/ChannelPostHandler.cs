@@ -48,11 +48,11 @@ public sealed class ChannelPostHandler(
             channelId = message.ForwardFromChat.Id;
             channelMsgId = message.ForwardFromMessageId ?? -1;
 
-            var option = await _channelOptionService.FetchChannelOption(message.ForwardFromChat);
+            var option = await _channelOptionService.FetchChannelOption(message.ForwardFromChat).ConfigureAwait(false);
 
             if (option == EChannelOption.AutoReject)
             {
-                await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
+                await _botClient.DeleteMessageAsync(message.Chat, message.MessageId).ConfigureAwait(false);
                 _logger.LogInformation("删除消息 {msgid}", message.MessageId);
                 return;
             }
@@ -84,11 +84,11 @@ public sealed class ChannelPostHandler(
             ReviewerUID = dbUser.UserID
         };
 
-        await _postService.CreateNewPosts(newPost);
+        await _postService.CreateNewPosts(newPost).ConfigureAwait(false);
 
         //增加通过数量
         dbUser.AcceptCount++;
-        await _userService.UpdateUserPostCount(dbUser);
+        await _userService.UpdateUserPostCount(dbUser).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -101,11 +101,11 @@ public sealed class ChannelPostHandler(
         {
             channelId = message.ForwardFromChat.Id;
             channelMsgId = message.ForwardFromMessageId ?? -1;
-            var option = await _channelOptionService.FetchChannelOption(message.ForwardFromChat);
+            var option = await _channelOptionService.FetchChannelOption(message.ForwardFromChat).ConfigureAwait(false);
 
             if (option == EChannelOption.AutoReject)
             {
-                await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
+                await _botClient.DeleteMessageAsync(message.Chat, message.MessageId).ConfigureAwait(false);
                 _logger.LogInformation("删除消息 {msgid}", message.MessageId);
                 return;
             }
@@ -138,14 +138,14 @@ public sealed class ChannelPostHandler(
             ReviewerUID = dbUser.UserID
         };
 
-        var postID = await _postService.CreateNewPosts(newPost);
+        var postID = await _postService.CreateNewPosts(newPost).ConfigureAwait(false);
 
         //添加附件
-        await _attachmentService.CreateAttachment(message, postID);
+        await _attachmentService.CreateAttachment(message, postID).ConfigureAwait(false);
 
         //增加通过数量
         dbUser.AcceptCount++;
-        await _userService.UpdateUserPostCount(dbUser);
+        await _userService.UpdateUserPostCount(dbUser).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -163,7 +163,7 @@ public sealed class ChannelPostHandler(
 
             MediaGroupIDs.TryAdd(mediaGroupId, -1);
 
-            bool exists = await _postService.IfExistsMediaGroupId(mediaGroupId);
+            bool exists = await _postService.IfExistsMediaGroupId(mediaGroupId).ConfigureAwait(false);
             if (!exists)
             {
                 long channelId = -1, channelMsgId = -1;
@@ -172,11 +172,11 @@ public sealed class ChannelPostHandler(
                     channelId = message.ForwardFromChat.Id;
                     channelMsgId = message.ForwardFromMessageId ?? -1;
 
-                    var option = await _channelOptionService.FetchChannelOption(message.ForwardFromChat);
+                    var option = await _channelOptionService.FetchChannelOption(message.ForwardFromChat).ConfigureAwait(false);
 
                     if (option == EChannelOption.AutoReject)
                     {
-                        await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
+                        await _botClient.DeleteMessageAsync(message.Chat, message.MessageId).ConfigureAwait(false);
                         _logger.LogInformation("删除消息 {msgid}", message.MessageId);
                         return;
                     }
@@ -210,18 +210,18 @@ public sealed class ChannelPostHandler(
                     ReviewerUID = dbUser.UserID
                 };
 
-                postID = await _postService.CreateNewPosts(newPost);
+                postID = await _postService.CreateNewPosts(newPost).ConfigureAwait(false);
 
                 MediaGroupIDs[mediaGroupId] = postID;
 
                 //两秒后停止接收媒体组消息
                 _ = Task.Run(async () => {
-                    await Task.Delay(1500);
+                    await Task.Delay(1500).ConfigureAwait(false);
                     MediaGroupIDs.Remove(mediaGroupId, out _);
 
                     //增加通过数量
                     dbUser.AcceptCount++;
-                    await _userService.UpdateUserPostCount(dbUser);
+                    await _userService.UpdateUserPostCount(dbUser).ConfigureAwait(false);
                 });
             }
         }
@@ -229,10 +229,10 @@ public sealed class ChannelPostHandler(
         if (postID > 0)
         {
             //更新附件
-            await _attachmentService.CreateAttachment(message, postID);
+            await _attachmentService.CreateAttachment(message, postID).ConfigureAwait(false);
 
             //记录媒体组
-            await _mediaGroupService.AddPostMediaGroup(message);
+            await _mediaGroupService.AddPostMediaGroup(message).ConfigureAwait(false);
         }
     }
 }

@@ -196,18 +196,18 @@ public sealed class CommandHandler(
             {
                 try
                 {
-                    await _botClient.SendChatActionAsync(message, ChatAction.Typing);
+                    await _botClient.SendChatActionAsync(message, ChatAction.Typing).ConfigureAwait(false);
 
-                    await CallCommandAsync(dbUser, message, type, method);
+                    await CallCommandAsync(dbUser, message, type, method).ConfigureAwait(false);
 
                     if (_channelService.IsGroupMessage(message.Chat.Id))
                     {
                         //删除原消息
                         _ = Task.Run(async () => {
-                            await Task.Delay(TimeSpan.FromSeconds(30));
+                            await Task.Delay(TimeSpan.FromSeconds(30)).ConfigureAwait(false);
                             try
                             {
-                                await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
+                                await _botClient.DeleteMessageAsync(message.Chat, message.MessageId).ConfigureAwait(false);
                             }
                             catch
                             {
@@ -220,18 +220,18 @@ public sealed class CommandHandler(
                 {
                     errorMsg = $"{ex.GetType} {ex.Message}";
                     _logger.LogError(ex, "命令 {cmd} 执行出错", cmd);
-                    await _botClient.SendCommandReply(_optionsSetting.Debug ? errorMsg : "遇到内部错误", message);
+                    await _botClient.SendCommandReply(_optionsSetting.Debug ? errorMsg : "遇到内部错误", message).ConfigureAwait(false);
                 }
                 handled = true;
                 break;
             }
         }
 
-        await _cmdRecordService.AddCmdRecord(message, dbUser, handled, false, errorMsg);
+        await _cmdRecordService.AddCmdRecord(message, dbUser, handled, false, errorMsg).ConfigureAwait(false);
 
         if (!handled && ((inGroup && IsAtMe) || (!inGroup)))
         {
-            await _botClient.SendCommandReply("未知的命令", message);
+            await _botClient.SendCommandReply("未知的命令", message).ConfigureAwait(false);
         }
     }
 
@@ -248,7 +248,7 @@ public sealed class CommandHandler(
         //权限检查
         if (!dbUser.Right.HasFlag(assemblyMethod.Rights))
         {
-            await _botClient.SendCommandReply("没有权限这么做", message);
+            await _botClient.SendCommandReply("没有权限这么做", message).ConfigureAwait(false);
             return;
         }
 
@@ -280,7 +280,7 @@ public sealed class CommandHandler(
         //调用方法
         if (method.Invoke(service, [.. methodParameters]) is Task task)
         {
-            await task;
+            await task.ConfigureAwait(false);
         }
     }
 
@@ -290,13 +290,13 @@ public sealed class CommandHandler(
         var message = query.Message;
         if (message == null)
         {
-            await _botClient.AutoReplyAsync("消息不存在", query, true);
+            await _botClient.AutoReplyAsync("消息不存在", query, true).ConfigureAwait(false);
             return;
         }
 
         if (string.IsNullOrEmpty(query.Data))
         {
-            await _botClient.RemoveMessageReplyMarkupAsync(message);
+            await _botClient.RemoveMessageReplyMarkupAsync(message).ConfigureAwait(false);
             return;
         }
 
@@ -308,15 +308,15 @@ public sealed class CommandHandler(
         {
             if (args.Length < 2 || !long.TryParse(args[1], out long userID))
             {
-                await _botClient.AutoReplyAsync("Payload 非法", query, true);
-                await _botClient.RemoveMessageReplyMarkupAsync(message);
+                await _botClient.AutoReplyAsync("Payload 非法", query, true).ConfigureAwait(false);
+                await _botClient.RemoveMessageReplyMarkupAsync(message).ConfigureAwait(false);
                 return;
             }
 
             //判断消息发起人是不是同一个, userID 为 -1 时所有人均可用
             if (dbUser.UserID != userID && userID != -1)
             {
-                await _botClient.AutoReplyAsync("这不是你的消息, 请不要瞎点", query, true);
+                await _botClient.AutoReplyAsync("这不是你的消息, 请不要瞎点", query, true).ConfigureAwait(false);
                 return;
             }
 
@@ -340,30 +340,30 @@ public sealed class CommandHandler(
             {
                 try
                 {
-                    await CallQueryCommandAsync(dbUser, query, type, method, args);
+                    await CallQueryCommandAsync(dbUser, query, type, method, args).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
                     errorMsg = $"{ex.GetType} {ex.Message}";
                     _logger.LogError(ex, "回调命令 {cmd} 执行出错", cmd);
-                    await _botClient.AutoReplyAsync(_optionsSetting.Debug ? errorMsg : "遇到内部错误", query, true);
+                    await _botClient.AutoReplyAsync(_optionsSetting.Debug ? errorMsg : "遇到内部错误", query, true).ConfigureAwait(false);
                 }
                 handled = true;
                 break;
             }
         }
 
-        await _cmdRecordService.AddCmdRecord(query, dbUser, handled, true, errorMsg);
+        await _cmdRecordService.AddCmdRecord(query, dbUser, handled, true, errorMsg).ConfigureAwait(false);
 
         if (!handled)
         {
             if (_optionsSetting.Debug)
             {
-                await _botClient.AutoReplyAsync($"未知的命令 [{query.Data}]", query, true);
+                await _botClient.AutoReplyAsync($"未知的命令 [{query.Data}]", query, true).ConfigureAwait(false);
             }
             else
             {
-                await _botClient.AutoReplyAsync("未知的命令", query, true);
+                await _botClient.AutoReplyAsync("未知的命令", query, true).ConfigureAwait(false);
             }
         }
     }
@@ -382,7 +382,7 @@ public sealed class CommandHandler(
         //权限检查
         if (!dbUser.Right.HasFlag(assemblyMethod.Rights))
         {
-            await _botClient.AutoReplyAsync("没有权限这么做", query, true);
+            await _botClient.AutoReplyAsync("没有权限这么做", query, true).ConfigureAwait(false);
             return;
         }
 
@@ -413,7 +413,7 @@ public sealed class CommandHandler(
         //调用方法
         if (method.Invoke(service, [.. methodParameters]) is Task task)
         {
-            await task;
+            await task.ConfigureAwait(false);
         }
     }
 
@@ -483,15 +483,15 @@ public sealed class CommandHandler(
 
         AddCommands(EUserRights.None);
         AddCommands(EUserRights.NormalCmd);
-        await _botClient.SetMyCommandsAsync(cmds, null);
-        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllPrivateChats());
-        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllGroupChats());
+        await _botClient.SetMyCommandsAsync(cmds, null).ConfigureAwait(false);
+        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllPrivateChats()).ConfigureAwait(false);
+        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllGroupChats()).ConfigureAwait(false);
 
         AddCommands(EUserRights.AdminCmd);
-        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllChatAdministrators());
+        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllChatAdministrators()).ConfigureAwait(false);
 
         AddCommands(EUserRights.ReviewPost);
-        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeChatAdministrators { ChatId = _channelService.ReviewGroup.Id });
+        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeChatAdministrators { ChatId = _channelService.ReviewGroup.Id }).ConfigureAwait(false);
         return true;
     }
 
@@ -500,11 +500,11 @@ public sealed class CommandHandler(
     {
         var cmds = new List<BotCommand>();
 
-        await _botClient.SetMyCommandsAsync(cmds);
-        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllPrivateChats());
-        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllGroupChats());
-        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllChatAdministrators());
-        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeChatAdministrators { ChatId = _channelService.ReviewGroup.Id });
+        await _botClient.SetMyCommandsAsync(cmds).ConfigureAwait(false);
+        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllPrivateChats()).ConfigureAwait(false);
+        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllGroupChats()).ConfigureAwait(false);
+        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllChatAdministrators()).ConfigureAwait(false);
+        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeChatAdministrators { ChatId = _channelService.ReviewGroup.Id }).ConfigureAwait(false);
         return true;
     }
 }

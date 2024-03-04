@@ -48,12 +48,12 @@ public sealed class SuperCommand(
             string path = Path.Exists(Environment.ProcessPath) ? Environment.ProcessPath : Utils.ExeFullPath;
             _logger.LogInformation("机器人运行路径: {path}", path);
             Process.Start(path);
-            await _botClient.SendCommandReply("机器人即将重启", message);
+            await _botClient.SendCommandReply("机器人即将重启", message).ConfigureAwait(false);
             Environment.Exit(0);
         }
         catch (Exception ex)
         {
-            await _botClient.SendCommandReply("启动进程遇到错误", message);
+            await _botClient.SendCommandReply("启动进程遇到错误", message).ConfigureAwait(false);
             _logger.LogError(ex, "启动进程遇到错误");
         }
     }
@@ -66,7 +66,7 @@ public sealed class SuperCommand(
     [TextCmd("EXIT", EUserRights.SuperCmd, Description = "终止机器人")]
     public async Task ResponseExit(Message message)
     {
-        await _botClient.SendCommandReply("机器人即将退出", message);
+        await _botClient.SendCommandReply("机器人即将退出", message).ConfigureAwait(false);
         Environment.Exit(0);
     }
 
@@ -91,7 +91,7 @@ public sealed class SuperCommand(
                 return ("请回复审核消息", null);
             }
 
-            var post = await _postService.FetchPostFromReplyToMessage(message);
+            var post = await _postService.FetchPostFromReplyToMessage(message).ConfigureAwait(false);
 
             if (post == null)
             {
@@ -103,7 +103,7 @@ public sealed class SuperCommand(
                 return ("不是来自其他频道的投稿, 无法设置频道选项", null);
             }
 
-            var channel = await _channelOptionService.FetchChannelByChannelId(post.ChannelID);
+            var channel = await _channelOptionService.FetchChannelByChannelId(post.ChannelID).ConfigureAwait(false);
 
             if (channel == null)
             {
@@ -122,8 +122,8 @@ public sealed class SuperCommand(
             return ($"请选择针对来自 {channel.ChannelTitle} 的稿件的处理方式\n当前设置: {option}", keyboard);
         }
 
-        (var text, var kbd) = await exec();
-        await _botClient.SendCommandReply(text, message, autoDelete: false, replyMarkup: kbd);
+        (var text, var kbd) = await exec().ConfigureAwait(false);
+        await _botClient.SendCommandReply(text, message, autoDelete: false, replyMarkup: kbd).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -166,7 +166,7 @@ public sealed class SuperCommand(
                 return $"未知的频道选项 {args[2]}";
             }
 
-            var channel = await _channelOptionService.UpdateChannelOptionById(channelId, option.Value);
+            var channel = await _channelOptionService.UpdateChannelOptionById(channelId, option.Value).ConfigureAwait(false);
 
             if (channel == null)
             {
@@ -176,8 +176,8 @@ public sealed class SuperCommand(
             return $"来自 {channel.ChannelTitle} 频道的稿件今后将被 {optionStr}";
         }
 
-        string text = await exec();
-        await _botClient.EditMessageTextAsync(query.Message!, text, replyMarkup: null);
+        string text = await exec().ConfigureAwait(false);
+        await _botClient.EditMessageTextAsync(query.Message!, text, replyMarkup: null).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -188,15 +188,15 @@ public sealed class SuperCommand(
     [TextCmd("COMMAND", EUserRights.SuperCmd, Description = "设置命令菜单")]
     public async Task ResponseCommand(Message message)
     {
-        bool result = await _commandHandler.SetCommandsMenu();
-        await _botClient.SendCommandReply(result ? "设置菜单成功" : "设置菜单失败", message, autoDelete: false);
+        bool result = await _commandHandler.SetCommandsMenu().ConfigureAwait(false);
+        await _botClient.SendCommandReply(result ? "设置菜单成功" : "设置菜单失败", message, autoDelete: false).ConfigureAwait(false);
     }
 
     [TextCmd("CLEARCOMMAND", EUserRights.SuperCmd, Description = "设置命令菜单")]
     public async Task ResponseClearCommand(Message message)
     {
-        bool result = await _commandHandler.ClearCommandsMenu();
-        await _botClient.SendCommandReply(result ? "清除菜单成功" : "清除菜单失败", message, autoDelete: false);
+        bool result = await _commandHandler.ClearCommandsMenu().ConfigureAwait(false);
+        await _botClient.SendCommandReply(result ? "清除菜单成功" : "清除菜单失败", message, autoDelete: false).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -212,24 +212,24 @@ public sealed class SuperCommand(
         int startId = 1;
         int effectCount = 0;
 
-        int totalUsers = await _userService.CountUser();
+        int totalUsers = await _userService.CountUser().ConfigureAwait(false);
 
-        var msg = await _botClient.SendCommandReply($"开始更新用户表, 共计 {totalUsers} 条记录", message, autoDelete: false);
+        var msg = await _botClient.SendCommandReply($"开始更新用户表, 共计 {totalUsers} 条记录", message, autoDelete: false).ConfigureAwait(false);
 
         while (startId <= totalUsers)
         {
-            var users = await _userService.GetUserListAfterId(startId, threads);
+            var users = await _userService.GetUserListAfterId(startId, threads).ConfigureAwait(false);
             if (users.Count == 0)
             {
                 break;
             }
 
             var tasks = users.Select(async user => {
-                int postCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID);
-                int acceptCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && (x.Status == EPostStatus.Accepted || x.Status == EPostStatus.AcceptedSecond));
-                int rejectCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == EPostStatus.Rejected);
-                int expiredCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status < 0);
-                int reviewCount = await _postService.Queryable().CountAsync(x => x.ReviewerUID == user.UserID && x.PosterUID != user.UserID);
+                int postCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID).ConfigureAwait(false);
+                int acceptCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && (x.Status == EPostStatus.Accepted || x.Status == EPostStatus.AcceptedSecond)).ConfigureAwait(false);
+                int rejectCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status == EPostStatus.Rejected).ConfigureAwait(false);
+                int expiredCount = await _postService.Queryable().CountAsync(x => x.PosterUID == user.UserID && x.Status < 0).ConfigureAwait(false);
+                int reviewCount = await _postService.Queryable().CountAsync(x => x.ReviewerUID == user.UserID && x.PosterUID != user.UserID).ConfigureAwait(false);
 
                 if (user.PostCount != postCount || user.AcceptCount != acceptCount || user.RejectCount != rejectCount || user.ExpiredPostCount != expiredCount || user.ReviewCount != reviewCount)
                 {
@@ -241,11 +241,11 @@ public sealed class SuperCommand(
 
                     effectCount++;
 
-                    await _userService.UpdateUserPostCount(user);
+                    await _userService.UpdateUserPostCount(user).ConfigureAwait(false);
                 }
             }).ToList();
 
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
 
             startId += threads;
 
@@ -254,11 +254,11 @@ public sealed class SuperCommand(
 
         try
         {
-            await _botClient.EditMessageTextAsync(msg, $"更新用户表完成, 更新了 {effectCount} 条记录");
+            await _botClient.EditMessageTextAsync(msg, $"更新用户表完成, 更新了 {effectCount} 条记录").ConfigureAwait(false);
         }
         catch
         {
-            await _botClient.SendCommandReply($"更新用户表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
+            await _botClient.SendCommandReply($"更新用户表完成, 更新了 {effectCount} 条记录", message, autoDelete: false).ConfigureAwait(false);
         }
     }
 
@@ -277,7 +277,7 @@ public sealed class SuperCommand(
                 return "当前版本不支持自动升级";
             }
 
-            var releaseResponse = await _httpHelperService.GetLatestRelease();
+            var releaseResponse = await _httpHelperService.GetLatestRelease().ConfigureAwait(false);
 
             if (releaseResponse == null)
             {
@@ -361,8 +361,8 @@ public sealed class SuperCommand(
             }
         }
 
-        string text = await exec();
-        await _botClient.SendCommandReply(text, message, false, ParseMode.Html);
+        string text = await exec().ConfigureAwait(false);
+        await _botClient.SendCommandReply(text, message, false, ParseMode.Html).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -378,12 +378,12 @@ public sealed class SuperCommand(
 
         if (replyMsg == null)
         {
-            await _botClient.SendCommandReply("请回复广告消息", message, false);
+            await _botClient.SendCommandReply("请回复广告消息", message, false).ConfigureAwait(false);
             return;
         }
 
-        await _advertiseService.CreateAdvertise(replyMsg);
+        await _advertiseService.CreateAdvertise(replyMsg).ConfigureAwait(false);
 
-        await _botClient.SendCommandReply("创建广告成功, 请在数据库中修改广告配置并启用该广告", message, false, parsemode: ParseMode.Html);
+        await _botClient.SendCommandReply("创建广告成功, 请在数据库中修改广告配置并启用该广告", message, false, parsemode: ParseMode.Html).ConfigureAwait(false);
     }
 }

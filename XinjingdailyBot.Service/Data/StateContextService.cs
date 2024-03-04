@@ -23,11 +23,11 @@ public sealed class StateContextService(ISqlSugarClient context) : BaseService<S
     /// <inheritdoc/>
     public async Task SetContext(int userId, string context)
     {
-        await DeleteAsync(x => x.UserId == userId);
+        await DeleteAsync(x => x.UserId == userId).ConfigureAwait(false);
 
         await InsertAsync(new StateContext {
             UserId = userId,
             Context = context
-        });
+        }).ConfigureAwait(false);
     }
 }

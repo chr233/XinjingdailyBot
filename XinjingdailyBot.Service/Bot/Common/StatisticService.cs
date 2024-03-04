@@ -23,7 +23,7 @@ public sealed class StatisticService(
         if (_options.Value.Statistic)
         {
             StatisticTimer = new Timer(
-                async (_) => await _httpHelperService.SendStatistic(),
+                async (_) => await _httpHelperService.SendStatistic().ConfigureAwait(false),
                 null,
                 TimeSpan.FromMinutes(30),
                 TimeSpan.FromHours(24)

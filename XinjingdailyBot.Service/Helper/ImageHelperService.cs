@@ -29,7 +29,7 @@ public sealed class ImageHelperService(
 
         if (handler != null)
         {
-            var ratio = await handler;
+            var ratio = await handler.ConfigureAwait(false);
 
             if (ratio == null)
             {
@@ -81,10 +81,10 @@ public sealed class ImageHelperService(
             return null;
         }
 
-        var tipsMsg = await _botClient.AutoReplyAsync("正在处理图片文件，请稍候...", message);
+        var tipsMsg = await _botClient.AutoReplyAsync("正在处理图片文件，请稍候...", message).ConfigureAwait(false);
 
-        var file = await _botClient.GetFileAsync(document.FileId);
-        var fileSteam = await _httpHelperService.GetTelegramFileHeader(file, 512);
+        var file = await _botClient.GetFileAsync(document.FileId).ConfigureAwait(false);
+        var fileSteam = await _httpHelperService.GetTelegramFileHeader(file, 512).ConfigureAwait(false);
         if (fileSteam == null)
         {
             _logger.LogWarning("文件流为 null");

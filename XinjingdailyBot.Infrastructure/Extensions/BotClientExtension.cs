@@ -129,15 +129,15 @@ public static class BotClientExtension
         //私聊始终不删除消息, 群聊中默认删除消息, 但可以指定不删除
         bool delete = (autoDelete != null ? autoDelete.Value : (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup)) && message.Chat.Type != ChatType.Private;
 
-        var msg = await botClient.SendTextMessageAsync(message.Chat, text, parseMode: parsemode, replyToMessageId: message.MessageId, replyMarkup: replyMarkup, disableWebPagePreview: true, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
+        var msg = await botClient.SendTextMessageAsync(message.Chat, text, parseMode: parsemode, replyToMessageId: message.MessageId, replyMarkup: replyMarkup, disableWebPagePreview: true, allowSendingWithoutReply: true, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         if (delete)
         {
             _ = Task.Run(async () => {
-                await Task.Delay(TimeSpan.FromSeconds(30));
+                await Task.Delay(TimeSpan.FromSeconds(30)).ConfigureAwait(false);
                 try
                 {
-                    await botClient.DeleteMessageAsync(msg.Chat, msg.MessageId, cancellationToken);
+                    await botClient.DeleteMessageAsync(msg.Chat, msg.MessageId, cancellationToken).ConfigureAwait(false);
                 }
                 catch
                 {
@@ -193,7 +193,7 @@ public static class BotClientExtension
         {
             try
             {
-                var chatMember = await botClient.GetChatMemberAsync(chat, userId);
+                var chatMember = await botClient.GetChatMemberAsync(chat, userId).ConfigureAwait(false);
                 status = chatMember.Status switch {
                     ChatMemberStatus.Creator or
                     ChatMemberStatus.Administrator or

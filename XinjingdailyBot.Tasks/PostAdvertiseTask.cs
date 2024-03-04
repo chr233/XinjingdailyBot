@@ -27,7 +27,7 @@ public sealed class PostAdvertiseTask(
     {
         _logger.LogInformation("开始定时任务, 发布广告");
 
-        var ad = await _advertisesService.GetPostableAdvertise();
+        var ad = await _advertisesService.GetPostableAdvertise().ConfigureAwait(false);
 
         if (ad == null)
         {
@@ -35,7 +35,7 @@ public sealed class PostAdvertiseTask(
         }
 
         //取消置顶旧的广告
-        await _advertisePostService.UnPinOldAdPosts(ad);
+        await _advertisePostService.UnPinOldAdPosts(ad).ConfigureAwait(false);
 
         var channelService = _serviceProvider.GetRequiredService<IChannelService>();
 
@@ -61,25 +61,25 @@ public sealed class PostAdvertiseTask(
 
                 try
                 {
-                    var msgId = await _botClient.CopyMessageAsync(chatId, ad.ChatID, (int)ad.MessageID, disableNotification: true);
+                    var msgId = await _botClient.CopyMessageAsync(chatId, ad.ChatID, (int)ad.MessageID, disableNotification: true).ConfigureAwait(false);
 
                     var kbd = _markupHelperService.AdvertiseExternalLinkButton(ad.ExternalLink, ad.ExternalLinkName);
                     if (kbd != null)
                     {
-                        await _botClient.EditMessageReplyMarkupAsync(chat, msgId.Id, kbd);
+                        await _botClient.EditMessageReplyMarkupAsync(chat, msgId.Id, kbd).ConfigureAwait(false);
                     }
 
-                    await _advertisePostService.AddAdPost(ad, chatId, msgId.Id);
+                    await _advertisePostService.AddAdPost(ad, chatId, msgId.Id).ConfigureAwait(false);
 
                     ad.ShowCount++;
                     ad.LastPostAt = DateTime.Now;
 
                     if (ad.PinMessage)
                     {
-                        await _botClient.PinChatMessageAsync(chatId, msgId.Id, true);
+                        await _botClient.PinChatMessageAsync(chatId, msgId.Id, true).ConfigureAwait(false);
                     }
 
-                    await _advertisesService.UpdateAdvertiseStatistics(ad);
+                    await _advertisesService.UpdateAdvertiseStatistics(ad).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -87,7 +87,7 @@ public sealed class PostAdvertiseTask(
                 }
                 finally
                 {
-                    await Task.Delay(500);
+                    await Task.Delay(500).ConfigureAwait(false);
                 }
             }
         }

@@ -20,18 +20,18 @@ public sealed class AdvertisePostsService(
     {
         var oldPosts = await Queryable()
             .Where(x => x.AdId == advertises.Id && !x.Deleted)
-            .ToListAsync();
+            .ToListAsync().ConfigureAwait(false);
 
         foreach (var oldPost in oldPosts)
         {
             try
             {
-                await _botClient.DeleteMessageAsync(oldPost.ChatID, (int)oldPost.MessageID);
+                await _botClient.DeleteMessageAsync(oldPost.ChatID, (int)oldPost.MessageID).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "删除消息失败");
-                await Task.Delay(500);
+                await Task.Delay(500).ConfigureAwait(false);
             }
             finally
             {
@@ -39,7 +39,7 @@ public sealed class AdvertisePostsService(
                 oldPost.ModifyAt = DateTime.Now;
                 await Updateable(oldPost)
                     .UpdateColumns(static x => new { x.Deleted, x.ModifyAt })
-                    .ExecuteCommandAsync();
+                    .ExecuteCommandAsync().ConfigureAwait(false);
             }
         }
     }
@@ -49,18 +49,18 @@ public sealed class AdvertisePostsService(
     {
         var oldPosts = await Queryable()
             .Where(x => x.AdId == advertises.Id && x.Pined)
-            .ToListAsync();
+            .ToListAsync().ConfigureAwait(false);
 
         foreach (var oldPost in oldPosts)
         {
             try
             {
-                await _botClient.UnpinChatMessageAsync(oldPost.ChatID, (int)oldPost.MessageID);
+                await _botClient.UnpinChatMessageAsync(oldPost.ChatID, (int)oldPost.MessageID).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "取消置顶消息失败");
-                await Task.Delay(500);
+                await Task.Delay(500).ConfigureAwait(false);
             }
             finally
             {
@@ -68,7 +68,7 @@ public sealed class AdvertisePostsService(
                 oldPost.ModifyAt = DateTime.Now;
                 await Updateable(oldPost)
                     .UpdateColumns(static x => new { x.Pined, x.ModifyAt })
-                    .ExecuteCommandAsync();
+                    .ExecuteCommandAsync().ConfigureAwait(false);
             }
         }
     }
@@ -85,6 +85,6 @@ public sealed class AdvertisePostsService(
             ModifyAt = DateTime.Now,
         };
 
-        await Insertable(adpost).ExecuteCommandAsync();
+        await Insertable(adpost).ExecuteCommandAsync().ConfigureAwait(false);
     }
 }

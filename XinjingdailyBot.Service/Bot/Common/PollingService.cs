@@ -50,16 +50,16 @@ public sealed class PollingService(
         _commandHandler.InstallCommands();
 
         _logger.LogInformation("读取基础信息");
-        await _channelService.InitChannelInfo();
+        await _channelService.InitChannelInfo().ConfigureAwait(false);
 
         _logger.LogInformation("读取群组和等级设定");
-        await _groupRepository.InitGroupCache();
-        await _levelRepository.InitLevelCache();
-        await _tagRepository.InitPostTagCache();
-        await _rejectReasonRepository.InitRejectReasonCache();
+        await _groupRepository.InitGroupCache().ConfigureAwait(false);
+        await _levelRepository.InitLevelCache().ConfigureAwait(false);
+        await _tagRepository.InitPostTagCache().ConfigureAwait(false);
+        await _rejectReasonRepository.InitRejectReasonCache().ConfigureAwait(false);
 
         _logger.LogInformation("开始运行 Bot");
-        await DoWork(stoppingToken);
+        await DoWork(stoppingToken).ConfigureAwait(false);
     }
 
     private async Task DoWork(CancellationToken stoppingToken)
@@ -83,7 +83,7 @@ public sealed class PollingService(
                     updateHandler: updateService.HandleUpdateAsync,
                     pollingErrorHandler: updateService.HandlePollingErrorAsync,
                     receiverOptions: receiverOptions,
-                    cancellationToken: stoppingToken);
+                    cancellationToken: stoppingToken).ConfigureAwait(false);
             }
             catch (ApiRequestException ex)
             {
@@ -92,7 +92,7 @@ public sealed class PollingService(
             catch (Exception ex)
             {
                 _logger.LogError(ex, "接收服务运行出错");
-                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken).ConfigureAwait(false);
             }
         }
     }

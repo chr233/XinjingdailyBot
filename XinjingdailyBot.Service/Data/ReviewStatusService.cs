@@ -19,7 +19,7 @@ public sealed class ReviewStatusService(
     /// <inheritdoc/>
     public async Task<ReviewStatus?> GetOldReviewStatu()
     {
-        var oldPost = await Queryable().FirstAsync(static x => !x.Deleted);
+        var oldPost = await Queryable().FirstAsync(static x => !x.Deleted).ConfigureAwait(false);
         return oldPost;
     }
 
@@ -28,18 +28,18 @@ public sealed class ReviewStatusService(
     {
         var oldPosts = await Queryable()
             .Where(static x => !x.Deleted)
-            .ToListAsync();
+            .ToListAsync().ConfigureAwait(false);
 
         foreach (var oldPost in oldPosts)
         {
             try
             {
-                await _botClient.DeleteMessageAsync(oldPost.ChatID, (int)oldPost.MessageID);
+                await _botClient.DeleteMessageAsync(oldPost.ChatID, (int)oldPost.MessageID).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "删除消息失败");
-                await Task.Delay(500);
+                await Task.Delay(500).ConfigureAwait(false);
             }
             finally
             {
@@ -47,7 +47,7 @@ public sealed class ReviewStatusService(
                 oldPost.ModifyAt = DateTime.Now;
                 await Updateable(oldPost)
                     .UpdateColumns(static x => new { x.Deleted, x.ModifyAt })
-                    .ExecuteCommandAsync();
+                    .ExecuteCommandAsync().ConfigureAwait(false);
             }
         }
     }
