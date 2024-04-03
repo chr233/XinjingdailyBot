@@ -27,14 +27,14 @@ public class LevelRepository(
     /// <returns></returns>
     public async Task InitLevelCache()
     {
-        var defaultLevel = await GetFirstAsync(x => x.Id == 1);
+        var defaultLevel = await GetFirstAsync(x => x.Id == 1).ConfigureAwait(false);
         if (defaultLevel == null)
         {
             _logger.LogInformation("缺少默认等级，正在创建内置等级");
-            await InsertBuildInLevels();
+            await InsertBuildInLevels().ConfigureAwait(false);
         }
 
-        var levels = await GetListAsync();
+        var levels = await GetListAsync().ConfigureAwait(false);
         if (levels.Count != 0)
         {
             LevelCache.Clear();
@@ -71,7 +71,7 @@ public class LevelRepository(
             new Levels { Id = 8, Name = "Lv6+", MinExp = 10001 },
         };
 
-        await Storageable(levels).ExecuteCommandAsync();
+        await Storageable(levels).ExecuteCommandAsync().ConfigureAwait(false);
     }
 
     /// <summary>

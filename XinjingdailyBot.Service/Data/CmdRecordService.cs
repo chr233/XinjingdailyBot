@@ -34,7 +34,7 @@ public sealed class CmdRecordService(ISqlSugarClient context) : BaseService<CmdR
             ExecuteAt = DateTime.Now,
         };
 
-        await Insertable(record).ExecuteCommandAsync();
+        await Insertable(record).ExecuteCommandAsync().ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -61,7 +61,7 @@ public sealed class CmdRecordService(ISqlSugarClient context) : BaseService<CmdR
             ExecuteAt = DateTime.Now,
         };
 
-        await Insertable(record).ExecuteCommandAsync();
+        await Insertable(record).ExecuteCommandAsync().ConfigureAwait(false);
     }
 
     /// <inheritdoc/>

@@ -30,7 +30,7 @@ public sealed class UpdateService(
             _channelService.OnChatTitleChanged(update.Message.Chat, update.Message.NewChatTitle);
         }
 
-        var dbUser = await _userService.FetchUserFromUpdate(update);
+        var dbUser = await _userService.FetchUserFromUpdate(update).ConfigureAwait(false);
 
         if (dbUser == null)
         {
@@ -59,7 +59,7 @@ public sealed class UpdateService(
         {
             try
             {
-                await handler;
+                await handler.ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -75,7 +75,7 @@ public sealed class UpdateService(
 
         if (exception is RequestException)
         {
-            await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+            await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken).ConfigureAwait(false);
         }
     }
 }

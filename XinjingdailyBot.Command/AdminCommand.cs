@@ -81,7 +81,7 @@ public sealed class AdminCommand(
                 sb.AppendLine($"群组链接: <code>@{chat.Username ?? "无"}</code>");
             }
         }
-        await _botClient.SendCommandReply(sb.ToString(), message, false, parsemode: ParseMode.Html);
+        await _botClient.SendCommandReply(sb.ToString(), message, false, parsemode: ParseMode.Html).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -95,13 +95,13 @@ public sealed class AdminCommand(
     {
         var sb = new StringBuilder();
 
-        var targetUser = await _userService.FetchTargetUser(message);
+        var targetUser = await _userService.FetchTargetUser(message).ConfigureAwait(false);
 
         if (targetUser == null)
         {
             if (args.Length > 0)
             {
-                targetUser = await _userService.FetchUserByUserNameOrUserID(args.First());
+                targetUser = await _userService.FetchUserByUserNameOrUserID(args.First()).ConfigureAwait(false);
             }
         }
 
@@ -116,10 +116,10 @@ public sealed class AdminCommand(
 
             sb.AppendLine();
             sb.AppendLine("-- 用户排名 --");
-            sb.AppendLine(await _userService.GetUserRank(targetUser));
+            sb.AppendLine(await _userService.GetUserRank(targetUser).ConfigureAwait(false));
         }
 
-        await _botClient.SendCommandReply(sb.ToString(), message, false, parsemode: ParseMode.Html);
+        await _botClient.SendCommandReply(sb.ToString(), message, false, parsemode: ParseMode.Html).ConfigureAwait(false);
     }
 
     [TextCmd("BAN", EUserRights.AdminCmd, Description = "封禁用户")]
@@ -140,13 +140,13 @@ public sealed class AdminCommand(
     {
         async Task<string> exec()
         {
-            var targetUser = await _userService.FetchTargetUser(message);
+            var targetUser = await _userService.FetchTargetUser(message).ConfigureAwait(false);
 
             if (targetUser == null)
             {
                 if (args.Length > 0)
                 {
-                    targetUser = await _userService.FetchUserByUserNameOrUserID(args.First());
+                    targetUser = await _userService.FetchUserByUserNameOrUserID(args.First()).ConfigureAwait(false);
                     args = args[1..];
                 }
             }
@@ -183,8 +183,8 @@ public sealed class AdminCommand(
             }
             else
             {
-                await _userService.BanUser(targetUser, true);
-                await banRecordService.AddBanRecord(targetUser, dbUser, EBanType.Ban, reason);
+                await _userService.BanUser(targetUser, true).ConfigureAwait(false);
+                await banRecordService.AddBanRecord(targetUser, dbUser, EBanType.Ban, reason).ConfigureAwait(false);
 
                 try
                 {
@@ -193,8 +193,8 @@ public sealed class AdminCommand(
                         if (targetUser.PrivateChatID > 0)
                         {
                             var msg = string.Format(Langs.BanedUserTips, "管理员", reason);
-                            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg);
-                            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, Langs.QueryBanDescribe);
+                            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg).ConfigureAwait(false);
+                            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, Langs.QueryBanDescribe).ConfigureAwait(false);
                         }
                         else
                         {
@@ -207,7 +207,7 @@ public sealed class AdminCommand(
                     _logger.LogError(ex, "发送私聊消息失败");
                 }
                 
-                await _botClient.SendTextMessageAsync(channelService.AdminLogChannel, textHelperService.MakeAdminLogText(dbUser, targetUser, EBanType.Ban, reason, message), parseMode: ParseMode.Html);
+                await _botClient.SendTextMessageAsync(channelService.AdminLogChannel, textHelperService.MakeAdminLogText(dbUser, targetUser, EBanType.Ban, reason, message), parseMode: ParseMode.Html).ConfigureAwait(false);
 
                 var sb = new StringBuilder();
                 sb.AppendLine($"成功封禁 {targetUser.HtmlUserLink()}");
@@ -217,8 +217,8 @@ public sealed class AdminCommand(
             }
         }
 
-        var text = await exec();
-        await _botClient.SendCommandReply(text, message, false, parsemode: ParseMode.Html);
+        var text = await exec().ConfigureAwait(false);
+        await _botClient.SendCommandReply(text, message, false, parsemode: ParseMode.Html).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -233,13 +233,13 @@ public sealed class AdminCommand(
     {
         async Task<string> exec()
         {
-            var targetUser = await _userService.FetchTargetUser(message);
+            var targetUser = await _userService.FetchTargetUser(message).ConfigureAwait(false);
 
             if (targetUser == null)
             {
                 if (args.Length > 0)
                 {
-                    targetUser = await _userService.FetchUserByUserNameOrUserID(args.First());
+                    targetUser = await _userService.FetchUserByUserNameOrUserID(args.First()).ConfigureAwait(false);
                     args = args[1..];
                 }
             }
@@ -276,16 +276,16 @@ public sealed class AdminCommand(
             }
             else
             {
-                await _userService.BanUser(targetUser, false);
-                await banRecordService.AddBanRecord(targetUser, dbUser, EBanType.UnBan, reason);
+                await _userService.BanUser(targetUser, false).ConfigureAwait(false);
+                await banRecordService.AddBanRecord(targetUser, dbUser, EBanType.UnBan, reason).ConfigureAwait(false);
 
                 try
                 {
                     if (targetUser.PrivateChatID > 0)
                     {
                         var msg = string.Format(Langs.UnbanedUserTips, "管理员", reason);
-                        await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg);
-                        await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, Langs.QueryBanDescribe);
+                        await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg).ConfigureAwait(false);
+                        await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, Langs.QueryBanDescribe).ConfigureAwait(false);
                     }
                     else
                     {
@@ -297,7 +297,7 @@ public sealed class AdminCommand(
                     _logger.LogError(ex, "发送私聊消息失败");
                 }
 
-                await _botClient.SendTextMessageAsync(channelService.AdminLogChannel, textHelperService.MakeAdminLogText(dbUser, targetUser, EBanType.UnBan, reason, message), parseMode: ParseMode.Html);
+                await _botClient.SendTextMessageAsync(channelService.AdminLogChannel, textHelperService.MakeAdminLogText(dbUser, targetUser, EBanType.UnBan, reason, message), parseMode: ParseMode.Html).ConfigureAwait(false);
 
                 
                 var sb = new StringBuilder();
@@ -308,8 +308,8 @@ public sealed class AdminCommand(
             }
         }
 
-        var text = await exec();
-        await _botClient.SendCommandReply(text, message, false, parsemode: ParseMode.Html);
+        var text = await exec().ConfigureAwait(false);
+        await _botClient.SendCommandReply(text, message, false, parsemode: ParseMode.Html).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -324,13 +324,13 @@ public sealed class AdminCommand(
     {
         async Task<string> exec()
         {
-            var targetUser = await _userService.FetchTargetUser(message);
+            var targetUser = await _userService.FetchTargetUser(message).ConfigureAwait(false);
 
             if (targetUser == null)
             {
                 if (args.Length > 0)
                 {
-                    targetUser = await _userService.FetchUserByUserNameOrUserID(args.First());
+                    targetUser = await _userService.FetchUserByUserNameOrUserID(args.First()).ConfigureAwait(false);
                     args = args[1..];
                 }
             }
@@ -367,9 +367,9 @@ public sealed class AdminCommand(
             }
             else
             {
-                int warnCount = await banRecordService.GetWarnCount(targetUser);
+                int warnCount = await banRecordService.GetWarnCount(targetUser).ConfigureAwait(false);
 
-                await banRecordService.AddBanRecord(targetUser, dbUser, EBanType.Warning, reason);
+                await banRecordService.AddBanRecord(targetUser, dbUser, EBanType.Warning, reason).ConfigureAwait(false);
 
                 warnCount++;
 
@@ -381,8 +381,8 @@ public sealed class AdminCommand(
 
                 if (warnCount >= WarningLimit)
                 {
-                    await _userService.BanUser(targetUser, true);
-                    await banRecordService.AddBanRecord(targetUser, dbUser, EBanType.Ban, "90天内受到警告过多, 自动封禁");
+                    await _userService.BanUser(targetUser, true).ConfigureAwait(false);
+                    await banRecordService.AddBanRecord(targetUser, dbUser, EBanType.Ban, "90天内受到警告过多, 自动封禁").ConfigureAwait(false);
 
                     sb.AppendLine("90天内受到警告过多, 系统自动封禁该用户");
                 }
@@ -395,15 +395,15 @@ public sealed class AdminCommand(
                         s.AppendLine(string.Format(Langs.WarnUserTips, reason));
                         s.AppendLine(string.Format(Langs.WarnUserTips2, warnCount, WarningLimit));
                         string msg = s.ToString();
-                        await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg, parseMode: ParseMode.Html);
+                        await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg, parseMode: ParseMode.Html).ConfigureAwait(false);
 
                         if (warnCount >= WarningLimit)
                         {
                             msg = string.Format(Langs.BanedUserTips, "系统", "自动封禁");
-                            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg);
+                            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg).ConfigureAwait(false);
                         }
 
-                        await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, Langs.QueryBanDescribe);
+                        await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, Langs.QueryBanDescribe).ConfigureAwait(false);
                     }
                     else
                     {
@@ -415,14 +415,14 @@ public sealed class AdminCommand(
                     _logger.LogError(ex, "发送私聊消息失败");
                 }
                 
-                await _botClient.SendTextMessageAsync(channelService.AdminLogChannel, textHelperService.MakeAdminLogText(dbUser, targetUser, EBanType.Warning, reason, message), parseMode: ParseMode.Html);
+                await _botClient.SendTextMessageAsync(channelService.AdminLogChannel, textHelperService.MakeAdminLogText(dbUser, targetUser, EBanType.Warning, reason, message), parseMode: ParseMode.Html).ConfigureAwait(false);
 
                 return sb.ToString();
             }
         }
 
-        var text = await exec();
-        await _botClient.SendCommandReply(text, message, false, parsemode: ParseMode.Html);
+        var text = await exec().ConfigureAwait(false);
+        await _botClient.SendCommandReply(text, message, false, parsemode: ParseMode.Html).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -436,13 +436,13 @@ public sealed class AdminCommand(
     {
         var sb = new StringBuilder();
 
-        var targetUser = await _userService.FetchTargetUser(message);
+        var targetUser = await _userService.FetchTargetUser(message).ConfigureAwait(false);
 
         if (targetUser == null)
         {
             if (args.Length > 0)
             {
-                targetUser = await _userService.FetchUserByUserNameOrUserID(args.First());
+                targetUser = await _userService.FetchUserByUserNameOrUserID(args.First()).ConfigureAwait(false);
             }
         }
 
@@ -453,7 +453,7 @@ public sealed class AdminCommand(
         else
         {
             sb.AppendLine("投稿机器人封禁状态:");
-            var records = await banRecordService.GetBanRecores(targetUser);
+            var records = await banRecordService.GetBanRecores(targetUser).ConfigureAwait(false);
 
             var status = targetUser.IsBan ? "已封禁" : "正常";
             sb.AppendLine($"用户名: {targetUser.HtmlUserLink()}");
@@ -473,7 +473,7 @@ public sealed class AdminCommand(
             {
                 var operators = records.Select(static x => x.OperatorUID).Distinct();
 
-                var users = await _userService.GetUserList(operators);
+                var users = await _userService.GetUserList(operators).ConfigureAwait(false);
 
                 foreach (var record in records)
                 {
@@ -506,19 +506,19 @@ public sealed class AdminCommand(
 
             sb.AppendLine();
             sb.AppendLine("频道和群组封禁状态:");
-            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(channelService.AcceptChannel, targetUser.UserID));
-            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(channelService.RejectChannel, targetUser.UserID));
-            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(channelService.CommentGroup, targetUser.UserID));
-            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(channelService.SubGroup, targetUser.UserID));
+            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(channelService.AcceptChannel, targetUser.UserID).ConfigureAwait(false));
+            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(channelService.RejectChannel, targetUser.UserID).ConfigureAwait(false));
+            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(channelService.CommentGroup, targetUser.UserID).ConfigureAwait(false));
+            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(channelService.SubGroup, targetUser.UserID).ConfigureAwait(false));
             if (channelService.HasSecondChannel)
             {
-                sb.AppendLine(await _botClient.GetChatMemberStatusAsync(channelService.SecondChannel, targetUser.UserID));
-                sb.AppendLine(await _botClient.GetChatMemberStatusAsync(channelService.SecondCommentGroup, targetUser.UserID));
+                sb.AppendLine(await _botClient.GetChatMemberStatusAsync(channelService.SecondChannel, targetUser.UserID).ConfigureAwait(false));
+                sb.AppendLine(await _botClient.GetChatMemberStatusAsync(channelService.SecondCommentGroup, targetUser.UserID).ConfigureAwait(false));
             }
 
         }
 
-        await _botClient.SendCommandReply(sb.ToString(), message, false, parsemode: ParseMode.Html);
+        await _botClient.SendCommandReply(sb.ToString(), message, false, parsemode: ParseMode.Html).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -534,13 +534,13 @@ public sealed class AdminCommand(
         var autoDelete = true;
         async Task<string> exec()
         {
-            var targetUser = await _userService.FetchTargetUser(message);
+            var targetUser = await _userService.FetchTargetUser(message).ConfigureAwait(false);
 
             if (targetUser == null)
             {
                 if (args.Length > 0)
                 {
-                    targetUser = await _userService.FetchUserByUserNameOrUserID(args.First());
+                    targetUser = await _userService.FetchUserByUserNameOrUserID(args.First()).ConfigureAwait(false);
                     args = args[1..];
                 }
             }
@@ -575,7 +575,7 @@ public sealed class AdminCommand(
             autoDelete = false;
             try
             {
-                await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"来自管理员的消息:\n<code>{msg.EscapeHtml()}</code>", parseMode: ParseMode.Html);
+                await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"来自管理员的消息:\n<code>{msg.EscapeHtml()}</code>", parseMode: ParseMode.Html).ConfigureAwait(false);
                 return $"消息成功发送给 {targetUser.EscapedFullName()}";
             }
             catch (Exception ex)
@@ -584,8 +584,8 @@ public sealed class AdminCommand(
             }
         }
 
-        var text = await exec();
-        await _botClient.SendCommandReply(text, message, autoDelete);
+        var text = await exec().ConfigureAwait(false);
+        await _botClient.SendCommandReply(text, message, autoDelete).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -600,7 +600,7 @@ public sealed class AdminCommand(
     {
         if (args.Length == 0)
         {
-            await _botClient.SendCommandReply("请指定 用户昵称/用户名/用户ID 作为查询参数, 或者使用通配符 * 查找全部用户", message, true);
+            await _botClient.SendCommandReply("请指定 用户昵称/用户名/用户ID 作为查询参数, 或者使用通配符 * 查找全部用户", message, true).ConfigureAwait(false);
             return;
         }
 
@@ -619,9 +619,9 @@ public sealed class AdminCommand(
             page = 1;
         }
 
-        (var text, var keyboard) = await _userService.QueryUserList(dbUser, query, page);
+        (var text, var keyboard) = await _userService.QueryUserList(dbUser, query, page).ConfigureAwait(false);
 
-        await _botClient.SendCommandReply(text, message, false, ParseMode.Html, keyboard);
+        await _botClient.SendCommandReply(text, message, false, ParseMode.Html, keyboard).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -648,10 +648,10 @@ public sealed class AdminCommand(
                 page = 1;
             }
 
-            return await _userService.QueryUserList(dbUser, query, page);
+            return await _userService.QueryUserList(dbUser, query, page).ConfigureAwait(false);
         }
-        (string text, var kbd) = await exec();
-        await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, ParseMode.Html, true, kbd);
+        (string text, var kbd) = await exec().ConfigureAwait(false);
+        await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, ParseMode.Html, true, kbd).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -666,7 +666,7 @@ public sealed class AdminCommand(
     {
         if (args.Length == 0)
         {
-            await _botClient.SendCommandReply("请指定 用户昵称/用户名/用户ID 作为查询参数, 或者使用通配符 * 查找全部用户", message, true);
+            await _botClient.SendCommandReply("请指定 用户昵称/用户名/用户ID 作为查询参数, 或者使用通配符 * 查找全部用户", message, true).ConfigureAwait(false);
             return;
         }
 
@@ -685,9 +685,9 @@ public sealed class AdminCommand(
             page = 1;
         }
 
-        (var text, var keyboard) = await _userService.QueryAllUserList(dbUser, query, page);
+        (var text, var keyboard) = await _userService.QueryAllUserList(dbUser, query, page).ConfigureAwait(false);
 
-        await _botClient.SendCommandReply(text, message, false, ParseMode.Html, keyboard);
+        await _botClient.SendCommandReply(text, message, false, ParseMode.Html, keyboard).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -714,10 +714,10 @@ public sealed class AdminCommand(
                 page = 1;
             }
 
-            return await _userService.QueryAllUserList(dbUser, query, page);
+            return await _userService.QueryAllUserList(dbUser, query, page).ConfigureAwait(false);
         }
-        (string text, var kbd) = await exec();
-        await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, ParseMode.Html, true, kbd);
+        (string text, var kbd) = await exec().ConfigureAwait(false);
+        await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, ParseMode.Html, true, kbd).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -730,7 +730,7 @@ public sealed class AdminCommand(
     public async Task QResponseCancelSearchUser(CallbackQuery callbackQuery, string[] args)
     {
         string text = args.Length >= 2 ? args[1] : "参数有误";
-        await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, ParseMode.Html, true, null);
+        await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, ParseMode.Html, true, null).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -752,84 +752,84 @@ public sealed class AdminCommand(
 
         var sb = new StringBuilder();
 
-        var todayPost = await postService.CountAllPosts(today);
-        var todayAcceptPost = await postService.CountAcceptedPosts(today);
-        var todayRejectPost = await postService.CountRejectedPosts(today);
+        var todayPost = await postService.CountAllPosts(today).ConfigureAwait(false);
+        var todayAcceptPost = await postService.CountAcceptedPosts(today).ConfigureAwait(false);
+        var todayRejectPost = await postService.CountRejectedPosts(today).ConfigureAwait(false);
 
         sb.AppendLine("-- 24小时投稿统计 --");
         sb.AppendLine($"接受/拒绝: <code>{todayAcceptPost}</code> / <code>{todayRejectPost}</code>");
         if (second)
         {
-            var todayAcceptSecondPost = await postService.CountAcceptedSecondPosts(today);
+            var todayAcceptSecondPost = await postService.CountAcceptedSecondPosts(today).ConfigureAwait(false);
             sb.AppendLine($"接受(二频): <code>{todayAcceptSecondPost}</code>");
         }
         sb.AppendLine($"通过率: <code>{(todayPost > 0 ? (100 * todayAcceptPost / todayPost).ToString("f2") : "--")}%</code>");
         sb.AppendLine($"累计投稿: <code>{todayPost}</code>");
 
-        var weekPost = await postService.CountAllPosts(prev7Days);
-        var weekAcceptPost = await postService.CountAcceptedPosts(prev7Days);
-        var weekRejectPost = await postService.CountRejectedPosts(prev7Days);
-        var weekExpiredPost = await postService.CountExpiredPosts(prev7Days);
+        var weekPost = await postService.CountAllPosts(prev7Days).ConfigureAwait(false);
+        var weekAcceptPost = await postService.CountAcceptedPosts(prev7Days).ConfigureAwait(false);
+        var weekRejectPost = await postService.CountRejectedPosts(prev7Days).ConfigureAwait(false);
+        var weekExpiredPost = await postService.CountExpiredPosts(prev7Days).ConfigureAwait(false);
 
         sb.AppendLine();
         sb.AppendLine("-- 7日投稿统计 --");
         sb.AppendLine($"接受/拒绝: <code>{weekAcceptPost}</code> / <code>{weekRejectPost}</code>");
         if (second)
         {
-            var weekAcceptSecondPost = await postService.CountAcceptedSecondPosts(prev7Days);
+            var weekAcceptSecondPost = await postService.CountAcceptedSecondPosts(prev7Days).ConfigureAwait(false);
             sb.AppendLine($"接受(二频): <code>{weekAcceptSecondPost}</code>");
         }
         sb.AppendLine($"通过率: <code>{(weekPost > 0 ? (100 * weekAcceptPost / weekPost).ToString("f2") : "--")}%</code>");
         sb.AppendLine($"过期投稿: <code>{weekExpiredPost}</code>");
         sb.AppendLine($"累计投稿: <code>{weekPost + weekExpiredPost}</code>");
 
-        var monthPost = await postService.CountAllPosts(monthStart);
-        var monthAcceptPost = await postService.CountAcceptedPosts(monthStart);
-        var monthRejectPost = await postService.CountRejectedPosts(monthStart);
-        var monthExpiredPost = await postService.CountExpiredPosts(monthStart);
+        var monthPost = await postService.CountAllPosts(monthStart).ConfigureAwait(false);
+        var monthAcceptPost = await postService.CountAcceptedPosts(monthStart).ConfigureAwait(false);
+        var monthRejectPost = await postService.CountRejectedPosts(monthStart).ConfigureAwait(false);
+        var monthExpiredPost = await postService.CountExpiredPosts(monthStart).ConfigureAwait(false);
 
         sb.AppendLine();
         sb.AppendLine($"-- {monthStart.ToString("MM")}月投稿统计 --");
         sb.AppendLine($"接受/拒绝: <code>{monthAcceptPost}</code> / <code>{monthRejectPost}</code>");
         if (second)
         {
-            var monthAcceptSecondPost = await postService.CountAcceptedSecondPosts(monthStart);
+            var monthAcceptSecondPost = await postService.CountAcceptedSecondPosts(monthStart).ConfigureAwait(false);
             sb.AppendLine($"接受(二频): <code>{monthAcceptSecondPost}</code>");
         }
         sb.AppendLine($"通过率: <code>{(monthPost > 0 ? (100 * monthAcceptPost / monthPost).ToString("f2") : "--")}%</code>");
         sb.AppendLine($"过期投稿: <code>{monthExpiredPost}</code>");
         sb.AppendLine($"累计投稿: <code>{monthPost}</code>");
 
-        var yearPost = await postService.CountAllPosts(yearStart);
-        var yearAcceptPost = await postService.CountAcceptedPosts(yearStart);
-        var yearRejectPost = await postService.CountRejectedPosts(yearStart);
-        var yearExpiredPost = await postService.CountExpiredPosts(yearStart);
+        var yearPost = await postService.CountAllPosts(yearStart).ConfigureAwait(false);
+        var yearAcceptPost = await postService.CountAcceptedPosts(yearStart).ConfigureAwait(false);
+        var yearRejectPost = await postService.CountRejectedPosts(yearStart).ConfigureAwait(false);
+        var yearExpiredPost = await postService.CountExpiredPosts(yearStart).ConfigureAwait(false);
 
         sb.AppendLine();
         sb.AppendLine($"-- {yearStart.ToString("yyyy")}年投稿统计 --");
         sb.AppendLine($"接受/拒绝: <code>{yearAcceptPost}</code> / <code>{yearRejectPost}</code>");
         if (second)
         {
-            var yearAcceptSecondPost = await postService.CountAcceptedSecondPosts(yearStart);
+            var yearAcceptSecondPost = await postService.CountAcceptedSecondPosts(yearStart).ConfigureAwait(false);
             sb.AppendLine($"接受(二频): <code>{yearAcceptSecondPost}</code>");
         }
         sb.AppendLine($"通过率: <code>{(yearPost > 0 ? (100 * yearAcceptPost / yearPost).ToString("f2") : "--")}%</code>");
         sb.AppendLine($"过期投稿: <code>{yearExpiredPost}</code>");
         sb.AppendLine($"累计投稿: <code>{yearPost}</code>");
 
-        var totalPost = await postService.CountAllPosts();
-        var totalAcceptPost = await postService.CountAcceptedPosts();
-        var totalRejectPost = await postService.CountRejectedPosts();
-        var totalExpiredPost = await postService.CountExpiredPosts();
-        var totalChannel = await channelOptionService.ChannelCount();
-        var totalAttachment = await attachmentService.GetAttachmentCount();
+        var totalPost = await postService.CountAllPosts().ConfigureAwait(false);
+        var totalAcceptPost = await postService.CountAcceptedPosts().ConfigureAwait(false);
+        var totalRejectPost = await postService.CountRejectedPosts().ConfigureAwait(false);
+        var totalExpiredPost = await postService.CountExpiredPosts().ConfigureAwait(false);
+        var totalChannel = await channelOptionService.ChannelCount().ConfigureAwait(false);
+        var totalAttachment = await attachmentService.GetAttachmentCount().ConfigureAwait(false);
 
         sb.AppendLine();
         sb.AppendLine("-- 历史投稿统计 --");
         sb.AppendLine($"接受/拒绝: <code>{totalAcceptPost}</code> / <code>{totalRejectPost}</code>");
         if (second)
         {
-            var totalAcceptSecondPost = await postService.CountAcceptedSecondPosts();
+            var totalAcceptSecondPost = await postService.CountAcceptedSecondPosts().ConfigureAwait(false);
             sb.AppendLine($"接受(二频): <code>{totalAcceptSecondPost}</code>");
         }
         sb.AppendLine($"通过率: <code>{(totalPost > 0 ? (100 * totalAcceptPost / totalPost).ToString("f2") : "--")}%</code>");
@@ -838,11 +838,11 @@ public sealed class AdminCommand(
         sb.AppendLine($"频道总数: <code>{totalChannel}</code>");
         sb.AppendLine($"附件总数: <code>{totalAttachment}</code>");
 
-        var totalUser = await _userService.CountUser();
-        var banedUser = await _userService.CountUnBannedUser();
-        var weekActiveUser = await _userService.CountRecentlyUpdateUser(prev7Days);
-        var MonthActiveUser = await _userService.CountRecentlyUpdateUser(prev30Days);
-        var postedUser = await _userService.CountPostedUser();
+        var totalUser = await _userService.CountUser().ConfigureAwait(false);
+        var banedUser = await _userService.CountUnBannedUser().ConfigureAwait(false);
+        var weekActiveUser = await _userService.CountRecentlyUpdateUser(prev7Days).ConfigureAwait(false);
+        var MonthActiveUser = await _userService.CountRecentlyUpdateUser(prev30Days).ConfigureAwait(false);
+        var postedUser = await _userService.CountPostedUser().ConfigureAwait(false);
 
         sb.AppendLine();
         sb.AppendLine("-- 用户统计 --");
@@ -852,7 +852,7 @@ public sealed class AdminCommand(
         sb.AppendLine($"投稿用户: <code>{postedUser}</code>");
         sb.AppendLine($"累计用户: <code>{totalUser}</code>");
 
-        await _botClient.SendCommandReply(sb.ToString(), message, true, ParseMode.Html);
+        await _botClient.SendCommandReply(sb.ToString(), message, true, ParseMode.Html).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -880,9 +880,9 @@ public sealed class AdminCommand(
         sb.AppendLine($"运行时间: <code>{day}</code> 天 <code>{hours:F8}</code> 小时");
 
         var today = DateTime.Now.AddHours(-24);
-        var cmdCount = await cmdRecordService.GetTextCmdCount(today);
-        var QueryCount = await cmdRecordService.GetQueryCmdCount(today);
-        var errorCount = await cmdRecordService.GetErrorCmdCount(today);
+        var cmdCount = await cmdRecordService.GetTextCmdCount(today).ConfigureAwait(false);
+        var QueryCount = await cmdRecordService.GetQueryCmdCount(today).ConfigureAwait(false);
+        var errorCount = await cmdRecordService.GetErrorCmdCount(today).ConfigureAwait(false);
 
         sb.AppendLine();
         sb.AppendLine("-- 调用统计 --");
@@ -920,7 +920,7 @@ public sealed class AdminCommand(
         sb.AppendLine($"框架版本: <code>DotNet {Environment.Version} {RuntimeInformation.OSArchitecture}</code>");
         sb.AppendLine($"系统信息: <code>{RuntimeInformation.OSDescription}</code>");
 
-        await _botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
+        await _botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -934,19 +934,19 @@ public sealed class AdminCommand(
     {
         if (channelService.ReviewGroup.Id == -1)
         {
-            await _botClient.SendCommandReply("尚未设置审核群, 无法完成此操作", message);
+            await _botClient.SendCommandReply("尚未设置审核群, 无法完成此操作", message).ConfigureAwait(false);
             return;
         }
 
         if (message.Chat.Type != ChatType.Private)
         {
-            await _botClient.SendCommandReply("该命令仅限私聊使用", message);
+            await _botClient.SendCommandReply("该命令仅限私聊使用", message).ConfigureAwait(false);
             return;
         }
 
         try
         {
-            var inviteLink = await _botClient.CreateChatInviteLinkAsync(channelService.ReviewGroup.Id, $"{dbUser} 创建的邀请链接", DateTime.Now.AddHours(1), 1, false);
+            var inviteLink = await _botClient.CreateChatInviteLinkAsync(channelService.ReviewGroup.Id, $"{dbUser} 创建的邀请链接", DateTime.Now.AddHours(1), 1, false).ConfigureAwait(false);
 
             var sb = new StringBuilder();
 
@@ -954,11 +954,11 @@ public sealed class AdminCommand(
 
             sb.AppendLine($"<a href=\"{inviteLink.InviteLink}\">{(inviteLink.Name ?? inviteLink.InviteLink).EscapeHtml()}</a>");
 
-            await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
+            await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html).ConfigureAwait(false);
         }
         catch
         {
-            await _botClient.SendCommandReply("创建邀请链接失败, 可能未给予机器人邀请权限", message);
+            await _botClient.SendCommandReply("创建邀请链接失败, 可能未给予机器人邀请权限", message).ConfigureAwait(false);
             throw;
         }
     }
@@ -980,7 +980,7 @@ public sealed class AdminCommand(
         var sb = new StringBuilder();
 
         sb.AppendLine("-- 用户投稿数量排名 --");
-        var userAcceptCountRank = await _userService.GetUserAcceptCountRankList(miniumPost, prev30Days, topCount);
+        var userAcceptCountRank = await _userService.GetUserAcceptCountRankList(miniumPost, prev30Days, topCount).ConfigureAwait(false);
         if (userAcceptCountRank.Count > 0)
         {
             var count = 1;
@@ -996,7 +996,7 @@ public sealed class AdminCommand(
 
         sb.AppendLine();
         sb.AppendLine("-- 管理员投稿数量排名 --");
-        var adminAcceptCountRank = await _userService.GetAdminUserAcceptCountRankList(miniumPost, prev30Days, topCount);
+        var adminAcceptCountRank = await _userService.GetAdminUserAcceptCountRankList(miniumPost, prev30Days, topCount).ConfigureAwait(false);
         if (adminAcceptCountRank.Count > 0)
         {
             var count = 1;
@@ -1012,7 +1012,7 @@ public sealed class AdminCommand(
 
         sb.AppendLine();
         sb.AppendLine("-- 管理员审核数量排名 --");
-        var adminReviewCountRank = await _userService.GetAdminUserReviewCountRankList(miniumPost, prev30Days, topCount);
+        var adminReviewCountRank = await _userService.GetAdminUserReviewCountRankList(miniumPost, prev30Days, topCount).ConfigureAwait(false);
         if (adminReviewCountRank.Count > 0)
         {
             var count = 1;
@@ -1026,7 +1026,7 @@ public sealed class AdminCommand(
             sb.AppendLine("暂无数据");
         }
 
-        await _botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
+        await _botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -1041,13 +1041,13 @@ public sealed class AdminCommand(
     {
         async Task<(string, InlineKeyboardMarkup?)> exec()
         {
-            var targetUser = await _userService.FetchTargetUser(message);
+            var targetUser = await _userService.FetchTargetUser(message).ConfigureAwait(false);
 
             if (targetUser == null)
             {
                 if (args.Length > 0)
                 {
-                    targetUser = await _userService.FetchUserByUserNameOrUserID(args.First());
+                    targetUser = await _userService.FetchUserByUserNameOrUserID(args.First()).ConfigureAwait(false);
                 }
             }
 
@@ -1076,14 +1076,14 @@ public sealed class AdminCommand(
                 return ("无法对同级管理员进行此操作", null);
             }
 
-            var keyboard = await markupHelperService.SetUserGroupKeyboard(dbUser, targetUser);
+            var keyboard = await markupHelperService.SetUserGroupKeyboard(dbUser, targetUser).ConfigureAwait(false);
             var groupName = groupRepository.GetGroupById(targetUser.GroupID)?.Name ?? "未知";
 
             return (keyboard != null ? $"请选择 {targetUser.EscapedFullName()} 的新用户组, 当前用户组 {groupName}" : "获取可用用户组失败", keyboard);
         }
 
-        (var text, var kbd) = await exec();
-        await _botClient.SendCommandReply(text, message, false, replyMarkup: kbd);
+        (var text, var kbd) = await exec().ConfigureAwait(false);
+        await _botClient.SendCommandReply(text, message, false, replyMarkup: kbd).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -1103,7 +1103,7 @@ public sealed class AdminCommand(
                 return "参数有误";
             }
 
-            var targetUser = await _userService.FetchUserByUserID(userId);
+            var targetUser = await _userService.FetchUserByUserID(userId).ConfigureAwait(false);
 
             if (targetUser == null)
             {
@@ -1130,13 +1130,13 @@ public sealed class AdminCommand(
                 var group = groupRepository.GetGroupById(groupID);
                 if (group != null)
                 {
-                    await _userService.UpdateUserGroupId(targetUser, groupID);
+                    await _userService.UpdateUserGroupId(targetUser, groupID).ConfigureAwait(false);
 
                     if (targetUser.PrivateChatID != -1)
                     {
                         try
                         {
-                            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"您的权限组已被管理员修改为 {group.Name}");
+                            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"您的权限组已被管理员修改为 {group.Name}").ConfigureAwait(false);
                         }
                         catch (Exception ex)
                         {
@@ -1151,8 +1151,8 @@ public sealed class AdminCommand(
             return $"修改用户 {targetUser} 权限组失败, 找不到指定的权限组";
         }
 
-        string text = await exec();
-        await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, replyMarkup: null);
+        string text = await exec().ConfigureAwait(false);
+        await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, replyMarkup: null).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -1203,7 +1203,7 @@ public sealed class AdminCommand(
         sb.AppendLine($"Message Type: <code>{msg.Type}</code>");
         sb.AppendLine($"Message Date: <code>{msg.Date}</code>");
 
-        await _botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
+        await _botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -1218,13 +1218,13 @@ public sealed class AdminCommand(
     {
         async Task<(InlineKeyboardMarkup?, string)> exec()
         {
-            var targetUser = await _userService.FetchTargetUser(message);
+            var targetUser = await _userService.FetchTargetUser(message).ConfigureAwait(false);
 
             if (targetUser == null)
             {
                 if (args.Length > 0)
                 {
-                    targetUser = await _userService.FetchUserByUserNameOrUserID(args.First());
+                    targetUser = await _userService.FetchUserByUserNameOrUserID(args.First()).ConfigureAwait(false);
                     args = args[1..];
                 }
             }
@@ -1250,7 +1250,7 @@ public sealed class AdminCommand(
                 return (null, "请指定NUKE理由");
             }
 
-            int warnCount = await banRecordService.GetWarnCount(targetUser);
+            int warnCount = await banRecordService.GetWarnCount(targetUser).ConfigureAwait(false);
 
             var sb = new StringBuilder();
             sb.AppendLine($"用户名: {targetUser.HtmlUserLink()}");
@@ -1263,8 +1263,8 @@ public sealed class AdminCommand(
             return (markupHelperService.NukeMenuKeyboard(dbUser, targetUser, reason), sb.ToString());
         }
 
-        var (keyboard, text) = await exec();
-        await _botClient.SendCommandReply(text, message, false, parsemode: ParseMode.Html, replyMarkup: keyboard);
+        var (keyboard, text) = await exec().ConfigureAwait(false);
+        await _botClient.SendCommandReply(text, message, false, parsemode: ParseMode.Html, replyMarkup: keyboard).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -1279,16 +1279,16 @@ public sealed class AdminCommand(
     {
         if (args.Length < 4)
         {
-            await _botClient.AutoReplyAsync("参数有误", callbackQuery, true);
-            await _botClient.EditMessageTextAsync(callbackQuery.Message!, "参数有误", replyMarkup: null);
+            await _botClient.AutoReplyAsync("参数有误", callbackQuery, true).ConfigureAwait(false);
+            await _botClient.EditMessageTextAsync(callbackQuery.Message!, "参数有误", replyMarkup: null).ConfigureAwait(false);
         }
         else
         {
-            var targetUser = await _userService.FetchUserByUserNameOrUserID(args[2]);
+            var targetUser = await _userService.FetchUserByUserNameOrUserID(args[2]).ConfigureAwait(false);
             if (targetUser == null)
             {
-                await _botClient.AutoReplyAsync("用户不存在", callbackQuery, true);
-                await _botClient.EditMessageTextAsync(callbackQuery.Message!, "用户不存在", replyMarkup: null);
+                await _botClient.AutoReplyAsync("用户不存在", callbackQuery, true).ConfigureAwait(false);
+                await _botClient.EditMessageTextAsync(callbackQuery.Message!, "用户不存在", replyMarkup: null).ConfigureAwait(false);
             }
             else
             {
@@ -1312,18 +1312,18 @@ public sealed class AdminCommand(
                             };
                             try
                             {
-                                await _botClient.RestrictChatMemberAsync(channelService.SubGroup, targetUser.UserID, permission);
+                                await _botClient.RestrictChatMemberAsync(channelService.SubGroup, targetUser.UserID, permission).ConfigureAwait(false);
                             }
                             catch
                             {
 
                             }
-                            await _botClient.RestrictChatMemberAsync(channelService.SubGroup, targetUser.UserID, permission);
+                            await _botClient.RestrictChatMemberAsync(channelService.SubGroup, targetUser.UserID, permission).ConfigureAwait(false);
                         }
                         break;
                     case "ban":
-                        await _botClient.BanChatMemberAsync(channelService.SubGroup, targetUser.UserID);
-                        await _botClient.BanChatMemberAsync(channelService.CommentGroup, targetUser.UserID);
+                        await _botClient.BanChatMemberAsync(channelService.SubGroup, targetUser.UserID).ConfigureAwait(false);
+                        await _botClient.BanChatMemberAsync(channelService.CommentGroup, targetUser.UserID).ConfigureAwait(false);
                         break;
                     case "unmute":
                         {
@@ -1338,17 +1338,17 @@ public sealed class AdminCommand(
                                 CanSendPolls = false,
                                 CanSendOtherMessages = false,
                             };
-                            await _botClient.RestrictChatMemberAsync(channelService.SubGroup, targetUser.UserID, permission);
-                            await _botClient.RestrictChatMemberAsync(channelService.SubGroup, targetUser.UserID, permission);
+                            await _botClient.RestrictChatMemberAsync(channelService.SubGroup, targetUser.UserID, permission).ConfigureAwait(false);
+                            await _botClient.RestrictChatMemberAsync(channelService.SubGroup, targetUser.UserID, permission).ConfigureAwait(false);
                         }
                         break;
                     case "unban":
-                        await _botClient.UnbanChatMemberAsync(channelService.SubGroup, targetUser.UserID);
-                        await _botClient.UnbanChatMemberAsync(channelService.CommentGroup, targetUser.UserID);
+                        await _botClient.UnbanChatMemberAsync(channelService.SubGroup, targetUser.UserID).ConfigureAwait(false);
+                        await _botClient.UnbanChatMemberAsync(channelService.CommentGroup, targetUser.UserID).ConfigureAwait(false);
                         break;
                     default:
-                        await _botClient.AutoReplyAsync("参数有误", callbackQuery, true);
-                        await _botClient.EditMessageTextAsync(callbackQuery.Message!, "参数有误", replyMarkup: null);
+                        await _botClient.AutoReplyAsync("参数有误", callbackQuery, true).ConfigureAwait(false);
+                        await _botClient.EditMessageTextAsync(callbackQuery.Message!, "参数有误", replyMarkup: null).ConfigureAwait(false);
                         return;
                 }
 
@@ -1370,14 +1370,14 @@ public sealed class AdminCommand(
 
                 string reason = string.Join(' ', args[3..]);
 
-                await banRecordService.AddBanRecord(targetUser, dbUser, banType, reason);
+                await banRecordService.AddBanRecord(targetUser, dbUser, banType, reason).ConfigureAwait(false);
 
                 try
                 {
                     if (targetUser.PrivateChatID > 0)
                     {
                         string msg = $"您因为 {reason} 被管理员设置了 {action}, 如有异议请联系频道管理员";
-                        await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg);
+                        await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg).ConfigureAwait(false);
                     }
                     else
                     {
@@ -1389,9 +1389,9 @@ public sealed class AdminCommand(
                     _logger.LogError(ex, "发送私聊消息失败");
                 }
 
-                await _botClient.AutoReplyAsync("操作执行成功", callbackQuery, true);
-                await _botClient.EditMessageTextAsync(callbackQuery.Message!, $"成功 {action} 了用户 {targetUser.EscapedFullName()}", replyMarkup: null);
-                await _botClient.SendTextMessageAsync(channelService.AdminLogChannel, textHelperService.MakeAdminLogText(dbUser, targetUser, banType, reason, callbackQuery.Message!), parseMode: ParseMode.Html);
+                await _botClient.AutoReplyAsync("操作执行成功", callbackQuery, true).ConfigureAwait(false);
+                await _botClient.EditMessageTextAsync(callbackQuery.Message!, $"成功 {action} 了用户 {targetUser.EscapedFullName()}", replyMarkup: null).ConfigureAwait(false);
+                await _botClient.SendTextMessageAsync(channelService.AdminLogChannel, textHelperService.MakeAdminLogText(dbUser, targetUser, banType, reason, callbackQuery.Message!), parseMode: ParseMode.Html).ConfigureAwait(false);
             }
         }
     }
@@ -1407,12 +1407,12 @@ public sealed class AdminCommand(
     {
         if (message.Chat.Type != ChatType.Private)
         {
-            await _botClient.SendCommandReply("该命令仅限私聊使用", message, false);
+            await _botClient.SendCommandReply("该命令仅限私聊使用", message, false).ConfigureAwait(false);
         }
         else
         {
-            var token = await userTokenService.GenerateNewUserToken(dbUser);
-            await _botClient.SendCommandReply(token.APIToken.ToString(), message, false);
+            var token = await userTokenService.GenerateNewUserToken(dbUser).ConfigureAwait(false);
+            await _botClient.SendCommandReply(token.APIToken.ToString(), message, false).ConfigureAwait(false);
         }
     }
 
@@ -1433,11 +1433,11 @@ public sealed class AdminCommand(
                 return "参数有误";
             }
 
-            NewPosts? post = null;
+            Posts? post = null;
 
             if (int.TryParse(args[1], out int postId))
             {
-                post = await postService.GetPostByPostId(postId);
+                post = await postService.GetPostByPostId(postId).ConfigureAwait(false);
             }
 
             if (post == null)
@@ -1456,13 +1456,13 @@ public sealed class AdminCommand(
                 return "第二频道未设定";
             }
 
-            await postService.RevocationPost(post);
+            await postService.RevocationPost(post).ConfigureAwait(false);
 
             if (post.WarnTextID != -1 && post.WarnTextID != 0)
             {
                 try
                 {
-                    await _botClient.DeleteMessageAsync(chat, (int)post.WarnTextID);
+                    await _botClient.DeleteMessageAsync(chat, (int)post.WarnTextID).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -1472,7 +1472,7 @@ public sealed class AdminCommand(
 
             if (post.IsMediaGroup)
             {
-                var mediaGroups = await mediaGroupService.QueryMediaGroup(post.PublishMediaGroupID);
+                var mediaGroups = await mediaGroupService.QueryMediaGroup(post.PublishMediaGroupID).ConfigureAwait(false);
                 int error = 0;
                 if (mediaGroups.Count == 0)
                 {
@@ -1482,7 +1482,7 @@ public sealed class AdminCommand(
                 {
                     try
                     {
-                        await _botClient.DeleteMessageAsync(group.ChatID, (int)group.MessageID);
+                        await _botClient.DeleteMessageAsync(group.ChatID, (int)group.MessageID).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
@@ -1497,7 +1497,7 @@ public sealed class AdminCommand(
             {
                 try
                 {
-                    await _botClient.DeleteMessageAsync(chat, (int)post.PublicMsgID);
+                    await _botClient.DeleteMessageAsync(chat, (int)post.PublicMsgID).ConfigureAwait(false);
                     return "删除消息成功";
                 }
                 catch (Exception ex)
@@ -1507,9 +1507,9 @@ public sealed class AdminCommand(
                 }
             }
         }
-        string text = await exec();
-        await _botClient.AutoReplyAsync(text, callbackQuery.Message!, ParseMode.Html);
-        await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, null);
+        string text = await exec().ConfigureAwait(false);
+        await _botClient.AutoReplyAsync(text, callbackQuery.Message!, ParseMode.Html).ConfigureAwait(false);
+        await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, null).ConfigureAwait(false);
     }
 
     [QueryCmd("QUERYPOSTER", EUserRights.AdminCmd)]
@@ -1526,7 +1526,7 @@ public sealed class AdminCommand(
 
             if (int.TryParse(args[1], out int userId))
             {
-                user = await _userService.QueryUserByUserId(userId);
+                user = await _userService.QueryUserByUserId(userId).ConfigureAwait(false);
             }
 
             if (user == null)
@@ -1541,12 +1541,12 @@ public sealed class AdminCommand(
 
             sb.AppendLine();
             sb.AppendLine("-- 用户排名 --");
-            sb.AppendLine(await _userService.GetUserRank(user));
+            sb.AppendLine(await _userService.GetUserRank(user).ConfigureAwait(false));
 
             return sb.ToString();
         }
-        string text = await exec();
-        await _botClient.AutoReplyAsync(text, callbackQuery.Message!, ParseMode.Html);
+        string text = await exec().ConfigureAwait(false);
+        await _botClient.AutoReplyAsync(text, callbackQuery.Message!, ParseMode.Html).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -1559,7 +1559,7 @@ public sealed class AdminCommand(
     public async Task QResponseRepost(Users dbUser, CallbackQuery callbackQuery)
     {
         _logger.LogInformation("todo {user}", dbUser);
-        await _botClient.AutoReplyAsync("未实现", callbackQuery, false);
+        await _botClient.AutoReplyAsync("未实现", callbackQuery, false).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -1573,29 +1573,29 @@ public sealed class AdminCommand(
     {
         if (dbUser.PrivateChatID == -1)
         {
-            await _botClient.AutoReplyAsync("未私聊过机器人, 无法发送消息", callbackQuery, true);
+            await _botClient.AutoReplyAsync("未私聊过机器人, 无法发送消息", callbackQuery, true).ConfigureAwait(false);
             return;
         }
 
-        var post = await postService.GetLatestReviewingPostLink();
+        var post = await postService.GetLatestReviewingPostLink().ConfigureAwait(false);
         if (post != null)
         {
             var chatId = Math.Abs(post.ReviewChatID + 1000000000000);
             var link = textHelperService.HtmlMessageLink(post.ReviewMsgID, $"c/{chatId}", $"前往投稿{post.Id}");
             try
             {
-                await _botClient.SendTextMessageAsync(dbUser.PrivateChatID, link, parseMode: ParseMode.Html);
-                await _botClient.AutoReplyAsync("消息链接已发送", callbackQuery, false);
+                await _botClient.SendTextMessageAsync(dbUser.PrivateChatID, link, parseMode: ParseMode.Html).ConfigureAwait(false);
+                await _botClient.AutoReplyAsync("消息链接已发送", callbackQuery, false).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "发送消息失败");
-                await _botClient.AutoReplyAsync("消息链接发送失败", callbackQuery, false);
+                await _botClient.AutoReplyAsync("消息链接发送失败", callbackQuery, false).ConfigureAwait(false);
             }
         }
         else
         {
-            await _botClient.AutoReplyAsync("今天没有未审核的稿件", callbackQuery, false);
+            await _botClient.AutoReplyAsync("今天没有未审核的稿件", callbackQuery, false).ConfigureAwait(false);
         }
     }
 
@@ -1604,13 +1604,13 @@ public sealed class AdminCommand(
     {
         async Task<string> exec()
         {
-            var targetUser = await _userService.FetchTargetUser(message);
+            var targetUser = await _userService.FetchTargetUser(message).ConfigureAwait(false);
 
             if (targetUser == null)
             {
                 if (args.Length > 0)
                 {
-                    targetUser = await _userService.FetchUserByUserNameOrUserID(args.First());
+                    targetUser = await _userService.FetchUserByUserNameOrUserID(args.First()).ConfigureAwait(false);
                 }
             }
 
@@ -1624,7 +1624,7 @@ public sealed class AdminCommand(
                 return "无法查询当前机器人的发言";
             }
 
-            var dialogs = await dialogueService.FetchUserGroupMessages(targetUser, 0, 30);
+            var dialogs = await dialogueService.FetchUserGroupMessages(targetUser, 0, 30).ConfigureAwait(false);
 
             if (dialogs.Count == 0)
             {
@@ -1642,7 +1642,7 @@ public sealed class AdminCommand(
             return sb.ToString();
         }
 
-        var text = await exec();
-        await _botClient.SendCommandReply(text, message, false, parsemode: ParseMode.Html);
+        var text = await exec().ConfigureAwait(false);
+        await _botClient.SendCommandReply(text, message, false, parsemode: ParseMode.Html).ConfigureAwait(false);
     }
 }

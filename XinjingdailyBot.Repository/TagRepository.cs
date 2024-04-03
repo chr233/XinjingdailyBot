@@ -38,14 +38,14 @@ public class TagRepository(
     /// <returns></returns>
     public async Task InitPostTagCache()
     {
-        var tagCount = await CountAsync(x => x.Id > 0 && x.Id < 32);
+        var tagCount = await CountAsync(x => x.Id > 0 && x.Id < 32).ConfigureAwait(false);
         if (tagCount == 0)
         {
             _logger.LogInformation("未设置标签，正在创建内置标签");
-            await InsertBuildInTags();
+            await InsertBuildInTags().ConfigureAwait(false);
         }
 
-        var tags = await GetListAsync(x => x.Id > 0 && x.Id < 32);
+        var tags = await GetListAsync(x => x.Id > 0 && x.Id < 32).ConfigureAwait(false);
         if (tags.Count != 0)
         {
             TagCache.Clear();
@@ -106,7 +106,7 @@ public class TagRepository(
 
             if (changed)
             {
-                await Storageable(tags).ExecuteCommandAsync();
+                await Storageable(tags).ExecuteCommandAsync().ConfigureAwait(false);
             }
 
             _logger.LogInformation("已加载 {Count} 个标签", tags.Count);
@@ -132,7 +132,7 @@ public class TagRepository(
             new Tags { Id = 4, Name = "AI怪图", Payload = "ai", KeyWords = "#AI" },
         };
 
-        await Storageable(tags).ExecuteCommandAsync();
+        await Storageable(tags).ExecuteCommandAsync().ConfigureAwait(false);
     }
 
     /// <summary>

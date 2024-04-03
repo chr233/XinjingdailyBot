@@ -19,7 +19,7 @@ public sealed class ChannelOptionService(ISqlSugarClient context) : BaseService<
         var chatTitle = channelChat.Title;
         var chatUserName = channelChat.Username;
 
-        var channel = await Queryable().Where(x => x.ChannelID == chatId).FirstAsync();
+        var channel = await Queryable().Where(x => x.ChannelID == chatId).FirstAsync().ConfigureAwait(false);
         if (channel == null)
         {
             channel = new ChannelOptions {
@@ -31,7 +31,7 @@ public sealed class ChannelOptionService(ISqlSugarClient context) : BaseService<
                 CreateAt = DateTime.Now,
                 ModifyAt = DateTime.Now,
             };
-            await Insertable(channel).ExecuteCommandAsync();
+            await Insertable(channel).ExecuteCommandAsync().ConfigureAwait(false);
         }
         else
         {
@@ -42,7 +42,7 @@ public sealed class ChannelOptionService(ISqlSugarClient context) : BaseService<
                 channel.ModifyAt = DateTime.Now;
             }
             channel.Count++;
-            await Updateable(channel).ExecuteCommandAsync();
+            await Updateable(channel).ExecuteCommandAsync().ConfigureAwait(false);
         }
 
         return channel.Option;
@@ -51,7 +51,7 @@ public sealed class ChannelOptionService(ISqlSugarClient context) : BaseService<
     /// <inheritdoc/>
     public async Task<EChannelOption> FetchChannelOption(long chatId, string chatTitle, string chatUserName)
     {
-        var channel = await Queryable().Where(x => x.ChannelID == chatId).FirstAsync();
+        var channel = await Queryable().Where(x => x.ChannelID == chatId).FirstAsync().ConfigureAwait(false);
         if (channel == null)
         {
             channel = new ChannelOptions {
@@ -63,7 +63,7 @@ public sealed class ChannelOptionService(ISqlSugarClient context) : BaseService<
                 CreateAt = DateTime.Now,
                 ModifyAt = DateTime.Now,
             };
-            await Insertable(channel).ExecuteCommandAsync();
+            await Insertable(channel).ExecuteCommandAsync().ConfigureAwait(false);
         }
         else
         {
@@ -74,7 +74,7 @@ public sealed class ChannelOptionService(ISqlSugarClient context) : BaseService<
                 channel.ModifyAt = DateTime.Now;
             }
             channel.Count++;
-            await Updateable(channel).ExecuteCommandAsync();
+            await Updateable(channel).ExecuteCommandAsync().ConfigureAwait(false);
         }
 
         return channel.Option;
@@ -83,33 +83,33 @@ public sealed class ChannelOptionService(ISqlSugarClient context) : BaseService<
     /// <inheritdoc/>
     public async Task<ChannelOptions?> FetchChannelByTitle(string channelTitle)
     {
-        var channel = await Queryable().Where(x => x.ChannelTitle == channelTitle).FirstAsync();
+        var channel = await Queryable().Where(x => x.ChannelTitle == channelTitle).FirstAsync().ConfigureAwait(false);
         return channel;
     }
 
     /// <inheritdoc/>
     public async Task<ChannelOptions?> FetchChannelByNameOrTitle(string channelName, string channelTitle)
     {
-        var channel = await Queryable().Where(x => x.ChannelName == channelName || x.ChannelTitle == channelTitle).FirstAsync();
+        var channel = await Queryable().Where(x => x.ChannelName == channelName || x.ChannelTitle == channelTitle).FirstAsync().ConfigureAwait(false);
         return channel;
     }
 
     /// <inheritdoc/>
     public async Task<ChannelOptions?> FetchChannelByChannelId(long channelId)
     {
-        var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync();
+        var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync().ConfigureAwait(false);
         return channel;
     }
 
     /// <inheritdoc/>
     public async Task<ChannelOptions?> UpdateChannelOptionById(long channelId, EChannelOption channelOption)
     {
-        var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync();
+        var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync().ConfigureAwait(false);
         if (channel != null)
         {
             channel.Option = channelOption;
             channel.ModifyAt = DateTime.Now;
-            await Updateable(channel).ExecuteCommandAsync();
+            await Updateable(channel).ExecuteCommandAsync().ConfigureAwait(false);
         }
         return channel;
     }

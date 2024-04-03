@@ -31,14 +31,14 @@ public sealed class ReviewStatusTask(
         var today = now.AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
 
 
-        var todayPost = await _postService.CountAllPosts(today);
-        var todayAcceptPost = await _postService.CountAcceptedPosts(today);
-        var todayRejectPost = await _postService.CountRejectedPosts(today);
-        var todayPaddingPost = await _postService.CountReviewingPosts(today);
+        var todayPost = await _postService.CountAllPosts(today).ConfigureAwait(false);
+        var todayAcceptPost = await _postService.CountAcceptedPosts(today).ConfigureAwait(false);
+        var todayRejectPost = await _postService.CountRejectedPosts(today).ConfigureAwait(false);
+        var todayPaddingPost = await _postService.CountReviewingPosts(today).ConfigureAwait(false);
 
         if (_channelService.HasSecondChannel)
         {
-            var todayAcceptSecondPost = await _postService.CountAcceptedSecondPosts(today);
+            var todayAcceptSecondPost = await _postService.CountAcceptedSecondPosts(today).ConfigureAwait(false);
             todayAcceptPost += todayAcceptSecondPost;
         }
 
@@ -52,11 +52,11 @@ public sealed class ReviewStatusTask(
 
         Message? statusMsg = null;
 
-        var oldPost = await _reviewStatusService.GetOldReviewStatu();
+        var oldPost = await _reviewStatusService.GetOldReviewStatu().ConfigureAwait(false);
 
         var reviewGroup = _channelService.ReviewGroup;
 
-        var newestPost = await _postService.GetLatestReviewingPostLink();
+        var newestPost = await _postService.GetLatestReviewingPostLink().ConfigureAwait(false);
         var kbd = _markupHelperService.ReviewStatusButton(newestPost);
 
         if (oldPost != null)
@@ -67,14 +67,14 @@ public sealed class ReviewStatusTask(
                 var startTime = oldTime.AddHours(-oldTime.Hour).AddMinutes(-oldTime.Minute).AddSeconds(oldTime.Second);
                 var endTime = startTime.AddDays(1);
 
-                var post = await _postService.CountAllPosts(startTime, endTime);
-                var acceptPost = await _postService.CountAcceptedPosts(startTime, endTime);
-                var rejectPost = await _postService.CountRejectedPosts(startTime, endTime);
-                var paddingPost = await _postService.CountReviewingPosts(startTime, endTime);
+                var post = await _postService.CountAllPosts(startTime, endTime).ConfigureAwait(false);
+                var acceptPost = await _postService.CountAcceptedPosts(startTime, endTime).ConfigureAwait(false);
+                var rejectPost = await _postService.CountRejectedPosts(startTime, endTime).ConfigureAwait(false);
+                var paddingPost = await _postService.CountReviewingPosts(startTime, endTime).ConfigureAwait(false);
 
                 if (_channelService.HasSecondChannel)
                 {
-                    var acceptSecondPost = await _postService.CountAcceptedSecondPosts(startTime, endTime);
+                    var acceptSecondPost = await _postService.CountAcceptedSecondPosts(startTime, endTime).ConfigureAwait(false);
                     acceptPost += acceptSecondPost;
                 }
 
@@ -90,23 +90,23 @@ public sealed class ReviewStatusTask(
                 {
                     try
                     {
-                        var oldMsg = await _botClient.EditMessageTextAsync(reviewGroup, (int)oldPost.MessageID, old.ToString(), parseMode: ParseMode.Html);
+                        var oldMsg = await _botClient.EditMessageTextAsync(reviewGroup, (int)oldPost.MessageID, old.ToString(), parseMode: ParseMode.Html).ConfigureAwait(false);
                     }
                     finally
                     {
-                        await _botClient.UnpinChatMessageAsync(reviewGroup, (int)oldPost.MessageID);
+                        await _botClient.UnpinChatMessageAsync(reviewGroup, (int)oldPost.MessageID).ConfigureAwait(false);
                     }
                 }
                 finally
                 {
-                    await _reviewStatusService.DeleteReviewStatus(oldPost);
+                    await _reviewStatusService.DeleteReviewStatus(oldPost).ConfigureAwait(false);
                 }
             }
             else // 同一天的统计
             {
                 try
                 {
-                    statusMsg = await _botClient.EditMessageTextAsync(reviewGroup, (int)oldPost.MessageID, sb.ToString(), parseMode: ParseMode.Html, replyMarkup: kbd);
+                    statusMsg = await _botClient.EditMessageTextAsync(reviewGroup, (int)oldPost.MessageID, sb.ToString(), parseMode: ParseMode.Html, replyMarkup: kbd).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -115,7 +115,7 @@ public sealed class ReviewStatusTask(
                         return;
                     }
                     // 删除旧的消息
-                    await _reviewStatusService.DeleteOldReviewStatus();
+                    await _reviewStatusService.DeleteOldReviewStatus().ConfigureAwait(false);
                     _logger.LogError(ex, "编辑消息失败");
                 }
             }
@@ -123,9 +123,9 @@ public sealed class ReviewStatusTask(
 
         if (statusMsg == null)
         {
-            statusMsg = await _botClient.SendTextMessageAsync(reviewGroup, sb.ToString(), parseMode: ParseMode.Html, replyMarkup: kbd);
-            await _botClient.PinChatMessageAsync(reviewGroup, statusMsg.MessageId);
-            await _reviewStatusService.CreateNewReviewStatus(statusMsg);
+            statusMsg = await _botClient.SendTextMessageAsync(reviewGroup, sb.ToString(), parseMode: ParseMode.Html, replyMarkup: kbd).ConfigureAwait(false);
+            await _botClient.PinChatMessageAsync(reviewGroup, statusMsg.MessageId).ConfigureAwait(false);
+            await _reviewStatusService.CreateNewReviewStatus(statusMsg).ConfigureAwait(false);
         }
     }
 }

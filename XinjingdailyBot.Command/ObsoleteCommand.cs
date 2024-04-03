@@ -16,7 +16,7 @@ namespace XinjingdailyBot.Command;
 /// 超级管理员命令
 /// </summary>
 [Obsolete("迁移使用")]
-[AppService(LifeTime.Scoped)]
+//[AppService(LifeTime.Scoped)]
 public sealed class ObsoleteCommand(
         ILogger<SuperCommand> _logger,
         ITelegramBotClient _botClient,
@@ -41,13 +41,13 @@ public sealed class ObsoleteCommand(
         int startId = 1;
         int effectCount = 0;
 
-        int totalPosts = await _oldPostService.Queryable().CountAsync();
+        int totalPosts = await _oldPostService.Queryable().CountAsync().ConfigureAwait(false);
 
-        var msg = await _botClient.SendCommandReply($"开始更新稿件表, 共计 {totalPosts} 条记录", message, autoDelete: false);
+        var msg = await _botClient.SendCommandReply($"开始更新稿件表, 共计 {totalPosts} 条记录", message, autoDelete: false).ConfigureAwait(false);
 
         while (startId <= totalPosts)
         {
-            var oldOosts = await _oldPostService.Queryable().Where(x => x.Id >= startId && x.Tags != EBuildInTags.None).Take(threads).ToListAsync();
+            var oldOosts = await _oldPostService.Queryable().Where(x => x.Id >= startId && x.Tags != EBuildInTags.None).Take(threads).ToListAsync().ConfigureAwait(false);
             if (oldOosts.Count == 0)
             {
                 break;
@@ -88,11 +88,11 @@ public sealed class ObsoleteCommand(
                         x.Tags,
                         x.NewTags,
                         x.ModifyAt
-                    }).ExecuteCommandAsync();
+                    }).ExecuteCommandAsync().ConfigureAwait(false);
                 }
             }).ToList();
 
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
 
             startId = oldOosts.Last().Id + 1;
 
@@ -101,11 +101,11 @@ public sealed class ObsoleteCommand(
 
         try
         {
-            await _botClient.EditMessageTextAsync(msg, $"更新稿件表完成, 更新了 {effectCount} 条记录");
+            await _botClient.EditMessageTextAsync(msg, $"更新稿件表完成, 更新了 {effectCount} 条记录").ConfigureAwait(false);
         }
         catch
         {
-            await _botClient.SendCommandReply($"更新稿件表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
+            await _botClient.SendCommandReply($"更新稿件表完成, 更新了 {effectCount} 条记录", message, autoDelete: false).ConfigureAwait(false);
         }
     }
 
@@ -123,12 +123,12 @@ public sealed class ObsoleteCommand(
         int startId = 1;
         int effectCount = 0;
 
-        int totalPosts = await _oldPostService.Queryable().CountAsync(x => !x.Merged);
-        var msg = await _botClient.SendCommandReply($"开始迁移稿件表, 共计 {totalPosts} 条记录", message, autoDelete: false);
+        int totalPosts = await _oldPostService.Queryable().CountAsync(x => !x.Merged).ConfigureAwait(false);
+        var msg = await _botClient.SendCommandReply($"开始迁移稿件表, 共计 {totalPosts} 条记录", message, autoDelete: false).ConfigureAwait(false);
 
         while (startId <= totalPosts)
         {
-            var oldPosts = await _oldPostService.Queryable().Where(x => x.Id >= startId && !x.Merged).Take(threads).ToListAsync();
+            var oldPosts = await _oldPostService.Queryable().Where(x => x.Id >= startId && !x.Merged).Take(threads).ToListAsync().ConfigureAwait(false);
             if (oldPosts.Count == 0)
             {
                 break;
@@ -156,11 +156,11 @@ public sealed class ObsoleteCommand(
                         {
                             channelMsgId = -1;
                         }
-                        channel = await _channelOptionService.FetchChannelByNameOrTitle(text[0], title);
+                        channel = await _channelOptionService.FetchChannelByNameOrTitle(text[0], title).ConfigureAwait(false);
                     }
                     else
                     {
-                        channel = await _channelOptionService.FetchChannelByNameOrTitle(name, title);
+                        channel = await _channelOptionService.FetchChannelByNameOrTitle(name, title).ConfigureAwait(false);
                     }
 
                     if (channel != null)
@@ -184,7 +184,7 @@ public sealed class ObsoleteCommand(
 
                 bool countReject = oldPost.Status == EPostStatus.Rejected && (oldPost.Reason != ERejectReason.Fuzzy && oldPost.Reason != ERejectReason.Duplicate);
 
-                var post = new NewPosts {
+                var post = new Posts {
                     Id = oldPost.Id,
                     OriginChatID = oldPost.OriginChatID,
                     OriginMsgID = oldPost.OriginMsgID,
@@ -231,20 +231,20 @@ public sealed class ObsoleteCommand(
 
                 try
                 {
-                    await _postService.Insertable(post).OffIdentity().ExecuteCommandAsync();
+                    await _postService.Insertable(post).OffIdentity().ExecuteCommandAsync().ConfigureAwait(false);
                 }
                 catch (Exception)
                 {
                     _logger.LogWarning("稿件Id {id} 已存在", oldPost.Id);
-                    await _postService.Updateable(post).ExecuteCommandAsync();
+                    await _postService.Updateable(post).ExecuteCommandAsync().ConfigureAwait(false);
                 }
 
                 oldPost.Merged = true;
-                await _oldPostService.Updateable(oldPost).UpdateColumns(static x => new { x.Merged }).ExecuteCommandAsync();
+                await _oldPostService.Updateable(oldPost).UpdateColumns(static x => new { x.Merged }).ExecuteCommandAsync().ConfigureAwait(false);
 
             }).ToList();
 
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
 
             startId = oldPosts.Last().Id + 1;
 
@@ -253,11 +253,11 @@ public sealed class ObsoleteCommand(
 
         try
         {
-            await _botClient.EditMessageTextAsync(msg, $"迁移稿件表完成, 更新了 {effectCount} 条记录");
+            await _botClient.EditMessageTextAsync(msg, $"迁移稿件表完成, 更新了 {effectCount} 条记录").ConfigureAwait(false);
         }
         catch
         {
-            await _botClient.SendCommandReply($"迁移稿件表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
+            await _botClient.SendCommandReply($"迁移稿件表完成, 更新了 {effectCount} 条记录", message, autoDelete: false).ConfigureAwait(false);
         }
     }
 
@@ -275,14 +275,14 @@ public sealed class ObsoleteCommand(
         int startId = 1;
         int effectCount = 0;
 
-        int totalPosts = await _postService.Queryable().CountAsync(x => x.ReviewActionChatID == x.ReviewActionMsgID);
-        var msg = await _botClient.SendCommandReply($"开始修补稿件表, 共计 {totalPosts} 条记录", message, autoDelete: false);
+        int totalPosts = await _postService.Queryable().CountAsync(x => x.ReviewActionChatID == x.ReviewActionMsgID).ConfigureAwait(false);
+        var msg = await _botClient.SendCommandReply($"开始修补稿件表, 共计 {totalPosts} 条记录", message, autoDelete: false).ConfigureAwait(false);
 
         while (startId <= totalPosts)
         {
             var posts = await _postService.Queryable().Where(x => x.Id >= startId &&
                 x.ReviewActionChatID == x.ReviewActionMsgID
-            ).Take(threads).ToListAsync();
+            ).Take(threads).ToListAsync().ConfigureAwait(false);
 
             if (posts.Count == 0)
             {
@@ -295,11 +295,11 @@ public sealed class ObsoleteCommand(
                 post.ReviewActionChatID = post.ReviewChatID;
                 post.ModifyAt = DateTime.Now;
 
-                await _postService.Updateable(post).UpdateColumns(static x => new { x.ReviewActionChatID, x.ModifyAt }).ExecuteCommandAsync();
+                await _postService.Updateable(post).UpdateColumns(static x => new { x.ReviewActionChatID, x.ModifyAt }).ExecuteCommandAsync().ConfigureAwait(false);
 
             }).ToList();
 
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
 
             startId = posts.Last().Id + 1;
 
@@ -308,11 +308,11 @@ public sealed class ObsoleteCommand(
 
         try
         {
-            await _botClient.EditMessageTextAsync(msg, $"修补稿件表完成, 更新了 {effectCount} 条记录");
+            await _botClient.EditMessageTextAsync(msg, $"修补稿件表完成, 更新了 {effectCount} 条记录").ConfigureAwait(false);
         }
         catch
         {
-            await _botClient.SendCommandReply($"修补稿件表完成, 更新了 {effectCount} 条记录", message, autoDelete: false);
+            await _botClient.SendCommandReply($"修补稿件表完成, 更新了 {effectCount} 条记录", message, autoDelete: false).ConfigureAwait(false);
         }
     }
 }

@@ -39,7 +39,7 @@ public sealed class ExpiredPostsTask(
         var expiredDate = DateTime.Now - PostExpiredTime;
 
         //获取有过期稿件的用户
-        var expiredPosts = await _postService.GetExpiredPosts(expiredDate);
+        var expiredPosts = await _postService.GetExpiredPosts(expiredDate).ConfigureAwait(false);
         var userIDList = expiredPosts.Select(x => x.PosterUID).Distinct().ToList();
 
         if (userIDList.Count == 0)
@@ -53,7 +53,7 @@ public sealed class ExpiredPostsTask(
         foreach (var userID in userIDList)
         {
             //获取过期投稿
-            var paddingPosts = await _postService.GetExpiredPosts(userID, expiredDate);
+            var paddingPosts = await _postService.GetExpiredPosts(userID, expiredDate).ConfigureAwait(false);
 
             if (paddingPosts.Count == 0)
             {
@@ -76,10 +76,10 @@ public sealed class ExpiredPostsTask(
                 }
                 post.ModifyAt = DateTime.Now;
 
-                await _postService.UpdatePostStatus(post, status);
+                await _postService.UpdatePostStatus(post, status).ConfigureAwait(false);
             }
 
-            var user = await _userService.FetchUserByUserID(userID);
+            var user = await _userService.FetchUserByUserID(userID).ConfigureAwait(false);
 
             if (user == null)
             {
@@ -109,21 +109,21 @@ public sealed class ExpiredPostsTask(
 
                     try
                     {
-                        await _botClient.SendTextMessageAsync(user.PrivateChatID, sb.ToString(), parseMode: ParseMode.Html, disableNotification: true);
-                        await Task.Delay(500);
+                        await _botClient.SendTextMessageAsync(user.PrivateChatID, sb.ToString(), parseMode: ParseMode.Html, disableNotification: true).ConfigureAwait(false);
+                        await Task.Delay(500).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, "通知消息发送失败, 自动禁用更新");
                         user.PrivateChatID = -1;
-                        await Task.Delay(5000);
+                        await Task.Delay(5000).ConfigureAwait(false);
                     }
                 }
 
                 user.ExpiredPostCount += rTmout;
 
                 //更新用户表
-                await _userService.UpdateUserPostCount(user);
+                await _userService.UpdateUserPostCount(user).ConfigureAwait(false);
             }
         }
     }

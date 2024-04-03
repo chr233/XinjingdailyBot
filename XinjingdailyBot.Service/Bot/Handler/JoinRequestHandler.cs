@@ -20,13 +20,13 @@ public sealed class JoinRequestHandler(
         {
             try
             {
-                await _botClient.ApproveChatJoinRequest(request.Chat, dbUser.UserID);
+                await _botClient.ApproveChatJoinRequest(request.Chat, dbUser.UserID).ConfigureAwait(false);
 
                 _logger.LogInformation("自动通过了 {user} 的加群请求", dbUser);
 
                 if (dbUser.PrivateChatID != -1)
                 {
-                    await _botClient.SendTextMessageAsync(dbUser.PrivateChatID, $"欢迎加入 {request.Chat.Title}, 如果有其他验证记得手动完成");
+                    await _botClient.SendTextMessageAsync(dbUser.PrivateChatID, $"欢迎加入 {request.Chat.Title}, 如果有其他验证记得手动完成").ConfigureAwait(false);
                 }
             }
             catch (Exception)

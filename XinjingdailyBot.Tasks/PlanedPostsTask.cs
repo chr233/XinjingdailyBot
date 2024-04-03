@@ -17,7 +17,7 @@ public sealed class PlanedPostsTask(
     {
         _logger.LogInformation("开始定时任务, 发布定时稿件");
 
-        var post = await _postService.GetInPlanPost();
+        var post = await _postService.GetInPlanPost().ConfigureAwait(false);
 
         if (post == null)
         {
@@ -25,7 +25,7 @@ public sealed class PlanedPostsTask(
             return;
         }
 
-        var result = await _postService.PublicInPlanPost(post);
+        var result = await _postService.PublicInPlanPost(post).ConfigureAwait(false);
         _logger.LogInformation("发布定时稿件 {status}", result ? "成功" : "失败");
     }
 }

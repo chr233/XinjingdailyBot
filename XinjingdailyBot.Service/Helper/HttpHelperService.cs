@@ -48,9 +48,9 @@ public sealed class HttpHelperService(
         try
         {
             var client = _httpClientFactory.CreateClient(clientName);
-            var httpRequestMessage = await client.SendAsync(request);
+            var httpRequestMessage = await client.SendAsync(request).ConfigureAwait(false);
             httpRequestMessage.EnsureSuccessStatusCode();
-            var contentStream = await httpRequestMessage.Content.ReadAsStreamAsync();
+            var contentStream = await httpRequestMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
             return contentStream;
         }
         catch (Exception ex)
@@ -70,7 +70,7 @@ public sealed class HttpHelperService(
     {
         try
         {
-            var obj = await JsonSerializer.DeserializeAsync<T>(stream);
+            var obj = await JsonSerializer.DeserializeAsync<T>(stream).ConfigureAwait(false);
             return obj;
         }
         catch (Exception ex)
@@ -84,12 +84,12 @@ public sealed class HttpHelperService(
     public async Task<GitHubReleaseResponse?> GetLatestRelease()
     {
         var request = new HttpRequestMessage(HttpMethod.Get, "/XinjingdailyBot/releases/latest");
-        using var rawResponse = await SendRequestToStream("GitHub", request);
+        using var rawResponse = await SendRequestToStream("GitHub", request).ConfigureAwait(false);
         if (rawResponse == null)
         {
             return null;
         }
-        var response = await StreamToObject<GitHubReleaseResponse>(rawResponse);
+        var response = await StreamToObject<GitHubReleaseResponse>(rawResponse).ConfigureAwait(false);
         return response;
     }
 
@@ -97,7 +97,7 @@ public sealed class HttpHelperService(
     public async Task<Stream?> DownloadRelease(string? downloadUrl)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, downloadUrl);
-        var rawResponse = await SendRequestToStream("GitHub", request);
+        var rawResponse = await SendRequestToStream("GitHub", request).ConfigureAwait(false);
         return rawResponse;
     }
 
@@ -105,12 +105,12 @@ public sealed class HttpHelperService(
     public async Task<IpInfoResponse?> GetIpInformation(IPAddress ip)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"/{ip}");
-        using var rawResponse = await SendRequestToStream("IpInfo", request);
+        using var rawResponse = await SendRequestToStream("IpInfo", request).ConfigureAwait(false);
         if (rawResponse == null)
         {
             return null;
         }
-        var response = await StreamToObject<IpInfoResponse>(rawResponse);
+        var response = await StreamToObject<IpInfoResponse>(rawResponse).ConfigureAwait(false);
         return response;
     }
 
@@ -122,7 +122,7 @@ public sealed class HttpHelperService(
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/file/bot{token}/{filePath}");
         request.Headers.Add("Range", $"bytes=0-{length}");
-        var rawStream = await SendRequestToStream("Telegram", request);
+        var rawStream = await SendRequestToStream("Telegram", request).ConfigureAwait(false);
         return rawStream;
     }
 }

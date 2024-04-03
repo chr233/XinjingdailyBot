@@ -7,17 +7,19 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Content Remove="appService.json" />
 	  <Content Remove="Properties\appService.json" />
 	  <Content Remove="Properties\dbtable.json" />
-	  <Content Remove="Properties\job.json" />
 	  <Content Remove="Properties\schedule.json" />
-	  <Content Remove="Properties\task.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="Properties\launchSettings.json" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <AdditionalFiles Include="Properties\appService.json" />
 	  <AdditionalFiles Include="Properties\dbtable.json" />
+	  <AdditionalFiles Include="Properties\launchSettings.json" />
 	  <AdditionalFiles Include="Properties\schedule.json" />
 	</ItemGroup>
 
@@ -27,6 +29,7 @@
 		<PackageReference Include="Quartz.AspNetCore" />
 		<PackageReference Include="Swashbuckle.AspNetCore" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
+		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -65,7 +68,7 @@
 
 	<ItemGroup>
 		<Content Update="appsettings.Development.json">
-		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Content>
 		<Content Update="nlog.config">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>

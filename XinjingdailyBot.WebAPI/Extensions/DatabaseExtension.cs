@@ -28,7 +28,7 @@ public static class DatabaseExtension
         if (config == null)
         {
             _logger.Error("数据库配置不能为空");
-            _logger.Error("按任意键退出...");
+            _logger.Info("按任意键退出...");
             Console.ReadKey();
             Environment.Exit(1);
         }
@@ -74,6 +74,8 @@ public static class DatabaseExtension
             DbType.Custom => config.DbConnectionString,
             _ => throw new NotSupportedException("不支持的数据库类型"),
         };
+
+        _logger.Info(connStr);
 
         services.AddSingleton<ISqlSugarClient>(s => {
             var sqlSugar = new SqlSugarScope(new ConnectionConfig {

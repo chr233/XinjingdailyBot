@@ -271,7 +271,7 @@ public sealed class MarkupHelperService(
     /// <inheritdoc/>
     public async Task<InlineKeyboardMarkup?> SetUserGroupKeyboard(Users dbUser, Users targetUser)
     {
-        var groups = await _groupRepository.Queryable().Where(x => x.Id > 0 && x.Id < dbUser.GroupID).ToListAsync();
+        var groups = await _groupRepository.Queryable().Where(x => x.Id > 0 && x.Id < dbUser.GroupID).ToListAsync().ConfigureAwait(false);
 
         if (groups.Count == 0)
         {
@@ -374,7 +374,7 @@ public sealed class MarkupHelperService(
     }
 
     /// <inheritdoc/>
-    public InlineKeyboardMarkup? LinkToOriginPostKeyboard(NewPosts post)
+    public InlineKeyboardMarkup? LinkToOriginPostKeyboard(Posts post)
     {
         var channel = _channelService.AcceptChannel;
         string link = channel.GetMessageLink(post.PublicMsgID);
@@ -477,7 +477,7 @@ public sealed class MarkupHelperService(
     }
 
     /// <inheritdoc/>
-    public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, NewPosts post, int tagId, string postType)
+    public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, Posts post, int tagId, string postType)
     {
         var channel = _channelService.AcceptChannel;
         string link = channel.GetMessageLink(post.PublicMsgID);
@@ -495,7 +495,7 @@ public sealed class MarkupHelperService(
     }
 
     /// <inheritdoc/>
-    public InlineKeyboardMarkup QueryPostMenuKeyboard(Users dbUser, NewPosts post)
+    public InlineKeyboardMarkup QueryPostMenuKeyboard(Users dbUser, Posts post)
     {
         InlineKeyboardMarkup keyboard;
 
@@ -586,7 +586,7 @@ public sealed class MarkupHelperService(
     }
 
     /// <inheritdoc/>
-    public InlineKeyboardMarkup ReviewStatusButton(NewPosts? post)
+    public InlineKeyboardMarkup ReviewStatusButton(Posts? post)
     {
         InlineKeyboardMarkup keyboard;
         if (post != null)

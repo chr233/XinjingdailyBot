@@ -50,6 +50,7 @@ dotnet_style_coalesce_expression = true:suggestion
 end_of_line = crlf
 tab_width = 4
 indent_size = 4
+dotnet_style_prefer_collection_expression = when_types_loosely_match:suggestion
 
 [*.{js,json}]
 indent_style = space
@@ -526,3 +527,4 @@ dotnet_diagnostic.IDE0021.severity = silent
 
 # IDE0022: 使用表达式主体来表示方法
 dotnet_diagnostic.IDE0022.severity = silent
+csharp_style_prefer_primary_constructors = true:suggestion

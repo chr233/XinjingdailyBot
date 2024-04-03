@@ -36,11 +36,11 @@ public sealed class DispatcherService(
         {
             if (_tagRepository.IsWarnText(message.Text))
             {
-                await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+                await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId).ConfigureAwait(false);
             }
             else
             {
-                await _botClient.UnpinChatMessageAsync(message.Chat.Id, message.MessageId);
+                await _botClient.UnpinChatMessageAsync(message.Chat.Id, message.MessageId).ConfigureAwait(false);
             }
         }
         catch (Exception ex)
@@ -52,13 +52,13 @@ public sealed class DispatcherService(
     /// <inheritdoc/>
     public async Task OnMessageReceived(Users dbUser, Message message)
     {
-        await _dialogueService.RecordMessage(message);
+        await _dialogueService.RecordMessage(message).ConfigureAwait(false);
 
         if (dbUser.UserID == 777000 && (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup))
         {
             if (_channelService.IsGroupMessage(message.Chat.Id))
             {
-                await UnPinMessage(message);
+                await UnPinMessage(message).ConfigureAwait(false);
                 return;
             }
         }
@@ -66,7 +66,7 @@ public sealed class DispatcherService(
         if (message.Type == MessageType.Text && message.Text!.StartsWith('/'))
         {
             //处理命令
-            await _commandHandler.OnCommandReceived(dbUser, message);
+            await _commandHandler.OnCommandReceived(dbUser, message).ConfigureAwait(false);
         }
         else
         {
@@ -75,7 +75,7 @@ public sealed class DispatcherService(
 
             if (handler != null)
             {
-                await handler;
+                await handler.ConfigureAwait(false);
             }
         }
     }
@@ -100,7 +100,7 @@ public sealed class DispatcherService(
 
             if (handler != null)
             {
-                await handler;
+                await handler.ConfigureAwait(false);
             }
         }
     }
@@ -108,7 +108,7 @@ public sealed class DispatcherService(
     /// <inheritdoc/>
     public async Task OnCallbackQueryReceived(Users dbUser, CallbackQuery query)
     {
-        await _commandHandler.OnQueryCommandReceived(dbUser, query);
+        await _commandHandler.OnQueryCommandReceived(dbUser, query).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -116,14 +116,14 @@ public sealed class DispatcherService(
     {
         if (_channelService.IsGroupMessage(request.Chat.Id))
         {
-            await _joinRequestHandler.OnJoinRequestReceived(dbUser, request);
+            await _joinRequestHandler.OnJoinRequestReceived(dbUser, request).ConfigureAwait(false);
         }
     }
 
     /// <inheritdoc/>
     public async Task OnInlineQueryReceived(Users dbUser, InlineQuery query)
     {
-        await _inlineQueryHandler.OnInlineQueryReceived(dbUser, query);
+        await _inlineQueryHandler.OnInlineQueryReceived(dbUser, query).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>

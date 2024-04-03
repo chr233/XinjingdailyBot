@@ -44,7 +44,7 @@ public sealed class DialogueService(
             CreateAt = message.Date,
         };
 
-        await InsertAsync(dialogue);
+        await InsertAsync(dialogue).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>

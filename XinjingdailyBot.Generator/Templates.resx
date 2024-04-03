@@ -156,7 +156,16 @@ _dbClient.CodeFirst.InitTables&lt;{1}&gt;();</value>
     <comment>数据库文件内容</comment>
   </data>
   <data name="DbTableFooter" xml:space="preserve">
-    <value>_logger.LogWarning("数据库结构生成完毕, 建议禁用 Database.Generate 来加快启动速度");
+    <value>}
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "创建数据库失败, 可能没有权限");
+                _logger.LogInformation("按任意键退出...");
+                Console.ReadKey();
+                Environment.Exit(1);
+            }
+
+            _logger.LogWarning("数据库结构生成完毕, 建议禁用 Database.Generate 来加快启动速度");
         }
 
         return Task.CompletedTask;
@@ -176,6 +185,7 @@ _dbClient.CodeFirst.InitTables&lt;{1}&gt;();</value>
     <value>using Microsoft.Extensions.Options;
 using SqlSugar;
 using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
@@ -208,7 +218,9 @@ public sealed class GeneratedDbInitService(
                 _logger.LogWarning(ex, "创建数据库失败, 可能没有权限");
             }
 
-            //创建数据表</value>
+            //创建数据表
+            try
+            {</value>
     <comment>数据库文件头</comment>
   </data>
   <data name="ScheduleContent" xml:space="preserve">

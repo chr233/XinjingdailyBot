@@ -28,14 +28,14 @@ public sealed class InlineQueryHandler(
 
             for (int i = 0; i < 10; i++)
             {
-                var randomPost = await _postService.GetRandomPost();
+                var randomPost = await _postService.GetRandomPost().ConfigureAwait(false);
 
                 if (randomPost == null)
                 {
                     break;
                 }
 
-                var postAttachment = await _attachmentService.FetchAttachmentByPostId(randomPost.Id);
+                var postAttachment = await _attachmentService.FetchAttachmentByPostId(randomPost.Id).ConfigureAwait(false);
                 var keyboard = _markupHelperService.LinkToOriginPostKeyboard(randomPost);
                 results.Add(new InlineQueryResultCachedPhoto(i.ToString(), postAttachment.FileID) {
                     Title = randomPost.Text,
@@ -55,7 +55,7 @@ public sealed class InlineQueryHandler(
                 inlineQueryId: query.Id,
                 results: results,
                 cacheTime: 10,
-                isPersonal: true);
+                isPersonal: true).ConfigureAwait(false);
         }
         else
         {
@@ -63,7 +63,7 @@ public sealed class InlineQueryHandler(
                 new InlineQueryResultArticle("1", "该功能暂时仅对管理员开放", new InputTextMessageContent("To be continued"))
             ];
 
-            await _botClient.AnswerInlineQueryAsync(inlineQueryId: query.Id, results: results, cacheTime: 10, isPersonal: true);
+            await _botClient.AnswerInlineQueryAsync(inlineQueryId: query.Id, results: results, cacheTime: 10, isPersonal: true).ConfigureAwait(false);
         }
     }
 }

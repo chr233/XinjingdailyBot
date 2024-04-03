@@ -9,6 +9,6 @@ namespace XinjingdailyBot.Repository;
 /// 稿件仓储类
 /// </summary>
 [AppService(LifeTime.Transient)]
-public class PostRepository(ISqlSugarClient context) : BaseRepository<NewPosts>(context)
+public class PostRepository(ISqlSugarClient context) : BaseRepository<Posts>(context)
 {
 }

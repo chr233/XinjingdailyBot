@@ -23,14 +23,14 @@ public class GroupRepository(
     /// <returns></returns>
     public async Task InitGroupCache()
     {
-        var defaultGroup = await GetFirstAsync(x => x.Id == 1);
+        var defaultGroup = await GetFirstAsync(x => x.Id == 1).ConfigureAwait(false);
         if (defaultGroup == null)
         {
             _logger.LogInformation("缺少默认群组，正在创建内置群组");
-            await InsertBuildInGroups();
+            await InsertBuildInGroups().ConfigureAwait(false);
         }
 
-        var groups = await GetListAsync();
+        var groups = await GetListAsync().ConfigureAwait(false);
         if (groups.Count != 0)
         {
             _groupCache.Clear();
@@ -65,7 +65,7 @@ public class GroupRepository(
             new Groups { Id = 50, Name = "*超级狗管理*", DefaultRight = EUserRights.ALL },
         };
 
-        await Storageable(groups).ExecuteCommandAsync();
+        await Storageable(groups).ExecuteCommandAsync().ConfigureAwait(false);
     }
 
     /// <summary>
