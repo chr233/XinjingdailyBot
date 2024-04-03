@@ -174,6 +174,10 @@ public sealed record OptionsSetting
         /// </summary>
         public bool Generate { get; set; }
         /// <summary>
+        /// 打印SQL日志
+        /// </summary>
+        public bool LogSQL { get; set; }
+        /// <summary>
         /// 是否使用MySQL数据库, true:MySQL, false:SQLite
         /// </summary>
         [Obsolete("使用DbType代替")]
@@ -183,9 +187,9 @@ public sealed record OptionsSetting
         /// </summary>
         public string? DbType { get; set; }
         /// <summary>
-        /// 打印SQL日志
+        /// 数据库连接字符串(DbType选Custom时生效)
         /// </summary>
-        public bool LogSQL { get; set; }
+        public string? DbConnectionString { get; set; }
         /// <summary>
         /// MySQL主机IP
         /// </summary>

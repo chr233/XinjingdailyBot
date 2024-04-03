@@ -4,7 +4,6 @@ using Npgsql;
 using SqlSugar;
 using System.Diagnostics.CodeAnalysis;
 using XinjingdailyBot.Infrastructure;
-using XinjingdailyBot.Service.Bot.Common;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
@@ -42,7 +41,7 @@ public static class DatabaseExtension
             _ => DbType.Custom,
         };
 
-        if (dbType == DbType.Custom)
+        if (dbType == DbType.Custom && string.IsNullOrEmpty(config.DbConnectionString))
         {
             _logger.Warn("UseMySQL已弃用, 请使用 DbType 配置数据库类型 MySql, Sqlite, PostgreSql");
 #pragma warning disable CS0618 // 类型或成员已过时
@@ -72,6 +71,7 @@ public static class DatabaseExtension
                 Username = config.DbUser,
                 Password = config.DbPassword,
             }.ToString(),
+            DbType.Custom => config.DbConnectionString,
             _ => throw new NotSupportedException("不支持的数据库类型"),
         };
 
