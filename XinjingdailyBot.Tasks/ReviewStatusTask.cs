@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using System.Text;
 using Telegram.Bot;
+using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
@@ -22,14 +23,20 @@ public sealed class ReviewStatusTask(
     IReviewStatusService _reviewStatusService,
     IMarkupHelperService _markupHelperService) : IJob
 {
+    private bool Disabled { get; set; }
+
     /// <inheritdoc/>
     public async Task Execute(IJobExecutionContext context)
     {
+        if (Disabled)
+        {
+            return;
+        }
+
         _logger.LogInformation("开始定时任务, 更新投稿状态显示");
 
         var now = DateTime.Now;
         var today = now.AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
-
 
         var todayPost = await _postService.CountAllPosts(today).ConfigureAwait(false);
         var todayAcceptPost = await _postService.CountAcceptedPosts(today).ConfigureAwait(false);
@@ -108,7 +115,7 @@ public sealed class ReviewStatusTask(
                 {
                     statusMsg = await _botClient.EditMessageTextAsync(reviewGroup, (int)oldPost.MessageID, sb.ToString(), parseMode: ParseMode.Html, replyMarkup: kbd).ConfigureAwait(false);
                 }
-                catch (Exception ex)
+                catch (ApiRequestException ex)
                 {
                     if (ex.Message.StartsWith("Bad Request: message is not modified"))
                     {
@@ -124,7 +131,20 @@ public sealed class ReviewStatusTask(
         if (statusMsg == null)
         {
             statusMsg = await _botClient.SendTextMessageAsync(reviewGroup, sb.ToString(), parseMode: ParseMode.Html, replyMarkup: kbd).ConfigureAwait(false);
-            await _botClient.PinChatMessageAsync(reviewGroup, statusMsg.MessageId).ConfigureAwait(false);
+            try
+            {
+                await _botClient.PinChatMessageAsync(reviewGroup, statusMsg.MessageId).ConfigureAwait(false);
+            }
+            catch (ApiRequestException ex)
+            {
+                if (ex.Message.StartsWith("Bad Request: not enough rights to manage pinned messages in the chat"))
+                {
+                    Disabled = true;
+                    _logger.LogWarning("没有足够的权限管理频道置顶消息");
+                    statusMsg = await _botClient.SendTextMessageAsync(reviewGroup, "审核状态显示功能需要机器人具有审核群的置顶消息权限, 为避免消息刷屏已禁用该功能, 请赋予机器人权限后重新启动机器人", parseMode: ParseMode.Html, replyMarkup: kbd).ConfigureAwait(false);
+                }
+            }
+
             await _reviewStatusService.CreateNewReviewStatus(statusMsg).ConfigureAwait(false);
         }
     }
