@@ -15,7 +15,7 @@ namespace XinjingdailyBot.WebAPI.Authorization;
 /// </summary>
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-public class VerifyAttribute : Attribute, IAuthorizationFilter
+public class VerifyAttribute : Attribute, IAsyncAuthorizationFilter
 {
     /// <summary>
     /// Header参数名称
@@ -34,7 +34,7 @@ public class VerifyAttribute : Attribute, IAuthorizationFilter
     /// 鉴权验证
     /// </summary>
     /// <param name="context"></param>
-    public void OnAuthorization(AuthorizationFilterContext context)
+    public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
         var request = context.HttpContext.Request;
         if ((!request.Headers.TryGetValue(HeaderName, out var token) && !request.Query.TryGetValue(QueryName, out token)))
@@ -61,7 +61,7 @@ public class VerifyAttribute : Attribute, IAuthorizationFilter
         var groupRepository = context.HttpContext.RequestServices.GetRequiredService<GroupRepository>();
         var config = context.HttpContext.RequestServices.GetRequiredService<IOptions<OptionsSetting>>().Value;
 
-        var dbUser = userTokenService.VerifyToken(guid).Result;
+        var dbUser =await userTokenService.VerifyToken(guid).ConfigureAwait(false);
 
 
 
