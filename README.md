@@ -36,7 +36,7 @@
   - [首页](https://github.com/chr233/XinjingdailyBot/wiki/Home)
   - [安装](https://github.com/chr233/XinjingdailyBot/wiki/Install)
   - [配置](https://github.com/chr233/XinjingdailyBot/wiki/Configuration)
-  - [命令说明](https://github.com/chr233/XinjingdailyBot/wiki/Configuration)
+  - [命令说明](https://github.com/chr233/XinjingdailyBot/wiki/Command)
 - 进阶
   - [自定义](https://github.com/chr233/XinjingdailyBot/wiki/Customizatio)
 - 信息
