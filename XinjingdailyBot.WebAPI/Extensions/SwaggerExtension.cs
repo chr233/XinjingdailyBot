@@ -63,10 +63,10 @@ public static class SwaggerExtension
             options.SchemaFilter<EnumSchemaFilter>();
 
             // 文档注释
-            var path = Utils.XmlFullPath;
-            if (File.Exists(path))
+            var xmlFiles = Directory.EnumerateFiles(AppContext.BaseDirectory, "*.xml");
+            foreach (var file in xmlFiles)
             {
-                options.IncludeXmlComments(path);
+                options.IncludeXmlComments(file);
             }
         });
     }

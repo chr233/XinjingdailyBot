@@ -1,5 +1,5 @@
 using System.Reflection;
-using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace XinjingdailyBot.Infrastructure;
 
@@ -9,35 +9,40 @@ namespace XinjingdailyBot.Infrastructure;
 public static class Utils
 {
     /// <summary>
-    /// 是否为Windows平台
+    /// 可执行文件
     /// </summary>
-    public static bool IsWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-    /// <summary>
-    /// 可执行文件名称
-    /// </summary>
-    public static string ExeFileName => IsWindows ? "XinjingdailyBot.WebAPI.exe" : "XinjingdailyBot.WebAPI";
-    /// <summary>
-    /// XML注释文件名
-    /// </summary>
-    public static string XmlFileName => "XinjingdailyBot.WebAPI.xml";
-    /// <summary>
-    /// 可执行文件目录
-    /// </summary>
-    public static string ExeDirname => AppContext.BaseDirectory;
-    /// <summary>
-    /// 可执行文件路径
-    /// </summary>
-    public static string ExeFullPath => Path.Combine(ExeDirname, ExeFileName);
-    /// <summary>
-    /// XML文件路径
-    /// </summary>
-    public static string XmlFullPath => Path.Combine(ExeDirname, XmlFileName);
-    /// <summary>
-    /// 备份文件路径
-    /// </summary>
-    public static string BackupFullPath => Path.Combine(ExeDirname, ExeFileName + ".bak");
+    private static readonly Assembly _assembly = Assembly.GetExecutingAssembly();
+
+    public static string AppDir => Directory.GetParent(_assembly.Location).FullName;
+    public static string AppPath => _assembly.Location;
+
     /// <summary>
     /// 版本
     /// </summary>
-    public static string Version => Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown";
+    public static string? Version => _assembly.GetName().Version?.ToString();
+    /// <summary>
+    /// 公司
+    /// </summary>
+    public static string? Company => _assembly.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company;
+    /// <summary>
+    /// 版权
+    /// </summary>
+    public static string? Copyright => _assembly.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright;
+    /// <summary>
+    /// 配置
+    /// </summary>
+    public static string? Configuration => _assembly.GetCustomAttribute<AssemblyConfigurationAttribute>()?.Configuration;
+    /// <summary>
+    /// 框架
+    /// </summary>
+    public static string? FrameworkName => _assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkDisplayName;
+
+    /// <summary>
+    /// 是否为调试模式
+    /// </summary>
+#if DEBUG
+    public const bool IsDebug = true;
+#else
+    public const bool IsDebug = false;
+#endif
 }

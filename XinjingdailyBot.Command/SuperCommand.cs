@@ -45,7 +45,7 @@ public sealed class SuperCommand(
     {
         try
         {
-            string path = Path.Exists(Environment.ProcessPath) ? Environment.ProcessPath : Utils.ExeFullPath;
+            string path = Path.Exists(Environment.ProcessPath) ? Environment.ProcessPath : Utils.AppPath;
             _logger.LogInformation("机器人运行路径: {path}", path);
             Process.Start(path);
             await _botClient.SendCommandReply("机器人即将重启", message).ConfigureAwait(false);
@@ -319,8 +319,8 @@ public sealed class SuperCommand(
                 {
                     using var zipArchive = new ZipArchive(bs);
 
-                    string currentPath = Utils.ExeFullPath;
-                    string backupPath = Utils.BackupFullPath;
+                    string currentPath = Utils.AppDir;
+                    string backupPath = Utils.AppDir + nameof(XinjingdailyBot) + ".bak";
 
                     System.IO.File.Move(currentPath, backupPath, true);
 
@@ -328,7 +328,9 @@ public sealed class SuperCommand(
                     foreach (var entry in zipArchive.Entries)
                     {
                         if (entry.FullName.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)
-                            || entry.FullName.Equals(Utils.ExeFileName, StringComparison.OrdinalIgnoreCase))
+                            //todo
+                            //|| entry.FullName.Equals(Utils.ExeFileName, StringComparison.OrdinalIgnoreCase)
+                            )
                         {
                             entry.ExtractToFile(currentPath);
                             count++;

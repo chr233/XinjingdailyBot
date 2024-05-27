@@ -40,6 +40,14 @@
 		<ProjectReference Include="..\XinjingdailyBot.Repository\XinjingdailyBot.Repository.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Service\XinjingdailyBot.Service.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Tasks\XinjingdailyBot.Tasks.csproj" />
+	
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='Debug'">
+
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='Release'">
 		<ProjectReference Include="..\XinjingdailyBot.Generator\XinjingdailyBot.Generator.csproj">
 			<OutputItemType>Analyzer</OutputItemType>
 			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
@@ -67,12 +75,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Update="appsettings.Development.json">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</Content>
 		<Content Update="nlog.config">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
+
 
 </Project>

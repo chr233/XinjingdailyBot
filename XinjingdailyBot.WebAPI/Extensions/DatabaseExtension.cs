@@ -116,7 +116,11 @@ public static class DatabaseExtension
 
         if (config.Generate)
         {
+#if DEBUG
+            services.AddHostedService<DbInitService>();
+#else
             services.AddHostedService<GeneratedDbInitService>();
+#endif
         }
     }
 }
