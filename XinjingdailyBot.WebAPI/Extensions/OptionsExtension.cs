@@ -20,10 +20,7 @@ public static class OptionsExtension
         config.SetBasePath(basePath);
 
         config.AddJsonFile("log.json", true, true);
-        config.AddJsonFile("api.json", false, false);
-        config.AddJsonFile("mqtt.json", false, false);
-        config.AddJsonFile("yudao.json", false, false);
-        config.AddJsonFile("tianyu.json", false, false);
+        config.AddJsonFile("database.json", false, false);
 
         builder.AddCustomOptionClass<BotConfig>();
     }

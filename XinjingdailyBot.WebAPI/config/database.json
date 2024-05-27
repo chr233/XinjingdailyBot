@@ -1,0 +1,13 @@
+{
+  "Db": {
+    "Generate": true,
+    "LogSQL": true,
+    "DbType": "mysql",
+    "DbConnectionString": null,
+    "DbHost": "10.10.0.3",
+    "DbPort": 3306,
+    "DbName": "sas",
+    "DbUser": "root",
+    "DbPassword": "qgd9qH$QXZ&Lt&$KbhJ7fnRgy9n4Fv"
+  }
+}

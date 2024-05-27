@@ -75,9 +75,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Update="nlog.config">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		<Content Update="config\nlog.config">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		  <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+		  <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="config\" />
 	</ItemGroup>
 
 

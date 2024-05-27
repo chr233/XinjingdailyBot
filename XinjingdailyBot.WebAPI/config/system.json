@@ -1,0 +1,9 @@
+{
+  "System": {
+    "Debug": true,
+    "Swagger": true,
+    "Port": 7600,
+    "AdminPassword": "123456",
+    "HttpProxy": "http://10.10.0.21:8080"
+  }
+}
