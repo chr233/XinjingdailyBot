@@ -61,7 +61,7 @@ public class VerifyAttribute : Attribute, IAsyncAuthorizationFilter
         var groupRepository = context.HttpContext.RequestServices.GetRequiredService<GroupRepository>();
         var config = context.HttpContext.RequestServices.GetRequiredService<IOptions<OptionsSetting>>().Value;
 
-        var dbUser =await userTokenService.VerifyToken(guid).ConfigureAwait(false);
+        var dbUser = await userTokenService.VerifyToken(guid).ConfigureAwait(false);
 
 
 

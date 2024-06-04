@@ -213,7 +213,7 @@ public sealed class PostController(
         }
         else if (post.Media != null && mediaCount > 1) // 媒体组消息
         {
-            post.MediaNames ??= new List<string>();
+            post.MediaNames ??= [];
 
             for (int i = post.MediaNames.Count; i < mediaCount; i++)
             {
@@ -446,7 +446,7 @@ public sealed class PostController(
         }
         else if (post.Media != null && mediaCount > 1) // 媒体组消息
         {
-            post.MediaNames ??= new List<string>();
+            post.MediaNames ??= [];
 
             for (int i = post.MediaNames.Count; i < mediaCount; i++)
             {

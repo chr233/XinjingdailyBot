@@ -21,6 +21,7 @@ public static class OptionsExtension
 
         config.AddJsonFile("log.json", true, true);
         config.AddJsonFile("database.json", false, false);
+        config.AddJsonFile("system.json", false, false);
 
         builder.AddCustomOptionClass<BotConfig>();
     }

@@ -29,6 +29,8 @@
 		<RuntimeIdentifiers>linux-arm;linux-arm64;linux-x64;osx-arm64;osx-x64;win-arm64;win-x64</RuntimeIdentifiers>
 		<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
 		<TargetFramework>net8.0</TargetFramework>
+		<CompilerVisibleProperty Include="RootNamespace" />
+		<CompilerVisibleProperty Include="ProjectDir" />
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">

@@ -32,11 +32,10 @@ public sealed class MarkupHelperService(
             {
                 InlineKeyboardButton.WithCallbackData(anymouse? Langs.AnymouseOn: Langs.AnymouseOff, "post anymouse"),
             },
-            new[]
-            {
+            [
                 InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "post cancel"),
                 InlineKeyboardButton.WithCallbackData(Langs.PostConfirm, "post confirm"),
-            },
+            ],
         });
         return keyboard;
     }
@@ -50,15 +49,13 @@ public sealed class MarkupHelperService(
             {
                 InlineKeyboardButton.WithCallbackData(anymouse? Langs.AnymouseOn: Langs.AnymouseOff, "post anymouse"),
             },
-            new[]
-            {
+            [
                 InlineKeyboardButton.WithCallbackData(Langs.PostSplitImage, "post splitimage"),
-            },
-            new[]
-            {
+            ],
+            [
                 InlineKeyboardButton.WithCallbackData(Langs.PostCancel, "post cancel"),
                 InlineKeyboardButton.WithCallbackData(Langs.PostConfirm, "post confirm"),
-            },
+            ],
         });
         return keyboard;
     }
@@ -107,18 +104,18 @@ public sealed class MarkupHelperService(
 
         if (hasSpoiler.HasValue)
         {
-            btns.Add(new[]
-            {
+            btns.Add(
+            [
                  InlineKeyboardButton.WithCallbackData(hasSpoiler.Value? Langs.TagSpoilerOn: Langs.TagSpoilerOff, "review spoiler"),
                  InlineKeyboardButton.WithCallbackData(anymouse? Langs.AnymouseOn: Langs.AnymouseOff, "review anymouse"),
-            });
+            ]);
         }
         else
         {
-            btns.Add(new[]
-            {
+            btns.Add(
+            [
                  InlineKeyboardButton.WithCallbackData(anymouse? Langs.AnymouseOn: Langs.AnymouseOff, "review anymouse"),
-            });
+            ]);
         }
 
         var lastLine = new List<InlineKeyboardButton> {
@@ -169,17 +166,17 @@ public sealed class MarkupHelperService(
 
         if (hasSpoiler.HasValue)
         {
-            btns.Add(new[]
-            {
-                 InlineKeyboardButton.WithCallbackData(hasSpoiler.Value? Langs.TagSpoilerOn: Langs.TagSpoilerOff, "review spoiler"),
-            });
+            btns.Add(
+            [
+                InlineKeyboardButton.WithCallbackData(hasSpoiler.Value? Langs.TagSpoilerOn: Langs.TagSpoilerOff, "review spoiler"),
+            ]);
         }
 
         if (anymouse.HasValue)
-            btns.Add(new[]
-               {
-                     InlineKeyboardButton.WithCallbackData(anymouse.Value ? Langs.AnymouseOn: Langs.AnymouseOff, "review forceAnymouse"),
-                });
+            btns.Add(
+            [
+                InlineKeyboardButton.WithCallbackData(anymouse.Value ? Langs.AnymouseOn: Langs.AnymouseOff, "review forceAnymouse"),
+            ]);
 
         if (!_botOption.PostSecondMenu)
         {
@@ -202,11 +199,11 @@ public sealed class MarkupHelperService(
         }
         else
         {
-            btns.Add(new[]
-            {
+            btns.Add(
+            [
                 InlineKeyboardButton.WithCallbackData(Langs.ReviewReject, "review reject"),
                 InlineKeyboardButton.WithCallbackData(Langs.ReviewAccept, "review accept"),
-            });
+            ]);
         }
 
         return new InlineKeyboardMarkup(btns);
@@ -259,10 +256,10 @@ public sealed class MarkupHelperService(
         }
         else
         {
-            btns.Add(new[]
-            {
+            btns.Add(
+            [
                 InlineKeyboardButton.WithCallbackData(Langs.RejectCancel, "review reject back"),
-            });
+            ]);
         }
 
         return new InlineKeyboardMarkup(btns);
@@ -286,16 +283,16 @@ public sealed class MarkupHelperService(
                 var name = targetUser.GroupID == group.Id ? $"[ {group.Id}. {group.Name} ]" : $"{group.Id}. {group.Name}";
                 var data = $"cmd {dbUser.UserID} setusergroup {targetUser.UserID} {group.Id}";
 
-                btns.Add(new[]
-                {
+                btns.Add(
+                [
                     InlineKeyboardButton.WithCallbackData(name, data),
-                });
+                ]);
             }
 
-            btns.Add(new[]
-            {
+            btns.Add(
+            [
                 InlineKeyboardButton.WithCallbackData("取消操作", $"cmd {dbUser.UserID} cancel"),
-            });
+            ]);
 
             var keyboard = new InlineKeyboardMarkup(btns);
 
@@ -337,10 +334,9 @@ public sealed class MarkupHelperService(
                 {
                     btnPrev, btnPage, btnNext,
                 },
-                new[]
-                {
+                [
                     btnClose,
-                },
+                ],
             });
 
             return keyboard;
@@ -356,18 +352,15 @@ public sealed class MarkupHelperService(
             {
                 InlineKeyboardButton.WithCallbackData( "不做特殊处理", $"cmd {dbUser.UserID} channeloption {channelId} normal"),
             },
-            new[]
-            {
+            [
                 InlineKeyboardButton.WithCallbackData( "抹除频道来源", $"cmd {dbUser.UserID} channeloption {channelId} purgeorigin"),
-            },
-            new[]
-            {
+            ],
+            [
                 InlineKeyboardButton.WithCallbackData( "拒绝此频道的投稿", $"cmd {dbUser.UserID} channeloption {channelId} autoreject"),
-            },
-            new[]
-            {
+            ],
+            [
                 InlineKeyboardButton.WithCallbackData( "取消操作", $"cmd {dbUser.UserID} cancel"),
-            }
+            ]
         });
 
         return keyboard;
@@ -438,10 +431,10 @@ public sealed class MarkupHelperService(
             btns.Add(line);
         }
 
-        btns.Add(new[]
-        {
+        btns.Add(
+        [
             InlineKeyboardButton.WithCallbackData("取消", $"cmd {dbUser.UserID} cancel"),
-        });
+        ]);
 
         return new InlineKeyboardMarkup(btns);
     }
@@ -455,22 +448,19 @@ public sealed class MarkupHelperService(
             {
                 InlineKeyboardButton.WithCallbackData( "不限类型的随机稿件", $"cmd {dbUser.UserID} randompost {tagNum} all"),
             },
-            new[]
-            {
+            [
                 InlineKeyboardButton.WithCallbackData( "随机图片", $"cmd {dbUser.UserID} randompost {tagNum} photo"),
                 InlineKeyboardButton.WithCallbackData( "随机视频", $"cmd {dbUser.UserID} randompost {tagNum} video"),
-            },
-            new[]
-            {
+            ],
+            [
                 InlineKeyboardButton.WithCallbackData( "随机音频", $"cmd {dbUser.UserID} randompost {tagNum} audio"),
                 InlineKeyboardButton.WithCallbackData( "随机GIF", $"cmd {dbUser.UserID} randompost {tagNum} animation"),
                 InlineKeyboardButton.WithCallbackData( "随机文件", $"cmd {dbUser.UserID} randompost {tagNum} document"),
-            },
-            new[]
-            {
+            ],
+            [
                 InlineKeyboardButton.WithCallbackData( "返回", $"cmd {dbUser.UserID} backrandompost"),
                 InlineKeyboardButton.WithCallbackData( "取消", $"cmd {dbUser.UserID} cancel"),
-            }
+            ]
         });
 
         return keyboard;
@@ -507,10 +497,9 @@ public sealed class MarkupHelperService(
                 {
                     InlineKeyboardButton.WithCallbackData("撤回稿件",$"cmd {dbUser.UserID} deletepost {post.Id}"),
                 },
-                new[]
-                {
+                [
                     InlineKeyboardButton.WithCallbackData("查询投稿人成分",$"cmd {dbUser.UserID} queryposter {post.PosterUID}"),
-                },
+                ],
             });
         }
         else
@@ -521,10 +510,9 @@ public sealed class MarkupHelperService(
                 {
                     InlineKeyboardButton.WithCallbackData("补发稿件",$"cmd {dbUser.UserID} repost {post.Id}"),
                 },
-                new[]
-                {
+                [
                     InlineKeyboardButton.WithCallbackData("查询投稿人成分",$"cmd {dbUser.UserID} queryposter {post.PosterUID}"),
-                },
+                ],
             });
         }
 
@@ -540,22 +528,18 @@ public sealed class MarkupHelperService(
             {
                 InlineKeyboardButton.WithCallbackData("全局禁言", $"cmd {dbUser.UserID} nuke mute {targetUser.UserID} {reason}"),
             },
-            new[]
-            {
+            [
                 InlineKeyboardButton.WithCallbackData("全局封禁",$"cmd {dbUser.UserID} nuke ban {targetUser.UserID} {reason}"),
-            },
-            new[]
-            {
+            ],
+            [
                 InlineKeyboardButton.WithCallbackData("撤销全局禁言",$"cmd {dbUser.UserID} nuke unmute {targetUser.UserID} {reason}"),
-            },
-            new[]
-            {
+            ],
+            [
                 InlineKeyboardButton.WithCallbackData("撤销全局封禁",$"cmd {dbUser.UserID} nuke unban {targetUser.UserID} {reason}"),
-            },
-            new[]
-            {
+            ],
+            [
                 InlineKeyboardButton.WithCallbackData( "取消操作", $"cmd {dbUser.UserID} cancel"),
-            }
+            ]
         });
 
         return keyboard;
