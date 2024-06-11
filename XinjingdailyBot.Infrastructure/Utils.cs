@@ -14,7 +14,13 @@ public static class Utils
     /// </summary>
     private static readonly Assembly _assembly = Assembly.GetExecutingAssembly();
 
-    public static string AppDir => Directory.GetParent(_assembly.Location).FullName;
+    /// <summary>
+    /// 可执行文件所在目录
+    /// </summary>
+    public static string AppDir => Directory.GetParent(_assembly.Location)?.FullName ?? ".";
+    /// <summary>
+    /// 可执行文件路径
+    /// </summary>
     public static string AppPath => _assembly.Location;
 
     /// <summary>

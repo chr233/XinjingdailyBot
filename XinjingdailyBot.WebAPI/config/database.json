@@ -6,8 +6,8 @@
     "DbConnectionString": null,
     "DbHost": "10.10.0.3",
     "DbPort": 3306,
-    "DbName": "sas",
+    "DbName": "xjb_bot",
     "DbUser": "root",
-    "DbPassword": "qgd9qH$QXZ&Lt&$KbhJ7fnRgy9n4Fv"
+    "DbPassword": "123456"
   }
 }

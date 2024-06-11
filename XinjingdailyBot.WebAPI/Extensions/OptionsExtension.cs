@@ -1,4 +1,5 @@
 using DsNext.Infrastructure.Options;
+using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Options;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
@@ -16,7 +17,7 @@ public static class OptionsExtension
     {
         var config = builder.Configuration;
 
-        var basePath = Path.Combine(AppContext.BaseDirectory, "config");
+        var basePath = Path.Combine(Utils.AppDir, "config");
         config.SetBasePath(basePath);
 
         config.AddJsonFile("log.json", true, true);
