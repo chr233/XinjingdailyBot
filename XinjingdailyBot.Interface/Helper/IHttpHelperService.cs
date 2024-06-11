@@ -1,4 +1,5 @@
 using System.Net;
+using XinjingdailyBot.Data.WebResponses;
 using XinjingdailyBot.Infrastructure.Model;
 
 namespace XinjingdailyBot.Interface.Helper;

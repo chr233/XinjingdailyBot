@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace XinjingdailyBot.Infrastructure.Model;
+namespace XinjingdailyBot.Data.WebResponses;
 
 /// <summary>
 /// IpInfo响应实体

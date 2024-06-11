@@ -2,11 +2,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Net;
 using System.Text.Json;
-using Telegram.Bot.Requests.Abstractions;
-using Telegram.Bot.Types;
+using XinjingdailyBot.Data.WebResponses;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Infrastructure.Model;
 using XinjingdailyBot.Interface.Helper;
 
 namespace XinjingdailyBot.Service.Helper;
