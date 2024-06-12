@@ -1,6 +1,9 @@
 using DsNext.Infrastructure.Options;
 
 namespace XinjingdailyBot.Infrastructure.Options;
+/// <summary>
+/// 频道设置
+/// </summary>
 public sealed record ChannelOption : IXjbConfig
 {
     static string? IXjbConfig.SectionName => "Channel";
@@ -9,6 +12,11 @@ public sealed record ChannelOption : IXjbConfig
     /// 审核群组
     /// </summary>
     public string ReviewGroup { get; set; } = "";
+
+
+
+
+
     /// <summary>
     /// 日志频道
     /// </summary>

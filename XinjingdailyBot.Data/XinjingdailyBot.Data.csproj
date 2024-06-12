@@ -17,8 +17,4 @@
 		<ProjectReference Include="..\XinjingdailyBot.Infrastructure\XinjingdailyBot.Infrastructure.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Bot\" />
-	</ItemGroup>
-
 </Project>
