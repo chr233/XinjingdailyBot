@@ -14,7 +14,10 @@ public sealed record ChannelOption : IXjbConfig
     public string ReviewGroup { get; set; } = "";
 
 
-
+    /// <summary>
+    /// 投稿频道列表
+    /// </summary>
+    public List<string> PostChannels { get; set; } = [];
 
 
     /// <summary>

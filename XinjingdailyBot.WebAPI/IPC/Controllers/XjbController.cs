@@ -18,5 +18,4 @@ namespace XinjingdailyBot.WebAPI.IPC.Controllers;
 [SwaggerResponse((int)HttpStatusCode.ServiceUnavailable, "内部错误", typeof(GenericResponse))]
 public abstract class XjbController : ControllerBase
 {
-
 }

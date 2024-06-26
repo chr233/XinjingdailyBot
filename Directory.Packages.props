@@ -23,7 +23,7 @@
     <PackageVersion Include="SkiaSharp.NativeAssets.macOS" Version="2.88.8" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Win32" Version="2.88.8" />
     <PackageVersion Include="SqlSugar.IOC" Version="2.0.0" />
-    <PackageVersion Include="SqlSugarCore" Version="5.1.4.158" />
+    <PackageVersion Include="SqlSugarCore" Version="5.1.4.159" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     <PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="6.6.2" />
     <PackageVersion Include="System.Text.Json" Version="8.0.1" />
