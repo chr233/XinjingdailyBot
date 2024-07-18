@@ -51,7 +51,7 @@ public static class TaskExtension
                     var jobKey = new JobKey(jobType.Name, group);
                     var tiggerKey = new TriggerKey(jobType.Name + "-Tigger", group);
 
-                    var schedule = cron.GetValueOrDefault(jobType.Name, jobAttribute.Schedule);
+                    var schedule = cron.GetValueOrDefault(jobType.Name, jobAttribute.Schedule)!;
 
                     try
                     {

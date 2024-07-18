@@ -1,5 +1,3 @@
-using XinjingdailyBot.Infrastructure.Localization;
-
 namespace XinjingdailyBot.Infrastructure;
 
 /// <summary>
@@ -294,7 +292,7 @@ public sealed record OptionsSetting
         /// <summary>
         /// 任务计划
         /// </summary>
-        public Dictionary<string, string> Cron { get; set; } = [];
+        public Dictionary<string, string?> Cron { get; set; } = [];
     }
 
     /// <summary>

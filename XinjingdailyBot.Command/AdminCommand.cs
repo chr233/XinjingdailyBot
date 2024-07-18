@@ -122,9 +122,23 @@ public sealed class AdminCommand(
         await _botClient.SendCommandReply(sb.ToString(), message, false, parsemode: ParseMode.Html).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// 封禁用户
+    /// </summary>
+    /// <param name="dbUser"></param>
+    /// <param name="message"></param>
+    /// <param name="args"></param>
+    /// <returns></returns>
     [TextCmd("BAN", EUserRights.AdminCmd, Description = "封禁用户")]
     public Task ResponseBan(Users dbUser, Message message, string[] args) => ResponseBan(dbUser, message, args, false);
 
+    /// <summary>
+    /// 静默封禁用户
+    /// </summary>
+    /// <param name="dbUser"></param>
+    /// <param name="message"></param>
+    /// <param name="args"></param>
+    /// <returns></returns>
     [TextCmd("MBAN", EUserRights.AdminCmd, Description = "静默封禁用户")]
     public Task ResponseMBan(Users dbUser, Message message, string[] args) => ResponseBan(dbUser, message, args, true);
 
@@ -206,7 +220,7 @@ public sealed class AdminCommand(
                 {
                     _logger.LogError(ex, "发送私聊消息失败");
                 }
-                
+
                 await _botClient.SendTextMessageAsync(channelService.AdminLogChannel, textHelperService.MakeAdminLogText(dbUser, targetUser, EBanType.Ban, reason, message), parseMode: ParseMode.Html).ConfigureAwait(false);
 
                 var sb = new StringBuilder();
@@ -299,7 +313,7 @@ public sealed class AdminCommand(
 
                 await _botClient.SendTextMessageAsync(channelService.AdminLogChannel, textHelperService.MakeAdminLogText(dbUser, targetUser, EBanType.UnBan, reason, message), parseMode: ParseMode.Html).ConfigureAwait(false);
 
-                
+
                 var sb = new StringBuilder();
                 sb.AppendLine($"成功解封 {targetUser.HtmlUserLink()}");
                 sb.AppendLine($"操作员 {dbUser.HtmlUserLink()}");
@@ -414,7 +428,7 @@ public sealed class AdminCommand(
                 {
                     _logger.LogError(ex, "发送私聊消息失败");
                 }
-                
+
                 await _botClient.SendTextMessageAsync(channelService.AdminLogChannel, textHelperService.MakeAdminLogText(dbUser, targetUser, EBanType.Warning, reason, message), parseMode: ParseMode.Html).ConfigureAwait(false);
 
                 return sb.ToString();
