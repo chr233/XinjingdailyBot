@@ -10,5 +10,5 @@ namespace XinjingdailyBot.Model.Models;
 public sealed record StateContext : BaseModel
 {
     public int UserId { get; set; }
-    public string Context { get; set; }
+    public string? Context { get; set; }
 }

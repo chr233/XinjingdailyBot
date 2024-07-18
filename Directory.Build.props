@@ -54,10 +54,4 @@
 		<SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
 		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(XJBVariant)' != ''">
-		<DefineConstants>
-			$(DefineConstants);XJB_VARIANT_$(XJBVariant.Replace('-','_').ToUpperInvariant())
-		</DefineConstants>
-	</PropertyGroup>
 </Project>

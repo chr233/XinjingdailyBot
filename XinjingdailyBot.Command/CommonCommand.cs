@@ -114,8 +114,8 @@ public sealed class CommonCommand(
     public async Task ResponseVersion(Message message)
     {
         var sb = new StringBuilder();
-        string version = Utils.Version;
-        string variant = BuildInfo.Variant;
+        var version = Utils.Version;
+        var variant = BuildInfo.Variant;
         sb.AppendLine($"程序版本: <code>{version}</code>");
         sb.AppendLine($"子版本: <code>{variant}</code>");
         sb.AppendLine(string.Format("获取开源程序: {0}", _textHelperService.HtmlLink("https://github.com/chr233/XinjingdailyBot/", "XinjingdailyBot")));
