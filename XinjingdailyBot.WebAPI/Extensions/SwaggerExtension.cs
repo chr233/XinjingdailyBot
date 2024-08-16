@@ -1,5 +1,4 @@
 using Microsoft.OpenApi.Models;
-using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.WebAPI.Authorization;
 using XinjingdailyBot.WebAPI.IPC.Middlewares;
 
@@ -18,8 +17,8 @@ public static class SwaggerExtension
     {
         //Swagger
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(static options => {
-            options.SwaggerDoc(
+        services.AddSwaggerGen(static o => {
+            o.SwaggerDoc(
                 "v1", new OpenApiInfo {
                     Version = "v1",
                     Title = "XinjingdailyBot WebAPI",
@@ -41,9 +40,9 @@ public static class SwaggerExtension
                 In = ParameterLocation.Header,
             };
 
-            options.AddSecurityDefinition(VerifyAttribute.FieldName, scheme);
+            o.AddSecurityDefinition(VerifyAttribute.FieldName, scheme);
 
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement {
+            o.AddSecurityRequirement(new OpenApiSecurityRequirement {
                     {
                         new OpenApiSecurityScheme {
                             Reference = new OpenApiReference {
@@ -56,17 +55,17 @@ public static class SwaggerExtension
                 }
             );
 
-            options.CustomSchemaIds(static type => type.ToString());
+            o.CustomSchemaIds(static type => type.ToString());
 
-            options.EnableAnnotations(true, true);
+            o.EnableAnnotations(true, true);
 
-            options.SchemaFilter<EnumSchemaFilter>();
+            o.SchemaFilter<EnumSchemaFilter>();
 
             // 文档注释
             var xmlFiles = Directory.EnumerateFiles(AppContext.BaseDirectory, "*.xml");
             foreach (var file in xmlFiles)
             {
-                options.IncludeXmlComments(file);
+                o.IncludeXmlComments(file);
             }
         });
     }
@@ -78,10 +77,14 @@ public static class SwaggerExtension
     public static void UseSwaggerEx(this WebApplication app)
     {
         app.UseSwagger();
-        app.UseSwaggerUI(options => {
-            options.DisplayRequestDuration();
-            options.EnableDeepLinking();
-            options.ShowExtensions();
+        app.UseSwaggerUI(static o => {
+            o.DisplayRequestDuration();
+            o.EnableDeepLinking();
+            o.ShowExtensions();
+            o.EnableTryItOutByDefault();
+            o.EnablePersistAuthorization();
+            o.EnableFilter();
+            o.EnableValidator();
         });
     }
 }
