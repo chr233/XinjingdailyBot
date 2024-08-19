@@ -73,7 +73,7 @@ public sealed class PollingService(
             {
                 var receiverOptions = new ReceiverOptions {
                     AllowedUpdates = [],
-                    ThrowPendingUpdates = _options.Value.Bot.ThrowPendingUpdates,
+                    DropPendingUpdates = _options.Value.Bot.ThrowPendingUpdates,
                     Limit = 100,
                 };
 

@@ -11,6 +11,7 @@ using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
 using XinjingdailyBot.WebAPI.Authorization;
+using XinjingdailyBot.WebAPI.Extensions;
 using XinjingdailyBot.WebAPI.IPC.Requests;
 using XinjingdailyBot.WebAPI.IPC.Responses;
 

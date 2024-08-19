@@ -1,5 +1,5 @@
-using DsNext.Infrastructure.Options;
 using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.Infrastructure.Configs;
 using XinjingdailyBot.Infrastructure.Options;
 
 namespace XinjingdailyBot.WebAPI.Extensions;

@@ -1,4 +1,4 @@
-using DsNext.Infrastructure.Options;
+using XinjingdailyBot.Infrastructure.Configs;
 
 namespace XinjingdailyBot.Infrastructure.Options;
 /// <summary>

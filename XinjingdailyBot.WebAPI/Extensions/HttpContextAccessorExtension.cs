@@ -1,6 +1,6 @@
 using XinjingdailyBot.Model.Models;
 
-namespace XinjingdailyBot.Infrastructure.Extensions;
+namespace XinjingdailyBot.WebAPI.Extensions;
 
 /// <summary>
 /// HttpContextAccessor扩展

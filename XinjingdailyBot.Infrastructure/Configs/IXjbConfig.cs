@@ -1,4 +1,7 @@
-namespace DsNext.Infrastructure.Options;
+namespace XinjingdailyBot.Infrastructure.Configs;
+/// <summary>
+/// 配置文件接口
+/// </summary>
 public interface IXjbConfig
 {
     /// <summary>
