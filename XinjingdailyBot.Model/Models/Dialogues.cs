@@ -9,7 +9,7 @@ namespace XinjingdailyBot.Model.Models;
 /// </summary>
 [SugarTable("dialogue", TableDescription = "消息记录")]
 [SugarIndex("index_chat", nameof(ChatID), OrderByType.Asc, nameof(MessageID), OrderByType.Asc, true)]
-public sealed record Dialogue : BaseModel, ICreateAt
+public sealed record Dialogues : BaseModel, ICreateAt
 {
     /// <summary>
     /// 主键

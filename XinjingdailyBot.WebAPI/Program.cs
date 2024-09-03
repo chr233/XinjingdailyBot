@@ -8,14 +8,12 @@ __  _ _             _  _            ___       _  _
 \ \/ <_>._ _  ___  <_><_>._ _  ___ | . \ ___ <_>| | _ _ 
  \ \ | || ' |/ . | | || || ' |/ . || | |<_> || || || | |
 _/\_\|_||_|_|\_. | | ||_||_|_|\_. ||___/<___||_||_|`_. |
-             <___'<__'        <___'                <___'           
+             <___'<__'        <___'                <___'
+New
 ";
 
 Console.WriteLine(Langs.Line);
-foreach (var line in banner.Split('\n'))
-{
-    Console.WriteLine(line);
-}
+Console.WriteLine(banner);
 Console.WriteLine(Langs.Line);
 Console.WriteLine("框架: {0}", Utils.FrameworkName);
 Console.WriteLine("版本: {0} {1} {2}", Utils.Version, Utils.Configuration, BuildInfo.Variant);
@@ -27,7 +25,9 @@ Console.WriteLine(Langs.Line);
 Console.WriteLine("欢迎订阅心惊报 https://t.me/xinjingdaily");
 Console.WriteLine(Langs.Line);
 
+#if !DEBUG
 Thread.Sleep(2000);
+#endif
 
 Utils.CleanOldFiles();
 
@@ -35,8 +35,7 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 
 // 配置类支持
-services.AddOptions();
-services.Configure<OptionsSetting>(builder.Configuration);
+builder.AddCustomJsonFiles();
 
 // NLog
 services.AddLogging(loggingBuilder => {
@@ -44,11 +43,11 @@ services.AddLogging(loggingBuilder => {
 #if !DEBUG
     loggingBuilder.SetMinimumLevel(LogLevel.Debug);
 #endif
-    loggingBuilder.AddNLog("config/nlog.config");
+    loggingBuilder.AddNLog("nlog.config");
 });
 
 // SqlSugar
-services.AddSqlSugarSetup(builder.Configuration);
+services.AddSqlSugarSetup();
 
 // 添加服务
 #if DEBUG

@@ -7,17 +7,8 @@ namespace XinjingdailyBot.Model.Models;
 /// <summary>
 /// 新的稿件表
 /// </summary>
-[SugarTable("new_post", TableDescription = "投稿记录")]
-[SugarIndex("index_origin", nameof(OriginChatID), OrderByType.Asc, nameof(OriginMsgID), OrderByType.Asc)]
-[SugarIndex("index_originaction", nameof(OriginActionChatID), OrderByType.Asc, nameof(OriginActionMsgID), OrderByType.Asc)]
-[SugarIndex("index_review", nameof(ReviewChatID), OrderByType.Asc, nameof(ReviewMsgID), OrderByType.Asc)]
-[SugarIndex("index_reviewaction", nameof(ReviewActionChatID), OrderByType.Asc, nameof(ReviewActionMsgID), OrderByType.Asc)]
-[SugarIndex("index_origin_media_group_id", nameof(OriginMediaGroupID), OrderByType.Asc)]
-[SugarIndex("index_review_media_group_id", nameof(ReviewMediaGroupID), OrderByType.Asc)]
-[SugarIndex("index_post_media_group_id", nameof(PublishMediaGroupID), OrderByType.Asc)]
-[SugarIndex("index_posterid", nameof(PosterUID), OrderByType.Asc)]
-[SugarIndex("index_reviewerid", nameof(ReviewerUID), OrderByType.Asc)]
-[SugarIndex("index_status_modifyat", nameof(Status), OrderByType.Asc, nameof(ModifyAt), OrderByType.Asc)]
+[SugarTable("bot", TableDescription = "机器人设置")]
+
 public sealed record Bots : BaseModel, IModifyAt, ICreateAt
 {
     /// <summary>
@@ -26,10 +17,36 @@ public sealed record Bots : BaseModel, IModifyAt, ICreateAt
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
 
-    [SugarColumn(Length = 64)]
-    public string? BotToken { get; set; }
+    /// <summary>
+    /// 启用机器人
+    /// </summary>
+    public bool Enabled { get; set; }
 
-    public int MyProperty { get; set; }
+    /// <summary>
+    /// 设为主要机器人
+    /// </summary>
+    public bool Primary { get; set; }
+
+    /// <summary>
+    /// 机器人Token
+    /// </summary>
+    [SugarColumn(Length = 50)]
+    public string BotToken { get; set; } = "";
+
+    /// <summary>
+    /// 机器人用户Id
+    /// </summary>
+    public long UserId { get; set; } = -1;
+
+    /// <summary>
+    /// 机器人用户名@
+    /// </summary>
+    public string Username { get; set; } = "";
+
+    /// <summary>
+    /// 机器人昵称
+    /// </summary>
+    public string? Nickname { get; set; } = "";
 
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;

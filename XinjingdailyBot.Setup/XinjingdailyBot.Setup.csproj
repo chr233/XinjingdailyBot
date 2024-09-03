@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
+		<PackageReference Include="NLog.Extensions.Logging" />
+		<PackageReference Include="Quartz.AspNetCore" />
+		<PackageReference Include="Swashbuckle.AspNetCore" />
+		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
+		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\XinjingdailyBot.Command\XinjingdailyBot.Command.csproj" />
+		<ProjectReference Include="..\XinjingdailyBot.Controllers\XinjingdailyBot.Controllers.csproj" />
+		<ProjectReference Include="..\XinjingdailyBot.Infrastructure\XinjingdailyBot.Infrastructure.csproj" />
+		<ProjectReference Include="..\XinjingdailyBot.Interface\XinjingdailyBot.Interface.csproj" />
+		<ProjectReference Include="..\XinjingdailyBot.Model\XinjingdailyBot.Model.csproj" />
+		<ProjectReference Include="..\XinjingdailyBot.Repository\XinjingdailyBot.Repository.csproj" />
+		<ProjectReference Include="..\XinjingdailyBot.Service\XinjingdailyBot.Service.csproj" />
+		<ProjectReference Include="..\XinjingdailyBot.Tasks\XinjingdailyBot.Tasks.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
+
+</Project>

@@ -25,10 +25,10 @@ public static class BotClientExtension
         this ITelegramBotClient botClient,
         string text,
         Message message,
-        ParseMode? parsemode = null,
+        ParseMode parsemode = ParseMode.Markdown,
         CancellationToken cancellationToken = default)
     {
-        return botClient.SendTextMessageAsync(message.Chat, text, parseMode: parsemode, replyToMessageId: message.MessageId, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
+        return botClient.SendTextMessageAsync(message.Chat, text, parseMode: parsemode, replyParameters: new ReplyParameters { MessageId = message.MessageId, AllowSendingWithoutReply = true }, cancellationToken: cancellationToken);
     }
 
     /// <summary>
@@ -93,18 +93,18 @@ public static class BotClientExtension
     /// <param name="disableWebPagePreview"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static Task<Message> EditMessageTextAsync(
-        this ITelegramBotClient botClient,
-        Message message,
-        string text,
-        ParseMode? parseMode = default,
-        bool? disableWebPagePreview = null,
-        InlineKeyboardMarkup? replyMarkup = default,
+    //public static Task<Message> EditMessageTextAsync(
+    //    this ITelegramBotClient botClient,
+    //    Message message,
+    //    string text,
+    //    ParseMode parseMode = ParseMode.Markdown,
+    //    bool? disableWebPagePreview = null,
+    //    InlineKeyboardMarkup? replyMarkup = default,
 
-        CancellationToken cancellationToken = default)
-    {
-        return botClient.EditMessageTextAsync(message.Chat, message.MessageId, text, parseMode: parseMode, disableWebPagePreview: disableWebPagePreview, replyMarkup: replyMarkup, cancellationToken: cancellationToken);
-    }
+    //    CancellationToken cancellationToken = default)
+    //{
+    //    return botClient.EditMessageTextAsync(message.Chat, message.MessageId, text, parseMode: parseMode, disableWebPagePreview: disableWebPagePreview, replyMarkup: replyMarkup, cancellationToken: cancellationToken);
+    //}
 
     /// <summary>
     /// 发送命令回复
@@ -117,37 +117,37 @@ public static class BotClientExtension
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static async Task<Message> SendCommandReply(
-        this ITelegramBotClient botClient,
-        string text,
-        Message message,
-        bool? autoDelete = null,
-        ParseMode? parsemode = null,
-        IReplyMarkup? replyMarkup = null,
-        CancellationToken cancellationToken = default)
-    {
-        //私聊始终不删除消息, 群聊中默认删除消息, 但可以指定不删除
-        bool delete = (autoDelete != null ? autoDelete.Value : (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup)) && message.Chat.Type != ChatType.Private;
+    //public static async Task<Message> SendCommandReply(
+    //    this ITelegramBotClient botClient,
+    //    string text,
+    //    Message message,
+    //    bool? autoDelete = null,
+    //    ParseMode? parsemode = null,
+    //    IReplyMarkup? replyMarkup = null,
+    //    CancellationToken cancellationToken = default)
+    //{
+    //    //私聊始终不删除消息, 群聊中默认删除消息, 但可以指定不删除
+    //    bool delete = (autoDelete != null ? autoDelete.Value : (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup)) && message.Chat.Type != ChatType.Private;
 
-        var msg = await botClient.SendTextMessageAsync(message.Chat, text, parseMode: parsemode, replyToMessageId: message.MessageId, replyMarkup: replyMarkup, disableWebPagePreview: true, allowSendingWithoutReply: true, cancellationToken: cancellationToken).ConfigureAwait(false);
+    //    var msg = await botClient.SendTextMessageAsync(message.Chat, text, parseMode: parsemode, replyToMessageId: message.MessageId, replyMarkup: replyMarkup, disableWebPagePreview: true, allowSendingWithoutReply: true, cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        if (delete)
-        {
-            _ = Task.Run(async () => {
-                await Task.Delay(TimeSpan.FromSeconds(30)).ConfigureAwait(false);
-                try
-                {
-                    await botClient.DeleteMessageAsync(msg.Chat, msg.MessageId, cancellationToken).ConfigureAwait(false);
-                }
-                catch
-                {
-                    _logger.Error("删除消息 {messageId} 失败", msg.MessageId);
-                }
-            }, cancellationToken);
-        }
+    //    if (delete)
+    //    {
+    //        _ = Task.Run(async () => {
+    //            await Task.Delay(TimeSpan.FromSeconds(30)).ConfigureAwait(false);
+    //            try
+    //            {
+    //                await botClient.DeleteMessageAsync(msg.Chat, msg.MessageId, cancellationToken).ConfigureAwait(false);
+    //            }
+    //            catch
+    //            {
+    //                _logger.Error("删除消息 {messageId} 失败", msg.MessageId);
+    //            }
+    //        }, cancellationToken);
+    //    }
 
-        return msg;
-    }
+    //    return msg;
+    //}
 
     /// <summary>
     /// 发送会话状态
@@ -157,22 +157,22 @@ public static class BotClientExtension
     /// <param name="chatAction"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static Task SendChatActionAsync(
-        this ITelegramBotClient botClient,
-        Message message,
-        ChatAction chatAction,
-        CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            return botClient.SendChatActionAsync(message.Chat, chatAction, null, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.Error(ex, "SendChatAction出错");
-            return Task.CompletedTask;
-        }
-    }
+    //public static Task SendChatActionAsync(
+    //    this ITelegramBotClient botClient,
+    //    Message message,
+    //    ChatAction chatAction,
+    //    CancellationToken cancellationToken = default)
+    //{
+    //    try
+    //    {
+    //        return botClient.SendChatActionAsync(message.Chat, chatAction, null, cancellationToken);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.Error(ex, "SendChatAction出错");
+    //        return Task.CompletedTask;
+    //    }
+    //}
 
     /// <summary>
     /// 获取群成员状态

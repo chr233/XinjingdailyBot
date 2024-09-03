@@ -11,7 +11,7 @@ namespace XinjingdailyBot.WebAPI.IPC.Controllers;
 /// 主页控制器
 /// </summary>
 public sealed class CommonControllerCommonController(
-        IOptions<OptionsSetting> _options) : XjbController
+        IOptions<OptionsSetting> _options) : AbstractController
 {
     /// <summary>
     /// 首页

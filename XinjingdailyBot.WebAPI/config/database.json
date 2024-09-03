@@ -1,13 +1,13 @@
 {
-  "Db": {
+  "Database": {
     "Generate": true,
     "LogSQL": true,
     "DbType": "mysql",
-    "DbConnectionString": null,
-    "DbHost": "10.10.0.3",
+    "DbHost": "127.0.0.1",
     "DbPort": 3306,
-    "DbName": "xjb_bot",
+    "DbName": "xjb_db",
     "DbUser": "root",
-    "DbPassword": "123456"
+    "DbPassword": "123456",
+    "DbConnectionString": null
   }
 }

@@ -1,9 +1,10 @@
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Options;
 using MySqlConnector;
 using Npgsql;
 using SqlSugar;
 using System.Diagnostics.CodeAnalysis;
-using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.Infrastructure.Options;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
@@ -19,93 +20,84 @@ public static class DatabaseExtension
     /// 注册数据库
     /// </summary>
     /// <param name="services"></param>
-    /// <param name="configuration"></param>
     [RequiresUnreferencedCode("不兼容剪裁")]
-    public static void AddSqlSugarSetup(this IServiceCollection services, IConfiguration configuration)
+    public static void AddSqlSugarSetup(this IServiceCollection services)
     {
-        var config = configuration.GetSection("Database").Get<OptionsSetting.DatabaseOption>();
-
-        if (config == null)
-        {
-            _logger.Error("数据库配置不能为空");
-            _logger.Info("按任意键退出...");
-            Console.ReadKey();
-            Environment.Exit(1);
-        }
-
-        var dbType = config.DbType?.ToLowerInvariant() switch {
-            "sqlite" => DbType.Sqlite,
-            "mysql" => DbType.MySql,
-            "postgresql" or
-            "pgsql" => DbType.PostgreSQL,
-            _ => DbType.Custom,
-        };
-
-        if (dbType == DbType.Custom && string.IsNullOrEmpty(config.DbConnectionString))
-        {
-            _logger.Warn("UseMySQL已弃用, 请使用 DbType 配置数据库类型 MySql, Sqlite, PostgreSql");
-#pragma warning disable CS0618 // 类型或成员已过时
-            dbType = config.UseMySQL ? DbType.MySql : DbType.Sqlite;
-#pragma warning restore CS0618 // 类型或成员已过时
-        }
-
-        _logger.Info("数据库驱动: {0}", dbType);
-
-        var connStr = dbType switch {
-            DbType.MySql => new MySqlConnectionStringBuilder {
-                Server = config.DbHost,
-                Port = config.DbPort,
-                Database = config.DbName,
-                UserID = config.DbUser,
-                Password = config.DbPassword,
-                CharacterSet = "utf8mb4",
-                AllowZeroDateTime = true,
-            }.ToString(),
-            DbType.Sqlite => new SqliteConnectionStringBuilder {
-                DataSource = $"{config.DbName}.db",
-            }.ToString(),
-            DbType.PostgreSQL => new NpgsqlConnectionStringBuilder {
-                Host = config.DbHost,
-                Port = (int)config.DbPort,
-                Database = config.DbName,
-                Username = config.DbUser,
-                Password = config.DbPassword,
-            }.ToString(),
-            DbType.Custom => config.DbConnectionString,
-            _ => throw new NotSupportedException("不支持的数据库类型"),
-        };
-
-        _logger.Info(connStr);
-
         services.AddSingleton<ISqlSugarClient>(s => {
+            var config = s.GetRequiredService<IOptions<DatabaseConfig>>().Value;
+
+            var dbType = config.DbType?.ToUpperInvariant() switch {
+                "SQLITE" => DbType.Sqlite,
+                "MYSQL" => DbType.MySql,
+                "POSTGRESQL" or "PGSQL" => DbType.PostgreSQL,
+                _ => DbType.Custom,
+            };
+
+            _logger.Info("数据库驱动: {0}", dbType);
+
+            var connStr = dbType switch {
+                DbType.MySql => new MySqlConnectionStringBuilder {
+                    Server = config.DbHost,
+                    Port = config.DbPort,
+                    Database = config.DbName,
+                    UserID = config.DbUser,
+                    Password = config.DbPassword,
+                    CharacterSet = "utf8mb4",
+                    AllowZeroDateTime = true,
+                }.ToString(),
+                DbType.Sqlite => new SqliteConnectionStringBuilder {
+                    DataSource = $"{config.DbName}.db",
+                }.ToString(),
+                DbType.PostgreSQL => new NpgsqlConnectionStringBuilder {
+                    Host = config.DbHost,
+                    Port = (int)config.DbPort,
+                    Database = config.DbName,
+                    Username = config.DbUser,
+                    Password = config.DbPassword,
+                }.ToString(),
+                DbType.Custom => config.DbConnectionString,
+                _ => null,
+            };
+
+            if (string.IsNullOrEmpty(connStr))
+            {
+                _logger.Error("数据库配置有误, 请检查 DbType 和 DbConnectionString");
+                _logger.Info("按任意键退出...");
+                Console.ReadKey();
+                Environment.Exit(1);
+            }
+
+            if (string.IsNullOrEmpty(config.DbPassword))
+            {
+                _logger.Info("数据库连接: {0}", connStr);
+            }
+            else
+            {
+                _logger.Info("数据库连接: {0}", connStr.Replace(config.DbPassword, "***"));
+            }
+
             var sqlSugar = new SqlSugarScope(new ConnectionConfig {
                 ConnectionString = connStr,
                 DbType = dbType,
                 IsAutoCloseConnection = true,
-            },
-            db => {
+            }, db => {
                 if (config.LogSQL)
                 {
                     db.Aop.OnLogExecuting = (sql, pars) => {
-                        //var param = db.GetConnectionScope(0).Utilities.SerializeObject(pars.ToDictionary(it => it.ParameterName, it => it.Value));
-                        foreach (var par in pars)
-                        {
-                            sql = sql.Replace(par.ParameterName, par.Value.ToString());
-                        }
-                        _logger.Debug("执行时间: {time} ms | {sql}", db.Ado.SqlExecutionTime.TotalMilliseconds, sql);
-                    };
+                        _logger.Debug("查询语句: {sql}", sql);
 
-                    //执行时间超过1秒
-                    //if (db.Ado.SqlExecutionTime.TotalSeconds > 1)
-                    //{
-                    //    //代码CS文件名
-                    //    var fileName = db.Ado.SqlStackTrace.FirstFileName;
-                    //    //代码行数
-                    //    var fileLine = db.Ado.SqlStackTrace.FirstLine;
-                    //    //方法名
-                    //    var FirstMethodName = db.Ado.SqlStackTrace.FirstMethodName;
-                    //    //db.Ado.SqlStackTrace.MyStackTraceList[1].xxx 获取上层方法的信息
-                    //}
+                        if (pars != null && pars.Length > 0)
+                        {
+                            List<string> values = [];
+                            foreach (var par in pars)
+                            {
+                                values.Add(string.Format("{0} = {1}", par.ParameterName, par.Value ?? "NULL"));
+                            }
+                            _logger.Debug("查询参数: {values}", string.Join(", ", values));
+                        }
+
+                        _logger.Trace("查询时间 {time} ms ", db.Ado.SqlExecutionTime.TotalMilliseconds);
+                    };
 
                     db.Aop.OnError = (e) => _logger.Error("执行SQL出错：", e);
                 }
@@ -114,13 +106,6 @@ public static class DatabaseExtension
             return sqlSugar;
         });
 
-        if (config.Generate)
-        {
-#if DEBUG
-            services.AddHostedService<DbInitService>();
-#else
-            services.AddHostedService<GeneratedDbInitService>();
-#endif
-        }
+        services.AddHostedService<DbInitService>();
     }
 }

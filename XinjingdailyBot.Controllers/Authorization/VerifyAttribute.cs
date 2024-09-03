@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using System.Net;
 using XinjingdailyBot.Infrastructure;
-using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Repository;
 using XinjingdailyBot.WebAPI.IPC.Responses;
 
@@ -57,49 +56,53 @@ public class VerifyAttribute : Attribute, IAsyncAuthorizationFilter
             return;
         }
 
-        var userTokenService = context.HttpContext.RequestServices.GetRequiredService<IUserTokenService>();
-        var groupRepository = context.HttpContext.RequestServices.GetRequiredService<GroupRepository>();
-        var config = context.HttpContext.RequestServices.GetRequiredService<IOptions<OptionsSetting>>().Value;
+        //TODO
 
-        var dbUser = await userTokenService.VerifyToken(guid).ConfigureAwait(false);
+        return;
+
+        //var userTokenService = context.HttpContext.RequestServices.GetRequiredService<IUserTokenService>();
+        //var groupRepository = context.HttpContext.RequestServices.GetRequiredService<GroupRepository>();
+        //var config = context.HttpContext.RequestServices.GetRequiredService<IOptions<OptionsSetting>>().Value;
+
+        //var dbUser = await userTokenService.VerifyToken(guid).ConfigureAwait(false);
 
 
 
-        if (dbUser != null && !dbUser.IsBan)
-        {
-            //如果是配置文件中指定的管理员就覆盖用户组权限
-            if (config.Bot.SuperAdmins?.Contains(dbUser.UserID) ?? false)
-            {
-                dbUser.GroupID = groupRepository.GetMaxGroupId();
-            }
+        //if (dbUser != null && !dbUser.IsBan)
+        //{
+        //    //如果是配置文件中指定的管理员就覆盖用户组权限
+        //    if (config.Bot.SuperAdmins?.Contains(dbUser.UserID) ?? false)
+        //    {
+        //        dbUser.GroupID = groupRepository.GetMaxGroupId();
+        //    }
 
-            //根据GroupID设置用户权限信息 (封禁用户区别对待)
-            var group = groupRepository.GetGroupById(dbUser.GroupID);
+        //    //根据GroupID设置用户权限信息 (封禁用户区别对待)
+        //    var group = groupRepository.GetGroupById(dbUser.GroupID);
 
-            if (group != null)
-            {
-                dbUser.Right = group.DefaultRight;
-                context.HttpContext.Items["Users"] = dbUser;
-            }
-            else
-            {
-                context.Result = new JsonResult(new GenericResponse {
-                    Code = HttpStatusCode.Unauthorized,
-                    Success = false,
-                    Message = "User group not found",
-                });
-                return;
-            }
-        }
-        else
-        {
-            context.Result = new JsonResult(new GenericResponse {
-                Code = HttpStatusCode.Unauthorized,
-                Success = false,
-                Message = "User not found or user is banned",
-            });
-            return;
-        }
+        //    if (group != null)
+        //    {
+        //        dbUser.Right = group.DefaultRight;
+        //        context.HttpContext.Items["Users"] = dbUser;
+        //    }
+        //    else
+        //    {
+        //        context.Result = new JsonResult(new GenericResponse {
+        //            Code = HttpStatusCode.Unauthorized,
+        //            Success = false,
+        //            Message = "User group not found",
+        //        });
+        //        return;
+        //    }
+        //}
+        //else
+        //{
+        //    context.Result = new JsonResult(new GenericResponse {
+        //        Code = HttpStatusCode.Unauthorized,
+        //        Success = false,
+        //        Message = "User not found or user is banned",
+        //    });
+        //    return;
+        //}
     }
 }
 

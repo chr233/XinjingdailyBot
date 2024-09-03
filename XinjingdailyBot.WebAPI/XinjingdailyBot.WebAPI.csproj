@@ -7,20 +7,20 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Content Remove="Properties\appService.json" />
-	  <Content Remove="Properties\dbtable.json" />
-	  <Content Remove="Properties\schedule.json" />
+		<Content Remove="Properties\appService.json" />
+		<Content Remove="Properties\dbtable.json" />
+		<Content Remove="Properties\schedule.json" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Properties\launchSettings.json" />
+		<None Remove="Properties\launchSettings.json" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <AdditionalFiles Include="Properties\appService.json" />
-	  <AdditionalFiles Include="Properties\dbtable.json" />
-	  <AdditionalFiles Include="Properties\launchSettings.json" />
-	  <AdditionalFiles Include="Properties\schedule.json" />
+		<AdditionalFiles Include="Properties\appService.json" />
+		<AdditionalFiles Include="Properties\dbtable.json" />
+		<AdditionalFiles Include="Properties\launchSettings.json" />
+		<AdditionalFiles Include="Properties\schedule.json" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -34,13 +34,13 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\XinjingdailyBot.Command\XinjingdailyBot.Command.csproj" />
+		<ProjectReference Include="..\XinjingdailyBot.Controllers\XinjingdailyBot.Controllers.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Infrastructure\XinjingdailyBot.Infrastructure.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Interface\XinjingdailyBot.Interface.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Model\XinjingdailyBot.Model.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Repository\XinjingdailyBot.Repository.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Service\XinjingdailyBot.Service.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Tasks\XinjingdailyBot.Tasks.csproj" />
-	
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
@@ -75,15 +75,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Update="config\nlog.config">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		  <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-		  <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		<Content Update="nlog.config">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="config\" />
+		<Folder Include="config\" />
 	</ItemGroup>
 
 
