@@ -82,9 +82,5 @@
 		</Content>
 	</ItemGroup>
 
-	<ItemGroup>
-		<Folder Include="config\" />
-	</ItemGroup>
-
 
 </Project>

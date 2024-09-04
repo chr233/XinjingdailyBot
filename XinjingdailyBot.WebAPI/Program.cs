@@ -32,10 +32,12 @@ Thread.Sleep(2000);
 Utils.CleanOldFiles();
 
 var builder = WebApplication.CreateBuilder(args);
-var services = builder.Services;
 
 // 配置类支持
 builder.AddCustomJsonFiles();
+
+// 服务注册
+var services = builder.Services;
 
 // NLog
 services.AddLogging(loggingBuilder => {

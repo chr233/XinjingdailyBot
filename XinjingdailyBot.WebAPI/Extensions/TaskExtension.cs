@@ -38,9 +38,9 @@ public static class TaskExtension
         });
 
         services.AddQuartz(qz => {
-            //qz.UseMicrosoftDependencyInjectionJobFactory();
 
             _logger.Debug("===== 注册定时任务 =====");
+
             uint count = 0;
             foreach (var jobType in tasks)
             {

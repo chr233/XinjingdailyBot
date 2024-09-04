@@ -1,4 +1,3 @@
-using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Configs;
 using XinjingdailyBot.Infrastructure.Options;
 
@@ -17,14 +16,17 @@ public static class OptionsExtension
     {
         var config = builder.Configuration;
 
-        var basePath = Path.Combine(Utils.AppDir, "config");
+        var basePath = Path.Combine(Environment.CurrentDirectory, "config");
+
         config.SetBasePath(basePath);
 
         config.AddJsonFile("log.json", true, true);
         config.AddJsonFile("database.json", false, false);
         config.AddJsonFile("system.json", false, false);
 
-        builder.AddCustomOptionClass<BotConfig>();
+        config.AddEnvironmentVariables();
+
+        builder.AddCustomOptionClass<DatabaseConfig>();
     }
 
     /// <summary>

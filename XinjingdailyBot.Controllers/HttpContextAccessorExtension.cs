@@ -1,6 +1,7 @@
+using Microsoft.AspNetCore.Http;
 using XinjingdailyBot.Model.Models;
 
-namespace XinjingdailyBot.WebAPI.Extensions;
+namespace XinjingdailyBot.Controllers;
 
 /// <summary>
 /// HttpContextAccessor扩展
