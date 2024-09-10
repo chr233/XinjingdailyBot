@@ -1,0 +1,6 @@
+{
+  "Network": {
+    //"HttpProxy": "http://10.10.0.21:8080",
+    "HttpProxy": null
+  }
+}

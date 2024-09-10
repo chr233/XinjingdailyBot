@@ -3,7 +3,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 using XinjingdailyBot.WebAPI.IPC.Responses;
 
-namespace XinjingdailyBot.WebAPI.IPC.Controllers;
+namespace XinjingdailyBot.Controllers.Controllers.Base;
 
 /// <summary>
 /// 基础控制器

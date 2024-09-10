@@ -20,13 +20,16 @@ public static class OptionsExtension
 
         config.SetBasePath(basePath);
 
-        config.AddJsonFile("log.json", true, true);
-        config.AddJsonFile("database.json", false, false);
-        config.AddJsonFile("system.json", false, false);
+        config.AddJsonFile("database.json", false, true);
+        config.AddJsonFile("network.json", false, true);
+        config.AddJsonFile("api.json", false, true);
 
         config.AddEnvironmentVariables();
 
         builder.AddCustomOptionClass<DatabaseConfig>();
+        builder.AddCustomOptionClass<ApiConfig>();
+        builder.AddCustomOptionClass<NetworkConfig>();
+        //builder.Services.Configure<DatabaseConfig>(builder.Configuration.GetSection(DatabaseConfig.SectionName));
     }
 
     /// <summary>

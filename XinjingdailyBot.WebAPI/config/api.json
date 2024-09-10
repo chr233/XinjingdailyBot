@@ -1,5 +1,5 @@
 {
-  "System": {
+  "Api": {
     "Debug": true,
     "Swagger": true,
     "Port": 8233,

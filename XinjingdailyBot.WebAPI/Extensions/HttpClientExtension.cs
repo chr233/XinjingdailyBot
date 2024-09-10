@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Http.Headers;
 using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.Infrastructure.Options;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
@@ -21,14 +22,14 @@ public static class HttpClientExtension
         string publicIdentifier = $"{nameof(XinjingdailyBot)}-{BuildInfo.Variant}";
 
         services.AddHttpClient("Telegram", (serviceProvider, httpClient) => {
-            var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
-            string? baseUrl = config.Bot.BaseUrl;
+            var config = serviceProvider.GetRequiredService<IOptions<NetworkConfig>>().Value;
+            string? baseUrl = config.TelegramEndpoint;
             httpClient.BaseAddress = new Uri(baseUrl ?? "https://api.telegram.org/");
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, Utils.Version));
+            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, BuildInfo.Version));
         }).ConfigurePrimaryHttpMessageHandler(serviceProvider => {
-            var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
-            string? proxy = config.Bot.Proxy;
+            var config = serviceProvider.GetRequiredService<IOptions<NetworkConfig>>().Value;
+            string? proxy = config.TelegramProxy;
 
             WebProxy? tgProxy = null;
             if (!string.IsNullOrEmpty(proxy))
@@ -42,27 +43,27 @@ public static class HttpClientExtension
             };
         });
 
-        services.AddHttpClient("GitHub", (serviceProvider, httpClient) => {
-            var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
-            string? baseUrl = config.GitHub.BaseUrl;
-            httpClient.BaseAddress = new Uri(baseUrl ?? "https://hub.chrxw.com/");
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, Utils.Version));
-        });
+        //services.AddHttpClient("GitHub", (serviceProvider, httpClient) => {
+        //    var config = serviceProvider.GetRequiredService<IOptions<NetworkConfig>>().Value;
+        //    string? baseUrl = config.GitHub.BaseUrl;
+        //    httpClient.BaseAddress = new Uri(baseUrl ?? "https://hub.chrxw.com/");
+        //    httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        //    httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, BuildInfo.Version));
+        //});
 
-        services.AddHttpClient("IpInfo", (serviceProvider, httpClient) => {
-            var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
-            httpClient.BaseAddress = new Uri("https://ipinfo.io/");
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, Utils.Version));
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.IpInfo.Token);
-        });
+        //services.AddHttpClient("IpInfo", (serviceProvider, httpClient) => {
+        //    var config = serviceProvider.GetRequiredService<IOptions<NetworkConfig>>().Value;
+        //    httpClient.BaseAddress = new Uri("https://ipinfo.io/");
+        //    httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        //    httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, BuildInfo.Version));
+        //    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.IpInfo.Token);
+        //});
 
         services.AddHttpClient("Statistic", (serviceProvider, httpClient) => {
-            var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
+            var config = serviceProvider.GetRequiredService<IOptions<NetworkConfig>>().Value;
             httpClient.BaseAddress = new Uri("https://asfe.chrxw.com/");
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, Utils.Version));
+            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, BuildInfo.Version));
         });
     }
 }

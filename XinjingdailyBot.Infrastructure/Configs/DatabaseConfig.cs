@@ -3,7 +3,7 @@ using XinjingdailyBot.Infrastructure.Configs;
 namespace XinjingdailyBot.Infrastructure.Options;
 public sealed record DatabaseConfig : IXjbConfig
 {
-    static string? IXjbConfig.SectionName => "Database";
+    public static string SectionName => "Database";
 
     /// <summary>
     /// 是否生成数据库字段(数据库结构变动时需要打开), 默认 false
@@ -13,11 +13,6 @@ public sealed record DatabaseConfig : IXjbConfig
     /// 打印SQL日志
     /// </summary>
     public bool LogSQL { get; set; }
-    /// <summary>
-    /// 是否使用MySQL数据库, true:MySQL, false:SQLite
-    /// </summary>
-    [Obsolete("使用DbType代替")]
-    public bool UseMySQL { get; set; }
     /// <summary>
     /// 数据库类型
     /// </summary>

@@ -1,10 +1,8 @@
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SqlSugar;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.Infrastructure.Options;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
@@ -14,7 +12,7 @@ namespace XinjingdailyBot.WebAPI.Extensions;
 public class DbInitService : BackgroundService
 {
     private readonly ILogger<DbInitService> _logger;
-    private readonly OptionsSetting.DatabaseOption _option;
+    private readonly DatabaseConfig _option;
     private readonly ISqlSugarClient _dbClient;
 
     /// <summary>
@@ -25,11 +23,11 @@ public class DbInitService : BackgroundService
     /// <param name="dbClient"></param>
     public DbInitService(
         ILogger<DbInitService> logger,
-        IOptions<OptionsSetting> options,
+        IOptions<DatabaseConfig> options,
         ISqlSugarClient dbClient)
     {
         _logger = logger;
-        _option = options.Value.Database;
+        _option = options.Value;
         _dbClient = dbClient;
     }
 
@@ -57,7 +55,8 @@ public class DbInitService : BackgroundService
             //创建数据表
             var assembly = Assembly.Load("XinjingdailyBot.Model");
             var types = assembly.GetTypes()
-                .Where(x => x.GetCustomAttribute<SugarTable>() != null);
+                .Where(x => x.GetCustomAttribute<SugarTable>() != null)
+                .Where(x => x.GetCustomAttribute<SplitTableAttribute>() == null); ;
 
             foreach (var type in types)
             {

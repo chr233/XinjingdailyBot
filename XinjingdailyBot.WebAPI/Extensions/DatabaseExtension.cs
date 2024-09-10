@@ -80,6 +80,10 @@ public static class DatabaseExtension
                 ConnectionString = connStr,
                 DbType = dbType,
                 IsAutoCloseConnection = true,
+                //ConfigureExternalServices = new ConfigureExternalServices {
+                //    // 配置分表策略
+                //    SplitTableService = new ChatIdSplitService(),
+                //},
             }, db => {
                 if (config.LogSQL)
                 {

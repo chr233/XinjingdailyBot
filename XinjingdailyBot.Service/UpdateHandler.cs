@@ -6,11 +6,10 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
-using XinjingdailyBot.Infrastructure.Attribute;
 
 namespace XinjingdailyBot.Service;
 
-[AppService(LifeTime.Singleton)]
+//[AppService(LifeTime.Singleton)]
 public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger) : IUpdateHandler
 {
     private static readonly InputPollOption[] PollOptions = ["Hello", "World!"];

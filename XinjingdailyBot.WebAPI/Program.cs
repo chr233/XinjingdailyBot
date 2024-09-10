@@ -15,10 +15,10 @@ New
 Console.WriteLine(Langs.Line);
 Console.WriteLine(banner);
 Console.WriteLine(Langs.Line);
-Console.WriteLine("框架: {0}", Utils.FrameworkName);
-Console.WriteLine("版本: {0} {1} {2}", Utils.Version, Utils.Configuration, BuildInfo.Variant);
-Console.WriteLine("作者: {0} {1}", BuildInfo.Author, Utils.Company);
-Console.WriteLine("版权: {0}", Utils.Copyright);
+Console.WriteLine("框架: {0}", BuildInfo.FrameworkName);
+Console.WriteLine("版本: {0} {1} {2}", BuildInfo.Version, BuildInfo.Configuration, BuildInfo.Variant);
+Console.WriteLine("作者: {0} {1}", BuildInfo.Author, BuildInfo.Company);
+Console.WriteLine("版权: {0}", BuildInfo.Copyright);
 Console.WriteLine(Langs.Line);
 Console.WriteLine("欢迎使用 XinjingdailyBot");
 Console.WriteLine(Langs.Line);
@@ -47,6 +47,9 @@ services.AddLogging(loggingBuilder => {
 #endif
     loggingBuilder.AddNLog("nlog.config");
 });
+
+// 设置 Kestrel
+builder.WebHost.SetupKestrel();
 
 // SqlSugar
 services.AddSqlSugarSetup();

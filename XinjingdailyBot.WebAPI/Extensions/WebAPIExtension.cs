@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.HttpOverrides;
+using System.Text.Json.Serialization;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
@@ -21,25 +22,25 @@ public static class WebAPIExtension
         services.AddResponseCaching();
 
         // 响应压缩
-        services.AddResponseCompression(static options => options.EnableForHttps = true);
+        services.AddResponseCompression(static o => o.EnableForHttps = true);
 
         // CORS
-        services.AddCors(static options => options.AddDefaultPolicy(static policy => policy.AllowAnyOrigin()));
+        services.AddCors(static options => options.AddDefaultPolicy(static p => p.AllowAnyOrigin()));
 
         // Swagger
         services.AddSwaggerEx();
 
         // 控制器
-        services.AddControllers();
+        services.AddControllers().AddJsonOptions(static o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
         // 注册服务
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
         //获取客户端 IP
-        services.Configure<ForwardedHeadersOptions>(options => {
-            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-            options.KnownNetworks.Clear();
-            options.KnownProxies.Clear();
+        services.Configure<ForwardedHeadersOptions>(o => {
+            o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            o.KnownNetworks.Clear();
+            o.KnownProxies.Clear();
         });
     }
 

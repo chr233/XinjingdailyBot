@@ -1,12 +1,14 @@
 using SqlSugar;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
+using XinjingdailyBot.Model.Services;
 
 namespace XinjingdailyBot.Model.Models;
 
 /// <summary>
 /// 消息记录
 /// </summary>
+[SplitTable(SplitType._Custom01, typeof(ChatIdSplitService))]
 [SugarTable("dialogue", TableDescription = "消息记录")]
 [SugarIndex("index_chat", nameof(ChatID), OrderByType.Asc, nameof(MessageID), OrderByType.Asc, true)]
 public sealed record Dialogues : BaseModel, ICreateAt
@@ -14,11 +16,12 @@ public sealed record Dialogues : BaseModel, ICreateAt
     /// <summary>
     /// 主键
     /// </summary>
-    [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
-    public int Id { get; set; }
+    [SugarColumn(IsPrimaryKey = true)]
+    public long Id { get; set; }
     /// <summary>
     /// 会话ID
     /// </summary>
+    [SplitField]
     public long ChatID { get; set; }
     /// <summary>
     /// 消息ID
