@@ -4,7 +4,7 @@ using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository.Base;
 
-namespace XinjingdailyBot.Repository;
+namespace XinjingdailyBot.Repository.Repositorys;
 
 /// <summary>
 /// 拒绝理由仓储类
@@ -12,7 +12,7 @@ namespace XinjingdailyBot.Repository;
 [AppService(LifeTime.Singleton)]
 public class RejectReasonRepository(
     ILogger<RejectReasonRepository> _logger,
-    ISqlSugarClient context) : BaseRepository<RejectReasons>(context)
+    ISqlSugarClient _context) : BaseRepository<RejectReasons>(_context)
 {
     /// <summary>
     /// 拒绝理由缓存, Key=Id
@@ -29,20 +29,20 @@ public class RejectReasonRepository(
     /// <returns></returns>
     public async Task InitRejectReasonCache()
     {
-        var reasonCount = await CountAsync(x => true).ConfigureAwait(false);
+        var reasonCount = await Queryable().CountAsync(x => true).ConfigureAwait(false);
         if (reasonCount == 0)
         {
             _logger.LogInformation("未设置拒绝理由，正在创建内置拒绝理由");
             await InsertBuildInRejectReasons().ConfigureAwait(false);
         }
 
-        var reasons = await GetListAsync().ConfigureAwait(false);
+        var reasons = await Queryable().ToListAsync().ConfigureAwait(false);
         if (reasons.Count != 0)
         {
             RejectReasonCache.Clear();
             RejectReasonPayloadCache.Clear();
 
-            bool changed = false;
+            var changed = false;
 
             foreach (var reason in reasons)
             {

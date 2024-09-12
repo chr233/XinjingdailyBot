@@ -8,6 +8,7 @@ namespace XinjingdailyBot.Model.Models;
 /// 新的稿件表
 /// </summary>
 [SugarTable("bot", TableDescription = "机器人设置")]
+[SugarIndex("b_bt", nameof(BotToken), OrderByType.Asc, true)]
 
 public sealed record Bots : BaseModel, IModifyAt, ICreateAt
 {
@@ -23,15 +24,15 @@ public sealed record Bots : BaseModel, IModifyAt, ICreateAt
     public bool Enabled { get; set; }
 
     /// <summary>
-    /// 设为主要机器人
-    /// </summary>
-    public bool Primary { get; set; }
-
-    /// <summary>
     /// 机器人Token
     /// </summary>
     [SugarColumn(Length = 50)]
-    public string BotToken { get; set; } = "";
+    public string BotToken { get; set; } = null!;
+
+    /// <summary>
+    /// 机器人权重, 权重越大被使用的概率越高
+    /// </summary>
+    public byte Weight { get; set; }
 
     /// <summary>
     /// 机器人用户Id
@@ -41,11 +42,13 @@ public sealed record Bots : BaseModel, IModifyAt, ICreateAt
     /// <summary>
     /// 机器人用户名@
     /// </summary>
-    public string Username { get; set; } = "";
+    [SugarColumn(IsNullable = true)]
+    public string? Username { get; set; } = "";
 
     /// <summary>
     /// 机器人昵称
     /// </summary>
+    [SugarColumn(IsNullable = true)]
     public string? Nickname { get; set; } = "";
 
     /// <inheritdoc cref="ICreateAt"/>

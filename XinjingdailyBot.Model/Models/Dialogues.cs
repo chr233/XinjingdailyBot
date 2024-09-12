@@ -11,6 +11,7 @@ namespace XinjingdailyBot.Model.Models;
 [SplitTable(SplitType._Custom01, typeof(ChatIdSplitService))]
 [SugarTable("dialogue", TableDescription = "消息记录")]
 [SugarIndex("index_chat", nameof(ChatID), OrderByType.Asc, nameof(MessageID), OrderByType.Asc, true)]
+[SugarIndex("index_chat", nameof(MessageID), OrderByType.Asc, true)]
 public sealed record Dialogues : BaseModel, ICreateAt
 {
     /// <summary>

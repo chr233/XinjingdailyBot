@@ -16,7 +16,7 @@ public class ChatIdSplitService : ISplitTableService
         List<SplitTableInfo> result = [];
         foreach (var item in tableInfos)
         {
-            if (item.Name.Contains("_First")) //区分标识如果不用正则符复杂一些，防止找错表
+            if (item.Name.Contains("_chat_")) //区分标识如果不用正则符复杂一些，防止找错表
             {
                 var data = new SplitTableInfo {
                     TableName = item.Name //要用item.name不要写错了
@@ -49,12 +49,12 @@ public class ChatIdSplitService : ISplitTableService
     /// <returns></returns>
     public string GetTableName(ISqlSugarClient db, EntityInfo entityInfo)
     {
-        return string.Format("{0}_default", entityInfo.DbTableName);//目前模式少不需要分类(自带的有 日、周、月、季、年等进行区分)
+        return string.Format("{0}_chat_default", entityInfo.DbTableName);//目前模式少不需要分类(自带的有 日、周、月、季、年等进行区分)
     }
 
     public string GetTableName(ISqlSugarClient db, EntityInfo entityInfo, SplitType type)
     {
-        return string.Format("{0}_default", entityInfo.DbTableName);//目前模式少不需要分类(自带的有 日、周、月、季、年等进行区分)
+        return string.Format("{0}_chat_default", entityInfo.DbTableName);//目前模式少不需要分类(自带的有 日、周、月、季、年等进行区分)
     }
 
     public string GetTableName(ISqlSugarClient db, EntityInfo entityInfo, SplitType splitType, object fieldValue)

@@ -4,7 +4,7 @@ using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository.Base;
 
-namespace XinjingdailyBot.Repository;
+namespace XinjingdailyBot.Repository.Repositorys;
 
 /// <summary>
 /// 用户等级仓储类
@@ -13,11 +13,11 @@ namespace XinjingdailyBot.Repository;
 /// 用户等级仓储类
 /// </remarks>
 /// <param name="_logger"></param>
-/// <param name="context"></param>
+/// <param name="_context"></param>
 [AppService(LifeTime.Singleton)]
 public class LevelRepository(
     ILogger<LevelRepository> _logger,
-    ISqlSugarClient context) : BaseRepository<Levels>(context)
+    ISqlSugarClient _context) : BaseRepository<Levels>(_context)
 {
     private Dictionary<int, Levels> LevelCache { get; } = [];
 
@@ -27,14 +27,14 @@ public class LevelRepository(
     /// <returns></returns>
     public async Task InitLevelCache()
     {
-        var defaultLevel = await GetFirstAsync(x => x.Id == 1).ConfigureAwait(false);
+        var defaultLevel = await Queryable().FirstAsync(x => x.Id == 1).ConfigureAwait(false);
         if (defaultLevel == null)
         {
             _logger.LogInformation("缺少默认等级，正在创建内置等级");
             await InsertBuildInLevels().ConfigureAwait(false);
         }
 
-        var levels = await GetListAsync().ConfigureAwait(false);
+        var levels = await Queryable().ToListAsync().ConfigureAwait(false);
         if (levels.Count != 0)
         {
             LevelCache.Clear();

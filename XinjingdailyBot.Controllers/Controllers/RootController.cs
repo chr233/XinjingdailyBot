@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Net;
+using XinjingdailyBot.Controllers.Controllers.Base;
 using XinjingdailyBot.Controllers.Responses;
 using XinjingdailyBot.Infrastructure.Options;
 using XinjingdailyBot.WebAPI.IPC.Responses;
@@ -9,7 +10,7 @@ using XinjingdailyBot.WebAPI.IPC.Responses;
 namespace XinjingdailyBot.Controllers.Controllers;
 
 [ApiController]
-public class RootController(IOptions<ApiConfig> _options) : ControllerBase
+public class RootController(IOptions<ApiConfig> _options) : AbstractController
 {
     /// <summary>
     /// 首页

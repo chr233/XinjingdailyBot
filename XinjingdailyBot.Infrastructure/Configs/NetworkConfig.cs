@@ -5,9 +5,9 @@ public sealed record NetworkConfig : IXjbConfig
 {
     public static string SectionName => "Network";
 
-    public string? TelegramProxy { get; set; }
+    public string? TelegramProxy { get; init; }
 
-    public string? TelegramEndpoint { get; set; }
+    public string? TelegramEndpoint { get; init; }
 
-    public string? MyProperty { get; set; }
+    public string? HttpProxy { get; init; }
 }

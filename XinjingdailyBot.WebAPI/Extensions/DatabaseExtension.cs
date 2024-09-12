@@ -45,9 +45,11 @@ public static class DatabaseExtension
                     CharacterSet = "utf8mb4",
                     AllowZeroDateTime = true,
                 }.ToString(),
+
                 DbType.Sqlite => new SqliteConnectionStringBuilder {
                     DataSource = $"{config.DbName}.db",
                 }.ToString(),
+
                 DbType.PostgreSQL => new NpgsqlConnectionStringBuilder {
                     Host = config.DbHost,
                     Port = (int)config.DbPort,
@@ -55,7 +57,9 @@ public static class DatabaseExtension
                     Username = config.DbUser,
                     Password = config.DbPassword,
                 }.ToString(),
+
                 DbType.Custom => config.DbConnectionString,
+
                 _ => null,
             };
 
@@ -80,10 +84,6 @@ public static class DatabaseExtension
                 ConnectionString = connStr,
                 DbType = dbType,
                 IsAutoCloseConnection = true,
-                //ConfigureExternalServices = new ConfigureExternalServices {
-                //    // 配置分表策略
-                //    SplitTableService = new ChatIdSplitService(),
-                //},
             }, db => {
                 if (config.LogSQL)
                 {
@@ -100,8 +100,9 @@ public static class DatabaseExtension
                             _logger.Debug("查询参数: {values}", string.Join(", ", values));
                         }
 
-                        _logger.Trace("查询时间 {time} ms ", db.Ado.SqlExecutionTime.TotalMilliseconds);
                     };
+
+                    db.Aop.OnLogExecuted = (_, _) => _logger.Trace("查询时间 {time} ms ", db.Ado.SqlExecutionTime.TotalMilliseconds);
 
                     db.Aop.OnError = (e) => _logger.Error("执行SQL出错：", e);
                 }

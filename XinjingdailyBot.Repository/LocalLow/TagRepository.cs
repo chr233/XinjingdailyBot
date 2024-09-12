@@ -5,7 +5,7 @@ using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository.Base;
 
-namespace XinjingdailyBot.Repository;
+namespace XinjingdailyBot.Repository.Repositorys;
 
 /// <summary>
 /// 标签仓储类
@@ -38,14 +38,14 @@ public class TagRepository(
     /// <returns></returns>
     public async Task InitPostTagCache()
     {
-        var tagCount = await CountAsync(x => x.Id > 0 && x.Id < 32).ConfigureAwait(false);
+        var tagCount = await Queryable().CountAsync(x => x.Id > 0 && x.Id < 32).ConfigureAwait(false);
         if (tagCount == 0)
         {
             _logger.LogInformation("未设置标签，正在创建内置标签");
             await InsertBuildInTags().ConfigureAwait(false);
         }
 
-        var tags = await GetListAsync(x => x.Id > 0 && x.Id < 32).ConfigureAwait(false);
+        var tags = await Queryable().Where(x => x.Id > 0 && x.Id < 32).ToListAsync().ConfigureAwait(false);
         if (tags.Count != 0)
         {
             TagCache.Clear();
@@ -53,7 +53,7 @@ public class TagRepository(
             TagKeywords.Clear();
             WarnTexts.Clear();
 
-            bool changed = false;
+            var changed = false;
 
             foreach (var tag in tags)
             {
@@ -183,7 +183,7 @@ public class TagRepository(
         {
             return 0;
         }
-        int tagNum = 0;
+        var tagNum = 0;
         foreach (var (seg, words) in TagKeywords)
         {
             foreach (var word in words)
@@ -271,7 +271,7 @@ public class TagRepository(
         var tags = new List<TagPayload>();
         foreach (var tag in TagCache.Values)
         {
-            bool status = (tag.Seg & tagNum) > 0;
+            var status = (tag.Seg & tagNum) > 0;
 
             tags.Add(new TagPayload(status ? tag.OnText : tag.OffText, tag.Payload));
         }
@@ -294,7 +294,7 @@ public class TagRepository(
         {
             text = text.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).First();
         }
-        bool result = WarnTexts.Any(x => x == text);
+        var result = WarnTexts.Any(x => x == text);
         return result;
     }
 }

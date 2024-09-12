@@ -19,6 +19,7 @@ Console.WriteLine("框架: {0}", BuildInfo.FrameworkName);
 Console.WriteLine("版本: {0} {1} {2}", BuildInfo.Version, BuildInfo.Configuration, BuildInfo.Variant);
 Console.WriteLine("作者: {0} {1}", BuildInfo.Author, BuildInfo.Company);
 Console.WriteLine("版权: {0}", BuildInfo.Copyright);
+Console.WriteLine("源码: {0}", BuildInfo.Repo);
 Console.WriteLine(Langs.Line);
 Console.WriteLine("欢迎使用 XinjingdailyBot");
 Console.WriteLine(Langs.Line);
@@ -53,6 +54,9 @@ builder.WebHost.SetupKestrel();
 
 // SqlSugar
 services.AddSqlSugarSetup();
+
+// Redis
+services.AddRedis();
 
 // 添加服务
 #if DEBUG

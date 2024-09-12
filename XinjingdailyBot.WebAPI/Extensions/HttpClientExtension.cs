@@ -31,17 +31,25 @@ public static class HttpClientExtension
             var config = serviceProvider.GetRequiredService<IOptions<NetworkConfig>>().Value;
             string? proxy = config.TelegramProxy;
 
-            WebProxy? tgProxy = null;
             if (!string.IsNullOrEmpty(proxy))
             {
                 _logger.Info("已配置代理: {0}", proxy);
-                tgProxy = new WebProxy { Address = new Uri(proxy) };
+                var tgProxy = new WebProxy { Address = new Uri(proxy) };
+
+                if (proxy.StartsWith("socks"))
+                {
+                    return new SocketsHttpHandler { Proxy = tgProxy, UseProxy = true, };
+                }
+                else
+                {
+                    return new HttpClientHandler { Proxy = tgProxy, UseProxy = true, };
+                }
             }
-            return new HttpClientHandler {
-                Proxy = tgProxy,
-                UseProxy = tgProxy != null,
-            };
-        });
+            else
+            {
+                return new HttpClientHandler();
+            }
+        }).RemoveAllLoggers();
 
         //services.AddHttpClient("GitHub", (serviceProvider, httpClient) => {
         //    var config = serviceProvider.GetRequiredService<IOptions<NetworkConfig>>().Value;
@@ -64,6 +72,6 @@ public static class HttpClientExtension
             httpClient.BaseAddress = new Uri("https://asfe.chrxw.com/");
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, BuildInfo.Version));
-        });
+        }).RemoveAllLoggers();
     }
 }

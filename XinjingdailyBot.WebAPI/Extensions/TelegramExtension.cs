@@ -1,3 +1,6 @@
+using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.Service;
+
 namespace XinjingdailyBot.WebAPI.Extensions;
 
 /// <summary>
@@ -12,6 +15,18 @@ public static class TelegramExtension
     /// <param name="services"></param>
     public static void AddTelegramBotClient(this IServiceCollection services)
     {
+        string publicIdentifier = $"{nameof(XinjingdailyBot)}-{BuildInfo.Variant}";
+
+        //services.AddScoped<ITelegramBotClient>(sp => {
+        //    var config = sp.GetRequiredService<IOptions<BotConfig>>().Value;
+        //    ArgumentNullException.ThrowIfNull(config);
+
+        //    var httpClient = sp.GetRequiredService<IHttpClientFactory>().CreateClient("Telegram");
+
+
+        //    return new TelegramBotClient(config.BotToken, httpClient);
+        //});
+
         //services.AddSingleton<ITelegramBotClient>(serviceProvider => {
         //    var httpHelperService = serviceProvider.GetRequiredService<IHttpHelperService>();
         //    var httpClient = httpHelperService.CreateClient("Telegram");
@@ -33,7 +48,17 @@ public static class TelegramExtension
         //    return new TelegramBotClient(options, httpClient);
         //});
 
+        //services.AddHttpClient("telegram_bot_client").RemoveAllLoggers()
+        //.AddTypedClient<ITelegramBotClient>((httpClient, sp) => {
+        //    BotConfiguration? botConfiguration = sp.GetService<IOptions<BotConfiguration>>()?.Value;
+        //    ArgumentNullException.ThrowIfNull(botConfiguration);
+        //    TelegramBotClientOptions options = new(botConfiguration.BotToken);
+        //    return new TelegramBotClient(options, httpClient);
+        //});
+
         //services.AddHostedService<PollingService>();
         //services.AddHostedService<StatisticService>();
+
+        services.AddHostedService<BotFactoryServices>();
     }
 }

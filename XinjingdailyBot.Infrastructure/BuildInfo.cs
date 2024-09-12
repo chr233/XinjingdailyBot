@@ -38,7 +38,7 @@ public static class BuildInfo
     public const bool CanUpdate = false;
     public const string Variant = "source";
 #endif
-    public const string Author = "chr233";
+    public const string Author = "@chr233";
     public const string Repo = "https://github.com/chr233/XinjingdailyBot/";
 
     /// <summary>

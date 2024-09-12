@@ -5,7 +5,7 @@ public sealed record ApiConfig : IXjbConfig
 {
     public static string SectionName => "Api";
 
-    public bool Debug { get; set; }
-    public bool Swagger { get; set; }
-    public int Port { get; set; } = 8233;
+    public bool Debug { get; init; }
+    public bool Swagger { get; init; }
+    public int Port { get; init; } = 8233;
 }

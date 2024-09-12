@@ -20,15 +20,17 @@ public static class OptionsExtension
 
         config.SetBasePath(basePath);
 
-        config.AddJsonFile("database.json", false, true);
-        config.AddJsonFile("network.json", false, true);
-        config.AddJsonFile("api.json", false, true);
+        config.AddJsonFile("database.json", false, false);
+        config.AddJsonFile("network.json", true, false);
+        config.AddJsonFile("redis.json", true, false);
+        config.AddJsonFile("api.json", true, false);
 
         config.AddEnvironmentVariables();
 
         builder.AddCustomOptionClass<DatabaseConfig>();
-        builder.AddCustomOptionClass<ApiConfig>();
         builder.AddCustomOptionClass<NetworkConfig>();
+        builder.AddCustomOptionClass<RedisConfig>();
+        builder.AddCustomOptionClass<ApiConfig>();
         //builder.Services.Configure<DatabaseConfig>(builder.Configuration.GetSection(DatabaseConfig.SectionName));
     }
 
