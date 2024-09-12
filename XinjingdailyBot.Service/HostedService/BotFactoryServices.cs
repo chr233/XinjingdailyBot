@@ -1,20 +1,19 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
-using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Repository.Services;
+using XinjingdailyBot.Service.Bot;
+using XinjingdailyBot.Service.Common;
 
-namespace XinjingdailyBot.Service;
+namespace XinjingdailyBot.Service.HostedService;
 
 public sealed class BotFactoryServices(
     ILogger<BotFactoryServices> _logger,
-    IServiceProvider _serviceProvider,
+    UpdateHandler _updateHandler,
     IHttpClientFactory _httpClientFactory,
     BotManagerService _botManagerService,
-    BotRepository _botRepository,
-    UserRepository _userRepository
+    BotRepository _botRepository
    ) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -27,27 +26,16 @@ public sealed class BotFactoryServices(
 
         foreach (var bot in bots)
         {
-            _logger.LogInformation("{bot}", bot);
-
-            var scope = _serviceProvider.CreateScope();
-            //scope.ServiceProvider.
-            //var pollingService = scope.ServiceProvider.GetRequiredService<PollingService>();
-
             var httpClient = _httpClientFactory.CreateClient("Telegram");
             var options = new TelegramBotClientOptions(bot.BotToken);
             var telegramBotClient = new TelegramBotClient(options, httpClient, cancellationToken);
 
-            var updateHandler = scope.ServiceProvider.GetRequiredService<UpdateHandler>();
-            var logger = scope.ServiceProvider.GetRequiredService<ILogger<BotWorkerService>>();
             _botManagerService.AddBot(bot.Id, telegramBotClient);
-
-            //var pollingService = new BotWorkerService(logger, telegramBotClient, updateHandler);
 
             var receiverOptions = new ReceiverOptions() {
                 AllowedUpdates = [],
                 DropPendingUpdates = true,
             };
-
 
             try
             {
@@ -55,12 +43,12 @@ public sealed class BotFactoryServices(
 
                 bot.UserId = me.Id;
                 bot.Username = me.Username;
-                bot.Nickname = me.FullName();
+                bot.Firstname = me.FirstName;
 
                 await _botRepository.UpdateBot(bot).ConfigureAwait(false);
 
                 tasks.Add(telegramBotClient.ReceiveAsync(
-                    updateHandler: updateHandler,
+                    updateHandler: _updateHandler,
                     receiverOptions: receiverOptions,
                     cancellationToken: cancellationToken));
 

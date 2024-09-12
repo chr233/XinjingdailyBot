@@ -2,7 +2,7 @@ using System.Collections.ObjectModel;
 using Telegram.Bot;
 using XinjingdailyBot.Infrastructure.Attribute;
 
-namespace XinjingdailyBot.Service;
+namespace XinjingdailyBot.Service.Common;
 
 [AppService(LifeTime.Singleton)]
 public sealed class BotManagerService

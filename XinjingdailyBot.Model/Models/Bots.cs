@@ -43,13 +43,13 @@ public sealed record Bots : BaseModel, IModifyAt, ICreateAt
     /// 机器人用户名@
     /// </summary>
     [SugarColumn(IsNullable = true)]
-    public string? Username { get; set; } = "";
+    public string? Username { get; set; }
 
     /// <summary>
     /// 机器人昵称
     /// </summary>
     [SugarColumn(IsNullable = true)]
-    public string? Nickname { get; set; } = "";
+    public string? Firstname { get; set; }
 
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;

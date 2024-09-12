@@ -1,5 +1,5 @@
 using XinjingdailyBot.Infrastructure;
-using XinjingdailyBot.Service;
+using XinjingdailyBot.Service.HostedService;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 

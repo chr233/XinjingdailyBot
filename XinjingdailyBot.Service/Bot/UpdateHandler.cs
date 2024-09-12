@@ -8,10 +8,11 @@ using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure.Attribute;
 
-namespace XinjingdailyBot.Service;
+namespace XinjingdailyBot.Service.Bot;
 
 [AppService(LifeTime.Singleton)]
-public class UpdateHandler(ILogger<UpdateHandler> logger) : IUpdateHandler
+public class UpdateHandler(
+    ILogger<UpdateHandler> logger) : IUpdateHandler
 {
     private static readonly InputPollOption[] PollOptions = ["Hello", "World!"];
 
@@ -49,7 +50,7 @@ public class UpdateHandler(ILogger<UpdateHandler> logger) : IUpdateHandler
         if (msg.Text is not { } messageText)
             return;
 
-        Message sentMessage = await (messageText.Split(' ')[0] switch {
+        var sentMessage = await (messageText.Split(' ')[0] switch {
             "/photo" => SendPhoto(botClient, msg),
             "/inline_buttons" => SendInlineKeyboard(botClient, msg),
             "/keyboard" => SendReplyKeyboard(botClient, msg),

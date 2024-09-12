@@ -15,8 +15,8 @@ public class BotRepository(ISqlSugarClient context) : BaseRepository<Bots>(conte
             BotToken = botToken,
             Weight = weight,
             UserId = -1,
-            Nickname = "",
-            Username = "",
+            Firstname = null,
+            Username = null,
             CreateAt = DateTime.Now,
             ModifyAt = DateTime.Now,
         };
@@ -34,7 +34,7 @@ public class BotRepository(ISqlSugarClient context) : BaseRepository<Bots>(conte
     {
         return Queryable()
             .WhereIF(!string.IsNullOrEmpty(botname), b => b.Username != null && b.Username.Contains(botname!))
-            .WhereIF(!string.IsNullOrEmpty(nickname), b => b.Nickname != null && b.Nickname.Contains(nickname!))
+            .WhereIF(!string.IsNullOrEmpty(nickname), b => b.Firstname != null && b.Firstname.Contains(nickname!))
             .ToPageListAsync(page, limit);
     }
 
