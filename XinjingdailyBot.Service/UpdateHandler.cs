@@ -17,7 +17,7 @@ public class UpdateHandler(ILogger<UpdateHandler> logger) : IUpdateHandler
 
     public async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, HandleErrorSource source, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HandleError: {Exception}", exception);
+        logger.LogError("HandleError: {Exception}", exception);
         // Cooldown in case of network connection error
         if (exception is RequestException)
             await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);

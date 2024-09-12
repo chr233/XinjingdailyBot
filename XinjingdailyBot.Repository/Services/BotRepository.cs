@@ -26,7 +26,8 @@ public class BotRepository(ISqlSugarClient context) : BaseRepository<Bots>(conte
 
     public async Task<Bots?> QueryBotById(int id)
     {
-        return await Queryable().Where(b => b.Id == id).FirstAsync().ConfigureAwait(false);
+        return await Queryable()
+            .Where(b => b.Id == id).FirstAsync().ConfigureAwait(false);
     }
 
     public Task<List<Bots>> QueryBotByName(string? botname, string? nickname, int page, int limit)
@@ -35,6 +36,11 @@ public class BotRepository(ISqlSugarClient context) : BaseRepository<Bots>(conte
             .WhereIF(!string.IsNullOrEmpty(botname), b => b.Username != null && b.Username.Contains(botname!))
             .WhereIF(!string.IsNullOrEmpty(nickname), b => b.Nickname != null && b.Nickname.Contains(nickname!))
             .ToPageListAsync(page, limit);
+    }
+
+    public Task<List<Bots>> QueryBotsEnabled()
+    {
+        return Queryable().Where(static x => x.Enabled).ToListAsync();
     }
 
     public Task UpdateBot(Bots bot)
