@@ -2,7 +2,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Diagnostics.CodeAnalysis;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -73,7 +72,7 @@ public sealed class PollingService(
             {
                 var receiverOptions = new ReceiverOptions {
                     AllowedUpdates = [],
-                    DropPendingUpdates = _options.Value.Bot.ThrowPendingUpdates,
+                    ThrowPendingUpdates = _options.Value.Bot.ThrowPendingUpdates,
                     Limit = 100,
                 };
 
