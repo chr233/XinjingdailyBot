@@ -34,9 +34,6 @@ Utils.CleanOldFiles();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 配置类支持
-builder.AddCustomJsonFiles();
-
 // 服务注册
 var services = builder.Services;
 
@@ -49,6 +46,9 @@ services.AddLogging(loggingBuilder => {
     loggingBuilder.AddNLog("nlog.config");
 });
 
+// 配置类支持
+builder.AddCustomJsonFiles();
+
 // 设置 Kestrel
 builder.WebHost.SetupKestrel();
 
@@ -58,11 +58,16 @@ services.AddSqlSugarSetup();
 // Redis
 services.AddRedis();
 
-// 添加服务
 #if DEBUG
+// 添加服务
 services.AddAppService();
+// 添加定时任务
+services.AddQuartzSetup(builder.Configuration);
 #else
+// 添加服务
 services.AddAppServiceGenerated();
+// 添加定时任务
+services.AddQuartzSetupGenerated(builder.Configuration);
 #endif
 
 // 注册HttpClient
@@ -70,13 +75,6 @@ services.AddHttpClients();
 
 // Telegram
 services.AddTelegramBotClient();
-
-// 添加定时任务
-#if DEBUG
-services.AddQuartzSetup(builder.Configuration);
-#else
-services.AddQuartzSetupGenerated(builder.Configuration);
-#endif
 
 // Web API
 services.AddWebAPI(builder.WebHost);

@@ -1,17 +1,19 @@
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SqlSugar;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using XinjingdailyBot.Infrastructure.Options;
 
-namespace XinjingdailyBot.WebAPI.Extensions;
+namespace XinjingdailyBot.Service.HostedService;
 
 /// <summary>
 /// 消息接收服务
 /// </summary>
-public class DbInitService : BackgroundService
+public class DbInitializationService : BackgroundService
 {
-    private readonly ILogger<DbInitService> _logger;
+    private readonly ILogger<DbInitializationService> _logger;
     private readonly DatabaseConfig _option;
     private readonly ISqlSugarClient _dbClient;
 
@@ -21,8 +23,8 @@ public class DbInitService : BackgroundService
     /// <param name="logger"></param>
     /// <param name="options"></param>
     /// <param name="dbClient"></param>
-    public DbInitService(
-        ILogger<DbInitService> logger,
+    public DbInitializationService(
+        ILogger<DbInitializationService> logger,
         IOptions<DatabaseConfig> options,
         ISqlSugarClient dbClient)
     {

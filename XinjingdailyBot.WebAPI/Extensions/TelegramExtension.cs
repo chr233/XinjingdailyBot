@@ -59,6 +59,6 @@ public static class TelegramExtension
         //services.AddHostedService<PollingService>();
         //services.AddHostedService<StatisticService>();
 
-        services.AddHostedService<BotFactoryServices>();
+        services.AddHostedService<BotInitializationServices>();
     }
 }

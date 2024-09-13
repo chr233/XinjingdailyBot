@@ -5,6 +5,7 @@ using Npgsql;
 using SqlSugar;
 using System.Diagnostics.CodeAnalysis;
 using XinjingdailyBot.Infrastructure.Options;
+using XinjingdailyBot.Service.HostedService;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
@@ -111,6 +112,6 @@ public static class DatabaseExtension
             return sqlSugar;
         });
 
-        services.AddHostedService<DbInitService>();
+        services.AddHostedService<DbInitializationService>();
     }
 }
