@@ -30,7 +30,7 @@ public sealed class BotInitializationServices(
 
         var receiverOptions = new ReceiverOptions() {
             AllowedUpdates = [],
-            DropPendingUpdates = false,
+            DropPendingUpdates = true,
         };
 
         var tasks = bots.Select(bot => CreateAndValidBot(bot, receiverOptions, cancellationToken));

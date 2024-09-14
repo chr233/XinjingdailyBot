@@ -9,7 +9,7 @@ namespace XinjingdailyBot.Model.Models;
 /// <summary>
 /// 新的稿件表
 /// </summary>
-[SugarTable("new_post", TableDescription = "投稿记录")]
+[SugarTable("post", TableDescription = "投稿记录")]
 [SugarIndex("index_origin", nameof(OriginChatID), OrderByType.Asc, nameof(OriginMsgID), OrderByType.Asc)]
 [SugarIndex("index_originaction", nameof(OriginActionChatID), OrderByType.Asc, nameof(OriginActionMsgID), OrderByType.Asc)]
 [SugarIndex("index_review", nameof(ReviewChatID), OrderByType.Asc, nameof(ReviewMsgID), OrderByType.Asc)]

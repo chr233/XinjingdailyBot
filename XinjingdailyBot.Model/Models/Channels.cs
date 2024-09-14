@@ -22,11 +22,15 @@ public sealed record Channels : BaseModel, ICreateAt, IModifyAt
     /// <summary>
     /// 频道ID @
     /// </summary>
-    public string ChannelName { get; set; } = "";
+    [SugarColumn(IsNullable = true)]
+    public string? ChannelName { get; set; }
     /// <summary>
     /// 频道名称
     /// </summary>
-    public string ChannelTitle { get; set; } = "";
+    [SugarColumn(IsNullable = true)]
+    public string? ChannelTitle { get; set; }
+    public bool IsPublish { get; set; }
+    public bool AllowInvite { get; set; }
 
 
 

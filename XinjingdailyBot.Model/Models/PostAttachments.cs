@@ -7,9 +7,9 @@ namespace XinjingdailyBot.Model.Models;
 /// <summary>
 /// 投稿附件
 /// </summary>
-[SugarTable("attachment", TableDescription = "投稿附件")]
-[SugarIndex("index_post_id", nameof(PostID), OrderByType.Asc)]
-public sealed record Attachments : BaseModel
+[SugarTable("post_attachment", TableDescription = "投稿附件")]
+[SugarIndex("index_post_id", nameof(PostId), OrderByType.Asc)]
+public sealed record PostAttachments : BaseModel
 {
     /// <summary>
     /// 主键
@@ -19,23 +19,27 @@ public sealed record Attachments : BaseModel
     /// <summary>
     /// 稿件ID
     /// </summary>
-    public long PostID { get; set; }
+    public long PostId { get; set; }
     /// <summary>
     /// 文件ID
     /// </summary>
-    public string FileID { get; set; } = "";
+    [SugarColumn(IsNullable = true)]
+    public string? FileId { get; set; }
     /// <summary>
     /// 文件名称
     /// </summary>
-    public string FileName { get; set; } = "";
+    [SugarColumn(IsNullable = true)]
+    public string? FileName { get; set; }
     /// <summary>
     /// 文件唯一ID
     /// </summary>
-    public string FileUniqueID { get; set; } = "";
+    [SugarColumn(IsNullable = true)]
+    public string? FileUniqueId { get; set; }
     /// <summary>
     /// 文件类型
     /// </summary>
-    public string MimeType { get; set; } = "";
+    [SugarColumn(IsNullable = true)]
+    public string? MimeType { get; set; }
     /// <summary>
     /// 文件尺寸
     /// </summary>

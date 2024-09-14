@@ -26,15 +26,18 @@ public sealed record Users : BaseModel, IModifyAt, ICreateAt
     /// <summary>
     /// 用户名@
     /// </summary>
-    public string UserName { get; set; } = "";
+    [SugarColumn(IsNullable = true)]
+    public string? UserName { get; set; }
     /// <summary>
     /// 用户昵称 姓
     /// </summary>
-    public string FirstName { get; set; } = "";
+    [SugarColumn(IsNullable = true)]
+    public string ?FirstName { get; set; }
     /// <summary>
     /// 用户昵称 名
     /// </summary>
-    public string LastName { get; set; } = "";
+    [SugarColumn(IsNullable = true)]
+    public string ?LastName { get; set; }
     /// <summary>
     /// 用户昵称
     /// </summary>
@@ -56,7 +59,6 @@ public sealed record Users : BaseModel, IModifyAt, ICreateAt
     /// <summary>
     /// 默认开启匿名模式
     /// </summary>
-    [SugarColumn(OldColumnName = "PreferAnymouse")]
     public bool PreferAnonymous { get; set; }
     /// <summary>
     /// 是否开启通知
@@ -69,7 +71,6 @@ public sealed record Users : BaseModel, IModifyAt, ICreateAt
     /// <summary>
     /// 被拒绝的稿件数量
     /// </summary>
-    [SugarColumn(OldColumnName = "RejetCount")]
     public int RejectCount { get; set; }
     /// <summary>
     /// 过期未被审核的稿件数量(统计时总投稿需要减去此字段)
@@ -92,19 +93,12 @@ public sealed record Users : BaseModel, IModifyAt, ICreateAt
     /// 用户等级
     /// </summary>
     public int Level { get; set; }
-    /// <summary>
-    /// 用户权限
-    /// </summary>
-    [SugarColumn(IsIgnore = true)]
-    public EUserRights Right { get; set; } = EUserRights.None;
+
     /// <summary>
     /// 用户组ID
     /// </summary>
     public int GroupID { get; set; }
-    /// <summary>
-    /// 私聊ChatID, 默认 -1;
-    /// </summary>
-    public long PrivateChatID { get; set; } = -1;
+
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;
     /// <inheritdoc cref="IModifyAt"/>

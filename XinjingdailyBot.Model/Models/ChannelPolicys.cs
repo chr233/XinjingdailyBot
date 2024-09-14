@@ -9,9 +9,9 @@ namespace XinjingdailyBot.Model.Models;
 /// 来源频道设定
 /// </summary>
 [SugarTable("channel_option", TableDescription = "来源频道设定")]
-[SugarIndex("index_channel_id", nameof(ChannelID), OrderByType.Asc, true)]
+[SugarIndex("co_channel_id", nameof(ChatId), OrderByType.Asc, true)]
 [SugarIndex("index_channel_name", nameof(ChannelName), OrderByType.Asc, false)]
-public sealed record ChannelOptions : BaseModel, ICreateAt, IModifyAt
+public sealed record ChannelPolicys : BaseModel, ICreateAt, IModifyAt
 {
     /// <summary>
     /// 主键
@@ -21,7 +21,7 @@ public sealed record ChannelOptions : BaseModel, ICreateAt, IModifyAt
     /// <summary>
     /// 频道ID
     /// </summary>
-    public long ChannelID { get; set; }
+    public long ChatId { get; set; }
     /// <summary>
     /// 频道ID @
     /// </summary>

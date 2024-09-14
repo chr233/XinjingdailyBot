@@ -1,5 +1,6 @@
 using SqlSugar;
 using System.Linq.Expressions;
+using XinjingdailyBot.Model.Base;
 
 #pragma warning disable CS1591 // 缺少对公共可见类型或成员的 XML 注释
 
@@ -9,7 +10,7 @@ namespace XinjingdailyBot.Repository.Base;
 /// 仓储层基类
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public abstract class BaseRepository<T>(ISqlSugarClient _context) where T : class, new()
+public abstract class BaseRepository<T>(ISqlSugarClient _context) where T : BaseModel, new()
 {
     protected readonly ISqlSugarClient _context = _context;
 

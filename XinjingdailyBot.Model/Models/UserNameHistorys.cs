@@ -7,8 +7,8 @@ namespace XinjingdailyBot.Model.Models;
 /// <summary>
 /// 用户曾用名记录
 /// </summary>
-[SugarTable("name_history", TableDescription = "用户名历史记录")]
-public sealed record NameHistory : BaseModel, ICreateAt
+[SugarTable("user_name_history", TableDescription = "用户名历史记录")]
+public sealed record UserNameHistorys : BaseModel, ICreateAt
 {
     /// <summary>
     /// 主键
@@ -18,15 +18,22 @@ public sealed record NameHistory : BaseModel, ICreateAt
     /// <summary>
     /// 用户UID
     /// </summary>
-    public int UId { get; set; }
+    public long UserId { get; set; }
+    /// <summary>
+    /// 用户名 @
+    /// </summary>
+    [SugarColumn(IsNullable = true)]
+    public string? Username { get; set; }
     /// <summary>
     /// 用户昵称 姓
     /// </summary>
-    public string FirstName { get; set; } = "";
+    [SugarColumn(IsNullable = true)]
+    public string? FirstName { get; set; }
     /// <summary>
     /// 用户昵称 名
     /// </summary>
-    public string LastName { get; set; } = "";
+    [SugarColumn(IsNullable = true)]
+    public string? LastName { get; set; }
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; }
 }
