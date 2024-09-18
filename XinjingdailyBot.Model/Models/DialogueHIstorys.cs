@@ -9,7 +9,7 @@ namespace XinjingdailyBot.Model.Models;
 /// 消息记录
 /// </summary>
 [SplitTable(SplitType._Custom01, typeof(ChatIdSplitService))]
-[SugarTable("dialogue_history", TableDescription = "消息记录")]
+[SugarTable(TableName = "dialogue_history", TableDescription = "消息记录" )]
 [SugarIndex("index_chat", nameof(ChatID), OrderByType.Asc, nameof(MessageID), OrderByType.Asc, true)]
 [SugarIndex("index_chat", nameof(MessageID), OrderByType.Asc, true)]
 public sealed record DialogueHIstorys : BaseModel, ICreateAt
