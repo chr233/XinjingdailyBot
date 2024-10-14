@@ -8,7 +8,7 @@ namespace XinjingdailyBot.Model.Models;
 /// 新的稿件表
 /// </summary>
 [SugarTable("bot", TableDescription = "机器人设置")]
-[SugarIndex("b_bt", nameof(BotToken), OrderByType.Asc, true)]
+[SugarIndex("bot_bt", nameof(BotToken), OrderByType.Asc, true)]
 
 public sealed record Bots : BaseModel, IModifyAt, ICreateAt
 {

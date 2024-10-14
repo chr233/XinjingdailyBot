@@ -41,6 +41,8 @@ public class DbInitializationService : BackgroundService
     [RequiresUnreferencedCode("不兼容剪裁")]
     protected override Task ExecuteAsync(CancellationToken cancellationToken)
     {
+        //var x = _dbClient.DbMaintenance.GetTableInfoList();
+
         if (_option.Generate)
         {
             _logger.LogInformation("开始生成数据库结构");

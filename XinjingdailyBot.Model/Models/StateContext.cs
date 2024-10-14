@@ -11,4 +11,10 @@ public sealed record StateContext : BaseModel
 {
     public int UserId { get; set; }
     public string? Context { get; set; }
+
+    /// <summary>
+    /// 用户数据
+    /// </summary>
+    [Navigate(NavigateType.OneToOne, nameof(UserId))]
+    public Users? User { get; set; }
 }

@@ -7,11 +7,11 @@ namespace XinjingdailyBot.Model.Models;
 /// <summary>
 /// 储存命令执行记录, 也用于查找用户
 /// </summary>
-[SugarTable("cmd", TableDescription = "命令回调")]
+[SugarTable("command_record", TableDescription = "命令回调")]
 [SugarIndex("index_cid", nameof(ChatID), OrderByType.Asc)]
 [SugarIndex("index_mid", nameof(MessageID), OrderByType.Asc)]
 [SugarIndex("index_uid", nameof(UserID), OrderByType.Asc)]
-public sealed record CmdRecords : BaseModel, IExecuteAt
+public sealed record CommadRecords : BaseModel, IExecuteAt
 {
     /// <summary>
     /// 主键

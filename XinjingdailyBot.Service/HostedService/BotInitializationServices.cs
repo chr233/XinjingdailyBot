@@ -16,7 +16,7 @@ public sealed class BotInitializationServices(
     IHttpClientFactory _httpClientFactory,
     BotManagerService _botManagerService,
     BotRepository _botRepository,
-    GroupRepository _groupRepository,
+    //GroupRepository _groupRepository,
     LevelRepository _levelRepository,
     TagRepository _tagRepository,
     RejectReasonRepository _rejectReasonRepository
@@ -47,7 +47,7 @@ public sealed class BotInitializationServices(
         //await _channelService.InitChannelInfo().ConfigureAwait(false);
 
         _logger.LogInformation("读取群组和等级设定");
-        await _groupRepository.InitGroupCache().ConfigureAwait(false);
+        //await _groupRepository.InitGroupCache().ConfigureAwait(false);
         await _levelRepository.InitLevelCache().ConfigureAwait(false);
         await _tagRepository.InitPostTagCache().ConfigureAwait(false);
         await _rejectReasonRepository.InitRejectReasonCache().ConfigureAwait(false);

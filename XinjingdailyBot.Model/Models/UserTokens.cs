@@ -8,14 +8,14 @@ namespace XinjingdailyBot.Model.Models;
 /// 用户密钥表, 储存WebAPI的Token
 /// </summary>
 [SugarTable("user_token", TableDescription = "用户密钥表")]
-[SugarIndex("index_token", nameof(APIToken), OrderByType.Asc, false)]
+[SugarIndex("index_token", nameof(ApiToken), OrderByType.Asc, false)]
 public sealed record UserTokens : BaseModel, ICreateAt, IExpiredAt
 {
     /// <summary>
     /// 用户表主键
     /// </summary>
     [SugarColumn(IsPrimaryKey = true)]
-    public int UID { get; set; }
+    public int UserId { get; set; }
 
     /// <summary>
     /// 用户ID
@@ -25,13 +25,13 @@ public sealed record UserTokens : BaseModel, ICreateAt, IExpiredAt
     /// <summary>
     /// API Token
     /// </summary>
-    public Guid APIToken { get; set; }
+    public Guid ApiToken { get; set; }
 
     /// <summary>
     /// 用户数据
     /// </summary>
-    [Navigate(NavigateType.OneToOne, nameof(UID))]//一对一 SchoolId是StudentA类里面的
-    public Users? User { get; set; } //不能赋值只能是null
+    [Navigate(NavigateType.OneToOne, nameof(UserId))]
+    public Users? User { get; set; }
 
     /// <inheritdoc cref=" ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;

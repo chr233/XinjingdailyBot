@@ -9,9 +9,9 @@ namespace XinjingdailyBot.Model.Models;
 /// 消息记录
 /// </summary>
 [SplitTable(SplitType._Custom01, typeof(ChatIdSplitService))]
-[SugarTable(TableName = "dialogue_history", TableDescription = "消息记录" )]
-[SugarIndex("index_chat", nameof(ChatID), OrderByType.Asc, nameof(MessageID), OrderByType.Asc, true)]
-[SugarIndex("index_chat", nameof(MessageID), OrderByType.Asc, true)]
+[SugarTable(TableName = "dialogue_history", TableDescription = "消息记录")]
+[SugarIndex("index_chat", nameof(ChatId), OrderByType.Asc, nameof(MessageId), OrderByType.Asc, true)]
+[SugarIndex("index_chat", nameof(MessageId), OrderByType.Asc, true)]
 public sealed record DialogueHIstorys : BaseModel, ICreateAt
 {
     /// <summary>
@@ -23,21 +23,21 @@ public sealed record DialogueHIstorys : BaseModel, ICreateAt
     /// 会话ID
     /// </summary>
     [SplitField]
-    public long ChatID { get; set; }
+    public long ChatId { get; set; }
     /// <summary>
     /// 消息ID
     /// </summary>
-    public long MessageID { get; set; }
+    public long MessageId { get; set; }
 
     /// <summary>
     /// 用户ID
     /// </summary>
-    public long UserID { get; set; } = -1;
+    public long UserId { get; set; } = -1;
 
     /// <summary>
     /// 回复消息ID
     /// </summary>
-    public long ReplyMessageID { get; set; } = -1;
+    public long ReplyMessageId { get; set; } = -1;
 
     /// <summary>
     /// 消息内容
@@ -49,6 +49,12 @@ public sealed record DialogueHIstorys : BaseModel, ICreateAt
     /// 消息类型
     /// </summary>
     public string Type { get; set; } = "";
+
+    /// <summary>
+    /// 用户数据
+    /// </summary>
+    [Navigate(NavigateType.OneToOne, nameof(UserId))]
+    public Users? User { get; set; }
 
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; }

@@ -12,7 +12,6 @@ namespace XinjingdailyBot.Model.Models;
 [SugarIndex("index_operatorid", nameof(OperatorUID), OrderByType.Asc)]
 [SugarIndex("index_userid_type", nameof(UserID), OrderByType.Asc, nameof(Type), OrderByType.Asc)]
 [SugarIndex("index_userid_bantime", nameof(UserID), OrderByType.Asc, nameof(BanTime), OrderByType.Desc)]
-
 public sealed record BanRecords : BaseModel
 {
     /// <summary>

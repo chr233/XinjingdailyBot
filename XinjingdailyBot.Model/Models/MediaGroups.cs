@@ -8,8 +8,8 @@ namespace XinjingdailyBot.Model.Models;
 /// 媒体组记录
 /// </summary>
 [SugarTable("post_group", TableDescription = "媒体组稿件记录")]
-[SugarIndex("index_msg", nameof(ChatID), OrderByType.Asc, nameof(MessageID), OrderByType.Asc)]
-[SugarIndex("index_groupid", nameof(MediaGroupID), OrderByType.Asc)]
+[SugarIndex("index_msg", nameof(ChatId), OrderByType.Asc, nameof(MessageId), OrderByType.Asc)]
+[SugarIndex("index_groupid", nameof(MediaGroupId), OrderByType.Asc)]
 public sealed record MediaGroups : BaseModel, ICreateAt
 {
     /// <summary>
@@ -20,15 +20,15 @@ public sealed record MediaGroups : BaseModel, ICreateAt
     /// <summary>
     /// 聊天ID
     /// </summary>
-    public long ChatID { get; set; } = -1;
+    public long ChatId { get; set; } = -1;
     /// <summary>
     /// 发布的消息Id
     /// </summary>
-    public long MessageID { get; set; } = -1;
+    public long MessageId { get; set; } = -1;
     /// <summary>
     /// 稿件ID
     /// </summary>
-    public string MediaGroupID { get; set; } = "";
+    public string MediaGroupId { get; set; } = "";
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;
 }

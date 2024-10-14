@@ -7,7 +7,7 @@ namespace XinjingdailyBot.Model.Models;
 /// <summary>
 /// 广告消息表
 /// </summary>
-[SugarTable("ad_post", TableDescription = "广告消息")]
+[SugarTable("advertise_post", TableDescription = "广告消息")]
 public sealed record AdvertisePosts : BaseModel, IModifyAt, ICreateAt
 {
     /// <summary>

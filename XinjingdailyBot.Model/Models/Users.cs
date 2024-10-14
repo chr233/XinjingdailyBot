@@ -1,5 +1,4 @@
 using SqlSugar;
-using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
@@ -32,17 +31,17 @@ public sealed record Users : BaseModel, IModifyAt, ICreateAt
     /// 用户昵称 姓
     /// </summary>
     [SugarColumn(IsNullable = true)]
-    public string ?FirstName { get; set; }
+    public string? FirstName { get; set; }
     /// <summary>
     /// 用户昵称 名
     /// </summary>
     [SugarColumn(IsNullable = true)]
-    public string ?LastName { get; set; }
+    public string? LastName { get; set; }
     /// <summary>
     /// 用户昵称
     /// </summary>
     [SugarColumn(IsIgnore = true)]
-    public string FullName => string.IsNullOrEmpty(LastName) ? FirstName : $"{FirstName} {LastName}";
+    public string FullName => string.IsNullOrEmpty(LastName) ? (FirstName ?? "") : $"{FirstName} {LastName}";
     /// <summary>
     /// 是否封禁
     /// </summary>

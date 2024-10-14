@@ -12,7 +12,7 @@ namespace XinjingdailyBot.Repository.Repositorys;
 /// </summary>
 [AppService(LifeTime.Singleton)]
 public class TagRepository(
-    ILogger<GroupRepository> _logger,
+    ILogger<TagRepository> _logger,
     ISqlSugarClient context) : BaseRepository<Tags>(context)
 {
     /// <summary>

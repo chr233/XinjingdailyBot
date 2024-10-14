@@ -7,7 +7,7 @@ namespace XinjingdailyBot.Model.Models;
 /// <summary>
 /// 来源频道设定
 /// </summary>
-[SugarTable("channel", TableDescription = "频道")]
+[SugarTable("channel", TableDescription = "机器人频道")]
 public sealed record Channels : BaseModel, ICreateAt, IModifyAt
 {
     /// <summary>
@@ -29,12 +29,10 @@ public sealed record Channels : BaseModel, ICreateAt, IModifyAt
     /// </summary>
     [SugarColumn(IsNullable = true)]
     public string? ChannelTitle { get; set; }
+
+    public bool IsEnable { get; set; }
     public bool IsPublish { get; set; }
     public bool AllowInvite { get; set; }
-
-
-
-
 
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;
