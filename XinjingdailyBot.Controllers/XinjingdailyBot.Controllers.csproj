@@ -17,6 +17,7 @@
 		<PackageReference Include="Quartz.AspNetCore" />
 		<PackageReference Include="Swashbuckle.AspNetCore" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
+		<PackageReference Include="System.Private.Uri" />
 	</ItemGroup>
 
 	<ItemGroup>

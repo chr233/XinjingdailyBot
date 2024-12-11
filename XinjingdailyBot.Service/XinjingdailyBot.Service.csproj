@@ -12,6 +12,7 @@
 		<PackageReference Include="SkiaSharp.NativeAssets.macOS" />
 		<PackageReference Include="SkiaSharp.NativeAssets.Win32" />
 		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
+		<PackageReference Include="System.Private.Uri" />
 	</ItemGroup>
 
 	<ItemGroup>

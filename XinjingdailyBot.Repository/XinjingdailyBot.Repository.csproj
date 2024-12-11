@@ -8,6 +8,7 @@
 		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
 		<PackageReference Include="NRedisStack" />
 		<PackageReference Include="StackExchange.Redis" />
+		<PackageReference Include="System.Private.Uri" />
 	</ItemGroup>
 
 	<ItemGroup>

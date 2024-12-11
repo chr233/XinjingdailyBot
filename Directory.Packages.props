@@ -29,7 +29,8 @@
     <PackageVersion Include="StackExchange.Redis" Version="2.8.22" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.2.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="7.2.0" />
+    <PackageVersion Include="System.Private.Uri" Version="4.3.2" />
     <PackageVersion Include="System.Text.Json" Version="8.0.1" />
-    <PackageVersion Include="Telegram.Bot" Version="22.0.0" />
+    <PackageVersion Include="Telegram.Bot" Version="22.2.0" />
   </ItemGroup>
 </Project>
