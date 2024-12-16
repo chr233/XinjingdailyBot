@@ -1,12 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Options;
 using System.Net;
-using XinjingdailyBot.Infrastructure;
-using XinjingdailyBot.Repository;
 using XinjingdailyBot.WebAPI.IPC.Responses;
 
-namespace XinjingdailyBot.WebAPI.Authorization;
+namespace XinjingdailyBot.Controllers.Authorization;
 
 /// <summary>
 /// 授权校验访问
@@ -36,7 +33,7 @@ public class VerifyAttribute : Attribute, IAsyncAuthorizationFilter
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
         var request = context.HttpContext.Request;
-        if ((!request.Headers.TryGetValue(HeaderName, out var token) && !request.Query.TryGetValue(QueryName, out token)))
+        if (!request.Headers.TryGetValue(HeaderName, out var token) && !request.Query.TryGetValue(QueryName, out token))
         {
             context.Result = new JsonResult(new GenericResponse {
                 Code = HttpStatusCode.Unauthorized,

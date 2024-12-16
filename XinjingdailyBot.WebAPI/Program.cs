@@ -10,7 +10,8 @@ __  _ _             _  _            ___       _  _
 _/\_\|_||_|_|\_. | | ||_||_|_|\_. ||___/<___||_||_|`_. |
              <___'<__'        <___'                <___'
 New
-";
+"
+;
 
 Console.WriteLine(Langs.Line);
 Console.WriteLine(banner);

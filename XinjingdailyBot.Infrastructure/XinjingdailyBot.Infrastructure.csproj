@@ -9,6 +9,7 @@
 		<PackageReference Include="NLog" />
 		<PackageReference Include="Telegram.Bot" />
 		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.ResxSourceGenerator" PrivateAssets="all" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -16,27 +17,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Update="Localization\Emojis.Designer.cs">
-			<DependentUpon>Emojis.resx</DependentUpon>
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-		</Compile>
-		<Compile Update="Localization\Langs.Designer.cs">
-			<DependentUpon>Langs.resx</DependentUpon>
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-		</Compile>
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Update="Localization\Emojis.resx">
-			<LastGenOutput>Emojis.Designer.cs</LastGenOutput>
-			<Generator>PublicResXFileCodeGenerator</Generator>
-		</EmbeddedResource>
-		<EmbeddedResource Update="Localization\Langs.resx">
-			<LastGenOutput>Langs.Designer.cs</LastGenOutput>
-			<Generator>PublicResXFileCodeGenerator</Generator>
-		</EmbeddedResource>
+		<EmbeddedResource Update="Localization\Emojis.resx" EmitFormatMethods="true" Public="true" AccessModifier="Public" />
+		<EmbeddedResource Update="Localization\Langs.resx" EmitFormatMethods="true" Public="true" AccessModifier="Public" />
 	</ItemGroup>
 
 </Project>

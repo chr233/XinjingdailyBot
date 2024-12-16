@@ -1,5 +1,5 @@
 using Microsoft.OpenApi.Models;
-using XinjingdailyBot.WebAPI.Authorization;
+using XinjingdailyBot.Controllers.Authorization;
 using XinjingdailyBot.WebAPI.IPC.Middlewares;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
