@@ -62,7 +62,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XinjingdailyBot.Controllers
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XinjingdailyBot.Setup", "XinjingdailyBot.Setup\XinjingdailyBot.Setup.csproj", "{6E7A98F4-D17B-4287-9E84-A69254D710B7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XinjingdailyBot.WebAPI", "XinjingdailyBot.WebAPI\XinjingdailyBot.WebAPI.csproj", "{F68A5AF3-FC11-41D2-897A-032BDD715B78}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XinjingdailyBot.App", "XinjingdailyBot.App\XinjingdailyBot.App.csproj", "{F68A5AF3-FC11-41D2-897A-032BDD715B78}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

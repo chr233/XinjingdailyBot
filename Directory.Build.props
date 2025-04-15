@@ -56,4 +56,9 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<OpenApiGenerateDocuments>true</OpenApiGenerateDocuments>
 	</PropertyGroup>
+
+	<ItemGroup Condition="'$(MSBuildProjectName)' != 'XinjingdailyBot.Generator'">
+		<Using Include="XinjingdailyBot.Infrastructure.Localization" />
+	</ItemGroup>
+	
 </Project>

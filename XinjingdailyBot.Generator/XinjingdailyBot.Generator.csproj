@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<OutputType>Library</OutputType>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 		<IsRoslynComponent>true</IsRoslynComponent>
@@ -23,6 +24,10 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
+		<PackageReference Include="Microsoft.CodeAnalysis.ResxSourceGenerator">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="Newtonsoft.Json">
 			<GeneratePathProperty>true</GeneratePathProperty>
 			<PrivateAssets>all</PrivateAssets>
@@ -30,20 +35,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Update="Templates.Designer.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>Templates.resx</DependentUpon>
-		</Compile>
+		<EmbeddedResource Update="Templates.resx" EmitFormatMethods="true" Public="false" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Update="Templates.resx">
-			<Generator>ResXFileCodeGenerator</Generator>
-			<LastGenOutput>Templates.Designer.cs</LastGenOutput>
-		</EmbeddedResource>
-	</ItemGroup>
-
+	
 	<ItemGroup>
 		<!-- Package the generator in the analyzer directory of the nuget package -->
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />

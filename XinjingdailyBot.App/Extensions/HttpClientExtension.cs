@@ -21,6 +21,8 @@ public static class HttpClientExtension
     {
         string publicIdentifier = $"{nameof(XinjingdailyBot)}-{BuildInfo.Variant}";
 
+        var decompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli;
+
         services.AddHttpClient("Telegram", (serviceProvider, httpClient) => {
             var config = serviceProvider.GetRequiredService<IOptions<NetworkConfig>>().Value;
             string? baseUrl = config.TelegramEndpoint;
@@ -38,11 +40,19 @@ public static class HttpClientExtension
 
                 if (proxy.StartsWith("socks"))
                 {
-                    return new SocketsHttpHandler { Proxy = tgProxy, UseProxy = true, };
+                    return new SocketsHttpHandler {
+                        AutomaticDecompression = decompression,
+                        Proxy = tgProxy,
+                        UseProxy = true,
+                    };
                 }
                 else
                 {
-                    return new HttpClientHandler { Proxy = tgProxy, UseProxy = true, };
+                    return new HttpClientHandler {
+                        AutomaticDecompression = decompression,
+                        Proxy = tgProxy,
+                        UseProxy = true,
+                    };
                 }
             }
             else

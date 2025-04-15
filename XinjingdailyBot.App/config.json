@@ -7,7 +7,7 @@
     "DbPort": 3306,
     "DbName": "xjb_db",
     "DbUser": "root",
-    "DbPassword": "123456",
+    "DbPassword": "root",
     "DbConnectionString": null
   }
 }

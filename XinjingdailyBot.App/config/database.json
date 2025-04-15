@@ -1,0 +1,13 @@
+{
+  "Database": {
+    "Generate": true,
+    "LogSQL": true,
+    "DbType": "mysql",
+    "DbHost": "127.0.0.1",
+    "DbPort": 3306,
+    "DbName": "xjb_db",
+    "DbUser": "root",
+    "DbPassword": "root",
+    "DbConnectionString": null
+  }
+}
