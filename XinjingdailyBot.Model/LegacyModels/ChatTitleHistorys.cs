@@ -2,13 +2,13 @@ using SqlSugar;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
 
-namespace XinjingdailyBot.Model.Models;
+namespace XinjingdailyBot.Model.Legacy;
 
 /// <summary>
 /// 用户曾用名记录
 /// </summary>
 [SugarTable("name_history", TableDescription = "用户名历史记录")]
-public sealed record NameHistory : BaseModel, ICreateAt
+public sealed record NameHistoryLegacy : BaseModel, ICreateAt
 {
     /// <summary>
     /// 主键

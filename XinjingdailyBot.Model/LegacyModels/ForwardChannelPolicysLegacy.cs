@@ -3,7 +3,7 @@ using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
 
-namespace XinjingdailyBot.Model.Models;
+namespace XinjingdailyBot.Model.Legacy;
 
 /// <summary>
 /// 来源频道设定
@@ -11,7 +11,7 @@ namespace XinjingdailyBot.Model.Models;
 [SugarTable("channel_option", TableDescription = "投稿来源频道设定")]
 [SugarIndex("co_channel_id", nameof(ChatId), OrderByType.Asc, true)]
 [SugarIndex("index_channel_name", nameof(ChannelName), OrderByType.Asc, false)]
-public sealed record ForwardChannelPolicys : BaseModel, ICreateAt, IModifyAt
+public sealed record ForwardChannelPolicysLegacy : BaseModel, ICreateAt, IModifyAt
 {
     /// <summary>
     /// 主键

@@ -3,7 +3,7 @@ using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
 
-namespace XinjingdailyBot.Model.Models;
+namespace XinjingdailyBot.Model.Legacy;
 
 /// <summary>
 /// 用户表, 储存所有用户的基本信息, 权限设定, 以及投稿信息统计
@@ -11,7 +11,7 @@ namespace XinjingdailyBot.Model.Models;
 [SugarTable("user", TableDescription = "用户表")]
 [SugarIndex("index_userid", nameof(UserID), OrderByType.Asc, true)]
 [SugarIndex("index_username", nameof(UserName), OrderByType.Asc)]
-public sealed record Users : BaseModel, IModifyAt, ICreateAt
+public sealed record UsersLegacy : BaseModel, IModifyAt, ICreateAt
 {
     /// <summary>
     /// 主键
@@ -41,7 +41,7 @@ public sealed record Users : BaseModel, IModifyAt, ICreateAt
     /// 用户昵称
     /// </summary>
     [SugarColumn(IsIgnore = true)]
-    public string FullName => string.IsNullOrEmpty(LastName) ? (FirstName ?? "") : $"{FirstName} {LastName}";
+    public string FullName => string.IsNullOrEmpty(LastName) ? FirstName ?? "" : $"{FirstName} {LastName}";
     /// <summary>
     /// 是否封禁
     /// </summary>
@@ -107,7 +107,7 @@ public sealed record Users : BaseModel, IModifyAt, ICreateAt
     /// API Token
     /// </summary>
     [Navigate(NavigateType.OneToOne, nameof(Id))]//一对一 SchoolId是StudentA类里面的
-    public UserTokens? Token { get; set; } //不能赋值只能是null
+    public UserTokensLegacy? Token { get; set; } //不能赋值只能是null
 
     /// <summary>
     /// 文本显示
@@ -131,7 +131,7 @@ public sealed record Users : BaseModel, IModifyAt, ICreateAt
     /// <returns></returns>
     public string HtmlUserLink()
     {
-        string nick = FullName.EscapeHtml();
+        var nick = FullName.EscapeHtml();
 
         if (string.IsNullOrEmpty(UserName))
         {

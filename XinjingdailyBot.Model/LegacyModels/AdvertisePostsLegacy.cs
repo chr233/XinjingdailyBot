@@ -2,19 +2,23 @@ using SqlSugar;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
 
-namespace XinjingdailyBot.Model.Models;
+namespace XinjingdailyBot.Model.Legacy;
 
 /// <summary>
 /// 广告消息表
 /// </summary>
-[SugarTable("review_status", TableDescription = "审核统计")]
-public sealed record ReviewStatus : BaseModel, IModifyAt, ICreateAt
+[SugarTable("advertise_post", TableDescription = "广告消息")]
+public sealed record AdvertisePostsLegacy : BaseModel, IModifyAt, ICreateAt
 {
     /// <summary>
     /// 主键
     /// </summary>
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
+    /// <summary>
+    /// 广告ID
+    /// </summary>
+    public int AdId { get; set; }
     /// <summary>
     /// 原会话ID
     /// </summary>
@@ -23,6 +27,10 @@ public sealed record ReviewStatus : BaseModel, IModifyAt, ICreateAt
     /// 原消息ID
     /// </summary>
     public long MessageID { get; set; }
+    /// <summary>
+    /// 是否为置顶消息
+    /// </summary>
+    public bool Pined { get; set; }
     /// <summary>
     /// 是否被删除
     /// </summary>

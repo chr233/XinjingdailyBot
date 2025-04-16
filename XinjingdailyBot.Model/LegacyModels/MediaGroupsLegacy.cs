@@ -2,7 +2,7 @@ using SqlSugar;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
 
-namespace XinjingdailyBot.Model.Models;
+namespace XinjingdailyBot.Model.Legacy;
 
 /// <summary>
 /// 媒体组记录
@@ -10,7 +10,7 @@ namespace XinjingdailyBot.Model.Models;
 [SugarTable("post_group", TableDescription = "媒体组稿件记录")]
 [SugarIndex("index_msg", nameof(ChatId), OrderByType.Asc, nameof(MessageId), OrderByType.Asc)]
 [SugarIndex("index_groupid", nameof(MediaGroupId), OrderByType.Asc)]
-public sealed record MediaGroups : BaseModel, ICreateAt
+public sealed record MediaGroupsLegacy : BaseModel, ICreateAt
 {
     /// <summary>
     /// 主键

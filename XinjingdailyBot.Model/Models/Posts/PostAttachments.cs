@@ -2,7 +2,7 @@ using SqlSugar;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Model.Base;
 
-namespace XinjingdailyBot.Model.Models;
+namespace XinjingdailyBot.Model.Models.Posts;
 
 /// <summary>
 /// 投稿附件

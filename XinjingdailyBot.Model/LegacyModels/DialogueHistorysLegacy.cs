@@ -3,7 +3,7 @@ using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
 using XinjingdailyBot.Model.Services;
 
-namespace XinjingdailyBot.Model.Models;
+namespace XinjingdailyBot.Model.Legacy;
 
 /// <summary>
 /// 消息记录
@@ -12,7 +12,7 @@ namespace XinjingdailyBot.Model.Models;
 [SugarTable(TableName = "dialogue_history", TableDescription = "消息记录")]
 [SugarIndex("index_chat", nameof(ChatId), OrderByType.Asc, nameof(MessageId), OrderByType.Asc, true)]
 [SugarIndex("index_chat", nameof(MessageId), OrderByType.Asc, true)]
-public sealed record DialogueHIstorys : BaseModel, ICreateAt
+public sealed record DialogueHistorysLegacy : BaseModel, ICreateAt
 {
     /// <summary>
     /// 主键
@@ -54,7 +54,7 @@ public sealed record DialogueHIstorys : BaseModel, ICreateAt
     /// 用户数据
     /// </summary>
     [Navigate(NavigateType.OneToOne, nameof(UserId))]
-    public Users? User { get; set; }
+    public UsersLegacy? User { get; set; }
 
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; }

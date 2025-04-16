@@ -2,7 +2,7 @@ using SqlSugar;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
 
-namespace XinjingdailyBot.Model.Models;
+namespace XinjingdailyBot.Model.Legacy;
 
 /// <summary>
 /// 储存命令执行记录, 也用于查找用户
@@ -11,7 +11,7 @@ namespace XinjingdailyBot.Model.Models;
 [SugarIndex("index_cid", nameof(ChatID), OrderByType.Asc)]
 [SugarIndex("index_mid", nameof(MessageID), OrderByType.Asc)]
 [SugarIndex("index_uid", nameof(UserID), OrderByType.Asc)]
-public sealed record CommadRecords : BaseModel, IExecuteAt
+public sealed record CommadRecordsLegacy : BaseModel, IExecuteAt
 {
     /// <summary>
     /// 主键

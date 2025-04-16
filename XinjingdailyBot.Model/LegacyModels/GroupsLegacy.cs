@@ -2,13 +2,13 @@ using SqlSugar;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
 
-namespace XinjingdailyBot.Model.Models;
+namespace XinjingdailyBot.Model.Legacy;
 
 /// <summary>
-/// 广告消息表
+/// 来源频道设定
 /// </summary>
-[SugarTable("advertise_post", TableDescription = "广告消息")]
-public sealed record AdvertisePosts : BaseModel, IModifyAt, ICreateAt
+[SugarTable("group", TableDescription = "机器人群组")]
+public sealed record GroupsLegacy : BaseModel, ICreateAt, IModifyAt
 {
     /// <summary>
     /// 主键
@@ -16,27 +16,25 @@ public sealed record AdvertisePosts : BaseModel, IModifyAt, ICreateAt
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
     /// <summary>
-    /// 广告ID
+    /// 频道ID
     /// </summary>
-    public int AdId { get; set; }
+    public long GroupId { get; set; }
     /// <summary>
-    /// 原会话ID
+    /// 频道ID @
     /// </summary>
-    public long ChatID { get; set; }
+    [SugarColumn(IsNullable = true)]
+    public string? GroupName { get; set; }
     /// <summary>
-    /// 原消息ID
+    /// 频道名称
     /// </summary>
-    public long MessageID { get; set; }
-    /// <summary>
-    /// 是否为置顶消息
-    /// </summary>
-    public bool Pined { get; set; }
-    /// <summary>
-    /// 是否被删除
-    /// </summary>
-    public bool Deleted { get; set; }
+    [SugarColumn(IsNullable = true)]
+    public string? GroupTitle { get; set; }
+    public bool IsPublish { get; set; }
+    public bool AllowInvite { get; set; }
+
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;
+
     /// <inheritdoc cref="IModifyAt"/>
     public DateTime ModifyAt { get; set; } = DateTime.Now;
 }

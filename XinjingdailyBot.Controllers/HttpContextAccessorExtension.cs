@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Http;
-using XinjingdailyBot.Model.Models;
+using XinjingdailyBot.Model.Legacy;
 
 namespace XinjingdailyBot.Controllers;
 
@@ -13,15 +13,15 @@ public static class HttpContextAccessorExtension
     /// </summary>
     /// <param name="httpContextAccessor"></param>
     /// <returns></returns>
-    public static Users GetUser(this IHttpContextAccessor httpContextAccessor)
+    public static UsersLegacy GetUser(this IHttpContextAccessor httpContextAccessor)
     {
-        Users? user = null;
+        UsersLegacy? user = null;
 
         if (httpContextAccessor.HttpContext?.Items.TryGetValue("Users", out var obj) ?? false)
         {
             if (obj != null)
             {
-                user = obj as Users;
+                user = obj as UsersLegacy;
             }
         }
 

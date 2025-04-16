@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using SqlSugar;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Model.Models;
+using XinjingdailyBot.Model.Legacy;
 using XinjingdailyBot.Repository.Base;
 
 namespace XinjingdailyBot.Repository.Repositorys;
@@ -12,16 +12,16 @@ namespace XinjingdailyBot.Repository.Repositorys;
 [AppService(LifeTime.Singleton)]
 public class RejectReasonRepository(
     ILogger<RejectReasonRepository> _logger,
-    ISqlSugarClient _context) : BaseRepository<RejectReasons>(_context)
+    ISqlSugarClient _context) : BaseRepository<RejectReasonsLegacy>(_context)
 {
     /// <summary>
     /// 拒绝理由缓存, Key=Id
     /// </summary>
-    private Dictionary<int, RejectReasons> RejectReasonCache { get; } = [];
+    private Dictionary<int, RejectReasonsLegacy> RejectReasonCache { get; } = [];
     /// <summary>
     /// 标签缓存, Key=Payload
     /// </summary>
-    private Dictionary<string, RejectReasons> RejectReasonPayloadCache { get; } = [];
+    private Dictionary<string, RejectReasonsLegacy> RejectReasonPayloadCache { get; } = [];
 
     /// <summary>
     /// 初始化缓存
@@ -82,16 +82,16 @@ public class RejectReasonRepository(
     /// <returns></returns>
     private async Task InsertBuildInRejectReasons()
     {
-        var levels = new List<RejectReasons>
+        var levels = new List<RejectReasonsLegacy>
         {
-            new RejectReasons { Id = 1, Name = "模糊", Payload = "fuzzy", FullText = "图片模糊/看不清", IsCount = false },
-            new RejectReasons { Id = 2, Name = "重复", Payload = "duplicate", FullText = "重复的稿件", IsCount = false },
-            new RejectReasons { Id = 3, Name = "无趣", Payload = "boring", FullText = "内容不够有趣" },
-            new RejectReasons { Id = 4, Name = "没懂", Payload = "confusing", FullText = "审核没看懂,建议配文说明" },
-            new RejectReasons { Id = 5, Name = "不合适", Payload = "deny", FullText = "不合适发布的内容" },
-            new RejectReasons { Id = 6, Name = "广告水印", Payload = "qrcode", FullText = "稿件包含二维码水印" },
-            new RejectReasons { Id = 7, Name = "其他原因", Payload = "other", FullText = "其他原因" },
-            new RejectReasons { Id = 8, Name = "太多了", Payload = "toomuch", FullText = "今天此类型的稿件的数量太多了" },
+            new RejectReasonsLegacy { Id = 1, Name = "模糊", Payload = "fuzzy", FullText = "图片模糊/看不清", IsCount = false },
+            new RejectReasonsLegacy { Id = 2, Name = "重复", Payload = "duplicate", FullText = "重复的稿件", IsCount = false },
+            new RejectReasonsLegacy { Id = 3, Name = "无趣", Payload = "boring", FullText = "内容不够有趣" },
+            new RejectReasonsLegacy { Id = 4, Name = "没懂", Payload = "confusing", FullText = "审核没看懂,建议配文说明" },
+            new RejectReasonsLegacy { Id = 5, Name = "不合适", Payload = "deny", FullText = "不合适发布的内容" },
+            new RejectReasonsLegacy { Id = 6, Name = "广告水印", Payload = "qrcode", FullText = "稿件包含二维码水印" },
+            new RejectReasonsLegacy { Id = 7, Name = "其他原因", Payload = "other", FullText = "其他原因" },
+            new RejectReasonsLegacy { Id = 8, Name = "太多了", Payload = "toomuch", FullText = "今天此类型的稿件的数量太多了" },
         };
 
         await Storageable(levels).ExecuteCommandAsync().ConfigureAwait(false);
@@ -102,7 +102,7 @@ public class RejectReasonRepository(
     /// </summary>
     /// <param name="reasonId"></param>
     /// <returns></returns>
-    public RejectReasons? GetReasonById(int reasonId)
+    public RejectReasonsLegacy? GetReasonById(int reasonId)
     {
         if (RejectReasonCache.TryGetValue(reasonId, out var level))
         {
@@ -116,7 +116,7 @@ public class RejectReasonRepository(
     /// </summary>
     /// <param name="payload"></param>
     /// <returns></returns>
-    public RejectReasons? GetReasonByPayload(string payload)
+    public RejectReasonsLegacy? GetReasonByPayload(string payload)
     {
         if (RejectReasonPayloadCache.TryGetValue(payload, out var reason))
         {
@@ -129,7 +129,7 @@ public class RejectReasonRepository(
     /// 获取所有拒绝理由
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<RejectReasons> GetAllRejectReasons()
+    public IEnumerable<RejectReasonsLegacy> GetAllRejectReasons()
     {
         return RejectReasonCache.Values;
     }

@@ -1,7 +1,7 @@
 using SqlSugar;
 using XinjingdailyBot.Model.Base;
 
-namespace XinjingdailyBot.Model.Models;
+namespace XinjingdailyBot.Model.Legacy;
 
 /// <summary>
 /// 机器人会话
@@ -9,7 +9,7 @@ namespace XinjingdailyBot.Model.Models;
 [SugarTable("bot_chat", TableDescription = "机器人会话")]
 [SugarIndex("bot_chat_bu", nameof(BotId), OrderByType.Asc, nameof(UserId), OrderByType.Asc, true)]
 [SugarIndex("bot_chat_cu", nameof(BotId), OrderByType.Asc, nameof(ChatId), OrderByType.Asc, true)]
-public sealed record BotChats : BaseModel
+public sealed record BotChatsLegacy : BaseModel
 {
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }

@@ -4,21 +4,21 @@ using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
 
-namespace XinjingdailyBot.Model.Models;
+namespace XinjingdailyBot.Model.Models.Posts;
 
 /// <summary>
 /// 新的稿件表
 /// </summary>
 [SugarTable("post", TableDescription = "投稿记录")]
-[SugarIndex("index_origin", nameof(OriginChatID), OrderByType.Asc, nameof(OriginMsgID), OrderByType.Asc)]
-[SugarIndex("index_originaction", nameof(OriginActionChatID), OrderByType.Asc, nameof(OriginActionMsgID), OrderByType.Asc)]
-[SugarIndex("index_review", nameof(ReviewChatID), OrderByType.Asc, nameof(ReviewMsgID), OrderByType.Asc)]
-[SugarIndex("index_reviewaction", nameof(ReviewActionChatID), OrderByType.Asc, nameof(ReviewActionMsgID), OrderByType.Asc)]
-[SugarIndex("index_origin_media_group_id", nameof(OriginMediaGroupID), OrderByType.Asc)]
-[SugarIndex("index_review_media_group_id", nameof(ReviewMediaGroupID), OrderByType.Asc)]
-[SugarIndex("index_post_media_group_id", nameof(PublishMediaGroupID), OrderByType.Asc)]
-[SugarIndex("index_posterid", nameof(PosterUID), OrderByType.Asc)]
-[SugarIndex("index_reviewerid", nameof(ReviewerUID), OrderByType.Asc)]
+[SugarIndex("index_origin", nameof(OriginChatId), OrderByType.Asc, nameof(OriginMsgId), OrderByType.Asc)]
+[SugarIndex("index_originaction", nameof(OriginActionChatId), OrderByType.Asc, nameof(OriginActionMsgId), OrderByType.Asc)]
+[SugarIndex("index_review", nameof(ReviewChatId), OrderByType.Asc, nameof(ReviewMsgId), OrderByType.Asc)]
+[SugarIndex("index_reviewaction", nameof(ReviewActionChatId), OrderByType.Asc, nameof(ReviewActionMsgId), OrderByType.Asc)]
+[SugarIndex("index_origin_media_group_id", nameof(OriginMediaGroupId), OrderByType.Asc)]
+[SugarIndex("index_review_media_group_id", nameof(ReviewMediaGroupId), OrderByType.Asc)]
+[SugarIndex("index_post_media_group_id", nameof(PublishMediaGroupId), OrderByType.Asc)]
+[SugarIndex("index_posterid", nameof(PosterUId), OrderByType.Asc)]
+[SugarIndex("index_reviewerid", nameof(ReviewerUId), OrderByType.Asc)]
 [SugarIndex("index_status_modifyat", nameof(Status), OrderByType.Asc, nameof(ModifyAt), OrderByType.Asc)]
 public sealed record Posts : BaseModel, IModifyAt, ICreateAt
 {
@@ -30,39 +30,39 @@ public sealed record Posts : BaseModel, IModifyAt, ICreateAt
     /// <summary>
     /// 原始消息会话ID
     /// </summary>
-    public long OriginChatID { get; set; } = -1;
+    public long OriginChatId { get; set; } = -1;
     /// <summary>
     /// 原始消息ID
     /// </summary>
-    public long OriginMsgID { get; set; } = -1;
+    public long OriginMsgId { get; set; } = -1;
 
     /// <summary>
     /// 投稿控制消息会话ID
     /// </summary>
-    public long OriginActionChatID { get; set; } = -1;
+    public long OriginActionChatId { get; set; } = -1;
 
     /// <summary>
     /// 投稿控制消息ID
     /// </summary>
-    public long OriginActionMsgID { get; set; } = -1;
+    public long OriginActionMsgId { get; set; } = -1;
 
     /// <summary>
     /// 审核消息会话ID
     /// </summary>
-    public long ReviewChatID { get; set; } = -1;
+    public long ReviewChatId { get; set; } = -1;
     /// <summary>
     /// 审核群消息ID
     /// </summary>
-    public long ReviewMsgID { get; set; } = -1;
+    public long ReviewMsgId { get; set; } = -1;
 
     /// <summary>
     /// 审核群控制消息会话ID
     /// </summary>
-    public long ReviewActionChatID { get; set; } = -1;
+    public long ReviewActionChatId { get; set; } = -1;
     /// <summary>
     /// 审核群控制消息ID
     /// </summary>
-    public long ReviewActionMsgID { get; set; } = -1;
+    public long ReviewActionMsgId { get; set; } = -1;
 
     /// <summary>
     /// 发布频道或拒绝频道的消息Id
@@ -77,7 +77,7 @@ public sealed record Posts : BaseModel, IModifyAt, ICreateAt
     /// 是否为直接投稿
     /// </summary>
     [SugarColumn(IsIgnore = true)]
-    public bool IsDirectPost => OriginActionChatID == ReviewActionChatID;
+    public bool IsDirectPost => OriginActionChatId == ReviewActionChatId;
 
     /// <summary>
     /// 匿名投稿
@@ -131,19 +131,19 @@ public sealed record Posts : BaseModel, IModifyAt, ICreateAt
     /// 是否为媒体组消息
     /// </summary>
     [SugarColumn(IsIgnore = true)]
-    public bool IsMediaGroup => !string.IsNullOrEmpty(OriginMediaGroupID);
+    public bool IsMediaGroup => !string.IsNullOrEmpty(OriginMediaGroupId);
     /// <summary>
     /// 原始媒体组ID
     /// </summary>
-    public string OriginMediaGroupID { get; set; } = "";
+    public string OriginMediaGroupId { get; set; } = "";
     /// <summary>
     /// 审核消息媒体组ID
     /// </summary>
-    public string ReviewMediaGroupID { get; set; } = "";
+    public string ReviewMediaGroupId { get; set; } = "";
     /// <summary>
     /// 发布频道或者拒绝频道的媒体组ID
     /// </summary>
-    public string PublishMediaGroupID { get; set; } = "";
+    public string PublishMediaGroupId { get; set; } = "";
     /// <summary>
     /// 稿件标签
     /// </summary>
@@ -170,11 +170,11 @@ public sealed record Posts : BaseModel, IModifyAt, ICreateAt
     /// <summary>
     /// 投稿人用户ID
     /// </summary>
-    public long PosterUID { get; set; } = -1;
+    public long PosterUId { get; set; } = -1;
     /// <summary>
     /// 审核人用户ID
     /// </summary>
-    public long ReviewerUID { get; set; } = -1;
+    public long ReviewerUId { get; set; } = -1;
 
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;

@@ -2,13 +2,13 @@ using SqlSugar;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
 
-namespace XinjingdailyBot.Model.Models;
+namespace XinjingdailyBot.Model.Legacy;
 
 /// <summary>
 /// 来源频道设定
 /// </summary>
 [SugarTable("channel", TableDescription = "机器人频道")]
-public sealed record Channels : BaseModel, ICreateAt, IModifyAt
+public sealed record ChannelsLegacy : BaseModel, ICreateAt, IModifyAt
 {
     /// <summary>
     /// 主键

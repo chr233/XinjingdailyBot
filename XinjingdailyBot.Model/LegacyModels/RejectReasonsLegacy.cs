@@ -1,14 +1,14 @@
-﻿using SqlSugar;
+using SqlSugar;
 using XinjingdailyBot.Model.Base;
 
-namespace XinjingdailyBot.Model.Models;
+namespace XinjingdailyBot.Model.Legacy;
 
 /// <summary>
 /// 拒绝理由
 /// </summary>
 [SugarTable("reject", TableDescription = "拒绝理由")]
 [SugarIndex("payload", nameof(Payload), OrderByType.Asc, true)]
-public sealed record RejectReasons : BaseModel
+public sealed record RejectReasonsLegacy : BaseModel
 {
     /// <summary>
     /// 主键

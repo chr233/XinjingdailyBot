@@ -1,14 +1,14 @@
 using SqlSugar;
 using XinjingdailyBot.Model.Base;
 
-namespace XinjingdailyBot.Model.Models;
+namespace XinjingdailyBot.Model.Legacy;
 
 /// <summary>
 /// 投稿标签
 /// </summary>
 [SugarTable("tag", TableDescription = "投稿标签")]
 [SugarIndex("payload", nameof(Payload), OrderByType.Asc, true)]
-public sealed record Tags : BaseModel
+public sealed record TagsLegacy : BaseModel
 {
     /// <summary>
     /// 主键

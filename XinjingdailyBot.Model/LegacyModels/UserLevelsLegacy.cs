@@ -2,14 +2,14 @@ using SqlSugar;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
 
-namespace XinjingdailyBot.Model.Models;
+namespace XinjingdailyBot.Model.Legacy;
 
 /// <summary>
 /// 用户表, 储存所有用户的基本信息, 权限设定, 以及投稿信息统计
 /// </summary>
 [SugarTable("user_level", TableDescription = "用户表")]
 [SugarIndex("index_userid", nameof(UserID), OrderByType.Asc, true)]
-public sealed record UserLevels : BaseModel, IModifyAt, ICreateAt
+public sealed record UserLevelsLegacy : BaseModel, IModifyAt, ICreateAt
 {
     /// <summary>
     /// 主键

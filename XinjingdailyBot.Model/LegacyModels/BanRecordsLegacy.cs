@@ -2,7 +2,7 @@ using SqlSugar;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Model.Base;
 
-namespace XinjingdailyBot.Model.Models;
+namespace XinjingdailyBot.Model.Legacy;
 
 /// <summary>
 /// 用户封禁记录
@@ -12,7 +12,7 @@ namespace XinjingdailyBot.Model.Models;
 [SugarIndex("index_operatorid", nameof(OperatorUID), OrderByType.Asc)]
 [SugarIndex("index_userid_type", nameof(UserID), OrderByType.Asc, nameof(Type), OrderByType.Asc)]
 [SugarIndex("index_userid_bantime", nameof(UserID), OrderByType.Asc, nameof(BanTime), OrderByType.Desc)]
-public sealed record BanRecords : BaseModel
+public sealed record BanRecordsLegacy : BaseModel
 {
     /// <summary>
     /// 主键

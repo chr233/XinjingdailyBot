@@ -1,13 +1,13 @@
 using SqlSugar;
 using XinjingdailyBot.Model.Base;
 
-namespace XinjingdailyBot.Model.Models;
+namespace XinjingdailyBot.Model.Legacy;
 
 /// <summary>
 /// 用户等级表
 /// </summary>
 [SugarTable("level", TableDescription = "等级组")]
-public sealed record Levels : BaseModel
+public sealed record LevelsLegacy : BaseModel
 {
     /// <summary>
     /// 主键

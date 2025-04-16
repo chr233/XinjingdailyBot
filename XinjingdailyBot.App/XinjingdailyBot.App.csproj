@@ -22,7 +22,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
 		<PackageReference Include="NLog.Extensions.Logging" />
 		<PackageReference Include="NSwag.AspNetCore" />
 		<PackageReference Include="NSwag.Generation.AspNetCore" />

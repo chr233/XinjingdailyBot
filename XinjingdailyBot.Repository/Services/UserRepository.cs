@@ -2,7 +2,7 @@ using SqlSugar;
 using StackExchange.Redis;
 using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Model.Models;
+using XinjingdailyBot.Model.Legacy;
 using XinjingdailyBot.Repository.Base;
 
 namespace XinjingdailyBot.Repository.Services;
@@ -12,16 +12,16 @@ namespace XinjingdailyBot.Repository.Services;
 /// </summary>
 [AppService(LifeTime.Transient)]
 public class UserRepository(
-    ISqlSugarClient _context, 
-    IConnectionMultiplexer connectionMultiplexer) : BaseRepository<Users>(_context)
+    ISqlSugarClient _context,
+    IConnectionMultiplexer connectionMultiplexer) : BaseRepository<UsersLegacy>(_context)
 {
-    public async Task<Users?> GetOrCreateUser()
+    public async Task<UsersLegacy?> GetOrCreateUser()
     {
         return null;
     }
 
     /// <inheritdoc/>
-    public async Task<Users?> FetchUserFromUpdate(Update update)
+    public async Task<UsersLegacy?> FetchUserFromUpdate(Update update)
     {
         //var msgChat = update.Type switch {
         //    UpdateType.ChannelPost => update.ChannelPost!.Chat,

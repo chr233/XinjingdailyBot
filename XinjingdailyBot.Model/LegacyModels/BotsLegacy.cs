@@ -2,7 +2,7 @@ using SqlSugar;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
 
-namespace XinjingdailyBot.Model.Models;
+namespace XinjingdailyBot.Model.Legacy;
 
 /// <summary>
 /// 新的稿件表
@@ -10,7 +10,7 @@ namespace XinjingdailyBot.Model.Models;
 [SugarTable("bot", TableDescription = "机器人设置")]
 [SugarIndex("bot_bt", nameof(BotToken), OrderByType.Asc, true)]
 
-public sealed record Bots : BaseModel, IModifyAt, ICreateAt
+public sealed record BotsLegacy : BaseModel, IModifyAt, ICreateAt
 {
     /// <summary>
     /// 主键

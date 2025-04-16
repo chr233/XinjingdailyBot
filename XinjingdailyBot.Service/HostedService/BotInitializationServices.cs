@@ -2,7 +2,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
-using XinjingdailyBot.Model.Models;
+using XinjingdailyBot.Model.Legacy;
 using XinjingdailyBot.Repository.Repositorys;
 using XinjingdailyBot.Repository.Services;
 using XinjingdailyBot.Service.Bot;
@@ -54,7 +54,7 @@ public sealed class BotInitializationServices(
     }
 
 
-    private async Task CreateAndValidBot(Bots bot, ReceiverOptions receiverOptions, CancellationToken cancellationToken)
+    private async Task CreateAndValidBot(BotsLegacy bot, ReceiverOptions receiverOptions, CancellationToken cancellationToken)
     {
         var httpClient = _httpClientFactory.CreateClient("Telegram");
         var telegramOption = new TelegramBotClientOptions(bot.BotToken);
@@ -62,7 +62,7 @@ public sealed class BotInitializationServices(
 
         try
         {
-            var me = await botClient.GetMeAsync(cancellationToken).ConfigureAwait(false);
+            var me = await botClient.GetMe(cancellationToken).ConfigureAwait(false);
 
             //更新数据库
             if (bot.UserId != me.Id || bot.Username != me.Username || bot.Firstname != me.FirstName)

@@ -1,16 +1,16 @@
 using SqlSugar;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Model.Models;
+using XinjingdailyBot.Model.Legacy;
 using XinjingdailyBot.Repository.Base;
 
 namespace XinjingdailyBot.Repository.Services;
 
 [AppService(LifeTime.Transient)]
-public class BotRepository(ISqlSugarClient context) : BaseRepository<Bots>(context)
+public class BotRepository(ISqlSugarClient context) : BaseRepository<BotsLegacy>(context)
 {
-    public Task<Bots> CreateBot(bool enable, string botToken, byte weight)
+    public Task<BotsLegacy> CreateBot(bool enable, string botToken, byte weight)
     {
-        var bot = new Bots {
+        var bot = new BotsLegacy {
             Enabled = enable,
             BotToken = botToken,
             Weight = weight,
@@ -24,13 +24,13 @@ public class BotRepository(ISqlSugarClient context) : BaseRepository<Bots>(conte
         return Insertable(bot).ExecuteReturnEntityAsync();
     }
 
-    public async Task<Bots?> QueryBotById(int id)
+    public async Task<BotsLegacy?> QueryBotById(int id)
     {
         return await Queryable()
             .Where(b => b.Id == id).FirstAsync().ConfigureAwait(false);
     }
 
-    public Task<List<Bots>> QueryBotByName(string? botname, string? nickname, int page, int limit)
+    public Task<List<BotsLegacy>> QueryBotByName(string? botname, string? nickname, int page, int limit)
     {
         return Queryable()
             .WhereIF(!string.IsNullOrEmpty(botname), b => b.Username != null && b.Username.Contains(botname!))
@@ -38,12 +38,12 @@ public class BotRepository(ISqlSugarClient context) : BaseRepository<Bots>(conte
             .ToPageListAsync(page, limit);
     }
 
-    public Task<List<Bots>> QueryBotsEnabled()
+    public Task<List<BotsLegacy>> QueryBotsEnabled()
     {
         return Queryable().Where(static x => x.Enabled).ToListAsync();
     }
 
-    public Task UpdateBot(Bots bot)
+    public Task UpdateBot(BotsLegacy bot)
     {
         bot.ModifyAt = DateTime.Now;
         return Updateable(bot).ExecuteCommandAsync();
