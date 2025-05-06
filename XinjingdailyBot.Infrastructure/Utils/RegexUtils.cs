@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace XinjingdailyBot.Infrastructure;
+namespace XinjingdailyBot.Infrastructure.Utils;
 
 /// <summary>
 /// 正则工具类

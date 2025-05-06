@@ -1,19 +1,17 @@
 using SqlSugar;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
-using XinjingdailyBot.Model.Services;
 
-namespace XinjingdailyBot.Model.Legacy;
+namespace XinjingdailyBot.Model.Models.Historys;
 
 /// <summary>
 /// 消息记录
 /// </summary>
 [Obsolete]
-[SplitTable(SplitType._Custom01, typeof(ChatIdSplitService))]
-[SugarTable(TableName = "dialogue_history", TableDescription = "消息记录")]
+[SugarTable(TableName = "xjb_dialogue_history", TableDescription = "消息记录")]
 [SugarIndex("index_chat", nameof(ChatId), OrderByType.Asc, nameof(MessageId), OrderByType.Asc, true)]
 [SugarIndex("index_chat", nameof(MessageId), OrderByType.Asc, true)]
-public sealed record DialogueHistorysLegacy : BaseModel, ICreateAt
+public sealed record DialogueHistorys : BaseModel, ICreateAt
 {
     /// <summary>
     /// 主键
@@ -50,12 +48,6 @@ public sealed record DialogueHistorysLegacy : BaseModel, ICreateAt
     /// 消息类型
     /// </summary>
     public string Type { get; set; } = "";
-
-    /// <summary>
-    /// 用户数据
-    /// </summary>
-    [Navigate(NavigateType.OneToOne, nameof(UserId))]
-    public UsersLegacy? User { get; set; }
 
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; }

@@ -10,7 +10,7 @@ using XinjingdailyBot.WebAPI.IPC.Responses;
 namespace XinjingdailyBot.Controllers.Controllers;
 
 [ApiController]
-public class RootController(IOptions<ApiConfig> _options) : AbstractController
+public class RootController(IOptions<SystemConfig> _options) : AbstractController
 {
     /// <summary>
     /// 首页
@@ -22,12 +22,14 @@ public class RootController(IOptions<ApiConfig> _options) : AbstractController
         return _options.Value.Swagger ? Redirect("/swagger") : Redirect("/about");
     }
 
-    private readonly AboutResponse about = new AboutResponse("机器人启动完成, 请我喝杯快乐水: https://afdian.com/a/chr233");
-
+    /// <summary>
+    /// 关于
+    /// </summary>
+    /// <returns></returns>
     [HttpGet("/about")]
     public ActionResult<AboutResponse> GetAbout()
     {
-        return Ok(about);
+        return Ok(new AboutResponse("机器人启动完成, 请我喝杯快乐水: https://afdian.com/a/chr233"));
     }
 
     /// <summary>

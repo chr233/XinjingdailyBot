@@ -22,7 +22,7 @@ public static class AppServiceExtensions
             "XinjingdailyBot.Repository",
             "XinjingdailyBot.Service",
             "XinjingdailyBot.Command",
-            "XinjingdailyBot.WebAPI",
+            "XinjingdailyBot.App",
         };
 
         foreach (var item in cls)

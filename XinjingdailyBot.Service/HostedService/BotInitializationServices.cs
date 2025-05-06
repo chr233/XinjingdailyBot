@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using XinjingdailyBot.Model.Legacy;
+using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository.Repositorys;
 using XinjingdailyBot.Repository.Services;
 using XinjingdailyBot.Service.Bot;

@@ -1,17 +1,15 @@
 using SqlSugar;
-using XinjingdailyBot.Infrastructure.Enums;
+using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
 
-namespace XinjingdailyBot.Model.Legacy;
+namespace XinjingdailyBot.Model.Models.Posts;
 
 /// <summary>
 /// 来源频道设定
 /// </summary>
-[SugarTable("channel_option", TableDescription = "投稿来源频道设定")]
-[SugarIndex("co_channel_id", nameof(ChatId), OrderByType.Asc, true)]
-[SugarIndex("index_channel_name", nameof(ChannelName), OrderByType.Asc, false)]
-public sealed record ForwardChannelPolicysLegacy : BaseModel, ICreateAt, IModifyAt
+[SugarTable("xjb_forward_policy", TableDescription = "转发设定")]
+public sealed record ForwardPolicies : BaseModel, ICreateAt, IModifyAt
 {
     /// <summary>
     /// 主键
@@ -25,20 +23,29 @@ public sealed record ForwardChannelPolicysLegacy : BaseModel, ICreateAt, IModify
     /// <summary>
     /// 频道ID @
     /// </summary>
-    public string ChannelName { get; set; } = "";
+    [SugarColumn(IsNullable = true)]
+    public string? ChannelName { get; set; }
     /// <summary>
     /// 频道名称
     /// </summary>
-    public string ChannelTitle { get; set; } = "";
-    /// <summary>
-    /// 封禁类型
-    /// </summary>
-    public EChannelOption Option { get; set; } = EChannelOption.Normal;
+    [SugarColumn(IsNullable = true)]
+    public string? Title { get; set; }
 
     /// <summary>
-    /// 频道引用计数
+    /// 来源类型 Channel / Group
     /// </summary>
-    public int Count { get; set; }
+    public ChatType Type { get; set; }
+
+    /// <summary>
+    /// 禁止从该频道/群组转发消息
+    /// </summary>
+    public bool IsDeny { get; set; }
+
+    /// <summary>
+    /// 转发时去除来源
+    /// </summary>
+    public bool IsPureFrom { get; set; }
+
 
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;

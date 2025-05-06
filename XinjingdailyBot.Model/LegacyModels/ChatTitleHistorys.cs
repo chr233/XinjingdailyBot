@@ -7,6 +7,7 @@ namespace XinjingdailyBot.Model.Legacy;
 /// <summary>
 /// 用户曾用名记录
 /// </summary>
+[Obsolete]
 [SugarTable("name_history", TableDescription = "用户名历史记录")]
 public sealed record NameHistoryLegacy : BaseModel, ICreateAt
 {

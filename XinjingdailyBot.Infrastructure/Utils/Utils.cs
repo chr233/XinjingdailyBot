@@ -1,6 +1,6 @@
 using NLog;
 
-namespace XinjingdailyBot.Infrastructure;
+namespace XinjingdailyBot.Infrastructure.Utils;
 
 /// <summary>
 /// 工具类

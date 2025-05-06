@@ -6,6 +6,7 @@ namespace XinjingdailyBot.Model.Legacy;
 /// <summary>
 /// 用户状态上下文
 /// </summary>
+[Obsolete]
 [SugarTable("state_context", TableDescription = "用户状态上下文")]
 public sealed record StateContextLegacy : BaseModel
 {

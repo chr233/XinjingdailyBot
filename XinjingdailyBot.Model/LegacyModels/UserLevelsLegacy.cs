@@ -7,6 +7,7 @@ namespace XinjingdailyBot.Model.Legacy;
 /// <summary>
 /// 用户表, 储存所有用户的基本信息, 权限设定, 以及投稿信息统计
 /// </summary>
+[Obsolete]
 [SugarTable("user_level", TableDescription = "用户表")]
 [SugarIndex("index_userid", nameof(UserID), OrderByType.Asc, true)]
 public sealed record UserLevelsLegacy : BaseModel, IModifyAt, ICreateAt

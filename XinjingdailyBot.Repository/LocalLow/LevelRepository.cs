@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using SqlSugar;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Model.Legacy;
+using XinjingdailyBot.Model.Models.Users;
 using XinjingdailyBot.Repository.Base;
 
 namespace XinjingdailyBot.Repository.Repositorys;

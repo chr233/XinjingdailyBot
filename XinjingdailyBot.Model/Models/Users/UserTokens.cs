@@ -1,21 +1,21 @@
 using SqlSugar;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
+using XinjingdailyBot.Model.Legacy;
 
-namespace XinjingdailyBot.Model.Legacy;
+namespace XinjingdailyBot.Model.Models.Users;
 
 /// <summary>
 /// 用户密钥表, 储存WebAPI的Token
 /// </summary>
-[Obsolete]
-[SugarTable("user_token", TableDescription = "用户密钥表")]
+[SugarTable("xjb_user_token", TableDescription = "用户密钥表")]
 [SugarIndex("index_token", nameof(ApiToken), OrderByType.Asc, false)]
-public sealed record UserTokensLegacy : BaseModel, ICreateAt, IExpiredAt
+public sealed record UserTokens : BaseModel, ICreateAt, IExpiredAt
 {
     /// <summary>
     /// 用户表主键
     /// </summary>
-    [SugarColumn(IsPrimaryKey = true,IsIdentity =true)]
+    [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
 
     /// <summary>

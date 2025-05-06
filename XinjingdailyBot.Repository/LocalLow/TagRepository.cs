@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using SqlSugar;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Model.Legacy;
+using XinjingdailyBot.Model.Models.Posts;
 using XinjingdailyBot.Repository.Base;
 
 namespace XinjingdailyBot.Repository.Repositorys;
@@ -12,16 +12,16 @@ namespace XinjingdailyBot.Repository.Repositorys;
 [AppService(LifeTime.Singleton)]
 public class TagRepository(
     ILogger<TagRepository> _logger,
-    ISqlSugarClient context) : BaseRepository<TagsLegacy>(context)
+    ISqlSugarClient context) : BaseRepository<Tags>(context)
 {
     /// <summary>
     /// 标签缓存, Key=Id
     /// </summary>
-    private Dictionary<int, TagsLegacy> TagCache { get; } = [];
+    private Dictionary<int, Tags> TagCache { get; } = [];
     /// <summary>
     /// 标签缓存, Key=Payload
     /// </summary>
-    private Dictionary<string, TagsLegacy> TagPayloadCache { get; } = [];
+    private Dictionary<string, Tags> TagPayloadCache { get; } = [];
     /// <summary>
     /// 标签缓存, Key=Id
     /// </summary>
@@ -123,12 +123,12 @@ public class TagRepository(
     /// <returns></returns>
     private async Task InsertBuildInTags()
     {
-        var tags = new List<TagsLegacy>
+        var tags = new List<Tags>
         {
-            new TagsLegacy { Id = 1, Name = "NSFW", Payload = "nsfw", KeyWords = "NSFW", WarnText = Langs.NSFWWarning },
-            new TagsLegacy { Id = 2, Name = "我有一个朋友", Payload = "friend", KeyWords = "朋友|英雄" },
-            new TagsLegacy { Id = 3, Name = "晚安", Payload = "wanan", KeyWords = "晚安" },
-            new TagsLegacy { Id = 4, Name = "AI怪图", Payload = "ai", KeyWords = "#AI" },
+            new Tags { Id = 1, Name = "NSFW", Payload = "nsfw", KeyWords = "NSFW", WarnText = Langs.NSFWWarning },
+            new Tags { Id = 2, Name = "我有一个朋友", Payload = "friend", KeyWords = "朋友|英雄" },
+            new Tags { Id = 3, Name = "晚安", Payload = "wanan", KeyWords = "晚安" },
+            new Tags { Id = 4, Name = "AI怪图", Payload = "ai", KeyWords = "#AI" },
         };
 
         await Storageable(tags).ExecuteCommandAsync().ConfigureAwait(false);
@@ -139,7 +139,7 @@ public class TagRepository(
     /// </summary>
     /// <param name="tagId"></param>
     /// <returns></returns>
-    public TagsLegacy? GetTagById(int tagId)
+    public Tags? GetTagById(int tagId)
     {
         if (TagCache.TryGetValue(tagId, out var tag))
         {
@@ -153,7 +153,7 @@ public class TagRepository(
     /// </summary>
     /// <param name="payload"></param>
     /// <returns></returns>
-    public TagsLegacy? GetTagByPayload(string payload)
+    public Tags? GetTagByPayload(string payload)
     {
         if (TagPayloadCache.TryGetValue(payload, out var tag))
         {
@@ -166,7 +166,7 @@ public class TagRepository(
     /// 获取所有标签
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<TagsLegacy> GetAllTags()
+    public IEnumerable<Tags> GetAllTags()
     {
         return TagCache.Values;
     }
@@ -202,9 +202,9 @@ public class TagRepository(
     /// </summary>
     /// <param name="tagNum"></param>
     /// <returns></returns>
-    public IEnumerable<TagsLegacy> GetActiviedTags(int tagNum)
+    public IEnumerable<Tags> GetActiviedTags(int tagNum)
     {
-        var tags = new List<TagsLegacy>();
+        var tags = new List<Tags>();
         foreach (var tag in TagCache.Values)
         {
             if ((tag.Seg & tagNum) > 0)

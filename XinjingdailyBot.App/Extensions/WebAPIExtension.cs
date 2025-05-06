@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Options;
 using System.Text.Json.Serialization;
+using XinjingdailyBot.Infrastructure;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
@@ -59,10 +61,10 @@ public static class WebAPIExtension
         // 支持CORS
         app.UseCors();
 
-        bool isDevelopment = app.Environment.IsDevelopment();
+        var config = app.Services.GetRequiredService<IOptions<OptionSettings>>().Value.System;
 
         // 调试模式输出错误信息
-        if (isDevelopment || app.Configuration.GetSection("Debug").Get<bool>())
+        if (config.Debug)
         {
             app.UseDeveloperExceptionPage();
         }
@@ -72,7 +74,7 @@ public static class WebAPIExtension
         }
 
         // Swagger
-        if (isDevelopment || app.Configuration.GetSection("Swagger").Get<bool>())
+        if (config.Swagger)
         {
             app.UseSwaggerEx();
         }

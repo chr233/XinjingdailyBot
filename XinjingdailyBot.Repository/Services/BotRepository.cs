@@ -1,6 +1,7 @@
 using SqlSugar;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Model.Legacy;
+using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository.Base;
 
 namespace XinjingdailyBot.Repository.Services;

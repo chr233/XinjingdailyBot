@@ -7,6 +7,7 @@ namespace XinjingdailyBot.Model.Legacy;
 /// <summary>
 /// 媒体组记录
 /// </summary>
+[Obsolete]
 [SugarTable("post_group", TableDescription = "媒体组稿件记录")]
 [SugarIndex("index_msg", nameof(ChatId), OrderByType.Asc, nameof(MessageId), OrderByType.Asc)]
 [SugarIndex("index_groupid", nameof(MediaGroupId), OrderByType.Asc)]

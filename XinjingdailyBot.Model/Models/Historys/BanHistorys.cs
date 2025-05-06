@@ -2,18 +2,18 @@ using SqlSugar;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Model.Base;
 
-namespace XinjingdailyBot.Model.Legacy;
+namespace XinjingdailyBot.Model.Models.Historys;
 
 /// <summary>
 /// 用户封禁记录
 /// </summary>
 [Obsolete]
-[SugarTable("ban", TableDescription = "用户封禁记录户表")]
-[SugarIndex("index_userid", nameof(UserID), OrderByType.Asc)]
-[SugarIndex("index_operatorid", nameof(OperatorUID), OrderByType.Asc)]
-[SugarIndex("index_userid_type", nameof(UserID), OrderByType.Asc, nameof(Type), OrderByType.Asc)]
-[SugarIndex("index_userid_bantime", nameof(UserID), OrderByType.Asc, nameof(BanTime), OrderByType.Desc)]
-public sealed record BanRecordsLegacy : BaseModel
+[SugarTable("xjb_ban_history", TableDescription = "用户w封禁记录户表")]
+[SugarIndex("index_userid", nameof(UserId), OrderByType.Asc)]
+[SugarIndex("index_operatorid", nameof(OperatorId), OrderByType.Asc)]
+[SugarIndex("index_userid_type", nameof(UserId), OrderByType.Asc, nameof(Type), OrderByType.Asc)]
+[SugarIndex("index_userid_bantime", nameof(UserId), OrderByType.Asc, nameof(BanTime), OrderByType.Desc)]
+public sealed record BanHistorys : BaseModel
 {
     /// <summary>
     /// 主键
@@ -23,11 +23,11 @@ public sealed record BanRecordsLegacy : BaseModel
     /// <summary>
     /// 用户ID
     /// </summary>
-    public long UserID { get; set; }
+    public long UserId { get; set; }
     /// <summary>
     /// 执行封禁操作的管理员ID
     /// </summary>
-    public long OperatorUID { get; set; }
+    public long OperatorId { get; set; }
     /// <summary>
     /// 是否封禁 true: 封禁, false: 解封
     /// </summary>

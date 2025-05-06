@@ -4,7 +4,7 @@ using MySqlConnector;
 using Npgsql;
 using SqlSugar;
 using System.Diagnostics.CodeAnalysis;
-using XinjingdailyBot.Infrastructure.Options;
+using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Service.HostedService;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
@@ -25,9 +25,9 @@ public static class DatabaseExtension
     public static void AddSqlSugarSetup(this IServiceCollection services)
     {
         services.AddSingleton<ISqlSugarClient>(s => {
-            var config = s.GetRequiredService<IOptions<DatabaseConfig>>().Value;
+            var config = s.GetRequiredService<IOptions<OptionSettings>>().Value.Database;
 
-            var dbType = config.DbType?.ToUpperInvariant() switch {
+            var dbType = config.Type?.ToUpperInvariant() switch {
                 "SQLITE" => DbType.Sqlite,
                 "MYSQL" => DbType.MySql,
                 "POSTGRESQL" or "PGSQL" => DbType.PostgreSQL,
@@ -38,11 +38,11 @@ public static class DatabaseExtension
 
             var connStr = dbType switch {
                 DbType.MySql => new MySqlConnectionStringBuilder {
-                    Server = config.DbHost,
-                    Port = config.DbPort,
+                    Server = config.Host,
+                    Port = config.Port,
                     Database = config.DbName,
-                    UserID = config.DbUser,
-                    Password = config.DbPassword,
+                    UserID = config.User,
+                    Password = config.Password,
                     CharacterSet = "utf8mb4",
                     AllowZeroDateTime = true,
                 }.ToString(),
@@ -52,14 +52,14 @@ public static class DatabaseExtension
                 }.ToString(),
 
                 DbType.PostgreSQL => new NpgsqlConnectionStringBuilder {
-                    Host = config.DbHost,
-                    Port = (int)config.DbPort,
+                    Host = config.Host,
+                    Port = (int)config.Port,
                     Database = config.DbName,
-                    Username = config.DbUser,
-                    Password = config.DbPassword,
+                    Username = config.User,
+                    Password = config.Password,
                 }.ToString(),
 
-                DbType.Custom => config.DbConnectionString,
+                DbType.Custom => config.ConnectionString,
 
                 _ => null,
             };
@@ -72,13 +72,13 @@ public static class DatabaseExtension
                 Environment.Exit(1);
             }
 
-            if (string.IsNullOrEmpty(config.DbPassword))
+            if (string.IsNullOrEmpty(config.Password))
             {
                 _logger.Info("数据库连接: {0}", connStr);
             }
             else
             {
-                _logger.Info("数据库连接: {0}", connStr.Replace(config.DbPassword, "***"));
+                _logger.Info("数据库连接: {0}", connStr.Replace(config.Password, "***"));
             }
 
             var sqlSugar = new SqlSugarScope(new ConnectionConfig {

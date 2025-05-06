@@ -4,35 +4,24 @@ using Microsoft.Extensions.Options;
 using SqlSugar;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using XinjingdailyBot.Infrastructure.Options;
+using XinjingdailyBot.Infrastructure;
 
 namespace XinjingdailyBot.Service.HostedService;
 
 /// <summary>
 /// 消息接收服务
 /// </summary>
-public class DbInitializationService : BackgroundService
+/// <remarks>
+/// 消息接收服务
+/// </remarks>
+/// <param name="_logger"></param>
+/// <param name="options"></param>
+/// <param name="dbClient"></param>
+public class DbInitializationService(
+    ILogger<DbInitializationService> _logger,
+    IOptions<OptionSettings> _options,
+    ISqlSugarClient _dbClient) : BackgroundService
 {
-    private readonly ILogger<DbInitializationService> _logger;
-    private readonly DatabaseConfig _option;
-    private readonly ISqlSugarClient _dbClient;
-
-    /// <summary>
-    /// 消息接收服务
-    /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="options"></param>
-    /// <param name="dbClient"></param>
-    public DbInitializationService(
-        ILogger<DbInitializationService> logger,
-        IOptions<DatabaseConfig> options,
-        ISqlSugarClient dbClient)
-    {
-        _logger = logger;
-        _option = options.Value;
-        _dbClient = dbClient;
-    }
-
     /// <summary>
     /// 执行
     /// </summary>
@@ -43,13 +32,15 @@ public class DbInitializationService : BackgroundService
     {
         //var x = _dbClient.DbMaintenance.GetTableInfoList();
 
-        if (_option.Generate)
+        var config = _options.Value.Database;
+
+        if (config.Generate)
         {
             _logger.LogInformation("开始生成数据库结构");
             //创建数据库
             try
             {
-                _dbClient.DbMaintenance.CreateDatabase(_option.DbName);
+                _dbClient.DbMaintenance.CreateDatabase(config.DbName);
             }
             catch (Exception ex)
             {
@@ -60,7 +51,9 @@ public class DbInitializationService : BackgroundService
             var assembly = Assembly.Load("XinjingdailyBot.Model");
             var types = assembly.GetTypes()
                 .Where(x => x.GetCustomAttribute<SugarTable>() != null)
-                .Where(x => x.GetCustomAttribute<SplitTableAttribute>() == null); ;
+                .Where(x => x.GetCustomAttribute<SplitTableAttribute>() == null)
+                //.Where(x => x.GetCustomAttribute<ObsoleteAttribute>() == null)
+                ;
 
             foreach (var type in types)
             {

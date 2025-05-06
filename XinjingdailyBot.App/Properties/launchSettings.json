@@ -10,17 +10,6 @@
       },
       "externalUrlConfiguration": true
     },
-    "XinjingdailyBot.WebAPI": {
-      "commandName": "Project",
-      "workingDirectory": "bin",
-      "launchUrl": "swagger",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "externalUrlConfiguration": true,
-      "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:5136"
-    },
     "WSL": {
       "commandName": "WSL2",
       "workingDirectory": "{ProjectDir}/bin",
@@ -40,6 +29,16 @@
         "ASPNETCORE_URLS": "http://+:80"
       },
       "publishAllPorts": true
+    },
+    "XinjingdailyBot.App": {
+      "commandName": "Project",
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "externalUrlConfiguration": true,
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5136"
     }
   },
   "$schema": "https://json.schemastore.org/launchsettings.json",

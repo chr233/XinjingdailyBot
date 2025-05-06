@@ -6,6 +6,7 @@ namespace XinjingdailyBot.Model.Legacy;
 /// <summary>
 /// 机器人会话
 /// </summary>
+[Obsolete]
 [SugarTable("bot_chat", TableDescription = "机器人会话")]
 [SugarIndex("bot_chat_bu", nameof(BotId), OrderByType.Asc, nameof(UserId), OrderByType.Asc, true)]
 [SugarIndex("bot_chat_cu", nameof(BotId), OrderByType.Asc, nameof(ChatId), OrderByType.Asc, true)]

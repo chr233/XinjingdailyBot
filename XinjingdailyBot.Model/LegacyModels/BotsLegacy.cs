@@ -7,6 +7,7 @@ namespace XinjingdailyBot.Model.Legacy;
 /// <summary>
 /// 新的稿件表
 /// </summary>
+[Obsolete]
 [SugarTable("bot", TableDescription = "机器人设置")]
 [SugarIndex("bot_bt", nameof(BotToken), OrderByType.Asc, true)]
 

@@ -1,10 +1,6 @@
-using XinjingdailyBot.Infrastructure.Configs;
-
 namespace XinjingdailyBot.Infrastructure.Options;
-public sealed record DatabaseConfig : IXjbConfig
+public sealed record DatabaseConfig
 {
-    public static string SectionName => "Database";
-
     /// <summary>
     /// 是否生成数据库字段(数据库结构变动时需要打开), 默认 false
     /// </summary>
@@ -16,19 +12,19 @@ public sealed record DatabaseConfig : IXjbConfig
     /// <summary>
     /// 数据库类型
     /// </summary>
-    public string? DbType { get; init; }
+    public string? Type { get; init; }
     /// <summary>
     /// 数据库连接字符串(DbType选Custom时生效)
     /// </summary>
-    public string? DbConnectionString { get; init; }
+    public string? ConnectionString { get; init; }
     /// <summary>
     /// MySQL主机IP
     /// </summary>
-    public string? DbHost { get; init; }
+    public string? Host { get; init; }
     /// <summary>
     /// MySQL主机端口
     /// </summary>
-    public uint DbPort { get; init; } = 3306;
+    public uint Port { get; init; } = 3306;
     /// <summary>
     /// MySQL数据库名称
     /// </summary>
@@ -36,9 +32,9 @@ public sealed record DatabaseConfig : IXjbConfig
     /// <summary>
     /// MySQL用户名
     /// </summary>
-    public string? DbUser { get; init; }
+    public string? User { get; init; }
     /// <summary>
     /// MySQL密码
     /// </summary>
-    public string? DbPassword { get; init; }
+    public string? Password { get; init; }
 }

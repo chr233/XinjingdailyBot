@@ -8,6 +8,7 @@ namespace XinjingdailyBot.Model.Legacy;
 /// <summary>
 /// 广告投放
 /// </summary>
+[Obsolete]
 [SugarTable("advertise", TableDescription = "广告投放")]
 public sealed record AdvertisesLegacy : BaseModel, ICreateAt, IExpiredAt
 {

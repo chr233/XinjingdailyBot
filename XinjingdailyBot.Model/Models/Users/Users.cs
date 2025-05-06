@@ -3,26 +3,20 @@ using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
 
-namespace XinjingdailyBot.Model.Legacy;
+namespace XinjingdailyBot.Model.Models.Users;
 
 /// <summary>
 /// 用户表, 储存所有用户的基本信息, 权限设定, 以及投稿信息统计
 /// </summary>
-[Obsolete]
-[SugarTable("user", TableDescription = "用户表")]
-[SugarIndex("index_userid", nameof(UserID), OrderByType.Asc, true)]
+[SugarTable("xjb_user", TableDescription = "用户表")]
 [SugarIndex("index_username", nameof(UserName), OrderByType.Asc)]
-public sealed record UsersLegacy : BaseModel, IModifyAt, ICreateAt
+public sealed record Users : BaseModel, IModifyAt, ICreateAt
 {
-    /// <summary>
-    /// 主键
-    /// </summary>
-    [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
-    public int Id { get; set; }
     /// <summary>
     /// 用户ID
     /// </summary>
-    public long UserID { get; set; }
+    [SugarColumn(IsPrimaryKey = true)]
+    public long Id { get; set; }
     /// <summary>
     /// 用户名@
     /// </summary>
@@ -38,11 +32,13 @@ public sealed record UsersLegacy : BaseModel, IModifyAt, ICreateAt
     /// </summary>
     [SugarColumn(IsNullable = true)]
     public string? LastName { get; set; }
+
     /// <summary>
     /// 用户昵称
     /// </summary>
     [SugarColumn(IsIgnore = true)]
     public string FullName => string.IsNullOrEmpty(LastName) ? FirstName ?? "" : $"{FirstName} {LastName}";
+
     /// <summary>
     /// 是否封禁
     /// </summary>
@@ -60,10 +56,14 @@ public sealed record UsersLegacy : BaseModel, IModifyAt, ICreateAt
     /// 默认开启匿名模式
     /// </summary>
     public bool PreferAnonymous { get; set; }
+
+    public int PreferChannel { get; set; }
+
     /// <summary>
     /// 是否开启通知
     /// </summary>
     public bool Notification { get; set; } = true;
+
     /// <summary>
     /// 通过的稿件数量
     /// </summary>
@@ -85,6 +85,7 @@ public sealed record UsersLegacy : BaseModel, IModifyAt, ICreateAt
     /// 审核数量
     /// </summary>
     public int ReviewCount { get; set; }
+
     /// <summary>
     /// 经验
     /// </summary>
@@ -108,7 +109,7 @@ public sealed record UsersLegacy : BaseModel, IModifyAt, ICreateAt
     /// API Token
     /// </summary>
     [Navigate(NavigateType.OneToOne, nameof(Id))]//一对一 SchoolId是StudentA类里面的
-    public UserTokensLegacy? Token { get; set; } //不能赋值只能是null
+    public UserTokens? Token { get; set; } //不能赋值只能是null
 
     /// <summary>
     /// 文本显示
@@ -118,7 +119,7 @@ public sealed record UsersLegacy : BaseModel, IModifyAt, ICreateAt
     {
         if (string.IsNullOrEmpty(UserName))
         {
-            return $"{FullName}(#{UserID})".EscapeHtml();
+            return $"{FullName}(#{Id})".EscapeHtml();
         }
         else
         {
@@ -136,7 +137,7 @@ public sealed record UsersLegacy : BaseModel, IModifyAt, ICreateAt
 
         if (string.IsNullOrEmpty(UserName))
         {
-            return $"<a href=\"tg://user?id={UserID}\">{nick}</a>";
+            return $"<a href=\"tg://user?id={Id}\">{nick}</a>";
         }
         else
         {

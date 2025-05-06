@@ -1,6 +1,7 @@
 using NLog.Extensions.Logging;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Localization;
+using XinjingdailyBot.Infrastructure.Utils;
 using XinjingdailyBot.WebAPI.Extensions;
 
 const string banner = @"

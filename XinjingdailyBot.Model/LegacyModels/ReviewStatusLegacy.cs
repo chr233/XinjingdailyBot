@@ -7,6 +7,7 @@ namespace XinjingdailyBot.Model.Legacy;
 /// <summary>
 /// 广告消息表
 /// </summary>
+[Obsolete]
 [SugarTable("review_status", TableDescription = "审核统计")]
 public sealed record ReviewStatusLegacy : BaseModel, IModifyAt, ICreateAt
 {

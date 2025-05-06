@@ -7,6 +7,7 @@ namespace XinjingdailyBot.Model.Legacy;
 /// <summary>
 /// 投稿附件
 /// </summary>
+[Obsolete]
 [SugarTable("post_attachment", TableDescription = "投稿附件")]
 [SugarIndex("index_post_id", nameof(PostId), OrderByType.Asc)]
 public sealed record PostAttachmentsLegacy : BaseModel

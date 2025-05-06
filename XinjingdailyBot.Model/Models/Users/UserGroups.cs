@@ -2,13 +2,13 @@ using SqlSugar;
 using XinjingdailyBot.Model.Base;
 using XinjingdailyBot.Model.Columns;
 
-namespace XinjingdailyBot.Model.Legacy;
+namespace XinjingdailyBot.Model.Models.Users;
 
 /// <summary>
 /// 来源频道设定
 /// </summary>
-[SugarTable("channel", TableDescription = "机器人频道")]
-public sealed record ChannelsLegacy : BaseModel, ICreateAt, IModifyAt
+[SugarTable("xjb_user_group", TableDescription = "机器人群组")]
+public sealed record UserGroups : BaseModel, ICreateAt, IModifyAt
 {
     /// <summary>
     /// 主键
@@ -18,19 +18,17 @@ public sealed record ChannelsLegacy : BaseModel, ICreateAt, IModifyAt
     /// <summary>
     /// 频道ID
     /// </summary>
-    public long ChannelId { get; set; }
+    public long GroupId { get; set; }
     /// <summary>
     /// 频道ID @
     /// </summary>
     [SugarColumn(IsNullable = true)]
-    public string? ChannelName { get; set; }
+    public string? GroupName { get; set; }
     /// <summary>
     /// 频道名称
     /// </summary>
     [SugarColumn(IsNullable = true)]
-    public string? ChannelTitle { get; set; }
-
-    public bool IsEnable { get; set; }
+    public string? GroupTitle { get; set; }
     public bool IsPublish { get; set; }
     public bool AllowInvite { get; set; }
 

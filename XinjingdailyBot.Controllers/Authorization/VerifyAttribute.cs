@@ -7,7 +7,7 @@ namespace XinjingdailyBot.Controllers.Authorization;
 
 /// <summary>
 /// 授权校验访问
-/// 如果跳过授权登录在Action 或controller加上 AllowAnonymousAttribute
+/// 如果跳过授权登录在Action 或 Controller 加上 AllowAnonymousAttribute
 /// </summary>
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]

@@ -9,17 +9,7 @@ namespace XinjingdailyBot.Model.Models.Posts;
 /// <summary>
 /// 新的稿件表
 /// </summary>
-[SugarTable("post", TableDescription = "投稿记录")]
-[SugarIndex("index_origin", nameof(OriginChatId), OrderByType.Asc, nameof(OriginMsgId), OrderByType.Asc)]
-[SugarIndex("index_originaction", nameof(OriginActionChatId), OrderByType.Asc, nameof(OriginActionMsgId), OrderByType.Asc)]
-[SugarIndex("index_review", nameof(ReviewChatId), OrderByType.Asc, nameof(ReviewMsgId), OrderByType.Asc)]
-[SugarIndex("index_reviewaction", nameof(ReviewActionChatId), OrderByType.Asc, nameof(ReviewActionMsgId), OrderByType.Asc)]
-[SugarIndex("index_origin_media_group_id", nameof(OriginMediaGroupId), OrderByType.Asc)]
-[SugarIndex("index_review_media_group_id", nameof(ReviewMediaGroupId), OrderByType.Asc)]
-[SugarIndex("index_post_media_group_id", nameof(PublishMediaGroupId), OrderByType.Asc)]
-[SugarIndex("index_posterid", nameof(PosterUId), OrderByType.Asc)]
-[SugarIndex("index_reviewerid", nameof(ReviewerUId), OrderByType.Asc)]
-[SugarIndex("index_status_modifyat", nameof(Status), OrderByType.Asc, nameof(ModifyAt), OrderByType.Asc)]
+[SugarTable("xjb_post", TableDescription = "投稿记录")]
 public sealed record Posts : BaseModel, IModifyAt, ICreateAt
 {
     /// <summary>
@@ -34,7 +24,8 @@ public sealed record Posts : BaseModel, IModifyAt, ICreateAt
     /// <summary>
     /// 原始消息ID
     /// </summary>
-    public long OriginMsgId { get; set; } = -1;
+    [SugarColumn(IsJson = true)]
+    public List<long> OriginMessageIds { get; set; } = [];
 
     /// <summary>
     /// 投稿控制消息会话ID
@@ -44,7 +35,7 @@ public sealed record Posts : BaseModel, IModifyAt, ICreateAt
     /// <summary>
     /// 投稿控制消息ID
     /// </summary>
-    public long OriginActionMsgId { get; set; } = -1;
+    public long OriginActionMessageId { get; set; } = -1;
 
     /// <summary>
     /// 审核消息会话ID
@@ -53,7 +44,7 @@ public sealed record Posts : BaseModel, IModifyAt, ICreateAt
     /// <summary>
     /// 审核群消息ID
     /// </summary>
-    public long ReviewMsgId { get; set; } = -1;
+    public long ReviewMessageId { get; set; } = -1;
 
     /// <summary>
     /// 审核群控制消息会话ID
@@ -67,27 +58,23 @@ public sealed record Posts : BaseModel, IModifyAt, ICreateAt
     /// <summary>
     /// 发布频道或拒绝频道的消息Id
     /// </summary>
-    public long PublicMsgID { get; set; } = -1;
+    [SugarColumn(IsJson = true)]
+    public List<long> PublicMessageIds { get; set; } = [];
 
     /// <summary>
     /// 警告消息Id
     /// </summary>
-    public long WarnTextID { get; set; } = -1;
+    public long WarnMessageId { get; set; } = -1;
+
     /// <summary>
     /// 是否为直接投稿
     /// </summary>
-    [SugarColumn(IsIgnore = true)]
-    public bool IsDirectPost => OriginActionChatId == ReviewActionChatId;
+    public bool IsDirectPost { get; set; }
 
     /// <summary>
     /// 匿名投稿
     /// </summary>
-    public bool Anonymous { get; set; }
-
-    /// <summary>
-    /// 强制匿名
-    /// </summary>
-    public bool ForceAnonymous { get; set; }
+    public EAnonymousType Anonymous { get; set; }
 
     /// <summary>
     /// 投稿描述(过滤#标签和链接)
@@ -103,16 +90,16 @@ public sealed record Posts : BaseModel, IModifyAt, ICreateAt
     /// <summary>
     /// 来源频道ID
     /// </summary>
-    public long ChannelID { get; set; } = -1;
+    public long ForwardChannelId { get; set; } = -1;
     /// <summary>
     /// 来源频道链接
     /// </summary>
-    public long ChannelMsgID { get; set; } = -1;
+    public long ForwardChannelMessageId { get; set; } = -1;
     /// <summary>
     /// 是否为频道转发
     /// </summary>
     [SugarColumn(IsIgnore = true)]
-    public bool IsFromChannel => ChannelID != -1;
+    public bool IsFromChannel => ForwardChannelId != -1;
 
     /// <summary>
     /// 投稿状态
@@ -152,6 +139,7 @@ public sealed record Posts : BaseModel, IModifyAt, ICreateAt
     /// 是否启用遮罩
     /// </summary>
     public bool HasSpoiler { get; set; }
+
     /// <summary>
     /// 是否允许遮罩
     /// </summary>

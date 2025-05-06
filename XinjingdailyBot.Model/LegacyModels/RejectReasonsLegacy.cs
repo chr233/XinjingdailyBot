@@ -6,6 +6,7 @@ namespace XinjingdailyBot.Model.Legacy;
 /// <summary>
 /// 拒绝理由
 /// </summary>
+[Obsolete]
 [SugarTable("reject", TableDescription = "拒绝理由")]
 [SugarIndex("payload", nameof(Payload), OrderByType.Asc, true)]
 public sealed record RejectReasonsLegacy : BaseModel

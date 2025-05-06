@@ -2,6 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
+		<UserSecretsId>c798909b-7fb5-44be-83ad-3a0355d63f49</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -41,6 +42,7 @@
 		<ProjectReference Include="..\XinjingdailyBot.Model\XinjingdailyBot.Model.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Repository\XinjingdailyBot.Repository.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Service\XinjingdailyBot.Service.csproj" />
+		<ProjectReference Include="..\XinjingdailyBot.SignalR\XinjingdailyBot.SignalR.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Tasks\XinjingdailyBot.Tasks.csproj" />
 	</ItemGroup>
 

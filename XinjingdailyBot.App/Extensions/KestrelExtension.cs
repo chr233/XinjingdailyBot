@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Options;
-using XinjingdailyBot.Infrastructure.Options;
+using XinjingdailyBot.Infrastructure;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
@@ -17,13 +17,13 @@ public static class KestrelExtension
 
         webHost.UseKestrel(o => {
             // 设置最大文件上传尺寸
-            o.Limits.MaxRequestBodySize = 1073741824;
+            o.Limits.MaxRequestBodySize = 500000000;
 
             var services = o.ApplicationServices;
 
             // 设置 Http 监听地址
-            var apiOption = services.GetRequiredService<IOptions<ApiConfig>>().Value;
-            var port = apiOption.Port;
+            var apiOption = services.GetRequiredService<IOptions<OptionSettings>>().Value;
+            var port = apiOption.System.HttpPort;
 
             if (port < 1024)
             {

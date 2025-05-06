@@ -7,6 +7,7 @@ namespace XinjingdailyBot.Model.Legacy;
 /// <summary>
 /// 储存命令执行记录, 也用于查找用户
 /// </summary>
+[Obsolete]
 [SugarTable("command_record", TableDescription = "命令回调")]
 [SugarIndex("index_cid", nameof(ChatID), OrderByType.Asc)]
 [SugarIndex("index_mid", nameof(MessageID), OrderByType.Asc)]

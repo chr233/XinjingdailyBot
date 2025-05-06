@@ -1,6 +1,0 @@
-{
-  "Network": {
-    //"HttpProxy": "http://127.0.0.1:1081",
-    "HttpProxy": null
-  }
-}
