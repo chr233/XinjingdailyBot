@@ -94,15 +94,16 @@ public sealed record Users : BaseModel, IModifyAt, ICreateAt
     /// </summary>
     public int GroupID { get; set; }
 
-    /// <summary>
-    /// 乐观锁
-    /// </summary>
-    public int Version { get; set; } = 0;
-
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;
     /// <inheritdoc cref="IModifyAt"/>
     public DateTime ModifyAt { get; set; } = DateTime.Now;
+
+    /// <summary>
+    /// API Token
+    /// </summary>
+    [Navigate(NavigateType.OneToOne, nameof(Id))]//一对一 SchoolId是StudentA类里面的
+    public UserTokens? Token { get; set; } //不能赋值只能是null
 
     /// <summary>
     /// 文本显示
