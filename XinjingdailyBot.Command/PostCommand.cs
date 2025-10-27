@@ -132,7 +132,7 @@ internal class PostCommand(
         Message reviewMsg;
         if (!post.IsMediaGroup)
         {
-            reviewMsg = await _botClient.ForwardMessageAsync(_channelService.ReviewGroup.Id, post.OriginChatID, (int)post.OriginMsgID);
+            reviewMsg = await _botClient.ForwardMessage(_channelService.ReviewGroup.Id, post.OriginChatID, (int)post.OriginMsgID);
         }
         else
         {
@@ -166,7 +166,7 @@ internal class PostCommand(
                     _ => throw new Exception("未知的稿件类型"),
                 };
             }
-            var messages = await _botClient.SendMediaGroupAsync(_channelService.ReviewGroup, group);
+            var messages = await _botClient.SendMediaGroup(_channelService.ReviewGroup, group);
             reviewMsg = messages.First();
             post.ReviewMediaGroupID = reviewMsg.MediaGroupId ?? "";
 
@@ -179,7 +179,7 @@ internal class PostCommand(
         bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
         var keyboard = _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
 
-        var manageMsg = await _botClient.SendTextMessageAsync(_channelService.ReviewGroup, msg, parseMode: ParseMode.Html, disableWebPagePreview: true, replyToMessageId: reviewMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+        var manageMsg = await _botClient.SendMessage(_channelService.ReviewGroup, msg, parseMode: ParseMode.Html, disableWebPagePreview: true, replyToMessageId: reviewMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
         post.ReviewChatID = reviewMsg.Chat.Id;
         post.ReviewMsgID = reviewMsg.MessageId;

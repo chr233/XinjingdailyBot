@@ -96,7 +96,7 @@ internal class MessageHandler : IMessageHandler
 
                     break;
                 default:
-                    await _botClient.AutoReplyAsync($"暂不支持的投稿类型 {message.Type}", message);
+                    await _botClient.AutoReply($"暂不支持的投稿类型 {message.Type}", message);
                     break;
             }
         }

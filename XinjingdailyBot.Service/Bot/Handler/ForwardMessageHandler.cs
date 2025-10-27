@@ -86,7 +86,7 @@ internal class ForwardMessageHandler : IForwardMessageHandler
                     {
                         if (post.Status == EPostStatus.Reviewing)
                         {
-                            await _botClient.AutoReplyAsync("无法操作审核中的稿件", message);
+                            await _botClient.AutoReply("无法操作审核中的稿件", message);
                             return false;
                         }
 
@@ -107,7 +107,7 @@ internal class ForwardMessageHandler : IForwardMessageHandler
                         sb.AppendLine($"模式: {postMode}");
                         sb.AppendLine($"状态: {postStatus}");
 
-                        await _botClient.SendTextMessageAsync(message.Chat, sb.ToString(), parseMode: ParseMode.Html, disableWebPagePreview: true, replyMarkup: keyboard, replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
+                        await _botClient.SendMessage(message.Chat, sb.ToString(), parseMode: ParseMode.Html, disableWebPagePreview: true, replyMarkup: keyboard, replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
                         return true;
                     }
                 }

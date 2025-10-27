@@ -62,7 +62,7 @@ internal sealed class UserService(
         };
 
         // 自动删除置顶通知 和 群名修改通知
-        if (message != null && (message.Type == MessageType.MessagePinned || message.Type == MessageType.ChatTitleChanged))
+        if (message != null && (message.Type == MessageType.PinnedMessage || message.Type == MessageType.NewChatTitle))
         {
             await AutoDeleteNotification(message);
             return null;
@@ -126,7 +126,7 @@ internal sealed class UserService(
         {
             try
             {
-                await _botClient.LeaveChatAsync(msgChat.Id);
+                await _botClient.LeaveChat(msgChat.Id);
             }
             catch (Exception ex)
             {
@@ -338,7 +338,7 @@ internal sealed class UserService(
         }
         else //缓存中没有该用户, 更新缓存
         {
-            var admins = await _botClient.GetChatAdministratorsAsync(message.Chat);
+            var admins = await _botClient.GetChatAdministrators(message.Chat);
             if (admins == null)
             {
                 return null;
@@ -368,7 +368,7 @@ internal sealed class UserService(
         {
             try
             {
-                await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
+                await _botClient.DeleteMessage(message.Chat, message.MessageId);
             }
             catch (Exception ex)
             {

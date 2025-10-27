@@ -30,7 +30,7 @@ internal class ChannelService(
 
     public async Task InitChannelInfo()
     {
-        BotUser = await _botClient.GetMeAsync();
+        BotUser = await _botClient.GetMe();
 
         _logger.LogInformation("机器人信息: {Id} {nickName} @{userName}", BotUser.Id, BotUser.FullName(), BotUser.Username);
 
@@ -38,7 +38,7 @@ internal class ChannelService(
 
         try
         {
-            AcceptChannel = await _botClient.GetChatAsync(channelOption.AcceptChannel);
+            AcceptChannel = await _botClient.GetChat(channelOption.AcceptChannel);
             _logger.LogInformation("稿件发布频道: {chatProfile}", AcceptChannel.ChatProfile());
         }
         catch
@@ -48,7 +48,7 @@ internal class ChannelService(
         }
         try
         {
-            RejectChannel = await _botClient.GetChatAsync(channelOption.RejectChannel);
+            RejectChannel = await _botClient.GetChat(channelOption.RejectChannel);
             _logger.LogInformation("拒稿存档频道: {chatProfile}", RejectChannel.ChatProfile());
         }
         catch
@@ -60,7 +60,7 @@ internal class ChannelService(
         {
             try
             {
-                SecondChannel = await _botClient.GetChatAsync(channelOption.SecondChannel);
+                SecondChannel = await _botClient.GetChat(channelOption.SecondChannel);
                 _logger.LogInformation("第二发布频道: {chatProfile}", SecondChannel.ChatProfile());
             }
             catch
@@ -73,11 +73,11 @@ internal class ChannelService(
         {
             if (long.TryParse(channelOption.ReviewGroup, out var groupId))
             {
-                ReviewGroup = await _botClient.GetChatAsync(groupId);
+                ReviewGroup = await _botClient.GetChat(groupId);
             }
             else
             {
-                ReviewGroup = await _botClient.GetChatAsync(channelOption.ReviewGroup);
+                ReviewGroup = await _botClient.GetChat(channelOption.ReviewGroup);
             }
             _logger.LogInformation("审核群组: {chatProfile}", ReviewGroup.ChatProfile());
         }
@@ -96,11 +96,11 @@ internal class ChannelService(
         {
             if (long.TryParse(channelOption.CommentGroup, out var subGroupId))
             {
-                CommentGroup = await _botClient.GetChatAsync(subGroupId);
+                CommentGroup = await _botClient.GetChat(subGroupId);
             }
             else
             {
-                CommentGroup = await _botClient.GetChatAsync(channelOption.CommentGroup);
+                CommentGroup = await _botClient.GetChat(channelOption.CommentGroup);
             }
             _logger.LogInformation("评论区群组: {chatProfile}", CommentGroup.ChatProfile());
         }
@@ -113,11 +113,11 @@ internal class ChannelService(
         {
             if (long.TryParse(channelOption.SubGroup, out var subGroupId))
             {
-                SubGroup = await _botClient.GetChatAsync(subGroupId);
+                SubGroup = await _botClient.GetChat(subGroupId);
             }
             else
             {
-                SubGroup = await _botClient.GetChatAsync(channelOption.SubGroup);
+                SubGroup = await _botClient.GetChat(channelOption.SubGroup);
             }
             _logger.LogInformation("频道子群组: {chatProfile}", SubGroup.ChatProfile());
         }
@@ -131,11 +131,11 @@ internal class ChannelService(
         {
             if (long.TryParse(channelOption.SecondCommentGroup, out var subGroupId))
             {
-                SecondCommentGroup = await _botClient.GetChatAsync(subGroupId);
+                SecondCommentGroup = await _botClient.GetChat(subGroupId);
             }
             else
             {
-                SecondCommentGroup = await _botClient.GetChatAsync(channelOption.SecondCommentGroup);
+                SecondCommentGroup = await _botClient.GetChat(channelOption.SecondCommentGroup);
             }
             _logger.LogInformation("第二频道评论区群组: {chatProfile}", SecondCommentGroup.ChatProfile());
         }

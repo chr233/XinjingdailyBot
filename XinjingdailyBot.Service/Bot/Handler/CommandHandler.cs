@@ -220,7 +220,7 @@ internal class CommandHandler : ICommandHandler
                             await Task.Delay(TimeSpan.FromSeconds(30));
                             try
                             {
-                                await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
+                                await _botClient.DeleteMessage(message.Chat, message.MessageId);
                             }
                             catch
                             {
@@ -493,15 +493,15 @@ internal class CommandHandler : ICommandHandler
 
         AddCommands(EUserRights.None);
         AddCommands(EUserRights.NormalCmd);
-        await _botClient.SetMyCommandsAsync(cmds, null);
-        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllPrivateChats());
-        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllGroupChats());
+        await _botClient.SetMyCommands(cmds, null);
+        await _botClient.SetMyCommands(cmds, new BotCommandScopeAllPrivateChats());
+        await _botClient.SetMyCommands(cmds, new BotCommandScopeAllGroupChats());
 
         AddCommands(EUserRights.AdminCmd);
-        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllChatAdministrators());
+        await _botClient.SetMyCommands(cmds, new BotCommandScopeAllChatAdministrators());
 
         AddCommands(EUserRights.ReviewPost);
-        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeChatAdministrators { ChatId = _channelService.ReviewGroup.Id });
+        await _botClient.SetMyCommands(cmds, new BotCommandScopeChatAdministrators { ChatId = _channelService.ReviewGroup.Id });
         return true;
     }
 
@@ -509,11 +509,11 @@ internal class CommandHandler : ICommandHandler
     {
         var cmds = new List<BotCommand>();
 
-        await _botClient.SetMyCommandsAsync(cmds);
-        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllPrivateChats());
-        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllGroupChats());
-        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeAllChatAdministrators());
-        await _botClient.SetMyCommandsAsync(cmds, new BotCommandScopeChatAdministrators { ChatId = _channelService.ReviewGroup.Id });
+        await _botClient.SetMyCommands(cmds);
+        await _botClient.SetMyCommands(cmds, new BotCommandScopeAllPrivateChats());
+        await _botClient.SetMyCommands(cmds, new BotCommandScopeAllGroupChats());
+        await _botClient.SetMyCommands(cmds, new BotCommandScopeAllChatAdministrators());
+        await _botClient.SetMyCommands(cmds, new BotCommandScopeChatAdministrators { ChatId = _channelService.ReviewGroup.Id });
         return true;
     }
 }

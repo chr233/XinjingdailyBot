@@ -50,7 +50,7 @@ internal class InlineQueryHandler(
                 results.Add(new InlineQueryResultArticle("1", "没有可用稿件", new InputTextMessageContent("没有可用稿件")));
             }
 
-            await _botClient.AnswerInlineQueryAsync(
+            await _botClient.AnswerInlineQuery(
                 inlineQueryId: query.Id,
                 results: results,
                 cacheTime: 10,
@@ -62,7 +62,7 @@ internal class InlineQueryHandler(
                 new InlineQueryResultArticle("1", "该功能暂时仅对管理员开放", new InputTextMessageContent("To be continued"))
             ];
 
-            await _botClient.AnswerInlineQueryAsync(inlineQueryId: query.Id, results: results, cacheTime: 10, isPersonal: true);
+            await _botClient.AnswerInlineQuery(inlineQueryId: query.Id, results: results, cacheTime: 10, isPersonal: true);
         }
     }
 }

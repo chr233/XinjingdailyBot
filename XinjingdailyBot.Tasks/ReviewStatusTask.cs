@@ -90,11 +90,11 @@ internal class ReviewStatusTask(
                 {
                     try
                     {
-                        var oldMsg = await _botClient.EditMessageTextAsync(reviewGroup, (int)oldPost.MessageID, old.ToString(), parseMode: ParseMode.Html);
+                        var oldMsg = await _botClient.EditMessageText(reviewGroup, (int)oldPost.MessageID, old.ToString(), parseMode: ParseMode.Html);
                     }
                     finally
                     {
-                        await _botClient.UnpinChatMessageAsync(reviewGroup, (int)oldPost.MessageID);
+                        await _botClient.UnpinChatMessage(reviewGroup, (int)oldPost.MessageID);
                     }
                 }
                 finally
@@ -106,7 +106,7 @@ internal class ReviewStatusTask(
             {
                 try
                 {
-                    statusMsg = await _botClient.EditMessageTextAsync(reviewGroup, (int)oldPost.MessageID, sb.ToString(), parseMode: ParseMode.Html, replyMarkup: kbd);
+                    statusMsg = await _botClient.EditMessageText(reviewGroup, (int)oldPost.MessageID, sb.ToString(), parseMode: ParseMode.Html, replyMarkup: kbd);
                 }
                 catch (Exception ex)
                 {
@@ -123,8 +123,8 @@ internal class ReviewStatusTask(
 
         if (statusMsg == null)
         {
-            statusMsg = await _botClient.SendTextMessageAsync(reviewGroup, sb.ToString(), parseMode: ParseMode.Html, replyMarkup: kbd);
-            await _botClient.PinChatMessageAsync(reviewGroup, statusMsg.MessageId);
+            statusMsg = await _botClient.SendMessage(reviewGroup, sb.ToString(), parseMode: ParseMode.Html, replyMarkup: kbd);
+            await _botClient.PinChatMessage(reviewGroup, statusMsg.MessageId);
             await _reviewStatusService.CreateNewReviewStatus(statusMsg);
         }
     }

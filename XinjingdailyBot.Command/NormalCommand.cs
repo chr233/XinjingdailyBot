@@ -168,7 +168,7 @@ internal class NormalCommand(
         else
         {
             var sb = new StringBuilder();
-            var admins = await _botClient.GetChatAdministratorsAsync(message.Chat.Id);
+            var admins = await _botClient.GetChatAdministrators(message.Chat.Id);
             foreach (var menber in admins)
             {
                 var admin = menber.User;
@@ -357,8 +357,8 @@ internal class NormalCommand(
                     };
                 }
 
-                var messages = await _botClient.SendMediaGroupAsync(chat, group);
-                await _botClient.SendTextMessageAsync(chat, "随机稿件操作", replyMarkup: keyboard);
+                var messages = await _botClient.SendMediaGroup(chat, group);
+                await _botClient.SendMessage(chat, "随机稿件操作", replyMarkup: keyboard);
 
                 //记录媒体组消息
                 await _mediaGroupService.AddPostMediaGroup(messages);
@@ -367,13 +367,13 @@ internal class NormalCommand(
             {
                 var attachment = await _attachmentService.FetchAttachmentByPostId(randomPost.Id);
                 var handler = randomPost.PostType switch {
-                    MessageType.Text => _botClient.SendTextMessageAsync(chat, randomPost.Text),
-                    MessageType.Photo => _botClient.SendPhotoAsync(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard, hasSpoiler: hasSpoiler),
-                    MessageType.Audio => _botClient.SendAudioAsync(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard, title: attachment.FileName),
-                    MessageType.Video => _botClient.SendVideoAsync(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard, hasSpoiler: hasSpoiler),
-                    MessageType.Voice => _botClient.SendVoiceAsync(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard),
-                    MessageType.Document => _botClient.SendDocumentAsync(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard),
-                    MessageType.Animation => _botClient.SendAnimationAsync(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard),
+                    MessageType.Text => _botClient.SendMessage(chat, randomPost.Text),
+                    MessageType.Photo => _botClient.SendPhoto(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard, hasSpoiler: hasSpoiler),
+                    MessageType.Audio => _botClient.SendAudio(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard, title: attachment.FileName),
+                    MessageType.Video => _botClient.SendVideo(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard, hasSpoiler: hasSpoiler),
+                    MessageType.Voice => _botClient.SendVoice(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard),
+                    MessageType.Document => _botClient.SendDocument(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard),
+                    MessageType.Animation => _botClient.SendAnimation(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard),
                     _ => null,
                 };
 
@@ -439,6 +439,6 @@ internal class NormalCommand(
                 sb.AppendLine("参数错误, 输入的IP无效");
             }
         }
-        await _botClient.AutoReplyAsync(sb.ToString(), message, ParseMode.Html);
+        await _botClient.AutoReply(sb.ToString(), message, ParseMode.Html);
     }
 }

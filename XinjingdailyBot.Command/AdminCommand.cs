@@ -193,8 +193,8 @@ internal class AdminCommand(
                         if (targetUser.PrivateChatID > 0)
                         {
                             var msg = string.Format(Langs.BanedUserTips, "管理员", reason);
-                            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg);
-                            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, Langs.QueryBanDescribe);
+                            await _botClient.SendMessage(targetUser.PrivateChatID, msg);
+                            await _botClient.SendMessage(targetUser.PrivateChatID, Langs.QueryBanDescribe);
                         }
                         else
                         {
@@ -282,8 +282,8 @@ internal class AdminCommand(
                     if (targetUser.PrivateChatID > 0)
                     {
                         var msg = string.Format(Langs.UnbanedUserTips, "管理员", reason);
-                        await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg);
-                        await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, Langs.QueryBanDescribe);
+                        await _botClient.SendMessage(targetUser.PrivateChatID, msg);
+                        await _botClient.SendMessage(targetUser.PrivateChatID, Langs.QueryBanDescribe);
                     }
                     else
                     {
@@ -390,15 +390,15 @@ internal class AdminCommand(
                         s.AppendLine(string.Format(Langs.WarnUserTips, reason));
                         s.AppendLine(string.Format(Langs.WarnUserTips2, warnCount, WarningLimit));
                         string msg = s.ToString();
-                        await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg, parseMode: ParseMode.Html);
+                        await _botClient.SendMessage(targetUser.PrivateChatID, msg, parseMode: ParseMode.Html);
 
                         if (warnCount >= WarningLimit)
                         {
                             msg = string.Format(Langs.BanedUserTips, "系统", "自动封禁");
-                            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg);
+                            await _botClient.SendMessage(targetUser.PrivateChatID, msg);
                         }
 
-                        await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, Langs.QueryBanDescribe);
+                        await _botClient.SendMessage(targetUser.PrivateChatID, Langs.QueryBanDescribe);
                     }
                     else
                     {
@@ -568,7 +568,7 @@ internal class AdminCommand(
             autoDelete = false;
             try
             {
-                await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"来自管理员的消息:\n<code>{msg.EscapeHtml()}</code>", parseMode: ParseMode.Html);
+                await _botClient.SendMessage(targetUser.PrivateChatID, $"来自管理员的消息:\n<code>{msg.EscapeHtml()}</code>", parseMode: ParseMode.Html);
                 return $"消息成功发送给 {targetUser.EscapedFullName()}";
             }
             catch (Exception ex)
@@ -939,7 +939,7 @@ internal class AdminCommand(
 
         try
         {
-            var inviteLink = await _botClient.CreateChatInviteLinkAsync(channelService.ReviewGroup.Id, $"{dbUser} 创建的邀请链接", DateTime.Now.AddHours(1), 1, false);
+            var inviteLink = await _botClient.CreateChatInviteLink(channelService.ReviewGroup.Id, $"{dbUser} 创建的邀请链接", DateTime.Now.AddHours(1), 1, false);
 
             var sb = new StringBuilder();
 
@@ -1129,7 +1129,7 @@ internal class AdminCommand(
                     {
                         try
                         {
-                            await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, $"您的权限组已被管理员修改为 {group.Name}");
+                            await _botClient.SendMessage(targetUser.PrivateChatID, $"您的权限组已被管理员修改为 {group.Name}");
                         }
                         catch (Exception ex)
                         {
@@ -1305,18 +1305,18 @@ internal class AdminCommand(
                             };
                             try
                             {
-                                await _botClient.RestrictChatMemberAsync(channelService.SubGroup, targetUser.UserID, permission);
+                                await _botClient.RestrictChatMember(channelService.SubGroup, targetUser.UserID, permission);
                             }
                             catch
                             {
 
                             }
-                            await _botClient.RestrictChatMemberAsync(channelService.SubGroup, targetUser.UserID, permission);
+                            await _botClient.RestrictChatMember(channelService.SubGroup, targetUser.UserID, permission);
                         }
                         break;
                     case "ban":
-                        await _botClient.BanChatMemberAsync(channelService.SubGroup, targetUser.UserID);
-                        await _botClient.BanChatMemberAsync(channelService.CommentGroup, targetUser.UserID);
+                        await _botClient.BanChatMember(channelService.SubGroup, targetUser.UserID);
+                        await _botClient.BanChatMember(channelService.CommentGroup, targetUser.UserID);
                         break;
                     case "unmute":
                         {
@@ -1331,13 +1331,13 @@ internal class AdminCommand(
                                 CanSendPolls = false,
                                 CanSendOtherMessages = false,
                             };
-                            await _botClient.RestrictChatMemberAsync(channelService.SubGroup, targetUser.UserID, permission);
-                            await _botClient.RestrictChatMemberAsync(channelService.SubGroup, targetUser.UserID, permission);
+                            await _botClient.RestrictChatMember(channelService.SubGroup, targetUser.UserID, permission);
+                            await _botClient.RestrictChatMember(channelService.SubGroup, targetUser.UserID, permission);
                         }
                         break;
                     case "unban":
-                        await _botClient.UnbanChatMemberAsync(channelService.SubGroup, targetUser.UserID);
-                        await _botClient.UnbanChatMemberAsync(channelService.CommentGroup, targetUser.UserID);
+                        await _botClient.UnbanChatMember(channelService.SubGroup, targetUser.UserID);
+                        await _botClient.UnbanChatMember(channelService.CommentGroup, targetUser.UserID);
                         break;
                     default:
                         await _botClient.AutoReplyAsync("参数有误", callbackQuery, true);
@@ -1370,7 +1370,7 @@ internal class AdminCommand(
                     if (targetUser.PrivateChatID > 0)
                     {
                         string msg = $"您因为 {reason} 被管理员设置了 {action}, 如有异议请联系频道管理员";
-                        await _botClient.SendTextMessageAsync(targetUser.PrivateChatID, msg);
+                        await _botClient.SendMessage(targetUser.PrivateChatID, msg);
                     }
                     else
                     {
@@ -1454,7 +1454,7 @@ internal class AdminCommand(
             {
                 try
                 {
-                    await _botClient.DeleteMessageAsync(chat, (int)post.WarnTextID);
+                    await _botClient.DeleteMessage(chat, (int)post.WarnTextID);
                 }
                 catch (Exception ex)
                 {
@@ -1474,7 +1474,7 @@ internal class AdminCommand(
                 {
                     try
                     {
-                        await _botClient.DeleteMessageAsync(group.ChatID, (int)group.MessageID);
+                        await _botClient.DeleteMessage(group.ChatID, (int)group.MessageID);
                     }
                     catch (Exception ex)
                     {
@@ -1489,7 +1489,7 @@ internal class AdminCommand(
             {
                 try
                 {
-                    await _botClient.DeleteMessageAsync(chat, (int)post.PublicMsgID);
+                    await _botClient.DeleteMessage(chat, (int)post.PublicMsgID);
                     return "删除消息成功";
                 }
                 catch (Exception ex)
@@ -1500,7 +1500,7 @@ internal class AdminCommand(
             }
         }
         string text = await exec();
-        await _botClient.AutoReplyAsync(text, callbackQuery.Message!, ParseMode.Html);
+        await _botClient.AutoReply(text, callbackQuery.Message!, ParseMode.Html);
         await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, null);
     }
 
@@ -1538,7 +1538,7 @@ internal class AdminCommand(
             return sb.ToString();
         }
         string text = await exec();
-        await _botClient.AutoReplyAsync(text, callbackQuery.Message!, ParseMode.Html);
+        await _botClient.AutoReply(text, callbackQuery.Message!, ParseMode.Html);
     }
 
     /// <summary>
@@ -1576,7 +1576,7 @@ internal class AdminCommand(
             var link = textHelperService.HtmlMessageLink(post.ReviewMsgID, $"c/{chatId}", $"前往投稿{post.Id}");
             try
             {
-                await _botClient.SendTextMessageAsync(dbUser.PrivateChatID, link, parseMode: ParseMode.Html);
+                await _botClient.SendMessage(dbUser.PrivateChatID, link, parseMode: ParseMode.Html);
                 await _botClient.AutoReplyAsync("消息链接已发送", callbackQuery, false);
             }
             catch (Exception ex)

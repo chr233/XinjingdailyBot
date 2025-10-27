@@ -41,7 +41,7 @@ internal sealed class ReviewStatusService : BaseService<ReviewStatus>, IReviewSt
         {
             try
             {
-                await _botClient.DeleteMessageAsync(oldPost.ChatID, (int)oldPost.MessageID);
+                await _botClient.DeleteMessage(oldPost.ChatID, (int)oldPost.MessageID);
             }
             catch (Exception ex)
             {

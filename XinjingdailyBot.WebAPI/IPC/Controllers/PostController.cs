@@ -172,7 +172,7 @@ public sealed class PostController(
                 });
             }
 
-            originMsg = await _botClient.SendTextMessageAsync(userChatId, postText, disableNotification: true, disableWebPagePreview: false);
+            originMsg = await _botClient.SendMessage(userChatId, postText, disableNotification: true, disableWebPagePreview: false);
 
         }
         else if (post.Media != null && mediaCount == 1) // 非媒体组消息
@@ -182,12 +182,12 @@ public sealed class PostController(
 
             var inputFile = new InputFileStream(fileStream, fileName);
             var handler = post.PostType switch {
-                MessageType.Photo => _botClient.SendPhotoAsync(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: post.HasSpoiler),
-                MessageType.Audio => _botClient.SendAudioAsync(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html, title: fileName),
-                MessageType.Video => _botClient.SendVideoAsync(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: post.HasSpoiler),
-                MessageType.Voice => _botClient.SendVoiceAsync(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html),
-                MessageType.Document => _botClient.SendDocumentAsync(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html),
-                MessageType.Animation => _botClient.SendAnimationAsync(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: post.HasSpoiler),
+                MessageType.Photo => _botClient.SendPhoto(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: post.HasSpoiler),
+                MessageType.Audio => _botClient.SendAudio(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html, title: fileName),
+                MessageType.Video => _botClient.SendVideo(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: post.HasSpoiler),
+                MessageType.Voice => _botClient.SendVoice(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html),
+                MessageType.Document => _botClient.SendDocument(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html),
+                MessageType.Animation => _botClient.SendAnimation(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: post.HasSpoiler),
                 _ => null,
             };
 
@@ -241,7 +241,7 @@ public sealed class PostController(
                 };
             }
 
-            var messages = await _botClient.SendMediaGroupAsync(userChatId, group);
+            var messages = await _botClient.SendMediaGroup(userChatId, group);
             originMsg = messages.First();
 
             // 记录Attachment
@@ -266,7 +266,7 @@ public sealed class PostController(
         var keyboard = _markupHelperService.ReviewKeyboardA(newTags, post.HasSpoiler);
         string msg = _textHelperService.MakeReviewMessage(dbUser, newPost.Anonymous);
 
-        var actionMsg = await _botClient.SendTextMessageAsync(userChatId, msg, parseMode: ParseMode.Html, disableWebPagePreview: true, replyToMessageId: originMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+        var actionMsg = await _botClient.SendMessage(userChatId, msg, parseMode: ParseMode.Html, disableWebPagePreview: true, replyToMessageId: originMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
         newPost.Id = newPostId;
         newPost.OriginMsgID = originMsg.MessageId;
@@ -410,7 +410,7 @@ public sealed class PostController(
                 });
             }
 
-            originMsg = await _botClient.SendTextMessageAsync(userChatId, postText, disableNotification: true, disableWebPagePreview: false);
+            originMsg = await _botClient.SendMessage(userChatId, postText, disableNotification: true, disableWebPagePreview: false);
 
         }
         else if (post.Media != null && mediaCount == 1) // 非媒体组消息
@@ -420,12 +420,12 @@ public sealed class PostController(
 
             var inputFile = new InputFileStream(fileStream, fileName);
             var handler = post.PostType switch {
-                MessageType.Photo => _botClient.SendPhotoAsync(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: post.HasSpoiler),
-                MessageType.Audio => _botClient.SendAudioAsync(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html, title: fileName),
-                MessageType.Video => _botClient.SendVideoAsync(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: post.HasSpoiler),
-                MessageType.Voice => _botClient.SendVoiceAsync(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html),
-                MessageType.Document => _botClient.SendDocumentAsync(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html),
-                MessageType.Animation => _botClient.SendAnimationAsync(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: post.HasSpoiler),
+                MessageType.Photo => _botClient.SendPhoto(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: post.HasSpoiler),
+                MessageType.Audio => _botClient.SendAudio(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html, title: fileName),
+                MessageType.Video => _botClient.SendVideo(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: post.HasSpoiler),
+                MessageType.Voice => _botClient.SendVoice(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html),
+                MessageType.Document => _botClient.SendDocument(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html),
+                MessageType.Animation => _botClient.SendAnimation(userChatId, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: post.HasSpoiler),
                 _ => null,
             };
 
@@ -479,7 +479,7 @@ public sealed class PostController(
                 };
             }
 
-            var messages = await _botClient.SendMediaGroupAsync(userChatId, group);
+            var messages = await _botClient.SendMediaGroup(userChatId, group);
             originMsg = messages.First();
 
             // 记录Attachment
@@ -504,7 +504,7 @@ public sealed class PostController(
         var keyboard = _markupHelperService.ReviewKeyboardA(newTags, post.HasSpoiler);
         string msg = _textHelperService.MakeReviewMessage(dbUser, newPost.Anonymous);
 
-        var actionMsg = await _botClient.SendTextMessageAsync(userChatId, msg, parseMode: ParseMode.Html, disableWebPagePreview: true, replyToMessageId: originMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+        var actionMsg = await _botClient.SendMessage(userChatId, msg, parseMode: ParseMode.Html, disableWebPagePreview: true, replyToMessageId: originMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
         newPost.Id = newPostId;
         newPost.OriginMsgID = originMsg.MessageId;

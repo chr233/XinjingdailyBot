@@ -77,12 +77,12 @@ internal class PostAdvertiseTask : IJob
 
                 try
                 {
-                    var msgId = await _botClient.CopyMessageAsync(chatId, ad.ChatID, (int)ad.MessageID, disableNotification: true);
+                    var msgId = await _botClient.CopyMessage(chatId, ad.ChatID, (int)ad.MessageID, disableNotification: true);
 
                     var kbd = _markupHelperService.AdvertiseExternalLinkButton(ad.ExternalLink, ad.ExternalLinkName);
                     if (kbd != null)
                     {
-                        await _botClient.EditMessageReplyMarkupAsync(chat, msgId.Id, kbd);
+                        await _botClient.EditMessageReplyMarkup(chat, msgId.Id, kbd);
                     }
 
                     await _advertisePostService.AddAdPost(ad, chatId, msgId.Id);
@@ -92,7 +92,7 @@ internal class PostAdvertiseTask : IJob
 
                     if (ad.PinMessage)
                     {
-                        await _botClient.PinChatMessageAsync(chatId, msgId.Id, true);
+                        await _botClient.PinChatMessage(chatId, msgId.Id, true);
                     }
 
                     await _advertisesService.UpdateAdvertiseStatistics(ad);

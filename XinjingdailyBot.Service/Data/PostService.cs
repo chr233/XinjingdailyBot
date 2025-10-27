@@ -75,7 +75,7 @@ internal sealed class PostService(
 
             if (paddingCount >= paddingLimit)
             {
-                await _botClient.AutoReplyAsync($"您的投稿队列已满 {paddingCount} / {paddingLimit}, 请先处理尚未确认的稿件", message);
+                await _botClient.AutoReply($"您的投稿队列已满 {paddingCount} / {paddingLimit}, 请先处理尚未确认的稿件", message);
                 return false;
             }
 
@@ -86,7 +86,7 @@ internal sealed class PostService(
 
             if (postCount >= dailyLimit)
             {
-                await _botClient.AutoReplyAsync($"您已达到每日投稿上限 {postCount} / {dailyLimit}, 暂时无法继续投稿, 请明日再来", message);
+                await _botClient.AutoReply($"您已达到每日投稿上限 {postCount} / {dailyLimit}, 暂时无法继续投稿, 请明日再来", message);
                 return false;
             }
         }
@@ -112,24 +112,24 @@ internal sealed class PostService(
     {
         if (!dbUser.Right.HasFlag(EUserRights.SendPost))
         {
-            await _botClient.AutoReplyAsync(Langs.NoPostRight, message);
+            await _botClient.AutoReply(Langs.NoPostRight, message);
             return;
         }
         if (_channelService.ReviewGroup.Id == -1)
         {
-            await _botClient.AutoReplyAsync(Langs.ReviewGroupNotSet, message);
+            await _botClient.AutoReply(Langs.ReviewGroupNotSet, message);
             return;
         }
 
         if (string.IsNullOrEmpty(message.Text))
         {
-            await _botClient.AutoReplyAsync(Langs.TextPostCantBeNull, message);
+            await _botClient.AutoReply(Langs.TextPostCantBeNull, message);
             return;
         }
 
         if (message.Text.Length > IPostService.MaxPostText)
         {
-            await _botClient.AutoReplyAsync($"文本长度超过上限 {IPostService.MaxPostText}, 无法创建投稿", message);
+            await _botClient.AutoReply($"文本长度超过上限 {IPostService.MaxPostText}, 无法创建投稿", message);
             return;
         }
 
@@ -144,7 +144,7 @@ internal sealed class PostService(
             {
                 if (channelId == _channelService.AcceptChannel.Id || channelId == _channelService.RejectChannel.Id)
                 {
-                    await _botClient.AutoReplyAsync("禁止从发布频道或者拒稿频道转载投稿内容", message);
+                    await _botClient.AutoReply("禁止从发布频道或者拒稿频道转载投稿内容", message);
                     return;
                 }
             }
@@ -175,7 +175,7 @@ internal sealed class PostService(
             Status = directPost ? EPostStatus.Reviewing : EPostStatus.Padding,
             PostType = message.Type,
             Tags = newTags,
-            HasSpoiler = message.HasMediaSpoiler ?? false,
+            HasSpoiler = message.HasMediaSpoiler,
             PosterUID = dbUser.UserID
         };
 
@@ -197,7 +197,7 @@ internal sealed class PostService(
                 return;
         }
 
-        var actionMsg = await _botClient.SendTextMessageAsync(message.Chat, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+        var actionMsg = await _botClient.SendMessage(message.Chat, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
         //修改数据库实体
         newPost.OriginChatID = message.Chat.Id;
@@ -220,12 +220,12 @@ internal sealed class PostService(
     {
         if (!dbUser.Right.HasFlag(EUserRights.SendPost))
         {
-            await _botClient.AutoReplyAsync("没有权限", message);
+            await _botClient.AutoReply("没有权限", message);
             return;
         }
         if (_channelService.ReviewGroup.Id == -1)
         {
-            await _botClient.AutoReplyAsync("尚未设置投稿群组, 无法接收投稿", message);
+            await _botClient.AutoReply("尚未设置投稿群组, 无法接收投稿", message);
             return;
         }
 
@@ -240,7 +240,7 @@ internal sealed class PostService(
             {
                 if (channelId == _channelService.AcceptChannel.Id || channelId == _channelService.RejectChannel.Id)
                 {
-                    await _botClient.AutoReplyAsync("禁止从发布频道或者拒稿频道转载投稿内容", message);
+                    await _botClient.AutoReply("禁止从发布频道或者拒稿频道转载投稿内容", message);
                     return;
                 }
             }
@@ -256,7 +256,7 @@ internal sealed class PostService(
         //直接发布模式
         bool directPost = dbUser.Right.HasFlag(EUserRights.DirectPost);
 
-        bool? hasSpoiler = message.CanSpoiler() ? message.HasMediaSpoiler ?? false : null;
+        bool? hasSpoiler = message.CanSpoiler() ? message.HasMediaSpoiler : null;
 
         //发送确认消息
         var keyboard = directPost ?
@@ -274,7 +274,7 @@ internal sealed class PostService(
             Status = directPost ? EPostStatus.Reviewing : EPostStatus.Padding,
             PostType = message.Type,
             Tags = newTags,
-            HasSpoiler = message.HasMediaSpoiler ?? false,
+            HasSpoiler = message.HasMediaSpoiler,
             PosterUID = dbUser.UserID
         };
 
@@ -296,7 +296,7 @@ internal sealed class PostService(
                 return;
         }
 
-        var actionMsg = await _botClient.SendTextMessageAsync(message.Chat, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+        var actionMsg = await _botClient.SendMessage(message.Chat, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
 
         //修改数据库实体
         newPost.OriginChatID = message.Chat.Id;
@@ -331,12 +331,12 @@ internal sealed class PostService(
     {
         if (!dbUser.Right.HasFlag(EUserRights.SendPost))
         {
-            await _botClient.AutoReplyAsync("没有权限", message);
+            await _botClient.AutoReply("没有权限", message);
             return;
         }
         if (_channelService.ReviewGroup.Id == -1)
         {
-            await _botClient.AutoReplyAsync("尚未设置投稿群组, 无法接收投稿", message);
+            await _botClient.AutoReply("尚未设置投稿群组, 无法接收投稿", message);
             return;
         }
 
@@ -361,7 +361,7 @@ internal sealed class PostService(
                     {
                         if (channelId == _channelService.AcceptChannel.Id || channelId == _channelService.RejectChannel.Id)
                         {
-                            await _botClient.AutoReplyAsync("禁止从发布频道或者拒稿频道转载投稿内容", message);
+                            await _botClient.AutoReply("禁止从发布频道或者拒稿频道转载投稿内容", message);
                             return;
                         }
                     }
@@ -377,7 +377,7 @@ internal sealed class PostService(
 
                 //直接发布模式
                 bool directPost = dbUser.Right.HasFlag(EUserRights.DirectPost);
-                bool? hasSpoiler = message.CanSpoiler() ? message.HasMediaSpoiler ?? false : null;
+                bool? hasSpoiler = message.CanSpoiler() ? message.HasMediaSpoiler : null;
 
                 //发送确认消息
                 var keyboard = directPost ?
@@ -385,7 +385,7 @@ internal sealed class PostService(
                     _markupHelperService.PostKeyboard(anonymous);
                 string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
-                var actionMsg = await _botClient.SendTextMessageAsync(message.Chat, "处理中, 请稍后", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
+                var actionMsg = await _botClient.SendMessage(message.Chat, "处理中, 请稍后", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
 
                 //生成数据库实体
                 var newPost = new NewPosts {
@@ -546,12 +546,12 @@ internal sealed class PostService(
 
                 var inputFile = new InputFileId(attachment.FileID);
                 var handler = post.PostType switch {
-                    MessageType.Photo => _botClient.SendPhotoAsync(_channelService.RejectChannel.Id, inputFile),
-                    MessageType.Audio => _botClient.SendAudioAsync(_channelService.RejectChannel.Id, inputFile),
-                    MessageType.Video => _botClient.SendVideoAsync(_channelService.RejectChannel.Id, inputFile),
-                    MessageType.Voice => _botClient.SendVoiceAsync(_channelService.RejectChannel.Id, inputFile),
-                    MessageType.Document => _botClient.SendDocumentAsync(_channelService.RejectChannel.Id, inputFile),
-                    MessageType.Animation => _botClient.SendAnimationAsync(_channelService.RejectChannel.Id, inputFile),
+                    MessageType.Photo => _botClient.SendPhoto(_channelService.RejectChannel.Id, inputFile),
+                    MessageType.Audio => _botClient.SendAudio(_channelService.RejectChannel.Id, inputFile),
+                    MessageType.Video => _botClient.SendVideo(_channelService.RejectChannel.Id, inputFile),
+                    MessageType.Voice => _botClient.SendVoice(_channelService.RejectChannel.Id, inputFile),
+                    MessageType.Document => _botClient.SendDocument(_channelService.RejectChannel.Id, inputFile),
+                    MessageType.Animation => _botClient.SendAnimation(_channelService.RejectChannel.Id, inputFile),
                     _ => throw new Exception("未知的稿件类型"),
                 };
 
@@ -582,7 +582,7 @@ internal sealed class PostService(
                     _ => throw new Exception("未知的稿件类型"),
                 };
             }
-            var postMessages = await _botClient.SendMediaGroupAsync(_channelService.RejectChannel, group);
+            var postMessages = await _botClient.SendMediaGroup(_channelService.RejectChannel, group);
 
             var postMessage = postMessages.FirstOrDefault();
             if (postMessage != null)
@@ -606,7 +606,7 @@ internal sealed class PostService(
         string posterMsg = _textHelperService.MakeNotification(htmlRejectMessage ?? rejectReason.FullText);
         if (poster.Notification)
         {
-            await _botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, parseMode: ParseMode.Html, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true);
+            await _botClient.SendMessage(post.OriginChatID, posterMsg, parseMode: ParseMode.Html, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true);
         }
         else
         {
@@ -698,14 +698,14 @@ internal sealed class PostService(
                 string? warnText = _tagRepository.GetActivedTagWarnings(post.Tags);
                 if (!string.IsNullOrEmpty(warnText))
                 {
-                    var warnMsg = await _botClient.SendTextMessageAsync(acceptChannel, warnText, allowSendingWithoutReply: true);
+                    var warnMsg = await _botClient.SendMessage(acceptChannel, warnText, allowSendingWithoutReply: true);
                     post.WarnTextID = warnMsg.MessageId;
                 }
 
                 Message? postMessage = null;
                 if (post.PostType == MessageType.Text)
                 {
-                    postMessage = await _botClient.SendTextMessageAsync(acceptChannel, postText, parseMode: ParseMode.Html, disableWebPagePreview: !_enableWebPagePreview);
+                    postMessage = await _botClient.SendMessage(acceptChannel, postText, parseMode: ParseMode.Html, disableWebPagePreview: !_enableWebPagePreview);
                 }
                 else
                 {
@@ -713,12 +713,12 @@ internal sealed class PostService(
 
                     var inputFile = new InputFileId(attachment.FileID);
                     var handler = post.PostType switch {
-                        MessageType.Photo => _botClient.SendPhotoAsync(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
-                        MessageType.Audio => _botClient.SendAudioAsync(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, title: attachment.FileName),
-                        MessageType.Video => _botClient.SendVideoAsync(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
-                        MessageType.Voice => _botClient.SendVoiceAsync(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html),
-                        MessageType.Document => _botClient.SendDocumentAsync(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html),
-                        MessageType.Animation => _botClient.SendAnimationAsync(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Photo => _botClient.SendPhoto(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Audio => _botClient.SendAudio(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, title: attachment.FileName),
+                        MessageType.Video => _botClient.SendVideo(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Voice => _botClient.SendVoice(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html),
+                        MessageType.Document => _botClient.SendDocument(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html),
+                        MessageType.Animation => _botClient.SendAnimation(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
                         _ => null,
                     };
 
@@ -759,11 +759,11 @@ internal sealed class PostService(
                 string? warnText = _tagRepository.GetActivedTagWarnings(post.Tags);
                 if (!string.IsNullOrEmpty(warnText))
                 {
-                    var warnMsg = await _botClient.SendTextMessageAsync(acceptChannel, warnText, allowSendingWithoutReply: true);
+                    var warnMsg = await _botClient.SendMessage(acceptChannel, warnText, allowSendingWithoutReply: true);
                     post.WarnTextID = warnMsg.MessageId;
                 }
 
-                var postMessages = await _botClient.SendMediaGroupAsync(acceptChannel, group);
+                var postMessages = await _botClient.SendMediaGroup(acceptChannel, group);
                 post.PublicMsgID = postMessages.First().MessageId;
                 post.PublishMediaGroupID = postMessages.First().MediaGroupId ?? "";
                 publicMsg = postMessages.First();
@@ -793,7 +793,7 @@ internal sealed class PostService(
         else // 直接投稿, 在审核群留档
         {
             string reviewMsg = _textHelperService.MakeReviewMessage(poster, post.Anonymous, second, publicMsg);
-            var msg = await _botClient.SendTextMessageAsync(_channelService.ReviewGroup.Id, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: !_enableWebPagePreview);
+            var msg = await _botClient.SendMessage(_channelService.ReviewGroup.Id, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: !_enableWebPagePreview);
             post.ReviewMsgID = msg.MessageId;
         }
 
@@ -812,7 +812,7 @@ internal sealed class PostService(
         if (poster.Notification && poster.UserID != dbUser.UserID)//启用通知并且审核与投稿不是同一个人
         {
             //单独发送通知消息
-            await _botClient.SendTextMessageAsync(post.OriginChatID, posterMsg, parseMode: ParseMode.Html, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true, disableWebPagePreview: true);
+            await _botClient.SendMessage(post.OriginChatID, posterMsg, parseMode: ParseMode.Html, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true, disableWebPagePreview: true);
         }
         else
         {
@@ -870,14 +870,14 @@ internal sealed class PostService(
                 string? warnText = _tagRepository.GetActivedTagWarnings(post.Tags);
                 if (!string.IsNullOrEmpty(warnText))
                 {
-                    var warnMsg = await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, warnText, allowSendingWithoutReply: true);
+                    var warnMsg = await _botClient.SendMessage(_channelService.AcceptChannel.Id, warnText, allowSendingWithoutReply: true);
                     post.WarnTextID = warnMsg.MessageId;
                 }
 
                 Message? postMessage = null;
                 if (post.PostType == MessageType.Text)
                 {
-                    postMessage = await _botClient.SendTextMessageAsync(_channelService.AcceptChannel.Id, postText, parseMode: ParseMode.Html, disableWebPagePreview: true);
+                    postMessage = await _botClient.SendMessage(_channelService.AcceptChannel.Id, postText, parseMode: ParseMode.Html, disableWebPagePreview: true);
                 }
                 else
                 {
@@ -885,12 +885,12 @@ internal sealed class PostService(
 
                     var inputFile = new InputFileId(attachment.FileID);
                     var handler = post.PostType switch {
-                        MessageType.Photo => _botClient.SendPhotoAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
-                        MessageType.Audio => _botClient.SendAudioAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, title: attachment.FileName),
-                        MessageType.Video => _botClient.SendVideoAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
-                        MessageType.Voice => _botClient.SendVoiceAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html),
-                        MessageType.Document => _botClient.SendDocumentAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html),
-                        MessageType.Animation => _botClient.SendAnimationAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Photo => _botClient.SendPhoto(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Audio => _botClient.SendAudio(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, title: attachment.FileName),
+                        MessageType.Video => _botClient.SendVideo(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Voice => _botClient.SendVoice(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html),
+                        MessageType.Document => _botClient.SendDocument(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html),
+                        MessageType.Animation => _botClient.SendAnimation(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
                         _ => null,
                     };
 
@@ -930,11 +930,11 @@ internal sealed class PostService(
                 string? warnText = _tagRepository.GetActivedTagWarnings(post.Tags);
                 if (!string.IsNullOrEmpty(warnText))
                 {
-                    var warnMsg = await _botClient.SendTextMessageAsync(_channelService.AcceptChannel, warnText, allowSendingWithoutReply: true);
+                    var warnMsg = await _botClient.SendMessage(_channelService.AcceptChannel, warnText, allowSendingWithoutReply: true);
                     post.WarnTextID = warnMsg.MessageId;
                 }
 
-                var postMessages = await _botClient.SendMediaGroupAsync(_channelService.AcceptChannel, group);
+                var postMessages = await _botClient.SendMediaGroup(_channelService.AcceptChannel, group);
                 post.PublicMsgID = postMessages.First().MessageId;
                 post.PublishMediaGroupID = postMessages.First().MediaGroupId ?? "";
 

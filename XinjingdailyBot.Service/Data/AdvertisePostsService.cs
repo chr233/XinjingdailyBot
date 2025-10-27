@@ -34,7 +34,7 @@ internal sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdve
         {
             try
             {
-                await _botClient.DeleteMessageAsync(oldPost.ChatID, (int)oldPost.MessageID);
+                await _botClient.DeleteMessage(oldPost.ChatID, (int)oldPost.MessageID);
             }
             catch (Exception ex)
             {
@@ -62,7 +62,7 @@ internal sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdve
         {
             try
             {
-                await _botClient.UnpinChatMessageAsync(oldPost.ChatID, (int)oldPost.MessageID);
+                await _botClient.UnpinChatMessage(oldPost.ChatID, (int)oldPost.MessageID);
             }
             catch (Exception ex)
             {

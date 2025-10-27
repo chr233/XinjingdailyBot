@@ -33,7 +33,7 @@ internal class JoinRequestHandler : IJoinRequestHandler
 
                 if (dbUser.PrivateChatID != -1)
                 {
-                    await _botClient.SendTextMessageAsync(dbUser.PrivateChatID, $"欢迎加入 {request.Chat.Title}, 如果有其他验证记得手动完成");
+                    await _botClient.SendMessage(dbUser.PrivateChatID, $"欢迎加入 {request.Chat.Title}, 如果有其他验证记得手动完成");
                 }
             }
             catch (Exception)

@@ -51,7 +51,7 @@ internal class ChannelPostHandler(
 
             if (option == EChannelOption.AutoReject)
             {
-                await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
+                await _botClient.DeleteMessage(message.Chat, message.MessageId);
                 _logger.LogInformation("删除消息 {msgid}", message.MessageId);
                 return;
             }
@@ -103,7 +103,7 @@ internal class ChannelPostHandler(
 
             if (option == EChannelOption.AutoReject)
             {
-                await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
+                await _botClient.DeleteMessage(message.Chat, message.MessageId);
                 _logger.LogInformation("删除消息 {msgid}", message.MessageId);
                 return;
             }
@@ -131,7 +131,7 @@ internal class ChannelPostHandler(
             Status = !second ? EPostStatus.Accepted : EPostStatus.AcceptedSecond,
             PostType = message.Type,
             Tags = newTags,
-            HasSpoiler = message.HasMediaSpoiler ?? false,
+            HasSpoiler = message.HasMediaSpoiler,
             PosterUID = dbUser.UserID,
             ReviewerUID = dbUser.UserID
         };
@@ -177,7 +177,7 @@ internal class ChannelPostHandler(
 
                     if (option == EChannelOption.AutoReject)
                     {
-                        await _botClient.DeleteMessageAsync(message.Chat, message.MessageId);
+                        await _botClient.DeleteMessage(message.Chat, message.MessageId);
                         _logger.LogInformation("删除消息 {msgid}", message.MessageId);
                         return;
                     }
@@ -206,7 +206,7 @@ internal class ChannelPostHandler(
                     Status = !second ? EPostStatus.Accepted : EPostStatus.AcceptedSecond,
                     PostType = message.Type,
                     Tags = newTags,
-                    HasSpoiler = message.HasMediaSpoiler ?? false,
+                    HasSpoiler = message.HasMediaSpoiler,
                     PosterUID = dbUser.UserID,
                     ReviewerUID = dbUser.UserID
                 };

@@ -37,11 +37,11 @@ internal class DispatcherService(
         {
             if (_tagRepository.IsWarnText(message.Text))
             {
-                await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+                await _botClient.DeleteMessage(message.Chat.Id, message.MessageId);
             }
             else
             {
-                await _botClient.UnpinChatMessageAsync(message.Chat.Id, message.MessageId);
+                await _botClient.UnpinChatMessage(message.Chat.Id, message.MessageId);
             }
         }
         catch (Exception ex)

@@ -23,7 +23,7 @@ internal class UpdateService(
     {
         _logger.LogUpdate(update);
 
-        if (update.Type == UpdateType.Message && update.Message!.Type == MessageType.ChatTitleChanged)
+        if (update.Type == UpdateType.Message && update.Message!.Type == MessageType.NewChatTitle)
         {
             _channelService.OnChatTitleChanged(update.Message.Chat, update.Message.NewChatTitle);
         }

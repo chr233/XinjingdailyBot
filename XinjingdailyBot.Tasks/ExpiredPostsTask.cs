@@ -109,7 +109,7 @@ internal class ExpiredPostsTask(
 
                     try
                     {
-                        await _botClient.SendTextMessageAsync(user.PrivateChatID, sb.ToString(), parseMode: ParseMode.Html, disableNotification: true);
+                        await _botClient.SendMessage(user.PrivateChatID, sb.ToString(), parseMode: ParseMode.Html, disableNotification: true);
                         await Task.Delay(500);
                     }
                     catch (Exception ex)
