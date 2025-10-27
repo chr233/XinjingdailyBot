@@ -49,7 +49,7 @@ internal sealed class PostService(
         //待定确认稿件上限
         int paddingLimit = _postOption.DailyPaddingLimit;
         //上限基数
-        int baseRatio = Math.Min(dbUser.AcceptCount / _postOption.RatioDivisor + 1, _postOption.MaxRatio);
+        int baseRatio = Math.Min((dbUser.AcceptCount / _postOption.RatioDivisor) + 1, _postOption.MaxRatio);
         //审核中稿件上限
         int reviewLimit = baseRatio * _postOption.DailyReviewLimit;
         //每日投稿上限
@@ -197,7 +197,7 @@ internal sealed class PostService(
                 return;
         }
 
-        var actionMsg = await _botClient.SendMessage(message.Chat, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+        var actionMsg = await _botClient.SendMessage(message, postText, replyMarkup: keyboard);
 
         //修改数据库实体
         newPost.OriginChatID = message.Chat.Id;
@@ -296,7 +296,7 @@ internal sealed class PostService(
                 return;
         }
 
-        var actionMsg = await _botClient.SendMessage(message.Chat, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+        var actionMsg = await _botClient.SendMessage(message, postText, replyMarkup: keyboard);
 
         //修改数据库实体
         newPost.OriginChatID = message.Chat.Id;
@@ -385,7 +385,7 @@ internal sealed class PostService(
                     _markupHelperService.PostKeyboard(anonymous);
                 string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
-                var actionMsg = await _botClient.SendMessage(message.Chat, "处理中, 请稍后", replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
+                var actionMsg = await _botClient.SendMessage(message, "处理中, 请稍后");
 
                 //生成数据库实体
                 var newPost = new NewPosts {
@@ -535,7 +535,12 @@ internal sealed class PostService(
 
         //修改审核群消息
         string reviewMsg = _textHelperService.MakeReviewMessage(poster, dbUser, post.Anonymous, htmlRejectMessage ?? rejectReason.FullText);
-        await _botClient.EditMessageText(post.ReviewActionChatID, (int)post.ReviewActionMsgID, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
+
+        var linkPreviewOptions = new LinkPreviewOptions {
+            IsDisabled = true,
+        };
+
+        await _botClient.EditMessageText(post.ReviewActionChatID, (int)post.ReviewActionMsgID, reviewMsg, ParseMode.Html, linkPreviewOptions: linkPreviewOptions);
 
         //拒稿频道发布消息
         if (!post.IsMediaGroup)
@@ -606,11 +611,11 @@ internal sealed class PostService(
         string posterMsg = _textHelperService.MakeNotification(htmlRejectMessage ?? rejectReason.FullText);
         if (poster.Notification)
         {
-            await _botClient.SendMessage(post.OriginChatID, posterMsg, parseMode: ParseMode.Html, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true);
+            await _botClient.SendMessage(post.OriginChatID, posterMsg, null, parseMode: ParseMode.Html, replyToMessageId: (int)post.OriginMsgID);
         }
         else
         {
-            await _botClient.EditMessageText(post.OriginActionChatID, (int)post.OriginActionMsgID, posterMsg, parseMode: ParseMode.Html);
+            await _botClient.EditMessageText(post.OriginActionChatID, (int)post.OriginActionMsgID, posterMsg, parseMode: ParseMode.Html, false);
         }
 
         poster.RejectCount++;
@@ -698,14 +703,14 @@ internal sealed class PostService(
                 string? warnText = _tagRepository.GetActivedTagWarnings(post.Tags);
                 if (!string.IsNullOrEmpty(warnText))
                 {
-                    var warnMsg = await _botClient.SendMessage(acceptChannel, warnText, allowSendingWithoutReply: true);
+                    var warnMsg = await _botClient.SendMessage(acceptChannel, warnText);
                     post.WarnTextID = warnMsg.MessageId;
                 }
 
                 Message? postMessage = null;
                 if (post.PostType == MessageType.Text)
                 {
-                    postMessage = await _botClient.SendMessage(acceptChannel, postText, parseMode: ParseMode.Html, disableWebPagePreview: !_enableWebPagePreview);
+                    postMessage = await _botClient.SendMessage(acceptChannel, postText, null, null, parseMode: ParseMode.Html, disableWebPagePreview: !_enableWebPagePreview);
                 }
                 else
                 {
@@ -759,7 +764,7 @@ internal sealed class PostService(
                 string? warnText = _tagRepository.GetActivedTagWarnings(post.Tags);
                 if (!string.IsNullOrEmpty(warnText))
                 {
-                    var warnMsg = await _botClient.SendMessage(acceptChannel, warnText, allowSendingWithoutReply: true);
+                    var warnMsg = await _botClient.SendMessage(acceptChannel, warnText);
                     post.WarnTextID = warnMsg.MessageId;
                 }
 
@@ -793,7 +798,7 @@ internal sealed class PostService(
         else // 直接投稿, 在审核群留档
         {
             string reviewMsg = _textHelperService.MakeReviewMessage(poster, post.Anonymous, second, publicMsg);
-            var msg = await _botClient.SendMessage(_channelService.ReviewGroup.Id, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: !_enableWebPagePreview);
+            var msg = await _botClient.SendMessage(_channelService.ReviewGroup, reviewMsg, null, null, parseMode: ParseMode.Html, disableWebPagePreview: !_enableWebPagePreview);
             post.ReviewMsgID = msg.MessageId;
         }
 
@@ -812,7 +817,7 @@ internal sealed class PostService(
         if (poster.Notification && poster.UserID != dbUser.UserID)//启用通知并且审核与投稿不是同一个人
         {
             //单独发送通知消息
-            await _botClient.SendMessage(post.OriginChatID, posterMsg, parseMode: ParseMode.Html, replyToMessageId: (int)post.OriginMsgID, allowSendingWithoutReply: true, disableWebPagePreview: true);
+            await _botClient.SendMessage(post.OriginChatID, posterMsg, null, (int)post.OriginMsgID, parseMode: ParseMode.Html, disableWebPagePreview: true);
         }
         else
         {
@@ -870,14 +875,14 @@ internal sealed class PostService(
                 string? warnText = _tagRepository.GetActivedTagWarnings(post.Tags);
                 if (!string.IsNullOrEmpty(warnText))
                 {
-                    var warnMsg = await _botClient.SendMessage(_channelService.AcceptChannel.Id, warnText, allowSendingWithoutReply: true);
+                    var warnMsg = await _botClient.SendMessage(_channelService.AcceptChannel, warnText);
                     post.WarnTextID = warnMsg.MessageId;
                 }
 
                 Message? postMessage = null;
                 if (post.PostType == MessageType.Text)
                 {
-                    postMessage = await _botClient.SendMessage(_channelService.AcceptChannel.Id, postText, parseMode: ParseMode.Html, disableWebPagePreview: true);
+                    postMessage = await _botClient.SendMessage(_channelService.AcceptChannel, postText, null, null, parseMode: ParseMode.Html, disableWebPagePreview: true);
                 }
                 else
                 {
@@ -930,7 +935,7 @@ internal sealed class PostService(
                 string? warnText = _tagRepository.GetActivedTagWarnings(post.Tags);
                 if (!string.IsNullOrEmpty(warnText))
                 {
-                    var warnMsg = await _botClient.SendMessage(_channelService.AcceptChannel, warnText, allowSendingWithoutReply: true);
+                    var warnMsg = await _botClient.SendMessage(_channelService.AcceptChannel, warnText);
                     post.WarnTextID = warnMsg.MessageId;
                 }
 

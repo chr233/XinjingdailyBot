@@ -152,7 +152,7 @@ internal class ReviewCommand(
         {
             var msg = "该稿件已过期, 无法操作";
             await _botClient.AutoReply(msg, query);
-            await _botClient.EditMessageText(message, msg, null);
+            await _botClient.EditMessageText(message, msg);
             return;
         }
 

@@ -114,7 +114,7 @@ internal class CommonCommand(
     public async Task ResponseVersion(Message message)
     {
         var sb = new StringBuilder();
-        string version = Utils.Version;
+        string version = BuildInfo.Version ?? "null";
         string variant = BuildInfo.Variant;
         sb.AppendLine($"程序版本: <code>{version}</code>");
         sb.AppendLine($"子版本: <code>{variant}</code>");

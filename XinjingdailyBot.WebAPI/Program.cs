@@ -1,94 +1,91 @@
 using NLog.Extensions.Logging;
-using System.Diagnostics.CodeAnalysis;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Localization;
+using XinjingdailyBot.Infrastructure.Utils;
 using XinjingdailyBot.WebAPI.Extensions;
 
-namespace XinjingdailyBot.WebAPI;
+const string banner = @"
+__  _ _             _  _            ___       _  _      
+\ \/ <_>._ _  ___  <_><_>._ _  ___ | . \ ___ <_>| | _ _ 
+ \ \ | || ' |/ . | | || || ' |/ . || | |<_> || || || | |
+_/\_\|_||_|_|\_. | | ||_||_|_|\_. ||___/<___||_||_|`_. |
+             <___'<__'        <___'                <___'
+New
+"
+;
 
-/// <summary>
-/// 根程序集
-/// </summary>
-public static class Program
-{
-    private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+Console.WriteLine(Langs.Line);
+Console.WriteLine(banner);
+Console.WriteLine(Langs.Line);
+Console.WriteLine("框架: {0}", BuildInfo.FrameworkName);
+Console.WriteLine("版本: {0} {1} {2}", BuildInfo.Version, BuildInfo.Configuration, BuildInfo.Variant);
+Console.WriteLine("作者: {0} {1}", BuildInfo.Author, BuildInfo.Company);
+Console.WriteLine("版权: {0}", BuildInfo.Copyright);
+Console.WriteLine("源码: {0}", BuildInfo.Repo);
+Console.WriteLine(Langs.Line);
+Console.WriteLine("欢迎使用 XinjingdailyBot");
+Console.WriteLine(Langs.Line);
+Console.WriteLine("欢迎订阅心惊报 https://t.me/xinjingdaily");
+Console.WriteLine(Langs.Line);
 
-    /// <summary>
-    /// 启动入口
-    /// </summary>
-    /// <param name="args"></param>
-    [RequiresUnreferencedCode("不兼容剪裁")]
-    public static void Main(string[] args)
-    {
-        _logger.Info(Langs.Line);
-        _logger.Info("欢迎使用 XinjingdailyBot");
-        _logger.Info(Langs.Version, Utils.Version, BuildInfo.Variant);
-        _logger.Info(Langs.Copyright, BuildInfo.Author);
-        _logger.Info(Langs.Line);
-        _logger.Warn("欢迎订阅心惊报 https://t.me/xinjingdaily");
-        _logger.Info(Langs.Line);
+Console.Title += BuildInfo.Variant;
 
-        Thread.Sleep(2000);
+#if !DEBUG
+Thread.Sleep(2000);
+#endif
 
-        CleanOldFiles();
+Utils.CleanOldFiles();
 
-        var builder = WebApplication.CreateBuilder(args);
-        var services = builder.Services;
+var builder = WebApplication.CreateBuilder(args);
 
-        // 配置类支持
-        services.AddOptions();
-        services.Configure<OptionsSetting>(builder.Configuration);
+// 服务注册
+var services = builder.Services;
 
-        // NLog
-        services.AddLogging(loggingBuilder => {
-            loggingBuilder.ClearProviders();
-            loggingBuilder.SetMinimumLevel(LogLevel.Debug);
-            loggingBuilder.AddNLog();
-        });
+// NLog
+services.AddLogging(loggingBuilder => {
+    loggingBuilder.ClearProviders();
+#if !DEBUG
+    loggingBuilder.SetMinimumLevel(LogLevel.Debug);
+#endif
+    loggingBuilder.AddNLog("nlog.config");
+});
 
-        // SqlSugar
-        services.AddSqlSugarSetup(builder.Configuration);
+// 配置类支持
+builder.AddCustomJsonFiles();
 
-        // 添加服务
-        services.AddAppService();
+// 设置 Kestrel
+builder.WebHost.SetupKestrel();
 
-        // 注册HttpClient
-        services.AddHttpClients();
+// SqlSugar
+services.AddSqlSugarSetup();
 
-        // Telegram
-        services.AddTelegramBotClient();
+// Redis
+services.AddRedis();
 
-        // 定时任务
-        services.AddQuartzSetup(builder.Configuration);
+#if DEBUG
+// 添加服务
+services.AddAppService();
+// 添加定时任务
+services.AddQuartzSetup(builder.Configuration);
+#else
+// 添加服务
+services.AddAppServiceGenerated();
+// 添加定时任务
+services.AddQuartzSetupGenerated(builder.Configuration);
+#endif
 
-        // Web API
-        services.AddWebAPI(builder.WebHost);
+// 注册HttpClient
+services.AddHttpClients();
 
-        var app = builder.Build();
+// Telegram
+services.AddTelegramBotClient();
 
-        // Web API
-        app.UseWebAPI();
+// Web API
+services.AddWebAPI(builder.WebHost);
 
-        app.Run();
-    }
+var app = builder.Build();
 
-    /// <summary>
-    /// 清除升级文件
-    /// </summary>
-    private static void CleanOldFiles()
-    {
-        string bakPath = Utils.BackupFullPath;
-        if (File.Exists(bakPath))
-        {
-            try
-            {
-                File.Delete(bakPath);
-                _logger.Warn("清理升级残留文件");
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, "清理升级残留文件失败");
-            }
-        }
-    }
-}
+// Web API
+app.UseWebAPI();
+
+app.Run();

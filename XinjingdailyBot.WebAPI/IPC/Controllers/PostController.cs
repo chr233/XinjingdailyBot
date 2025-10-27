@@ -172,7 +172,7 @@ public sealed class PostController(
                 });
             }
 
-            originMsg = await _botClient.SendMessage(userChatId, postText, disableNotification: true, disableWebPagePreview: false);
+            originMsg = await _botClient.SendMessage(userChatId, postText, null, null, parseMode: ParseMode.None, disableNotification: true, disableWebPagePreview: false);
 
         }
         else if (post.Media != null && mediaCount == 1) // 非媒体组消息
@@ -266,7 +266,7 @@ public sealed class PostController(
         var keyboard = _markupHelperService.ReviewKeyboardA(newTags, post.HasSpoiler);
         string msg = _textHelperService.MakeReviewMessage(dbUser, newPost.Anonymous);
 
-        var actionMsg = await _botClient.SendMessage(userChatId, msg, parseMode: ParseMode.Html, disableWebPagePreview: true, replyToMessageId: originMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+        var actionMsg = await _botClient.SendMessage(originMsg, msg, parseMode: ParseMode.Html, true, disableWebPagePreview: true, replyMarkup: keyboard);
 
         newPost.Id = newPostId;
         newPost.OriginMsgID = originMsg.MessageId;
@@ -410,7 +410,7 @@ public sealed class PostController(
                 });
             }
 
-            originMsg = await _botClient.SendMessage(userChatId, postText, disableNotification: true, disableWebPagePreview: false);
+            originMsg = await _botClient.SendMessage(userChatId, postText, null, null, ParseMode.None, disableNotification: true, disableWebPagePreview: false);
 
         }
         else if (post.Media != null && mediaCount == 1) // 非媒体组消息
@@ -504,7 +504,7 @@ public sealed class PostController(
         var keyboard = _markupHelperService.ReviewKeyboardA(newTags, post.HasSpoiler);
         string msg = _textHelperService.MakeReviewMessage(dbUser, newPost.Anonymous);
 
-        var actionMsg = await _botClient.SendMessage(userChatId, msg, parseMode: ParseMode.Html, disableWebPagePreview: true, replyToMessageId: originMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+        var actionMsg = await _botClient.SendMessage(originMsg, msg, parseMode: ParseMode.Html, replyToMessage: true, disableWebPagePreview: true, replyMarkup: keyboard);
 
         newPost.Id = newPostId;
         newPost.OriginMsgID = originMsg.MessageId;

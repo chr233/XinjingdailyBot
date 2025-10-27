@@ -25,7 +25,7 @@ public static class HttpClientExtension
             string? baseUrl = config.Bot.BaseUrl;
             httpClient.BaseAddress = new Uri(baseUrl ?? "https://api.telegram.org/");
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, Utils.Version));
+            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, BuildInfo.Version));
         }).ConfigurePrimaryHttpMessageHandler(serviceProvider => {
             var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
             string? proxy = config.Bot.Proxy;
@@ -47,14 +47,14 @@ public static class HttpClientExtension
             string? baseUrl = config.GitHub.BaseUrl;
             httpClient.BaseAddress = new Uri(baseUrl ?? "https://hub.chrxw.com/");
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, Utils.Version));
+            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, BuildInfo.Version));
         });
 
         services.AddHttpClient("IpInfo", (serviceProvider, httpClient) => {
             var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
             httpClient.BaseAddress = new Uri("https://ipinfo.io/");
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, Utils.Version));
+            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, BuildInfo.Version));
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.IpInfo.Token);
         });
 
@@ -62,7 +62,7 @@ public static class HttpClientExtension
             var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
             httpClient.BaseAddress = new Uri("https://asfe.chrxw.com/");
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, Utils.Version));
+            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, BuildInfo.Version));
         });
     }
 }

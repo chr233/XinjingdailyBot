@@ -1,4 +1,7 @@
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Options;
+using System.Text.Json.Serialization;
+using XinjingdailyBot.Infrastructure;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
@@ -21,25 +24,25 @@ public static class WebAPIExtension
         services.AddResponseCaching();
 
         // 响应压缩
-        services.AddResponseCompression(static options => options.EnableForHttps = true);
+        services.AddResponseCompression(static o => o.EnableForHttps = true);
 
         // CORS
-        services.AddCors(static options => options.AddDefaultPolicy(static policy => policy.AllowAnyOrigin()));
+        services.AddCors(static options => options.AddDefaultPolicy(static p => p.AllowAnyOrigin()));
 
         // Swagger
         services.AddSwaggerEx();
 
         // 控制器
-        services.AddControllers();
+        services.AddControllers().AddJsonOptions(static o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
         // 注册服务
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
         //获取客户端 IP
-        services.Configure<ForwardedHeadersOptions>(options => {
-            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-            options.KnownNetworks.Clear();
-            options.KnownProxies.Clear();
+        services.Configure<ForwardedHeadersOptions>(o => {
+            o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            o.KnownNetworks.Clear();
+            o.KnownProxies.Clear();
         });
     }
 
@@ -58,10 +61,10 @@ public static class WebAPIExtension
         // 支持CORS
         app.UseCors();
 
-        bool isDevelopment = app.Environment.IsDevelopment();
+        var config = app.Services.GetRequiredService<IOptions<OptionsSetting>>().Value.System;
 
         // 调试模式输出错误信息
-        if (isDevelopment || app.Configuration.GetSection("Debug").Get<bool>())
+        if (config.Debug)
         {
             app.UseDeveloperExceptionPage();
         }
@@ -71,7 +74,7 @@ public static class WebAPIExtension
         }
 
         // Swagger
-        if (isDevelopment || app.Configuration.GetSection("Swagger").Get<bool>())
+        if (config.Swagger)
         {
             app.UseSwaggerEx();
         }

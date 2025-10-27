@@ -50,7 +50,7 @@ internal class PostCommand(
         {
             var msg = "该稿件已过期, 无法操作";
             await _botClient.AutoReply(msg, query);
-            await _botClient.EditMessageText(message, msg, null);
+            await _botClient.EditMessageText(message, msg);
             return;
         }
 
@@ -179,7 +179,9 @@ internal class PostCommand(
         bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
         var keyboard = _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
 
-        var manageMsg = await _botClient.SendMessage(_channelService.ReviewGroup, msg, parseMode: ParseMode.Html, disableWebPagePreview: true, replyToMessageId: reviewMsg.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true);
+
+
+        var manageMsg = await _botClient.SendMessage(reviewMsg, msg, parseMode: ParseMode.Html, true, disableWebPagePreview: true, replyMarkup: keyboard);
 
         post.ReviewChatID = reviewMsg.Chat.Id;
         post.ReviewMsgID = reviewMsg.MessageId;

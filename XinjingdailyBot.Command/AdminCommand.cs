@@ -868,7 +868,7 @@ internal class AdminCommand(
 
         var uptime = DateTime.Now - StartAt;
         int day = (int)uptime.TotalDays;
-        double hours = uptime.TotalHours - day * 24;
+        double hours = uptime.TotalHours - (day * 24);
 
         sb.AppendLine($"运行时间: <code>{day}</code> 天 <code>{hours:F8}</code> 小时");
 

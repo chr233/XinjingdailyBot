@@ -10,6 +10,7 @@ using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
+using XinjingdailyBot.Infrastructure.Utils;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
@@ -284,9 +285,9 @@ internal class SuperCommand(
                 return "读取在线版本信息失败";
             }
 
-            if (Utils.Version == releaseResponse.TagName)
+            if (BuildInfo.Version == releaseResponse.TagName)
             {
-                return string.Format("当前已经是最新版本 {0}", Utils.Version);
+                return string.Format("当前已经是最新版本 {0}", BuildInfo.Version);
             }
 
             string varint = BuildInfo.Variant;
@@ -339,7 +340,7 @@ internal class SuperCommand(
                     {
                         var sb = new StringBuilder();
                         sb.AppendLine(string.Format("自动更新成功, 更新了{0}个文件", count));
-                        sb.AppendLine(string.Format("版本变动: {0} -> {1}", Utils.Version, releaseResponse.TagName));
+                        sb.AppendLine(string.Format("版本变动: {0} -> {1}", BuildInfo.Version, releaseResponse.TagName));
                         sb.AppendLine();
                         sb.AppendLine("发行版日志:");
                         sb.AppendLine(string.Format("<code>{0}</code>", releaseResponse.Body));

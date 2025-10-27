@@ -1,9 +1,11 @@
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Options;
 using MySqlConnector;
+using Npgsql;
 using SqlSugar;
 using System.Diagnostics.CodeAnalysis;
 using XinjingdailyBot.Infrastructure;
-using XinjingdailyBot.Service.Bot.Common;
+using XinjingdailyBot.Service.Data.Base;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
@@ -19,65 +21,89 @@ public static class DatabaseExtension
     /// 注册数据库
     /// </summary>
     /// <param name="services"></param>
-    /// <param name="configuration"></param>
     [RequiresUnreferencedCode("不兼容剪裁")]
-    public static void AddSqlSugarSetup(this IServiceCollection services, IConfiguration configuration)
+    public static void AddSqlSugarSetup(this IServiceCollection services)
     {
-        var config = configuration.GetSection("Database").Get<OptionsSetting.DatabaseOption>();
-
-        if (config == null)
-        {
-            _logger.Error("数据库配置不能为空");
-            _logger.Error("按任意键退出...");
-            Console.ReadKey();
-            Environment.Exit(1);
-        }
-
-        _logger.Info("数据库驱动: {0}", config.UseMySQL ? "MySQL" : "SQLite");
-
-        var connStr = config.UseMySQL ?
-            new MySqlConnectionStringBuilder {
-                Server = config.DbHost,
-                Port = config.DbPort,
-                Database = config.DbName,
-                UserID = config.DbUser,
-                Password = config.DbPassword,
-                CharacterSet = "utf8mb4",
-                AllowZeroDateTime = true,
-            }.ToString() :
-            new SqliteConnectionStringBuilder {
-                DataSource = $"{config.DbName}.db",
-            }.ToString();
-
         services.AddSingleton<ISqlSugarClient>(s => {
+            var config = s.GetRequiredService<IOptions<OptionsSetting>>().Value.Database;
+
+            var dbType = config.Type?.ToUpperInvariant() switch {
+                "SQLITE" => DbType.Sqlite,
+                "MYSQL" => DbType.MySql,
+                "POSTGRESQL" or "PGSQL" => DbType.PostgreSQL,
+                _ => DbType.Custom,
+            };
+
+            _logger.Info("数据库驱动: {0}", dbType);
+
+            var connStr = dbType switch {
+                DbType.MySql => new MySqlConnectionStringBuilder {
+                    Server = config.Host,
+                    Port = config.Port,
+                    Database = config.DbName,
+                    UserID = config.User,
+                    Password = config.Password,
+                    CharacterSet = "utf8mb4",
+                    AllowZeroDateTime = true,
+                }.ToString(),
+
+                DbType.Sqlite => new SqliteConnectionStringBuilder {
+                    DataSource = $"{config.DbName}.db",
+                }.ToString(),
+
+                DbType.PostgreSQL => new NpgsqlConnectionStringBuilder {
+                    Host = config.Host,
+                    Port = (int)config.Port,
+                    Database = config.DbName,
+                    Username = config.User,
+                    Password = config.Password,
+                }.ToString(),
+
+                DbType.Custom => config.ConnectionString,
+
+                _ => null,
+            };
+
+            if (string.IsNullOrEmpty(connStr))
+            {
+                _logger.Error("数据库配置有误, 请检查 DbType 和 DbConnectionString");
+                _logger.Info("按任意键退出...");
+                Console.ReadKey();
+                Environment.Exit(1);
+            }
+
+            if (string.IsNullOrEmpty(config.Password))
+            {
+                _logger.Info("数据库连接: {0}", connStr);
+            }
+            else
+            {
+                _logger.Info("数据库连接: {0}", connStr.Replace(config.Password, "***"));
+            }
+
             var sqlSugar = new SqlSugarScope(new ConnectionConfig {
                 ConnectionString = connStr,
-                DbType = config.UseMySQL ? DbType.MySql : DbType.Sqlite,
+                DbType = dbType,
                 IsAutoCloseConnection = true,
-            },
-            db => {
+            }, db => {
                 if (config.LogSQL)
                 {
                     db.Aop.OnLogExecuting = (sql, pars) => {
-                        //var param = db.GetConnectionScope(0).Utilities.SerializeObject(pars.ToDictionary(it => it.ParameterName, it => it.Value));
-                        foreach (var par in pars)
+                        _logger.Debug("查询语句: {sql}", sql);
+
+                        if (pars != null && pars.Length > 0)
                         {
-                            sql = sql.Replace(par.ParameterName, par.Value.ToString());
+                            List<string> values = [];
+                            foreach (var par in pars)
+                            {
+                                values.Add(string.Format("{0} = {1}", par.ParameterName, par.Value ?? "NULL"));
+                            }
+                            _logger.Debug("查询参数: {values}", string.Join(", ", values));
                         }
-                        _logger.Debug("执行时间: {time} ms | {sql}", db.Ado.SqlExecutionTime.TotalMilliseconds, sql);
+
                     };
 
-                    //执行时间超过1秒
-                    //if (db.Ado.SqlExecutionTime.TotalSeconds > 1)
-                    //{
-                    //    //代码CS文件名
-                    //    var fileName = db.Ado.SqlStackTrace.FirstFileName;
-                    //    //代码行数
-                    //    var fileLine = db.Ado.SqlStackTrace.FirstLine;
-                    //    //方法名
-                    //    var FirstMethodName = db.Ado.SqlStackTrace.FirstMethodName;
-                    //    //db.Ado.SqlStackTrace.MyStackTraceList[1].xxx 获取上层方法的信息
-                    //}
+                    db.Aop.OnLogExecuted = (_, _) => _logger.Trace("查询时间 {time} ms ", db.Ado.SqlExecutionTime.TotalMilliseconds);
 
                     db.Aop.OnError = (e) => _logger.Error("执行SQL出错：", e);
                 }
@@ -86,9 +112,6 @@ public static class DatabaseExtension
             return sqlSugar;
         });
 
-        if (config.Generate)
-        {
-            services.AddHostedService<DbInitService>();
-        }
+        services.AddHostedService<DbInitializationService>();
     }
 }

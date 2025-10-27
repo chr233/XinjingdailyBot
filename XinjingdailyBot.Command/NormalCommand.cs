@@ -380,7 +380,7 @@ internal class NormalCommand(
                 if (handler == null)
                 {
                     await _botClient.AutoReply($"不支持的稿件类型: {randomPost.PostType}", callbackQuery, true);
-                    await _botClient.EditMessageText(callbackQuery.Message!, $"不支持的稿件类型: {randomPost.PostType}", null);
+                    await _botClient.EditMessageText(callbackQuery.Message!, $"不支持的稿件类型: {randomPost.PostType}");
                     return;
                 }
 

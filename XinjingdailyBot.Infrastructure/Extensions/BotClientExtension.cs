@@ -105,7 +105,6 @@ public static class BotClientExtension
         ParseMode parseMode = ParseMode.None,
         bool disableWebPagePreview = false,
         InlineKeyboardMarkup? replyMarkup = default,
-
         CancellationToken cancellationToken = default)
     {
         var linkPreviewOptions = new LinkPreviewOptions {
@@ -113,6 +112,109 @@ public static class BotClientExtension
         };
 
         return botClient.EditMessageText(message.Chat, message.MessageId, text, parseMode: parseMode, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken);
+    }
+
+    /// <summary>
+    /// 编辑消息
+    /// </summary>
+    /// <param name="botClient"></param>
+    /// <param name="chatId"></param>
+    /// <param name="messageId"></param>
+    /// <param name="text"></param>
+    /// <param name="parseMode"></param>
+    /// <param name="disableWebPagePreview"></param>
+    /// <param name="replyMarkup"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public static Task<Message> EditMessageText(
+        this ITelegramBotClient botClient,
+        ChatId chatId,
+        int messageId,
+        string text,
+        ParseMode parseMode = ParseMode.None,
+        bool disableWebPagePreview = false,
+        InlineKeyboardMarkup? replyMarkup = default,
+        CancellationToken cancellationToken = default)
+    {
+        var linkPreviewOptions = new LinkPreviewOptions {
+            IsDisabled = disableWebPagePreview,
+        };
+
+        return botClient.EditMessageText(chatId, messageId, text, parseMode: parseMode, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken);
+    }
+
+    /// <summary>
+    /// 发送消息
+    /// </summary>
+    /// <param name="botClient"></param>
+    /// <param name="chatId"></param>
+    /// <param name="text"></param>
+    /// <param name="messageThreadId"></param>
+    /// <param name="replyToMessageId"></param>
+    /// <param name="parseMode"></param>
+    /// <param name="disableWebPagePreview"></param>
+    /// <param name="disableNotification"></param>
+    /// <param name="replyMarkup"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public static Task<Message> SendMessage(
+        this ITelegramBotClient botClient,
+        ChatId chatId,
+        string text,
+        int? messageThreadId,
+        int? replyToMessageId,
+        ParseMode parseMode = ParseMode.None,
+        bool disableWebPagePreview = false,
+        bool disableNotification = false,
+        InlineKeyboardMarkup? replyMarkup = default,
+        CancellationToken cancellationToken = default)
+    {
+        var linkPreviewOptions = new LinkPreviewOptions {
+            IsDisabled = disableWebPagePreview,
+        };
+
+        var replyParameters = replyToMessageId != null ? new ReplyParameters {
+            AllowSendingWithoutReply = true,
+            MessageId = replyToMessageId.Value,
+        } : null;
+
+        return botClient.SendMessage(chatId, text, parseMode: parseMode, messageThreadId: messageThreadId, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, replyParameters: replyParameters, disableNotification: disableNotification, cancellationToken: cancellationToken);
+    }
+
+    /// <summary>
+    /// 发送消息
+    /// </summary>
+    /// <param name="botClient"></param>
+    /// <param name="message"></param>
+    /// <param name="text"></param>
+    /// <param name="parseMode"></param>
+    /// <param name="replyToMessage"></param>
+    /// <param name="disableWebPagePreview"></param>
+    /// <param name="disableNotification"></param>
+    /// <param name="replyMarkup"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public static Task<Message> SendMessage(
+        this ITelegramBotClient botClient,
+        Message message,
+        string text,
+        ParseMode parseMode = ParseMode.None,
+        bool replyToMessage = false,
+        bool disableWebPagePreview = false,
+        bool disableNotification = false,
+        InlineKeyboardMarkup? replyMarkup = default,
+        CancellationToken cancellationToken = default)
+    {
+        var linkPreviewOptions = new LinkPreviewOptions {
+            IsDisabled = disableWebPagePreview,
+        };
+
+        var replyParameters = replyToMessage ? new ReplyParameters {
+            AllowSendingWithoutReply = true,
+            MessageId = message.MessageId,
+        } : null;
+
+        return botClient.SendMessage(message.Chat, text, parseMode: parseMode, messageThreadId: message.MessageThreadId, replyMarkup: replyMarkup, replyParameters: replyParameters, linkPreviewOptions: linkPreviewOptions, disableNotification: disableNotification, cancellationToken: cancellationToken);
     }
 
     /// <summary>

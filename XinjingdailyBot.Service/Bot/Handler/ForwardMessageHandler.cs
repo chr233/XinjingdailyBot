@@ -45,25 +45,25 @@ internal class ForwardMessageHandler : IForwardMessageHandler
         {
             var forwardFrom = message.ForwardFrom!;
             var forwardChatId = message.ForwardFromChat?.Id ?? -1;
-            var foreardMsgId = message.ForwardFromMessageId ?? -1;
+            var forwardMsgId = message.ForwardFromMessageId ?? -1;
 
-            if (forwardChatId != -1 && foreardMsgId != -1 &&
+            if (forwardChatId != -1 && forwardMsgId != -1 &&
                (_channelService.IsChannelMessage(forwardChatId) || _channelService.IsGroupMessage(forwardChatId)))
             {
                 NewPosts? post = null;
 
-                var mediaGroup = await _mediaGroupService.QueryMediaGroup(forwardChatId, foreardMsgId);
+                var mediaGroup = await _mediaGroupService.QueryMediaGroup(forwardChatId, forwardMsgId);
                 if (mediaGroup == null)
                 {
                     if (_channelService.IsChannelMessage(forwardChatId)) //转发自发布频道或拒绝存档
                     {
-                        post = await _postService.GetFirstAsync(x => x.PublicMsgID == foreardMsgId);
+                        post = await _postService.GetFirstAsync(x => x.PublicMsgID == forwardMsgId);
                     }
                     else //转发自关联群组
                     {
                         post = await _postService.GetFirstAsync(x =>
-                            (x.ReviewChatID == forwardChatId && x.ReviewMsgID == foreardMsgId) ||
-                            (x.ReviewActionChatID == forwardChatId && x.ReviewActionMsgID == foreardMsgId)
+                            (x.ReviewChatID == forwardChatId && x.ReviewMsgID == forwardMsgId) ||
+                            (x.ReviewActionChatID == forwardChatId && x.ReviewActionMsgID == forwardMsgId)
                         );
                     }
                 }
@@ -107,7 +107,7 @@ internal class ForwardMessageHandler : IForwardMessageHandler
                         sb.AppendLine($"模式: {postMode}");
                         sb.AppendLine($"状态: {postStatus}");
 
-                        await _botClient.SendMessage(message.Chat, sb.ToString(), parseMode: ParseMode.Html, disableWebPagePreview: true, replyMarkup: keyboard, replyToMessageId: message.MessageId, allowSendingWithoutReply: true);
+                        await _botClient.SendMessage(message, sb.ToString(), parseMode: ParseMode.Html, replyToMessage: true, disableWebPagePreview: true, disableNotification: true, replyMarkup: keyboard);
                         return true;
                     }
                 }
