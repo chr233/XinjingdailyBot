@@ -499,14 +499,14 @@ internal class AdminCommand(
 
             sb.AppendLine();
             sb.AppendLine("频道和群组封禁状态:");
-            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(channelService.AcceptChannel, targetUser.UserID));
-            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(channelService.RejectChannel, targetUser.UserID));
-            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(channelService.CommentGroup, targetUser.UserID));
-            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(channelService.SubGroup, targetUser.UserID));
+            sb.AppendLine(await _botClient.GetChatMemberStatus(channelService.AcceptChannel, targetUser.UserID));
+            sb.AppendLine(await _botClient.GetChatMemberStatus(channelService.RejectChannel, targetUser.UserID));
+            sb.AppendLine(await _botClient.GetChatMemberStatus(channelService.CommentGroup, targetUser.UserID));
+            sb.AppendLine(await _botClient.GetChatMemberStatus(channelService.SubGroup, targetUser.UserID));
             if (channelService.HasSecondChannel)
             {
-                sb.AppendLine(await _botClient.GetChatMemberStatusAsync(channelService.SecondChannel, targetUser.UserID));
-                sb.AppendLine(await _botClient.GetChatMemberStatusAsync(channelService.SecondCommentGroup, targetUser.UserID));
+                sb.AppendLine(await _botClient.GetChatMemberStatus(channelService.SecondChannel, targetUser.UserID));
+                sb.AppendLine(await _botClient.GetChatMemberStatus(channelService.SecondCommentGroup, targetUser.UserID));
             }
 
         }
@@ -644,7 +644,7 @@ internal class AdminCommand(
             return await _userService.QueryUserList(dbUser, query, page);
         }
         (string text, var kbd) = await exec();
-        await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, ParseMode.Html, true, kbd);
+        await _botClient.EditMessageText(callbackQuery.Message!, text, ParseMode.Html, true, kbd);
     }
 
     /// <summary>
@@ -710,7 +710,7 @@ internal class AdminCommand(
             return await _userService.QueryAllUserList(dbUser, query, page);
         }
         (string text, var kbd) = await exec();
-        await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, ParseMode.Html, true, kbd);
+        await _botClient.EditMessageText(callbackQuery.Message!, text, ParseMode.Html, true, kbd);
     }
 
     /// <summary>
@@ -723,7 +723,7 @@ internal class AdminCommand(
     public async Task QResponseCancelSearchUser(CallbackQuery callbackQuery, string[] args)
     {
         string text = args.Length >= 2 ? args[1] : "参数有误";
-        await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, ParseMode.Html, true, null);
+        await _botClient.EditMessageText(callbackQuery.Message!, text, ParseMode.Html, true, null);
     }
 
     /// <summary>
@@ -1145,7 +1145,7 @@ internal class AdminCommand(
         }
 
         string text = await exec();
-        await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, replyMarkup: null);
+        await _botClient.EditMessageText(callbackQuery.Message!, text, replyMarkup: null);
     }
 
     /// <summary>
@@ -1272,16 +1272,16 @@ internal class AdminCommand(
     {
         if (args.Length < 4)
         {
-            await _botClient.AutoReplyAsync("参数有误", callbackQuery, true);
-            await _botClient.EditMessageTextAsync(callbackQuery.Message!, "参数有误", replyMarkup: null);
+            await _botClient.AutoReply("参数有误", callbackQuery, true);
+            await _botClient.EditMessageText(callbackQuery.Message!, "参数有误", replyMarkup: null);
         }
         else
         {
             var targetUser = await _userService.FetchUserByUserNameOrUserID(args[2]);
             if (targetUser == null)
             {
-                await _botClient.AutoReplyAsync("用户不存在", callbackQuery, true);
-                await _botClient.EditMessageTextAsync(callbackQuery.Message!, "用户不存在", replyMarkup: null);
+                await _botClient.AutoReply("用户不存在", callbackQuery, true);
+                await _botClient.EditMessageText(callbackQuery.Message!, "用户不存在", replyMarkup: null);
             }
             else
             {
@@ -1340,8 +1340,8 @@ internal class AdminCommand(
                         await _botClient.UnbanChatMember(channelService.CommentGroup, targetUser.UserID);
                         break;
                     default:
-                        await _botClient.AutoReplyAsync("参数有误", callbackQuery, true);
-                        await _botClient.EditMessageTextAsync(callbackQuery.Message!, "参数有误", replyMarkup: null);
+                        await _botClient.AutoReply("参数有误", callbackQuery, true);
+                        await _botClient.EditMessageText(callbackQuery.Message!, "参数有误", replyMarkup: null);
                         return;
                 }
 
@@ -1382,8 +1382,8 @@ internal class AdminCommand(
                     _logger.LogError(ex, "发送私聊消息失败");
                 }
 
-                await _botClient.AutoReplyAsync("操作执行成功", callbackQuery, true);
-                await _botClient.EditMessageTextAsync(callbackQuery.Message!, $"成功 {action} 了用户 {targetUser.EscapedFullName()}", replyMarkup: null);
+                await _botClient.AutoReply("操作执行成功", callbackQuery, true);
+                await _botClient.EditMessageText(callbackQuery.Message!, $"成功 {action} 了用户 {targetUser.EscapedFullName()}", replyMarkup: null);
             }
         }
     }
@@ -1501,7 +1501,7 @@ internal class AdminCommand(
         }
         string text = await exec();
         await _botClient.AutoReply(text, callbackQuery.Message!, ParseMode.Html);
-        await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, null);
+        await _botClient.EditMessageReplyMarkup(callbackQuery.Message!, null);
     }
 
     [QueryCmd("QUERYPOSTER", EUserRights.AdminCmd)]
@@ -1551,7 +1551,7 @@ internal class AdminCommand(
     public async Task QResponseRepost(Users dbUser, CallbackQuery callbackQuery)
     {
         _logger.LogInformation("todo {user}", dbUser);
-        await _botClient.AutoReplyAsync("未实现", callbackQuery, false);
+        await _botClient.AutoReply("未实现", callbackQuery, false);
     }
 
     /// <summary>
@@ -1565,7 +1565,7 @@ internal class AdminCommand(
     {
         if (dbUser.PrivateChatID == -1)
         {
-            await _botClient.AutoReplyAsync("未私聊过机器人, 无法发送消息", callbackQuery, true);
+            await _botClient.AutoReply("未私聊过机器人, 无法发送消息", callbackQuery, true);
             return;
         }
 
@@ -1577,17 +1577,17 @@ internal class AdminCommand(
             try
             {
                 await _botClient.SendMessage(dbUser.PrivateChatID, link, parseMode: ParseMode.Html);
-                await _botClient.AutoReplyAsync("消息链接已发送", callbackQuery, false);
+                await _botClient.AutoReply("消息链接已发送", callbackQuery, false);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "发送消息失败");
-                await _botClient.AutoReplyAsync("消息链接发送失败", callbackQuery, false);
+                await _botClient.AutoReply("消息链接发送失败", callbackQuery, false);
             }
         }
         else
         {
-            await _botClient.AutoReplyAsync("今天没有未审核的稿件", callbackQuery, false);
+            await _botClient.AutoReply("今天没有未审核的稿件", callbackQuery, false);
         }
     }
 

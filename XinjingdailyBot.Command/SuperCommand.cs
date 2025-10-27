@@ -177,7 +177,7 @@ internal class SuperCommand(
         }
 
         string text = await exec();
-        await _botClient.EditMessageTextAsync(query.Message!, text, replyMarkup: null);
+        await _botClient.EditMessageText(query.Message!, text, replyMarkup: null);
     }
 
     /// <summary>
@@ -254,7 +254,7 @@ internal class SuperCommand(
 
         try
         {
-            await _botClient.EditMessageTextAsync(msg, $"更新用户表完成, 更新了 {effectCount} 条记录");
+            await _botClient.EditMessageText(msg, $"更新用户表完成, 更新了 {effectCount} 条记录");
         }
         catch
         {

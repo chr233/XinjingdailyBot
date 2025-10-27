@@ -66,7 +66,7 @@ public class PollingService(
             {
                 var receiverOptions = new ReceiverOptions {
                     AllowedUpdates = [],
-                    ThrowPendingUpdates = _throwPendingUpdates,
+                    DropPendingUpdates = _throwPendingUpdates,
                     Limit = 100,
                 };
 
@@ -74,7 +74,7 @@ public class PollingService(
 
                 await _botClient.ReceiveAsync(
                     updateHandler: updateService.HandleUpdateAsync,
-                    pollingErrorHandler: updateService.HandlePollingErrorAsync,
+                    errorHandler: updateService.HandlePollingErrorAsync,
                     receiverOptions: receiverOptions,
                     cancellationToken: stoppingToken);
             }

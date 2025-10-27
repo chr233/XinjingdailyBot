@@ -183,7 +183,7 @@ internal class NormalCommand(
 
             try
             {
-                await _botClient.EditMessageTextAsync(msg, $"用户 {dbUser} 呼叫群管理", ParseMode.Html);
+                await _botClient.EditMessageText(msg, $"用户 {dbUser} 呼叫群管理", ParseMode.Html);
             }
             catch (Exception)
             {
@@ -203,8 +203,8 @@ internal class NormalCommand(
     {
         string text = args.Length > 1 ? string.Join(' ', args[1..]) : "操作已取消";
 
-        await _botClient.AutoReplyAsync(text, query);
-        await _botClient.EditMessageTextAsync(query.Message!, text, replyMarkup: null);
+        await _botClient.AutoReply(text, query);
+        await _botClient.EditMessageText(query.Message!, text, replyMarkup: null);
     }
 
     /// <summary>
@@ -225,7 +225,7 @@ internal class NormalCommand(
         {
             text = string.Join(' ', args[1..]);
         }
-        await _botClient.AutoReplyAsync(text, query);
+        await _botClient.AutoReply(text, query);
     }
 
     /// <summary>
@@ -261,7 +261,7 @@ internal class NormalCommand(
     {
         if (args.Length < 1)
         {
-            await _botClient.EditMessageTextAsync(callbackQuery.Message!, "参数有误", replyMarkup: null);
+            await _botClient.EditMessageText(callbackQuery.Message!, "参数有误", replyMarkup: null);
             return;
         }
 
@@ -279,7 +279,7 @@ internal class NormalCommand(
         }
 
         var keyboard = _markupHelperService.RandomPostMenuKeyboard(dbUser, tagId);
-        await _botClient.EditMessageTextAsync(callbackQuery.Message!, text, replyMarkup: keyboard);
+        await _botClient.EditMessageText(callbackQuery.Message!, text, replyMarkup: keyboard);
     }
 
     /// <summary>
@@ -292,7 +292,7 @@ internal class NormalCommand(
     public async Task QResponseBackRandomPost(Users dbUser, CallbackQuery callbackQuery)
     {
         var keyboard = _markupHelperService.RandomPostMenuKeyboard(dbUser);
-        await _botClient.EditMessageTextAsync(callbackQuery.Message!, "请选择感兴趣的稿件标签", replyMarkup: keyboard);
+        await _botClient.EditMessageText(callbackQuery.Message!, "请选择感兴趣的稿件标签", replyMarkup: keyboard);
     }
 
     /// <summary>
@@ -307,7 +307,7 @@ internal class NormalCommand(
     {
         if (args.Length < 3 || !int.TryParse(args[1], out int tagId))
         {
-            await _botClient.EditMessageTextAsync(callbackQuery.Message!, "参数有误", replyMarkup: null);
+            await _botClient.EditMessageText(callbackQuery.Message!, "参数有误", replyMarkup: null);
             return;
         }
 
@@ -379,8 +379,8 @@ internal class NormalCommand(
 
                 if (handler == null)
                 {
-                    await _botClient.AutoReplyAsync($"不支持的稿件类型: {randomPost.PostType}", callbackQuery, true);
-                    await _botClient.EditMessageTextAsync(callbackQuery.Message!, $"不支持的稿件类型: {randomPost.PostType}", null);
+                    await _botClient.AutoReply($"不支持的稿件类型: {randomPost.PostType}", callbackQuery, true);
+                    await _botClient.EditMessageText(callbackQuery.Message!, $"不支持的稿件类型: {randomPost.PostType}", null);
                     return;
                 }
 
@@ -391,16 +391,16 @@ internal class NormalCommand(
             if (args.Length > 3 && long.TryParse(args[3], out long msgId))
             {
                 var kbd = _markupHelperService.LinkToOriginPostKeyboard(msgId);
-                await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, kbd);
+                await _botClient.EditMessageReplyMarkup(callbackQuery.Message!, kbd);
             }
             else
             {
-                await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, null);
+                await _botClient.EditMessageReplyMarkup(callbackQuery.Message!, null);
             }
         }
         else
         {
-            await _botClient.EditMessageTextAsync(callbackQuery.Message!, "无可用稿件", replyMarkup: null);
+            await _botClient.EditMessageText(callbackQuery.Message!, "无可用稿件", replyMarkup: null);
         }
     }
 

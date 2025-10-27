@@ -25,10 +25,14 @@ public static class BotClientExtension
         this ITelegramBotClient botClient,
         string text,
         Message message,
-        ParseMode? parsemode = null,
+        ParseMode parsemode = ParseMode.None,
         CancellationToken cancellationToken = default)
     {
-        return botClient.SendMessage(message.Chat, text, parseMode: parsemode, replyToMessageId: message.MessageId, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
+        var replyParameters = new ReplyParameters {
+            AllowSendingWithoutReply = true,
+            MessageId = message.MessageId,
+        };
+        return botClient.SendMessage(message.Chat, text, parseMode: parsemode, replyParameters: replyParameters, cancellationToken: cancellationToken);
     }
 
     /// <summary>
@@ -40,7 +44,7 @@ public static class BotClientExtension
     /// <param name="showAlert"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static Task AutoReplyAsync(
+    public static Task AutoReply(
         this ITelegramBotClient botClient,
         string text,
         CallbackQuery query,
@@ -58,7 +62,8 @@ public static class BotClientExtension
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static Task<Message> EditMessageReplyMarkupAsync(
+    public static Task<Message> EditMessageReplyMarkup
+        (
         this ITelegramBotClient botClient,
         Message message,
         InlineKeyboardMarkup? replyMarkup = default,
@@ -74,7 +79,7 @@ public static class BotClientExtension
     /// <param name="message"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static Task<Message> RemoveMessageReplyMarkupAsync(
+    public static Task<Message> RemoveMessageReplyMarkup(
         this ITelegramBotClient botClient,
         Message message,
         CancellationToken cancellationToken = default)
@@ -93,17 +98,21 @@ public static class BotClientExtension
     /// <param name="disableWebPagePreview"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static Task<Message> EditMessageTextAsync(
+    public static Task<Message> EditMessageText(
         this ITelegramBotClient botClient,
         Message message,
         string text,
-        ParseMode? parseMode = default,
-        bool? disableWebPagePreview = null,
+        ParseMode parseMode = ParseMode.None,
+        bool disableWebPagePreview = false,
         InlineKeyboardMarkup? replyMarkup = default,
 
         CancellationToken cancellationToken = default)
     {
-        return botClient.EditMessageText(message.Chat, message.MessageId, text, parseMode: parseMode, disableWebPagePreview: disableWebPagePreview, replyMarkup: replyMarkup, cancellationToken: cancellationToken);
+        var linkPreviewOptions = new LinkPreviewOptions {
+            IsDisabled = disableWebPagePreview,
+        };
+
+        return botClient.EditMessageText(message.Chat, message.MessageId, text, parseMode: parseMode, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken);
     }
 
     /// <summary>
@@ -122,15 +131,23 @@ public static class BotClientExtension
         string text,
         Message message,
         bool? autoDelete = null,
-        ParseMode? parsemode = null,
+        ParseMode parsemode = ParseMode.None,
         ReplyMarkup? replyMarkup = null,
         CancellationToken cancellationToken = default)
     {
         //私聊始终不删除消息, 群聊中默认删除消息, 但可以指定不删除
         bool delete = (autoDelete != null ? autoDelete.Value : (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup)) && message.Chat.Type != ChatType.Private;
 
-        var msg = await botClient.SendMessage(message.Chat, text, parseMode: parsemode,
-            replyToMessageId: message.MessageId, replyMarkup: replyMarkup, disableWebPagePreview: true, allowSendingWithoutReply: true, cancellationToken: cancellationToken);
+        var replyParameters = new ReplyParameters {
+            AllowSendingWithoutReply = true,
+            MessageId = message.MessageId,
+        };
+        var linkPreviewOptions = new LinkPreviewOptions {
+            IsDisabled = true,
+        };
+
+        var msg = await botClient.SendMessage(message.Chat, text, parseMode: parsemode, messageThreadId: message.MessageThreadId,
+            replyParameters: replyParameters, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken);
 
         if (delete)
         {
@@ -156,18 +173,18 @@ public static class BotClientExtension
     /// <param name="botClient"></param>
     /// <param name="message"></param>
     /// <param name="chatAction"></param>
+    /// <param name="threadId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static Task SendChatActionAsync(
+    public static Task SendChatAction(
         this ITelegramBotClient botClient,
         Message message,
         ChatAction chatAction,
-        int? threadId,
         CancellationToken cancellationToken = default)
     {
         try
         {
-            return botClient.SendChatAction(message.Chat, chatAction, threadId, null, cancellationToken);
+            return botClient.SendChatAction(message.Chat, chatAction, message.MessageThreadId, null, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -183,7 +200,7 @@ public static class BotClientExtension
     /// <param name="chat"></param>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public static async Task<string> GetChatMemberStatusAsync(
+    public static async Task<string> GetChatMemberStatus(
         this ITelegramBotClient botClient,
         Chat? chat,
         long userId)

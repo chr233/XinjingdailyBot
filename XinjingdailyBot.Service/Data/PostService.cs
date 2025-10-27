@@ -100,7 +100,7 @@ internal sealed class PostService(
 
             if (reviewCount >= reviewLimit)
             {
-                await _botClient.AutoReplyAsync($"您的审核队列已满 {reviewCount} / {reviewLimit}, 请耐心等待队列中的稿件审核完毕", query, true);
+                await _botClient.AutoReply($"您的审核队列已满 {reviewCount} / {reviewLimit}, 请耐心等待队列中的稿件审核完毕", query, true);
                 return false;
             }
         }
@@ -348,7 +348,7 @@ internal sealed class PostService(
             bool exists = await Queryable().AnyAsync(x => x.OriginMediaGroupID == mediaGroupId);
             if (!exists)
             {
-                await _botClient.SendChatActionAsync(message, ChatAction.Typing);
+                await _botClient.SendChatAction(message, ChatAction.Typing);
 
                 var channelOption = EChannelOption.Normal;
 
@@ -442,7 +442,7 @@ internal sealed class PostService(
                     await Task.Delay(1500);
                     MediaGroupIDs.Remove(mediaGroupId, out _);
 
-                    await _botClient.EditMessageTextAsync(actionMsg, postText, replyMarkup: keyboard);
+                    await _botClient.EditMessageText(actionMsg, postText, replyMarkup: keyboard);
                 });
             }
         }
@@ -483,14 +483,14 @@ internal sealed class PostService(
         post.ModifyAt = DateTime.Now;
         await Updateable(post).UpdateColumns(static x => new { x.Tags, x.ModifyAt }).ExecuteCommandAsync();
 
-        await _botClient.AutoReplyAsync($"当前标签: {tagName}", callbackQuery);
+        await _botClient.AutoReply($"当前标签: {tagName}", callbackQuery);
 
         bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
 
         var keyboard = post.IsDirectPost ?
             _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags, hasSpoiler) :
             _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
-        await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, keyboard);
+        await _botClient.EditMessageReplyMarkup(callbackQuery.Message!, keyboard);
     }
 
     public async Task SetPostTag(NewPosts post, string payload, CallbackQuery callbackQuery)
@@ -535,7 +535,7 @@ internal sealed class PostService(
 
         //修改审核群消息
         string reviewMsg = _textHelperService.MakeReviewMessage(poster, dbUser, post.Anonymous, htmlRejectMessage ?? rejectReason.FullText);
-        await _botClient.EditMessageTextAsync(post.ReviewActionChatID, (int)post.ReviewActionMsgID, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
+        await _botClient.EditMessageText(post.ReviewActionChatID, (int)post.ReviewActionMsgID, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
 
         //拒稿频道发布消息
         if (!post.IsMediaGroup)
@@ -610,7 +610,7 @@ internal sealed class PostService(
         }
         else
         {
-            await _botClient.EditMessageTextAsync(post.OriginActionChatID, (int)post.OriginActionMsgID, posterMsg, parseMode: ParseMode.Html);
+            await _botClient.EditMessageText(post.OriginActionChatID, (int)post.OriginActionMsgID, posterMsg, parseMode: ParseMode.Html);
         }
 
         poster.RejectCount++;
@@ -648,10 +648,10 @@ internal sealed class PostService(
 
         if (callbackQuery != null)
         {
-            await _botClient.AutoReplyAsync("此用户已被封禁，无法通过审核", callbackQuery);
+            await _botClient.AutoReply("此用户已被封禁，无法通过审核", callbackQuery);
 
             string reviewMsg = _textHelperService.MakeReviewMessage(poster, reviewer, post.Anonymous, "此用户已被封禁");
-            await _botClient.EditMessageTextAsync(callbackQuery.Message!, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
+            await _botClient.EditMessageText(callbackQuery.Message!, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
         }
     }
 
@@ -688,7 +688,7 @@ internal sealed class PostService(
             if (acceptChannel == null)
             {
                 _logger.LogError("发布频道为空, 无法发布稿件");
-                await _botClient.AutoReplyAsync("发布频道为空, 无法发布稿件", callbackQuery, true);
+                await _botClient.AutoReply("发布频道为空, 无法发布稿件", callbackQuery, true);
                 return;
             }
 
@@ -724,7 +724,7 @@ internal sealed class PostService(
 
                     if (handler == null)
                     {
-                        await _botClient.AutoReplyAsync($"不支持的稿件类型: {post.PostType}", callbackQuery);
+                        await _botClient.AutoReply($"不支持的稿件类型: {post.PostType}", callbackQuery);
                         return;
                     }
 
@@ -772,12 +772,12 @@ internal sealed class PostService(
                 await _mediaGroupService.AddPostMediaGroup(postMessages);
             }
 
-            await _botClient.AutoReplyAsync("稿件已发布", callbackQuery);
+            await _botClient.AutoReply("稿件已发布", callbackQuery);
             post.Status = !second ? EPostStatus.Accepted : EPostStatus.AcceptedSecond;
         }
         else
         {
-            await _botClient.AutoReplyAsync("稿件将按设定频率定期发布", callbackQuery);
+            await _botClient.AutoReply("稿件将按设定频率定期发布", callbackQuery);
             post.Status = EPostStatus.InPlan;
         }
 
@@ -788,7 +788,7 @@ internal sealed class PostService(
         if (!post.IsDirectPost) // 非直接投稿
         {
             string reviewMsg = _textHelperService.MakeReviewMessage(poster, dbUser, post.Anonymous, second, publicMsg);
-            await _botClient.EditMessageTextAsync(callbackQuery.Message!, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
+            await _botClient.EditMessageText(callbackQuery.Message!, reviewMsg, parseMode: ParseMode.Html, disableWebPagePreview: true);
         }
         else // 直接投稿, 在审核群留档
         {
@@ -817,7 +817,7 @@ internal sealed class PostService(
         else
         {
             //静默模式, 不单独发送通知消息
-            await _botClient.EditMessageTextAsync(post.OriginChatID, (int)post.OriginActionMsgID, posterMsg, ParseMode.Html, disableWebPagePreview: true);
+            await _botClient.EditMessageText(post.OriginChatID, (int)post.OriginActionMsgID, posterMsg, ParseMode.Html, disableWebPagePreview: true);
         }
 
         //增加通过数量

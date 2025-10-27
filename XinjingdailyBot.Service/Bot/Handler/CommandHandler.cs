@@ -24,30 +24,16 @@ namespace XinjingdailyBot.Service.Bot.Handler;
 /// 命令处理器
 /// </summary>
 [AppService(typeof(ICommandHandler), LifeTime.Singleton)]
-internal class CommandHandler : ICommandHandler
+internal class CommandHandler(
+    ILogger<CommandHandler> _logger,
+    IChannelService _channelService,
+    IServiceProvider _serviceProvider,
+    ITelegramBotClient _botClient,
+    ICmdRecordService _cmdRecordService,
+    IOptions<OptionsSetting> _options) : ICommandHandler
 {
-    private readonly ILogger<CommandHandler> _logger;
-    private readonly IChannelService _channelService;
-    private readonly ITelegramBotClient _botClient;
-    private readonly IServiceScope _serviceScope;
-    private readonly ICmdRecordService _cmdRecordService;
-    private readonly OptionsSetting _optionsSetting;
-
-    public CommandHandler(
-        ILogger<CommandHandler> logger,
-        IChannelService channelService,
-        IServiceProvider serviceProvider,
-        ITelegramBotClient botClient,
-        ICmdRecordService cmdRecordService,
-        IOptions<OptionsSetting> options)
-    {
-        _logger = logger;
-        _channelService = channelService;
-        _serviceScope = serviceProvider.CreateScope();
-        _botClient = botClient;
-        _cmdRecordService = cmdRecordService;
-        _optionsSetting = options.Value;
-    }
+    private readonly OptionsSetting _optionsSetting = _options.Value;
+    private readonly IServiceScope _serviceScope = _serviceProvider.CreateScope();
 
     /// <summary>
     /// 指令方法名映射
@@ -209,7 +195,7 @@ internal class CommandHandler : ICommandHandler
             {
                 try
                 {
-                    await _botClient.SendChatActionAsync(message, ChatAction.Typing);
+                    await _botClient.SendChatAction(message, ChatAction.Typing);
 
                     await CallCommandAsync(dbUser, message, type, method);
 
@@ -302,13 +288,13 @@ internal class CommandHandler : ICommandHandler
         var message = query.Message;
         if (message == null)
         {
-            await _botClient.AutoReplyAsync("消息不存在", query, true);
+            await _botClient.AutoReply("消息不存在", query, true);
             return;
         }
 
         if (string.IsNullOrEmpty(query.Data))
         {
-            await _botClient.RemoveMessageReplyMarkupAsync(message);
+            await _botClient.RemoveMessageReplyMarkup(message);
             return;
         }
 
@@ -320,15 +306,15 @@ internal class CommandHandler : ICommandHandler
         {
             if (args.Length < 2 || !long.TryParse(args[1], out long userID))
             {
-                await _botClient.AutoReplyAsync("Payload 非法", query, true);
-                await _botClient.RemoveMessageReplyMarkupAsync(message);
+                await _botClient.AutoReply("Payload 非法", query, true);
+                await _botClient.RemoveMessageReplyMarkup(message);
                 return;
             }
 
             //判断消息发起人是不是同一个, userID 为 -1 时所有人均可用
             if (dbUser.UserID != userID && userID != -1)
             {
-                await _botClient.AutoReplyAsync("这不是你的消息, 请不要瞎点", query, true);
+                await _botClient.AutoReply("这不是你的消息, 请不要瞎点", query, true);
                 return;
             }
 
@@ -358,7 +344,7 @@ internal class CommandHandler : ICommandHandler
                 {
                     errorMsg = $"{ex.GetType} {ex.Message}";
                     _logger.LogError(ex, "回调命令 {cmd} 执行出错", cmd);
-                    await _botClient.AutoReplyAsync(_optionsSetting.Debug ? errorMsg : "遇到内部错误", query, true);
+                    await _botClient.AutoReply(_optionsSetting.Debug ? errorMsg : "遇到内部错误", query, true);
                 }
                 handled = true;
                 break;
@@ -371,11 +357,11 @@ internal class CommandHandler : ICommandHandler
         {
             if (_optionsSetting.Debug)
             {
-                await _botClient.AutoReplyAsync($"未知的命令 [{query.Data}]", query, true);
+                await _botClient.AutoReply($"未知的命令 [{query.Data}]", query, true);
             }
             else
             {
-                await _botClient.AutoReplyAsync("未知的命令", query, true);
+                await _botClient.AutoReply("未知的命令", query, true);
             }
         }
     }
@@ -394,7 +380,7 @@ internal class CommandHandler : ICommandHandler
         //权限检查
         if (!dbUser.Right.HasFlag(assemblyMethod.Rights))
         {
-            await _botClient.AutoReplyAsync("没有权限这么做", query, true);
+            await _botClient.AutoReply("没有权限这么做", query, true);
             return;
         }
 

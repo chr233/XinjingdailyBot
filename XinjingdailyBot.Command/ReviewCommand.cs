@@ -143,36 +143,36 @@ internal class ReviewCommand(
         var post = await _postService.FetchPostFromCallbackQuery(query);
         if (post == null)
         {
-            await _botClient.AutoReplyAsync("未找到稿件", query, true);
-            await _botClient.EditMessageReplyMarkupAsync(message, null);
+            await _botClient.AutoReply("未找到稿件", query, true);
+            await _botClient.EditMessageReplyMarkup(message, null);
             return;
         }
 
         if (post.Status == EPostStatus.ReviewTimeout || post.Status == EPostStatus.ConfirmTimeout)
         {
             var msg = "该稿件已过期, 无法操作";
-            await _botClient.AutoReplyAsync(msg, query);
-            await _botClient.EditMessageTextAsync(message, msg, null);
+            await _botClient.AutoReply(msg, query);
+            await _botClient.EditMessageText(message, msg, null);
             return;
         }
 
         if (post.Status != EPostStatus.Reviewing)
         {
-            await _botClient.AutoReplyAsync("请不要重复操作", query, true);
-            await _botClient.EditMessageReplyMarkupAsync(message, null);
+            await _botClient.AutoReply("请不要重复操作", query, true);
+            await _botClient.EditMessageReplyMarkup(message, null);
             return;
         }
 
         if (!dbUser.Right.HasFlag(EUserRights.ReviewPost))
         {
-            await _botClient.AutoReplyAsync("无权操作", query, true);
+            await _botClient.AutoReply("无权操作", query, true);
             return;
         }
 
         var data = query.Data;
         if (string.IsNullOrEmpty(data))
         {
-            await _botClient.AutoReplyAsync("内部错误", query, true);
+            await _botClient.AutoReply("内部错误", query, true);
             return;
         }
 
@@ -243,7 +243,7 @@ internal class ReviewCommand(
     /// <returns></returns>
     private async Task SetAnonymous(NewPosts post, CallbackQuery query)
     {
-        await _botClient.AutoReplyAsync("可以使用命令 /anonymous 切换默认匿名投稿", query);
+        await _botClient.AutoReply("可以使用命令 /anonymous 切换默认匿名投稿", query);
 
         bool anonymous = !post.Anonymous;
         await _postService.SetPostAnonymous(post, anonymous);
@@ -251,7 +251,7 @@ internal class ReviewCommand(
         bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
 
         var keyboard = _markupHelperService.DirectPostKeyboard(anonymous, post.Tags, hasSpoiler);
-        await _botClient.EditMessageReplyMarkupAsync(query.Message!, keyboard);
+        await _botClient.EditMessageReplyMarkup(query.Message!, keyboard);
     }
 
     /// <summary>
@@ -264,7 +264,7 @@ internal class ReviewCommand(
     {
         if (!post.CanSpoiler)
         {
-            await _botClient.AutoReplyAsync("当前稿件类型无法设置遮罩", query, true);
+            await _botClient.AutoReply("当前稿件类型无法设置遮罩", query, true);
             return;
         }
 
@@ -272,12 +272,12 @@ internal class ReviewCommand(
 
         await _postService.SetPostSpoiler(post, hasSpoiler);
 
-        await _botClient.AutoReplyAsync(hasSpoiler ? "启用遮罩" : "禁用遮罩", query);
+        await _botClient.AutoReply(hasSpoiler ? "启用遮罩" : "禁用遮罩", query);
 
         var keyboard = post.IsDirectPost ?
             _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags, hasSpoiler) :
             _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
-        await _botClient.EditMessageReplyMarkupAsync(query.Message!, keyboard);
+        await _botClient.EditMessageReplyMarkup(query.Message!, keyboard);
     }
 
     /// <summary>
@@ -290,9 +290,9 @@ internal class ReviewCommand(
     {
         await _postService.CancelPost(post);
 
-        await _botClient.EditMessageTextAsync(query.Message!, Langs.PostCanceled, replyMarkup: null);
+        await _botClient.EditMessageText(query.Message!, Langs.PostCanceled, replyMarkup: null);
 
-        await _botClient.AutoReplyAsync(Langs.PostCanceled, query);
+        await _botClient.AutoReply(Langs.PostCanceled, query);
     }
 
     /// <summary>
@@ -308,7 +308,7 @@ internal class ReviewCommand(
         var reason = _rejectReasonRepository.GetReasonByPayload(payload);
         if (reason == null)
         {
-            await _botClient.AutoReplyAsync($"找不到 {payload} 对应的拒绝理由", query, true);
+            await _botClient.AutoReply($"找不到 {payload} 对应的拒绝理由", query, true);
             return;
         }
         await _postService.RejectPost(post, dbUser, reason, null);
@@ -325,7 +325,7 @@ internal class ReviewCommand(
     {
         if (rejectMode)
         {
-            await _botClient.AutoReplyAsync("请选择拒稿原因", callbackQuery);
+            await _botClient.AutoReply("请选择拒稿原因", callbackQuery);
         }
 
         bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
@@ -334,6 +334,6 @@ internal class ReviewCommand(
             _markupHelperService.ReviewKeyboardB() :
             _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
 
-        await _botClient.EditMessageReplyMarkupAsync(callbackQuery.Message!, keyboard);
+        await _botClient.EditMessageReplyMarkup(callbackQuery.Message!, keyboard);
     }
 }

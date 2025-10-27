@@ -41,29 +41,29 @@ internal class PostCommand(
 
         if (post == null)
         {
-            await _botClient.AutoReplyAsync("未找到稿件", query);
-            await _botClient.EditMessageReplyMarkupAsync(message, null);
+            await _botClient.AutoReply("未找到稿件", query);
+            await _botClient.EditMessageReplyMarkup(message, null);
             return;
         }
 
         if (post.Status == EPostStatus.ReviewTimeout || post.Status == EPostStatus.ConfirmTimeout)
         {
             var msg = "该稿件已过期, 无法操作";
-            await _botClient.AutoReplyAsync(msg, query);
-            await _botClient.EditMessageTextAsync(message, msg, null);
+            await _botClient.AutoReply(msg, query);
+            await _botClient.EditMessageText(message, msg, null);
             return;
         }
 
         if (post.Status != EPostStatus.Padding)
         {
-            await _botClient.AutoReplyAsync("请不要重复操作", query, true);
-            await _botClient.EditMessageReplyMarkupAsync(message, null);
+            await _botClient.AutoReply("请不要重复操作", query, true);
+            await _botClient.EditMessageReplyMarkup(message, null);
             return;
         }
 
         if (post.PosterUID != dbUser.UserID)
         {
-            await _botClient.AutoReplyAsync("这不是你的稿件", query);
+            await _botClient.AutoReply("这不是你的稿件", query);
             return;
         }
 
@@ -91,13 +91,13 @@ internal class PostCommand(
     /// <returns></returns>
     private async Task SetAnymouse(NewPosts post, CallbackQuery query)
     {
-        await _botClient.AutoReplyAsync("可以使用命令 /anonymous 切换默认匿名投稿", query);
+        await _botClient.AutoReply("可以使用命令 /anonymous 切换默认匿名投稿", query);
 
         bool anonymous = !post.Anonymous;
         await _postService.SetPostAnonymous(post, anonymous);
 
         var keyboard = _markupHelperService.PostKeyboard(anonymous);
-        await _botClient.EditMessageReplyMarkupAsync(query.Message!, keyboard);
+        await _botClient.EditMessageReplyMarkup(query.Message!, keyboard);
     }
 
     /// <summary>
@@ -110,9 +110,9 @@ internal class PostCommand(
     {
         await _postService.CancelPost(post);
 
-        await _botClient.EditMessageTextAsync(query.Message!, Langs.PostCanceled, replyMarkup: null);
+        await _botClient.EditMessageText(query.Message!, Langs.PostCanceled, replyMarkup: null);
 
-        await _botClient.AutoReplyAsync(Langs.PostCanceled, query);
+        await _botClient.AutoReply(Langs.PostCanceled, query);
     }
 
     /// <summary>
@@ -197,8 +197,8 @@ internal class PostCommand(
             x.ModifyAt
         }).ExecuteCommandAsync();
 
-        await _botClient.AutoReplyAsync(Langs.PostSendSuccess, query);
-        await _botClient.EditMessageTextAsync(query.Message!, Langs.ThanksForSendingPost, replyMarkup: null);
+        await _botClient.AutoReply(Langs.PostSendSuccess, query);
+        await _botClient.EditMessageText(query.Message!, Langs.ThanksForSendingPost, replyMarkup: null);
 
         dbUser.PostCount++;
         await _userService.UpdateUserPostCount(dbUser);

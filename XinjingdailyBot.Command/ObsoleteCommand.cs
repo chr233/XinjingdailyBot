@@ -1,10 +1,6 @@
 using Microsoft.Extensions.Logging;
-using System.IO.Compression;
-using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
@@ -105,7 +101,7 @@ internal class ObsoleteCommand(
 
         try
         {
-            await _botClient.EditMessageTextAsync(msg, $"更新稿件表完成, 更新了 {effectCount} 条记录");
+            await _botClient.EditMessageText(msg, $"更新稿件表完成, 更新了 {effectCount} 条记录");
         }
         catch
         {
@@ -257,7 +253,7 @@ internal class ObsoleteCommand(
 
         try
         {
-            await _botClient.EditMessageTextAsync(msg, $"迁移稿件表完成, 更新了 {effectCount} 条记录");
+            await _botClient.EditMessageText(msg, $"迁移稿件表完成, 更新了 {effectCount} 条记录");
         }
         catch
         {
@@ -312,7 +308,7 @@ internal class ObsoleteCommand(
 
         try
         {
-            await _botClient.EditMessageTextAsync(msg, $"修补稿件表完成, 更新了 {effectCount} 条记录");
+            await _botClient.EditMessageText(msg, $"修补稿件表完成, 更新了 {effectCount} 条记录");
         }
         catch
         {

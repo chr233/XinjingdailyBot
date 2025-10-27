@@ -178,15 +178,15 @@ internal class CommonCommand(
 
         sb.AppendLine();
         sb.AppendLine("频道和群组封禁状态:");
-        sb.AppendLine(await _botClient.GetChatMemberStatusAsync(_channelService.AcceptChannel, dbUser.UserID));
-        sb.AppendLine(await _botClient.GetChatMemberStatusAsync(_channelService.RejectChannel, dbUser.UserID));
-        sb.AppendLine(await _botClient.GetChatMemberStatusAsync(_channelService.CommentGroup, dbUser.UserID));
-        sb.AppendLine(await _botClient.GetChatMemberStatusAsync(_channelService.SubGroup, dbUser.UserID));
+        sb.AppendLine(await _botClient.GetChatMemberStatus(_channelService.AcceptChannel, dbUser.UserID));
+        sb.AppendLine(await _botClient.GetChatMemberStatus(_channelService.RejectChannel, dbUser.UserID));
+        sb.AppendLine(await _botClient.GetChatMemberStatus(_channelService.CommentGroup, dbUser.UserID));
+        sb.AppendLine(await _botClient.GetChatMemberStatus(_channelService.SubGroup, dbUser.UserID));
 
         if (_channelService.HasSecondChannel)
         {
-            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(_channelService.SecondChannel, dbUser.UserID));
-            sb.AppendLine(await _botClient.GetChatMemberStatusAsync(_channelService.SecondCommentGroup, dbUser.UserID));
+            sb.AppendLine(await _botClient.GetChatMemberStatus(_channelService.SecondChannel, dbUser.UserID));
+            sb.AppendLine(await _botClient.GetChatMemberStatus(_channelService.SecondCommentGroup, dbUser.UserID));
         }
 
         await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);

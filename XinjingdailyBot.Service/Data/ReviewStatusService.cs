@@ -11,20 +11,11 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IReviewStatusService"/>
 [AppService(typeof(IReviewStatusService), LifeTime.Transient)]
-internal sealed class ReviewStatusService : BaseService<ReviewStatus>, IReviewStatusService
+internal sealed class ReviewStatusService(
+    ILogger<ReviewStatusService> _logger,
+    ITelegramBotClient _botClient,
+    ISqlSugarClient _context) : BaseService<ReviewStatus>(_context), IReviewStatusService
 {
-    private readonly ILogger<ReviewStatusService> _logger;
-    private readonly ITelegramBotClient _botClient;
-
-    public ReviewStatusService(
-        ILogger<ReviewStatusService> logger,
-        ITelegramBotClient botClient,
-        ISqlSugarClient context) : base(context)
-    {
-        _logger = logger;
-        _botClient = botClient;
-    }
-
     public async Task<ReviewStatus?> GetOldReviewStatu()
     {
         var oldPost = await Queryable().FirstAsync(static x => !x.Deleted);
