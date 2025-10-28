@@ -9,7 +9,7 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IBanRecordService"/>
 [AppService(typeof(IBanRecordService), LifeTime.Transient)]
-internal sealed class BanRecordService(ISqlSugarClient context) : BaseService<BanRecords>(context), IBanRecordService
+public sealed class BanRecordService(ISqlSugarClient context) : BaseService<BanRecords>(context), IBanRecordService
 {
     public async Task AddBanRecord(Users targetUser, Users operatorUser, EBanType banType, string reason)
     {
@@ -39,14 +39,14 @@ internal sealed class BanRecordService(ISqlSugarClient context) : BaseService<Ba
         return warnCount;
     }
 
-    public Task<List<BanRecords>> GetBanRecores(Users targetUser)
+    public Task<List<BanRecords>> GetBanRecords(Users targetUser)
     {
         return Queryable()
          .Where(x => x.UserID == targetUser.UserID)
          .OrderByDescending(static x => new { x.BanTime }).ToListAsync();
     }
 
-    public Task<List<BanRecords>> GetBanRecores(Users targetUser, DateTime expireTime)
+    public Task<List<BanRecords>> GetBanRecords(Users targetUser, DateTime expireTime)
     {
         return Queryable()
             .Where(x => x.UserID == targetUser.UserID && (x.Type != EBanType.Warning || x.BanTime > expireTime))

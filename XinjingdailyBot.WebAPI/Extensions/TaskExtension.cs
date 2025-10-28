@@ -2,8 +2,8 @@ using Quartz;
 using Quartz.AspNetCore;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Configs;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
@@ -22,7 +22,7 @@ public static class TaskExtension
     [RequiresUnreferencedCode("不兼容剪裁")]
     public static void AddQuartzSetup(this IServiceCollection services, IConfiguration configuration)
     {
-        var scheduleConfig = configuration.GetSection("Schedule").Get<OptionsSetting.ScheduleOption>();
+        var scheduleConfig = configuration.GetSection("Schedule").Get<ScheduleOption>();
         var cron = scheduleConfig?.Cron ?? new Dictionary<string, string>();
 
         var tasks = Assembly.Load("XinjingdailyBot.Tasks").GetTypes();
@@ -37,7 +37,6 @@ public static class TaskExtension
         });
 
         services.AddQuartz(qz => {
-            //qz.UseMicrosoftDependencyInjectionJobFactory();
 
             _logger.Debug("===== 注册定时任务 =====");
             uint count = 0;

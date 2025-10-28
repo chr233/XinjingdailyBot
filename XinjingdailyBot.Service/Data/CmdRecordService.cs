@@ -9,7 +9,7 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="ICmdRecordService"/>
 [AppService(typeof(ICmdRecordService), LifeTime.Transient)]
-internal sealed class CmdRecordService : BaseService<CmdRecords>, ICmdRecordService
+public sealed class CmdRecordService : BaseService<CmdRecords>, ICmdRecordService
 {
     public CmdRecordService(ISqlSugarClient context) : base(context)
     {

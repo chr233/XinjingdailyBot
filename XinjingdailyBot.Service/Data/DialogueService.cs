@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using SqlSugar;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -6,14 +5,13 @@ using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
-using XinjingdailyBot.Service.Bot.Common;
 using XinjingdailyBot.Service.Data.Base;
 
 namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IDialogueService"/>
 [AppService(typeof(IDialogueService), LifeTime.Transient)]
-internal sealed class DialogueService(
+public sealed class DialogueService(
     ISqlSugarClient context,
     IChannelService _channelService) : BaseService<Dialogue>(context), IDialogueService
 {

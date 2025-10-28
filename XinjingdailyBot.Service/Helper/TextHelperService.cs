@@ -14,7 +14,7 @@ namespace XinjingdailyBot.Service.Helper;
 
 /// <inheritdoc cref="ITextHelperService"/>
 [AppService(typeof(ITextHelperService), LifeTime.Transient)]
-internal sealed class TextHelperService : ITextHelperService
+public sealed class TextHelperService : ITextHelperService
 {
     private readonly TagRepository _tagRepository;
 

@@ -14,31 +14,14 @@ using XinjingdailyBot.Model.Models;
 namespace XinjingdailyBot.Service.Bot.Handler;
 
 [AppService(typeof(IForwardMessageHandler), LifeTime.Singleton)]
-internal class ForwardMessageHandler : IForwardMessageHandler
+public class ForwardMessageHandler(
+     ITelegramBotClient _botClient,
+     IChannelService _channelService,
+     IPostService _postService,
+     IMarkupHelperService _markupHelperService,
+     IUserService _userService,
+     IMediaGroupService _mediaGroupService) : IForwardMessageHandler
 {
-    private readonly IChannelService _channelService;
-    private readonly ITelegramBotClient _botClient;
-    private readonly IPostService _postService;
-    private readonly IMarkupHelperService _markupHelperService;
-    private readonly IUserService _userService;
-    private readonly IMediaGroupService _mediaGroupService;
-
-    public ForwardMessageHandler(
-        ITelegramBotClient botClient,
-        IChannelService channelService,
-        IPostService postService,
-        IMarkupHelperService markupHelperService,
-        IUserService userService,
-        IMediaGroupService mediaGroupService)
-    {
-        _botClient = botClient;
-        _channelService = channelService;
-        _postService = postService;
-        _markupHelperService = markupHelperService;
-        _userService = userService;
-        _mediaGroupService = mediaGroupService;
-    }
-
     public async Task<bool> OnForwardMessageReceived(Users dbUser, Message message)
     {
         if (dbUser.Right.HasFlag(EUserRights.AdminCmd))

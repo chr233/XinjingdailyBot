@@ -17,7 +17,7 @@ namespace XinjingdailyBot.Command;
 /// 审核命令
 /// </summary>
 [AppService(LifeTime.Scoped)]
-internal class ReviewCommand(
+public class ReviewCommand(
         ITelegramBotClient _botClient,
         IUserService _userService,
         IChannelService _channelService,

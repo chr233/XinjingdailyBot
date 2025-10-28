@@ -23,7 +23,7 @@ namespace XinjingdailyBot.Command;
 /// 管理员命令
 /// </summary>
 [AppService(LifeTime.Scoped)]
-internal class AdminCommand(
+public class AdminCommand(
     ILogger<AdminCommand> _logger,
     ITelegramBotClient _botClient,
     IUserService _userService,
@@ -446,7 +446,7 @@ internal class AdminCommand(
         else
         {
             sb.AppendLine("投稿机器人封禁状态:");
-            var records = await banRecordService.GetBanRecores(targetUser);
+            var records = await banRecordService.GetBanRecords(targetUser);
 
             var status = targetUser.IsBan ? "已封禁" : "正常";
             sb.AppendLine($"用户名: {targetUser.HtmlUserLink()}");

@@ -10,7 +10,7 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IAdvertisePostService"/>
 [AppService(typeof(IAdvertisePostService), LifeTime.Transient)]
-internal sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdvertisePostService
+public sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdvertisePostService
 {
     private readonly ILogger<AdvertisePostsService> _logger;
     private readonly ITelegramBotClient _botClient;

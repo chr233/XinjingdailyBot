@@ -11,7 +11,7 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IReviewStatusService"/>
 [AppService(typeof(IReviewStatusService), LifeTime.Transient)]
-internal sealed class ReviewStatusService(
+public sealed class ReviewStatusService(
     ILogger<ReviewStatusService> _logger,
     ITelegramBotClient _botClient,
     ISqlSugarClient _context) : BaseService<ReviewStatus>(_context), IReviewStatusService

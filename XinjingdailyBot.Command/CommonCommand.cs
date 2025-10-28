@@ -19,7 +19,7 @@ namespace XinjingdailyBot.Command;
 /// 通用命令
 /// </summary>
 [AppService(LifeTime.Scoped)]
-internal class CommonCommand(
+public class CommonCommand(
         ITelegramBotClient _botClient,
         IOptions<OptionsSetting> _configuration,
         IBanRecordService _banRecordService,
@@ -133,7 +133,7 @@ internal class CommonCommand(
     public async Task ResponseMyBan(Users dbUser, Message message)
     {
         var expireTime = DateTime.Now.AddDays(-WarnDuration);
-        var records = await _banRecordService.GetBanRecores(dbUser, expireTime);
+        var records = await _banRecordService.GetBanRecords(dbUser, expireTime);
 
         var sb = new StringBuilder();
 

@@ -1,4 +1,3 @@
-using NLog.Extensions.Logging;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Infrastructure.Utils;
@@ -10,7 +9,7 @@ __  _ _             _  _            ___       _  _
  \ \ | || ' |/ . | | || || ' |/ . || | |<_> || || || | |
 _/\_\|_||_|_|\_. | | ||_||_|_|\_. ||___/<___||_||_|`_. |
              <___'<__'        <___'                <___'
-New
+Classic
 "
 ;
 
@@ -28,8 +27,6 @@ Console.WriteLine(Langs.Line);
 Console.WriteLine("欢迎订阅心惊报 https://t.me/xinjingdaily");
 Console.WriteLine(Langs.Line);
 
-Console.Title += BuildInfo.Variant;
-
 #if !DEBUG
 Thread.Sleep(2000);
 #endif
@@ -42,13 +39,7 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 
 // NLog
-services.AddLogging(loggingBuilder => {
-    loggingBuilder.ClearProviders();
-#if !DEBUG
-    loggingBuilder.SetMinimumLevel(LogLevel.Debug);
-#endif
-    loggingBuilder.AddNLog("nlog.config");
-});
+services.AddNLogEx();
 
 // 配置类支持
 builder.AddCustomJsonFiles();

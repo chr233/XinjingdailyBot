@@ -24,7 +24,7 @@ namespace XinjingdailyBot.Service.Bot.Handler;
 /// 命令处理器
 /// </summary>
 [AppService(typeof(ICommandHandler), LifeTime.Singleton)]
-internal class CommandHandler(
+public class CommandHandler(
     ILogger<CommandHandler> _logger,
     IChannelService _channelService,
     IServiceProvider _serviceProvider,

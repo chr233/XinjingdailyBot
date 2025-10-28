@@ -7,6 +7,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Configs;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Localization;
@@ -21,7 +22,7 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IPostService"/>
 [AppService(typeof(IPostService), LifeTime.Singleton)]
-internal sealed class PostService(
+public sealed class PostService(
     ILogger<PostService> _logger,
     IAttachmentService _attachmentService,
     IChannelService _channelService,
@@ -35,7 +36,7 @@ internal sealed class PostService(
     IMediaGroupService _mediaGroupService,
     ISqlSugarClient _context) : BaseService<NewPosts>(_context), IPostService
 {
-    private readonly OptionsSetting.PostOption _postOption = options.Value.Post;
+    private readonly PostOption _postOption = options.Value.Post;
     private readonly bool _enableWebPagePreview = options.Value.Bot.EnableWebPagePreview;
 
     public async Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null)

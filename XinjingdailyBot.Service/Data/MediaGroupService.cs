@@ -9,12 +9,8 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IMediaGroupService"/>
 [AppService(typeof(IMediaGroupService), LifeTime.Singleton)]
-internal sealed class MediaGroupService : BaseService<MediaGroups>, IMediaGroupService
+public sealed class MediaGroupService(ISqlSugarClient context) : BaseService<MediaGroups>(context), IMediaGroupService
 {
-    public MediaGroupService(ISqlSugarClient context) : base(context)
-    {
-    }
-
     public async Task AddPostMediaGroup(Message message)
     {
         if (string.IsNullOrEmpty(message.MediaGroupId))

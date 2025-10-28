@@ -17,7 +17,7 @@ namespace XinjingdailyBot.Command;
 /// </summary>
 [Obsolete("迁移使用")]
 [AppService(LifeTime.Scoped)]
-internal class ObsoleteCommand(
+public class ObsoleteCommand(
         ILogger<SuperCommand> _logger,
         ITelegramBotClient _botClient,
         IPostService _postService,

@@ -24,7 +24,9 @@ public static class DatabaseExtension
     [RequiresUnreferencedCode("不兼容剪裁")]
     public static void AddSqlSugarSetup(this IServiceCollection services)
     {
-        services.AddSingleton<ISqlSugarClient>(s => {
+        services.AddHttpContextAccessor();
+
+        services.AddTransient<ISqlSugarClient>(s => {
             var config = s.GetRequiredService<IOptions<OptionsSetting>>().Value.Database;
 
             var dbType = config.Type?.ToUpperInvariant() switch {
@@ -81,7 +83,7 @@ public static class DatabaseExtension
                 _logger.Info("数据库连接: {0}", connStr.Replace(config.Password, "***"));
             }
 
-            var sqlSugar = new SqlSugarScope(new ConnectionConfig {
+            var sqlSugar = new SqlSugarClient(new ConnectionConfig {
                 ConnectionString = connStr,
                 DbType = dbType,
                 IsAutoCloseConnection = true,

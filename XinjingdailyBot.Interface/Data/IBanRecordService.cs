@@ -33,14 +33,14 @@ public interface IBanRecordService : IBaseService<BanRecords>
     /// </summary>
     /// <param name="targetUser"></param>
     /// <returns></returns>
-    Task<List<BanRecords>> GetBanRecores(Users targetUser);
+    Task<List<BanRecords>> GetBanRecords(Users targetUser);
     /// <summary>
     /// 获取封禁记录
     /// </summary>
     /// <param name="targetUser"></param>
     /// <param name="expireTime"></param>
     /// <returns></returns>
-    Task<List<BanRecords>> GetBanRecores(Users targetUser, DateTime expireTime);
+    Task<List<BanRecords>> GetBanRecords(Users targetUser, DateTime expireTime);
 
     /// <summary>
     /// 获取最近封禁/解封记录

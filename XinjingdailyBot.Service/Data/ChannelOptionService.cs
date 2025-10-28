@@ -10,12 +10,8 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IChannelOptionService"/>
 [AppService(typeof(IChannelOptionService), LifeTime.Transient)]
-internal sealed class ChannelOptionService : BaseService<ChannelOptions>, IChannelOptionService
+public sealed class ChannelOptionService(ISqlSugarClient context) : BaseService<ChannelOptions>(context), IChannelOptionService
 {
-    public ChannelOptionService(ISqlSugarClient context) : base(context)
-    {
-    }
-
     public async Task<EChannelOption> FetchChannelOption(Chat channelChat)
     {
         var chatId = channelChat.Id;

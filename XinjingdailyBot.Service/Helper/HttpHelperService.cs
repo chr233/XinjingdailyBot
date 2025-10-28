@@ -11,7 +11,7 @@ namespace XinjingdailyBot.Service.Helper;
 
 /// <inheritdoc cref="IHttpHelperService"/>
 [AppService(typeof(IHttpHelperService), LifeTime.Transient)]
-internal sealed class HttpHelperService : IHttpHelperService, IDisposable
+public sealed class HttpHelperService : IHttpHelperService, IDisposable
 {
     private readonly ILogger<HttpHelperService> _logger;
     private readonly IHttpClientFactory _httpClientFactory;

@@ -10,17 +10,10 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IAdvertiseService"/>
 [AppService(typeof(IAdvertiseService), LifeTime.Transient)]
-internal sealed class AdvertiseService : BaseService<Advertises>, IAdvertiseService
+public sealed class AdvertiseService(
+    IAdvertisePostService _advertisePostService,
+    ISqlSugarClient context) : BaseService<Advertises>(context), IAdvertiseService
 {
-    private readonly IAdvertisePostService _advertisePostService;
-
-    public AdvertiseService(
-        IAdvertisePostService advertisePostService,
-        ISqlSugarClient context) : base(context)
-    {
-        _advertisePostService = advertisePostService;
-    }
-
     public Task CreateAdvertise(Message message)
     {
         var newAd = new Advertises {

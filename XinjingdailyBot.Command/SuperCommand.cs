@@ -10,7 +10,6 @@ using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
-using XinjingdailyBot.Infrastructure.Utils;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
@@ -23,7 +22,7 @@ namespace XinjingdailyBot.Command;
 /// 超级管理员命令
 /// </summary>
 [AppService(LifeTime.Scoped)]
-internal class SuperCommand(
+public class SuperCommand(
         ILogger<SuperCommand> _logger,
         ITelegramBotClient _botClient,
         IPostService _postService,

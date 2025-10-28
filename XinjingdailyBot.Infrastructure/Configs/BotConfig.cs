@@ -1,4 +1,7 @@
 namespace XinjingdailyBot.Infrastructure.Configs;
+/// <summary>
+/// 机器人设置
+/// </summary>
 public sealed record BotConfig
 {
     /// <summary>

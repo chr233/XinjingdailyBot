@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -275,15 +275,18 @@ public sealed class GeneratedDbInitService(
   <data name="ScheduleHeader" xml:space="preserve">
     <value>using Quartz;
 using Quartz.AspNetCore;
-using XinjingdailyBot.Infrastructure;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Configs;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
 /// &lt;summary&gt;
-/// 定时任务扩展
+/// Telegram扩展
 /// &lt;/summary&gt;
-public static class GeneratedTaskExtensions
-{    
+public static class GeneratedTaskExtension
+{
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
     /// &lt;summary&gt;
@@ -291,9 +294,10 @@ public static class GeneratedTaskExtensions
     /// &lt;/summary&gt;
     /// &lt;param name="services"&gt;&lt;/param&gt;
     /// &lt;param name="configuration"&gt;&lt;/param&gt;
+    [RequiresUnreferencedCode("不兼容剪裁")]
     public static void AddQuartzSetupGenerated(this IServiceCollection services, IConfiguration configuration)
     {
-        var scheduleConfig = configuration.GetSection("Schedule").Get&lt;OptionsSetting.ScheduleOption&gt;();
+        var scheduleConfig = configuration.GetSection("Schedule").Get&lt;ScheduleOption&gt;();
         var cron = scheduleConfig?.Cron ?? [];
 
         services.Configure&lt;QuartzOptions&gt;(options =&gt; {
