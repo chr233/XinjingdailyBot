@@ -1,3 +1,4 @@
+using XinjingdailyBot.Infrastructure.Configs;
 using XinjingdailyBot.Infrastructure.Localization;
 
 namespace XinjingdailyBot.Infrastructure;
@@ -7,21 +8,11 @@ namespace XinjingdailyBot.Infrastructure;
 /// </summary>
 public sealed record OptionsSetting
 {
-    /// <summary>
-    /// 调试模式
-    /// </summary>
-    public bool Debug { get; set; }
-    /// <summary>
-    /// 启用Swagger
-    /// </summary>
-    public bool Swagger { get; set; }
-    /// <summary>
-    /// 统计
-    /// </summary>
-    public bool Statistic { get; set; } = true;
+    /// <inheritdoc cref="SystemConfig"/>
+    public SystemConfig System { get; set; } = new();
 
-    /// <inheritdoc cref="BotOption"/>
-    public BotOption Bot { get; set; } = new();
+    /// <inheritdoc cref="BotConfig"/>
+    public BotConfig Bot { get; set; } = new();
 
     /// <inheritdoc cref="ChannelOption"/>
     public ChannelOption Channel { get; set; } = new();
@@ -30,7 +21,7 @@ public sealed record OptionsSetting
     public MessageOption Message { get; set; } = new();
 
     /// <inheritdoc cref="DatabaseOption"/>
-    public DatabaseOption Database { get; set; } = new();
+    public DatabaseConfig Database { get; set; } = new();
 
     /// <inheritdoc cref="PostOption"/>
     public PostOption Post { get; set; } = new();
@@ -46,50 +37,6 @@ public sealed record OptionsSetting
 
     /// <inheritdoc cref="LevelOption"/>
     public LevelOption Level { get; set; } = new();
-
-    /// <summary>
-    /// 机器人选项
-    /// </summary>
-    public sealed record BotOption
-    {
-        /// <summary>
-        /// Telegram Api地址
-        /// </summary>
-        public string? BaseUrl { get; set; }
-        /// <summary>
-        /// 机器人Token
-        /// </summary>
-        public string? BotToken { get; set; }
-        /// <summary>
-        /// 代理链接, 默认 null
-        /// </summary>
-        public string? Proxy { get; set; }
-        /// <summary>
-        /// 忽略机器人离线时的Update
-        /// </summary>
-        public bool ThrowPendingUpdates { get; set; }
-        /// <summary>
-        /// 自动退出未在配置文件中定义的群组和频道, 默认 false
-        /// </summary>
-        public bool AutoLeaveOtherGroup { get; set; }
-        /// <summary>
-        /// 超级管理员(覆盖数据库配置)
-        /// </summary>
-        public HashSet<long>? SuperAdmins { get; set; }
-
-        /// <summary>
-        /// 启用定时发布
-        /// </summary>
-        public bool EnablePlanPost { get; set; }
-        /// <summary>
-        /// 二级菜单
-        /// </summary>
-        public bool PostSecondMenu { get; set; }
-        /// <summary>
-        /// 文本稿件发布时是否启用链接预览
-        /// </summary>
-        public bool EnableWebPagePreview { get; set; }
-    }
 
     /// <summary>
     /// 频道选项
@@ -153,49 +100,6 @@ public sealed record OptionsSetting
         /// /about 命令返回的消息
         /// </summary>
         public string? About { get; set; }
-    }
-
-    /// <summary>
-    /// 数据库选项
-    /// </summary>
-    public sealed record DatabaseOption
-    {
-        /// <summary>
-        /// 是否生成数据库字段(数据库结构变动时需要打开), 默认 false
-        /// </summary>
-        public bool Generate { get; init; }
-        /// <summary>
-        /// 打印SQL日志
-        /// </summary>
-        public bool LogSQL { get; init; }
-        /// <summary>
-        /// 数据库类型
-        /// </summary>
-        public string? Type { get; init; }
-        /// <summary>
-        /// 数据库连接字符串(DbType选Custom时生效)
-        /// </summary>
-        public string? ConnectionString { get; init; }
-        /// <summary>
-        /// MySQL主机IP
-        /// </summary>
-        public string? Host { get; init; }
-        /// <summary>
-        /// MySQL主机端口
-        /// </summary>
-        public uint Port { get; init; } = 3306;
-        /// <summary>
-        /// MySQL数据库名称
-        /// </summary>
-        public string? DbName { get; init; }
-        /// <summary>
-        /// MySQL用户名
-        /// </summary>
-        public string? User { get; init; }
-        /// <summary>
-        /// MySQL密码
-        /// </summary>
-        public string? Password { get; init; }
     }
 
     /// <summary>

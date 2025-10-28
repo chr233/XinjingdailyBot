@@ -20,7 +20,7 @@ public sealed class CommonController : XjbController
     public CommonController(
         IOptions<OptionsSetting> options)
     {
-        _debug = options.Value.Debug;
+        _debug = options.Value.System.Debug;
     }
 
     /// <summary>

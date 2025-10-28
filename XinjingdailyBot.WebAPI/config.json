@@ -1,23 +1,13 @@
 {
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
-    }
+  // 系统设置
+  "System": {
+    // 调试模式
+    "Debug": true,
+    // Swagger
+    "Swagger": true,
+    "Statistic": true,
+    "HttpPort": 8235
   },
-  "AllowedHosts": "*",
-  "Kestrel": {
-    "Endpoints": {
-      "Http": {
-        "Url": "http://*:8123"
-      }
-    }
-  },
-  // 调试模式
-  "Debug": false,
-  // Swagger
-  "Swagger": false,
-  "Statistic": true,
   // 机器人设置
   "Bot": {
     "BotToken": "",
@@ -47,8 +37,8 @@
   // 数据库设置
   "Database": {
     "Generate": true,
-    "UseMySQL": true,
     "LogSQL": false,
+    "Type": "mysql",
     "DbHost": "localhost",
     "DbPort": 3306,
     "DbName": "xjb_db",

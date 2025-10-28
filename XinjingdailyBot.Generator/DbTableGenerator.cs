@@ -11,7 +11,7 @@ namespace XinjingdailyBot.Generator;
 internal sealed class DbTableGenerator : IIncrementalGenerator
 {
     const string InputFileName = "dbtable.json";
-    const string OutoutFileName = "GeneratedDbTableExtensions.g.cs";
+    const string OutputFileName = "GeneratedDbTableExtensions.g.cs";
 
     /// <inheritdoc/>
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -70,7 +70,7 @@ internal sealed class DbTableGenerator : IIncrementalGenerator
 
         Debug.WriteLine(sb.ToString());
 
-        context.AddSource(OutoutFileName, SourceText.From(sb.ToString(), Encoding.UTF8));
+        context.AddSource(OutputFileName, SourceText.From(sb.ToString(), Encoding.UTF8));
     }
 }
 

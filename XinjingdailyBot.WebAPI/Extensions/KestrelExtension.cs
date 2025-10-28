@@ -22,8 +22,8 @@ public static class KestrelExtension
             var services = o.ApplicationServices;
 
             // 设置 Http 监听地址
-            var apiOption = services.GetRequiredService<IOptions<OptionSettings>>().Value;
-            var port = apiOption.System.HttpPort;
+            var apiOption = services.GetRequiredService<IOptions<OptionsSetting>>().Value.System;
+            var port = apiOption.HttpPort;
 
             if (port < 1024)
             {

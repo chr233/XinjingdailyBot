@@ -25,7 +25,7 @@ internal sealed class HttpHelperService : IHttpHelperService, IDisposable
         _httpClientFactory = httpClientFactory;
 
         //统计
-        if (options.Value.Statistic)
+        if (options.Value.System.Statistic)
         {
             var client = _httpClientFactory.CreateClient("Statistic");
 

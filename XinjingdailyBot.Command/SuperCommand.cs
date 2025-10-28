@@ -46,7 +46,7 @@ internal class SuperCommand(
     {
         try
         {
-            string path = Path.Exists(Environment.ProcessPath) ? Environment.ProcessPath : Utils.ExeFullPath;
+            string path = Path.Exists(Environment.ProcessPath) ? Environment.ProcessPath : BuildInfo.AppPath;
             _logger.LogInformation("机器人运行路径: {path}", path);
             Process.Start(path);
             await _botClient.SendCommandReply("机器人即将重启", message);
@@ -320,8 +320,8 @@ internal class SuperCommand(
                 {
                     using var zipArchive = new ZipArchive(bs);
 
-                    string currentPath = Utils.ExeFullPath;
-                    string backupPath = Utils.BackupFullPath;
+                    string currentPath = BuildInfo.AppDir;
+                    string backupPath = BuildInfo.AppPath + ".bak";
 
                     System.IO.File.Move(currentPath, backupPath, true);
 
@@ -329,7 +329,7 @@ internal class SuperCommand(
                     foreach (var entry in zipArchive.Entries)
                     {
                         if (entry.FullName.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)
-                            || entry.FullName.Equals(Utils.ExeFileName, StringComparison.OrdinalIgnoreCase))
+                            || entry.FullName.Equals(BuildInfo.AppPath, StringComparison.OrdinalIgnoreCase))
                         {
                             entry.ExtractToFile(currentPath);
                             count++;

@@ -5,6 +5,7 @@ using SqlSugar;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.Infrastructure.Configs;
 
 namespace XinjingdailyBot.Service.Bot.Common;
 
@@ -14,7 +15,7 @@ namespace XinjingdailyBot.Service.Bot.Common;
 public class DbInitService : BackgroundService
 {
     private readonly ILogger<DbInitService> _logger;
-    private readonly OptionsSetting.DatabaseOption _option;
+    private readonly DatabaseConfig _option;
     private readonly ISqlSugarClient _dbClient;
 
     /// <summary>

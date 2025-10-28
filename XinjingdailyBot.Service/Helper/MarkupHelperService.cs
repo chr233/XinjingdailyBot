@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Configs;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Localization;
@@ -20,7 +21,7 @@ internal sealed class MarkupHelperService : IMarkupHelperService
     private readonly IChannelService _channelService;
     private readonly TagRepository _tagRepository;
     private readonly RejectReasonRepository _rejectReasonRepository;
-    private readonly OptionsSetting.BotOption _botOption;
+    private readonly BotConfig _botOption;
 
     public MarkupHelperService(
         GroupRepository groupRepository,

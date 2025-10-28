@@ -219,7 +219,7 @@ internal class CommandHandler(
                 {
                     errorMsg = $"{ex.GetType} {ex.Message}";
                     _logger.LogError(ex, "命令 {cmd} 执行出错", cmd);
-                    await _botClient.SendCommandReply(_optionsSetting.Debug ? errorMsg : "遇到内部错误", message);
+                    await _botClient.SendCommandReply(_optionsSetting.System.Debug ? errorMsg : "遇到内部错误", message);
                 }
                 handled = true;
                 break;
@@ -344,7 +344,7 @@ internal class CommandHandler(
                 {
                     errorMsg = $"{ex.GetType} {ex.Message}";
                     _logger.LogError(ex, "回调命令 {cmd} 执行出错", cmd);
-                    await _botClient.AutoReply(_optionsSetting.Debug ? errorMsg : "遇到内部错误", query, true);
+                    await _botClient.AutoReply(_optionsSetting.System.Debug ? errorMsg : "遇到内部错误", query, true);
                 }
                 handled = true;
                 break;
@@ -355,7 +355,7 @@ internal class CommandHandler(
 
         if (!handled)
         {
-            if (_optionsSetting.Debug)
+            if (_optionsSetting.System.Debug)
             {
                 await _botClient.AutoReply($"未知的命令 [{query.Data}]", query, true);
             }

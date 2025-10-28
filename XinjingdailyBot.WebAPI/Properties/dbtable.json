@@ -1,0 +1,20 @@
+{
+  "Users": "XinjingdailyBot.Model.Models.Users",
+  "Advertises": "XinjingdailyBot.Model.Models.Advertises",
+  "NewPosts": "XinjingdailyBot.Model.Models.NewPosts",
+  "Tags": "XinjingdailyBot.Model.Models.Tags",
+  "NameHistory": "XinjingdailyBot.Model.Models.NameHistory",
+  "Attachments": "XinjingdailyBot.Model.Models.Attachments",
+  "BanRecords": "XinjingdailyBot.Model.Models.BanRecords",
+  "OldPosts": "XinjingdailyBot.Model.Models.OldPosts",
+  "Levels": "XinjingdailyBot.Model.Models.Levels",
+  "ChannelOptions": "XinjingdailyBot.Model.Models.ChannelOptions",
+  "UserTokens": "XinjingdailyBot.Model.Models.UserTokens",
+  "ReviewStatus": "XinjingdailyBot.Model.Models.ReviewStatus",
+  "CmdRecords": "XinjingdailyBot.Model.Models.CmdRecords",
+  "MediaGroups": "XinjingdailyBot.Model.Models.MediaGroups",
+  "Dialogue": "XinjingdailyBot.Model.Models.Dialogue",
+  "Groups": "XinjingdailyBot.Model.Models.Groups",
+  "AdvertisePosts": "XinjingdailyBot.Model.Models.AdvertisePosts",
+  "RejectReasons": "XinjingdailyBot.Model.Models.RejectReasons"
+}

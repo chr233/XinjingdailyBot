@@ -148,7 +148,7 @@ internal sealed class UserService(
             return null;
         }
 
-        bool isDebug = _optionsSetting.Debug;
+        bool isDebug = _optionsSetting.System.Debug;
 
         if (msgUser.Username == "GroupAnonymousBot")
         {

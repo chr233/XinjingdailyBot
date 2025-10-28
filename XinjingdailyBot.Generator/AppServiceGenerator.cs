@@ -11,7 +11,7 @@ namespace XinjingdailyBot.Generator;
 internal sealed class AppServiceGenerator : IIncrementalGenerator
 {
     const string InputFileName = "appService.json";
-    const string OutoutFileName = "GeneratedAppServiceExtensions.g.cs";
+    const string OutputFileName = "GeneratedAppServiceExtensions.g.cs";
 
     /// <inheritdoc/>
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -89,7 +89,7 @@ internal sealed class AppServiceGenerator : IIncrementalGenerator
         }
         sb.AppendLine(Templates.AppServiceFooter);
 
-        context.AddSource(OutoutFileName, SourceText.From(sb.ToString(), Encoding.UTF8));
+        context.AddSource(OutputFileName, SourceText.From(sb.ToString(), Encoding.UTF8));
     }
 }
 

@@ -1,39 +1,39 @@
 <Project>
-	<ItemGroup>
-		<PackageVersion Include="ConfigureAwaitChecker.Analyzer" Version="5.0.0.1" />
-		<PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
-		<PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
-		<PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.13.0" />
-		<PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />
-		<PackageVersion Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
-		<PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.4" />
-		<PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.4" />
-		<PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.4" />
-		<PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-		<PackageVersion Include="Microsoft.CodeAnalysis.ResxSourceGenerator" Version="3.11.0-beta1.24527.2" />
-		<PackageVersion Include="MySql.Data" Version="8.2.0" />
-		<PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageVersion Include="NLog" Version="5.4.0" />
-		<PackageVersion Include="NLog.Extensions.Logging" Version="5.4.0" />
-		<PackageVersion Include="NLog.Web.AspNetCore" Version="5.3.5" />
-		<PackageVersion Include="NRedisStack" Version="0.13.3" />
-		<PackageVersion Include="NSwag.AspNetCore" Version="14.3.0" />
-		<PackageVersion Include="NSwag.Generation.AspNetCore" Version="14.3.0" />
-		<PackageVersion Include="Quartz" Version="3.14.0" />
-		<PackageVersion Include="Quartz.AspNetCore" Version="3.14.0" />
-		<PackageVersion Include="SkiaSharp" Version="3.116.1" />
-		<PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="2.88.8" />
-		<PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.116.1" />
-		<PackageVersion Include="SkiaSharp.NativeAssets.macOS" Version="3.116.1" />
-		<PackageVersion Include="SkiaSharp.NativeAssets.Win32" Version="3.116.1" />
-		<PackageVersion Include="Spectre.Console" Version="0.50.0" />
-		<PackageVersion Include="SqlSugar.IOC" Version="2.0.0" />
-		<PackageVersion Include="SqlSugarCore" Version="5.1.4.188" />
-		<PackageVersion Include="StackExchange.Redis" Version="2.8.31" />
-		<PackageVersion Include="Swashbuckle.AspNetCore" Version="8.1.1" />
-		<PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.1" />
-		<PackageVersion Include="System.Private.Uri" Version="4.3.2" />
-		<PackageVersion Include="System.Text.Json" Version="8.0.1" />
-		<PackageVersion Include="Telegram.Bot" Version="22.5.0" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageVersion Include="ConfigureAwaitChecker.Analyzer" Version="5.0.0.1" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.ResxSourceGenerator" Version="3.11.0-beta1.24527.2" />
+    <PackageVersion Include="MySql.Data" Version="8.2.0" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageVersion Include="NLog" Version="6.0.5" />
+    <PackageVersion Include="NLog.Extensions.Logging" Version="6.0.5" />
+    <PackageVersion Include="NLog.Web.AspNetCore" Version="5.3.5" />
+    <PackageVersion Include="NRedisStack" Version="0.13.3" />
+    <PackageVersion Include="NSwag.AspNetCore" Version="14.6.1" />
+    <PackageVersion Include="NSwag.Generation.AspNetCore" Version="14.6.1" />
+    <PackageVersion Include="Quartz" Version="3.15.1" />
+    <PackageVersion Include="Quartz.AspNetCore" Version="3.15.1" />
+    <PackageVersion Include="SkiaSharp" Version="3.119.1" />
+    <PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="2.88.8" />
+    <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.116.1" />
+    <PackageVersion Include="SkiaSharp.NativeAssets.macOS" Version="3.116.1" />
+    <PackageVersion Include="SkiaSharp.NativeAssets.Win32" Version="3.116.1" />
+    <PackageVersion Include="Spectre.Console" Version="0.50.0" />
+    <PackageVersion Include="SqlSugar.IOC" Version="2.0.0" />
+    <PackageVersion Include="SqlSugarCore" Version="5.1.4.206" />
+    <PackageVersion Include="StackExchange.Redis" Version="2.8.31" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.6" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="9.0.6" />
+    <PackageVersion Include="System.Private.Uri" Version="4.3.2" />
+    <PackageVersion Include="System.Text.Json" Version="8.0.1" />
+    <PackageVersion Include="Telegram.Bot" Version="22.7.4" />
+  </ItemGroup>
 </Project>

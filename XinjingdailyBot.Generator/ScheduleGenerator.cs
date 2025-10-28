@@ -11,7 +11,7 @@ namespace XinjingdailyBot.Generator;
 internal sealed class ScheduleGenerator : IIncrementalGenerator
 {
     const string InputFileName = "schedule.json";
-    const string OutoutFileName = "GeneratedScheduleExtensions.g.cs";
+    const string OutputFileName = "GeneratedScheduleExtensions.g.cs";
 
     /// <inheritdoc/>
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -78,7 +78,7 @@ internal sealed class ScheduleGenerator : IIncrementalGenerator
 
         Debug.WriteLine(sb.ToString());
 
-        context.AddSource(OutoutFileName, SourceText.From(sb.ToString(), Encoding.UTF8));
+        context.AddSource(OutputFileName, SourceText.From(sb.ToString(), Encoding.UTF8));
     }
 }
 

@@ -8,11 +8,28 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
+		<AdditionalFiles Include="Properties\appService.json" />
+		<AdditionalFiles Include="Properties\dbtable.json" />
+		<AdditionalFiles Include="Properties\launchSettings.json" />
+		<AdditionalFiles Include="Properties\schedule.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+		<PackageReference Include="Microsoft.Extensions.Http" />
+		<PackageReference Include="SkiaSharp" />
 		<PackageReference Include="NLog.Extensions.Logging" />
+		<PackageReference Include="NLog.Extensions.Logging" />
+		<PackageReference Include="NSwag.AspNetCore" />
+		<PackageReference Include="NSwag.Generation.AspNetCore" />
 		<PackageReference Include="Quartz.AspNetCore" />
+		<PackageReference Include="SqlSugarCore" />
 		<PackageReference Include="Swashbuckle.AspNetCore" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
+		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
+		<PackageReference Include="System.Private.Uri" />
+		<PackageReference Include="Telegram.Bot" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -25,11 +42,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Properties\PublishProfiles\" />
+		<None Include="..\.editorconfig" Link=".editorconfig" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<None Include="..\.editorconfig" Link=".editorconfig" />
+	<ItemGroup Condition="'$(Configuration)'=='Debug'">
+
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='Release'">
+		<ProjectReference Include="..\XinjingdailyBot.Generator\XinjingdailyBot.Generator.csproj">
+			<OutputItemType>Analyzer</OutputItemType>
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+		</ProjectReference>
 	</ItemGroup>
 
 	<ItemGroup>

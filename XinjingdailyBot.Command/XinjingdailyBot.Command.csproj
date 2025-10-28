@@ -15,4 +15,8 @@
 		<None Include="..\.editorconfig" Link=".editorconfig" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <PackageReference Include="System.Private.Uri" />
+	</ItemGroup>
+
 </Project>
