@@ -20,7 +20,6 @@
 		<PackageReference Include="Microsoft.Extensions.Http" />
 		<PackageReference Include="SkiaSharp" />
 		<PackageReference Include="NLog.Extensions.Logging" />
-		<PackageReference Include="NLog.Extensions.Logging" />
 		<PackageReference Include="NSwag.AspNetCore" />
 		<PackageReference Include="NSwag.Generation.AspNetCore" />
 		<PackageReference Include="Quartz.AspNetCore" />
