@@ -16,8 +16,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
-		<PackageReference Include="Microsoft.Extensions.Http" />
 		<PackageReference Include="SkiaSharp" />
 		<PackageReference Include="NLog.Extensions.Logging" />
 		<PackageReference Include="NSwag.AspNetCore" />
@@ -27,7 +25,6 @@
 		<PackageReference Include="Swashbuckle.AspNetCore" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
 		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
-		<PackageReference Include="System.Private.Uri" />
 		<PackageReference Include="Telegram.Bot" />
 	</ItemGroup>
 

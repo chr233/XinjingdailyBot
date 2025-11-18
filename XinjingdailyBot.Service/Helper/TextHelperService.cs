@@ -89,6 +89,15 @@ public sealed class TextHelperService : ITextHelperService
         return $"<a href=\"https://t.me/{chatName}/{messageID}\">{linkName}</a>";
     }
 
+    public string HtmlMessageLink(long messageID, long chatId, string linkName)
+    {
+        if (chatId < 0)
+        {
+            chatId = -1000000000000L - chatId;
+        }
+        return $"<a href=\"https://t.me/c/{chatId}/{messageID}\">{linkName}</a>";
+    }
+
     public string EscapeHtml(string? text)
     {
         if (string.IsNullOrEmpty(text))

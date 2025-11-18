@@ -26,6 +26,7 @@ public class ChannelService(
     public Chat AcceptChannel { get; private set; } = new();
     public Chat? SecondChannel { get; private set; }
     public Chat RejectChannel { get; private set; } = new();
+    public Chat AdminLogChannel { get; private set; } = new();
     public User BotUser { get; private set; } = new();
 
     public async Task InitChannelInfo()
