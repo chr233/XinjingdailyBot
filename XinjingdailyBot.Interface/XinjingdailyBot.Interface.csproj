@@ -5,6 +5,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+
 		<ProjectReference Include="..\XinjingdailyBot.Infrastructure\XinjingdailyBot.Infrastructure.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Model\XinjingdailyBot.Model.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Repository\XinjingdailyBot.Repository.csproj" />
@@ -15,7 +16,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="System.Private.Uri" />
+		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
+		<PackageReference Include="System.Private.Uri" />
 	</ItemGroup>
 
 </Project>

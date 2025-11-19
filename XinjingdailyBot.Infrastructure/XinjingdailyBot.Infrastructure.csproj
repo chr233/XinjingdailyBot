@@ -5,6 +5,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.Extensions.Logging" />
 		<PackageReference Include="NLog" />
 		<PackageReference Include="Telegram.Bot" />
