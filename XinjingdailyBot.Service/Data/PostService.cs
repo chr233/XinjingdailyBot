@@ -450,102 +450,123 @@ public sealed class PostService(
         {
             //添加媒体组缓存信息
             mgCache = new MediaGroupCache();
-            MediaGroupCache.TryAdd(mediaGroupId, mgCache);
-
-            bool exists = await Queryable().AnyAsync(x => x.OriginMediaGroupID == mediaGroupId).ConfigureAwait(false);
-            if (!exists)
+            if (MediaGroupCache.TryAdd(mediaGroupId, mgCache))
             {
-                await _botClient.SendChatActionAsync(message, ChatAction.Typing).ConfigureAwait(false);
-
-                var channelOption = EChannelOption.Normal;
-
-                long channelId = -1, channelMsgId = -1;
-                if (message.ForwardFromChat?.Type == ChatType.Channel)
+                try
                 {
-                    channelId = message.ForwardFromChat.Id;
-                    //非管理员禁止从自己的频道转发
-                    if (!dbUser.Right.HasFlag(EUserRights.ReviewPost))
+                    bool exists = await Queryable().AnyAsync(x => x.OriginMediaGroupID == mediaGroupId).ConfigureAwait(false);
+                    if (!exists)
                     {
-                        if (channelId == _channelService.AcceptChannel.Id || channelId == _channelService.RejectChannel.Id)
+                        await _botClient.SendChatActionAsync(message, ChatAction.Typing).ConfigureAwait(false);
+
+                        var channelOption = EChannelOption.Normal;
+
+                        long channelId = -1, channelMsgId = -1;
+                        if (message.ForwardFromChat?.Type == ChatType.Channel)
                         {
-                            await _botClient.AutoReplyAsync("禁止从发布频道或者拒稿频道转载投稿内容", message).ConfigureAwait(false);
-                            return;
+                            channelId = message.ForwardFromChat.Id;
+                            //非管理员禁止从自己的频道转发
+                            if (!dbUser.Right.HasFlag(EUserRights.ReviewPost))
+                            {
+                                if (channelId == _channelService.AcceptChannel.Id || channelId == _channelService.RejectChannel.Id)
+                                {
+                                    await _botClient.AutoReplyAsync("禁止从发布频道或者拒稿频道转载投稿内容", message).ConfigureAwait(false);
+                                    mgCache.PostIdTcs.SetResult(-1);
+                                    return;
+                                }
+                            }
+
+                            channelMsgId = message.ForwardFromMessageId ?? -1;
+                            channelOption = await _channelOptionService.FetchChannelOption(message.ForwardFromChat).ConfigureAwait(false);
                         }
+
+                        int newTags = _tagRepository.FetchTags(message.Caption);
+                        string text = _textHelperService.ParseMessage(message);
+
+                        bool anonymous = dbUser.PreferAnonymous;
+
+                        //直接发布模式
+                        bool directPost = dbUser.Right.HasFlag(EUserRights.DirectPost);
+                        bool? hasSpoiler = message.CanSpoiler() ? message.HasMediaSpoiler ?? false : null;
+
+                        //发送确认消息
+                        mgCache.Keyboard = directPost ?
+                            _markupHelperService.DirectPostKeyboard(anonymous, newTags, hasSpoiler) :
+                            _markupHelperService.PostKeyboard(anonymous);
+                        mgCache.PostText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
+
+                        string processText = "处理中, 请稍后";
+                        //套用频道设定
+                        switch (channelOption)
+                        {
+                            case EChannelOption.Normal:
+                                break;
+                            case EChannelOption.PurgeOrigin:
+                                processText += "\n由于系统设定, 来自该频道的投稿将不会显示来源";
+                                mgCache.PostText += "\n由于系统设定, 来自该频道的投稿将不会显示来源";
+                                break;
+                            case EChannelOption.AutoReject:
+                                processText = "由于系统设定, 暂不接受来自此频道的投稿";
+                                //清空状态量, 将不进行后续操作
+                                mgCache.PostText = null;
+                                mgCache.Keyboard = null;
+                                break;
+                            default:
+                                _logger.LogError("未知的频道选项 {channelOption}", channelOption);
+                                mgCache.PostIdTcs.SetResult(-1);
+                                return;
+                        }
+
+                        mgCache.ActionMessage = await _botClient.SendTextMessageAsync(message.Chat, processText, replyToMessageId: message.MessageId, allowSendingWithoutReply: true).ConfigureAwait(false);
+
+                        //生成数据库实体
+                        var newPost = new Posts {
+                            OriginChatID = message.Chat.Id,
+                            OriginMsgID = message.MessageId,
+                            OriginActionChatID = mgCache.ActionMessage.Chat.Id,
+                            OriginActionMsgID = mgCache.ActionMessage.MessageId,
+                            Anonymous = anonymous,
+                            Text = text,
+                            RawText = message.Text ?? "",
+                            ChannelID = channelId,
+                            ChannelMsgID = channelMsgId,
+                            Status = channelOption == EChannelOption.AutoReject ?
+                                EPostStatus.Rejected :
+                                (directPost ? EPostStatus.Reviewing : EPostStatus.Padding),
+                            PostType = message.Type,
+                            OriginMediaGroupID = mediaGroupId,
+                            Tags = newTags,
+                            HasSpoiler = hasSpoiler ?? false,
+                            PosterUID = dbUser.UserID,
+                        };
+
+                        if (directPost)
+                        {
+                            newPost.ReviewChatID = newPost.OriginChatID;
+                            newPost.ReviewMsgID = newPost.OriginMsgID;
+                            newPost.ReviewActionChatID = newPost.OriginActionChatID;
+                            newPost.ReviewActionMsgID = newPost.OriginActionMsgID;
+                            newPost.ReviewMediaGroupID = mediaGroupId;
+                        }
+
+                        mgCache.PostId = await Insertable(newPost).ExecuteReturnIdentityAsync().ConfigureAwait(false);
+                        mgCache.PostIdTcs.SetResult(mgCache.PostId);
                     }
-
-                    channelMsgId = message.ForwardFromMessageId ?? -1;
-                    channelOption = await _channelOptionService.FetchChannelOption(message.ForwardFromChat).ConfigureAwait(false);
                 }
-
-                int newTags = _tagRepository.FetchTags(message.Caption);
-                string text = _textHelperService.ParseMessage(message);
-
-                bool anonymous = dbUser.PreferAnonymous;
-
-                //直接发布模式
-                bool directPost = dbUser.Right.HasFlag(EUserRights.DirectPost);
-                bool? hasSpoiler = message.CanSpoiler() ? message.HasMediaSpoiler ?? false : null;
-
-                //发送确认消息
-                mgCache.Keyboard = directPost ?
-                    _markupHelperService.DirectPostKeyboard(anonymous, newTags, hasSpoiler) :
-                    _markupHelperService.PostKeyboard(anonymous);
-                mgCache.PostText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
-
-                string processText = "处理中, 请稍后";
-                //套用频道设定
-                switch (channelOption)
+                catch (Exception e)
                 {
-                    case EChannelOption.Normal:
-                        break;
-                    case EChannelOption.PurgeOrigin:
-                        processText += "\n由于系统设定, 来自该频道的投稿将不会显示来源";
-                        mgCache.PostText += "\n由于系统设定, 来自该频道的投稿将不会显示来源";
-                        break;
-                    case EChannelOption.AutoReject:
-                        processText = "由于系统设定, 暂不接受来自此频道的投稿";
-                        //清空状态量, 将不进行后续操作
-                        mgCache.PostText = null;
-                        mgCache.Keyboard = null;
-                        break;
-                    default:
-                        _logger.LogError("未知的频道选项 {channelOption}", channelOption);
-                        return;
+                    _logger.LogError(e, "初始化媒体组投稿失败");
+                    mgCache.PostIdTcs.TrySetException(e);
+                    throw;
                 }
-
-                mgCache.ActionMessage = await _botClient.SendTextMessageAsync(message.Chat, processText, replyToMessageId: message.MessageId, allowSendingWithoutReply: true).ConfigureAwait(false);
-
-                //生成数据库实体
-                var newPost = new Posts {
-                    OriginChatID = message.Chat.Id,
-                    OriginMsgID = message.MessageId,
-                    OriginActionChatID = mgCache.ActionMessage.Chat.Id,
-                    OriginActionMsgID = mgCache.ActionMessage.MessageId,
-                    Anonymous = anonymous,
-                    Text = text,
-                    RawText = message.Text ?? "",
-                    ChannelID = channelId,
-                    ChannelMsgID = channelMsgId,
-                    Status = channelOption == EChannelOption.AutoReject ?
-                        EPostStatus.Rejected :
-                        (directPost ? EPostStatus.Reviewing : EPostStatus.Padding),
-                    PostType = message.Type,
-                    OriginMediaGroupID = mediaGroupId,
-                    Tags = newTags,
-                    HasSpoiler = hasSpoiler ?? false,
-                    PosterUID = dbUser.UserID,
-                };
-
-                if (directPost)
+            }
+            else
+            {
+                //如果添加失败说明已经存在，重新获取
+                if (MediaGroupCache.TryGetValue(mediaGroupId, out mgCache))
                 {
-                    newPost.ReviewChatID = newPost.OriginChatID;
-                    newPost.ReviewMsgID = newPost.OriginMsgID;
-                    newPost.ReviewActionChatID = newPost.OriginActionChatID;
-                    newPost.ReviewActionMsgID = newPost.OriginActionMsgID;
-                    newPost.ReviewMediaGroupID = mediaGroupId;
+                    mgCache.RenewTtl();
                 }
-
-                mgCache.PostId = await Insertable(newPost).ExecuteReturnIdentityAsync().ConfigureAwait(false);
             }
         }
         else
@@ -553,20 +574,38 @@ public sealed class PostService(
             mgCache.RenewTtl();
         }
 
-        //储存多媒体信息
-        if (mgCache.PostId > 0)
+        if (mgCache != null)
         {
-            //更新附件
-            await _attachmentService.CreateAttachment(message, mgCache.PostId).ConfigureAwait(false);
-
-            //检查每张图片是否模糊
-            if (string.IsNullOrEmpty(mgCache.WarnMsg))
+            try
             {
-                mgCache.WarnMsg = await _imageHelperService.FuzzyImageCheck(message).ConfigureAwait(false);
-            }
+                //等待PostID生成
+                //设置超时时间为10秒
+                int postId = await mgCache.PostIdTcs.Task.WaitAsync(TimeSpan.FromSeconds(10)).ConfigureAwait(false);
 
-            //记录媒体组
-            await _mediaGroupService.AddPostMediaGroup(message).ConfigureAwait(false);
+                //储存多媒体信息
+                if (postId > 0)
+                {
+                    //更新附件
+                    await _attachmentService.CreateAttachment(message, postId).ConfigureAwait(false);
+
+                    //检查每张图片是否模糊
+                    if (string.IsNullOrEmpty(mgCache.WarnMsg))
+                    {
+                        mgCache.WarnMsg = await _imageHelperService.FuzzyImageCheck(message).ConfigureAwait(false);
+                    }
+
+                    //记录媒体组
+                    await _mediaGroupService.AddPostMediaGroup(message).ConfigureAwait(false);
+                }
+            }
+            catch (TimeoutException)
+            {
+                _logger.LogWarning("等待媒体组PostID生成超时");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "处理媒体组附件时发生错误");
+            }
         }
     }
 
@@ -1332,6 +1371,10 @@ public sealed class PostService(
 internal sealed record MediaGroupCache
 {
     public int PostId { get; set; } = -1;
+    /// <summary>
+    /// PostID生成完成信号量
+    /// </summary>
+    public TaskCompletionSource<int> PostIdTcs { get; } = new();
     public DateTime ExpireAt { get; set; }
     public string? PostText { get; set; }
     public InlineKeyboardMarkup? Keyboard { get; set; }
