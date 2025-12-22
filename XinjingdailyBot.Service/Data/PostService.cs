@@ -5,9 +5,9 @@ using System.Collections.Concurrent;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Infrastructure.Configs;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Localization;
@@ -31,30 +31,31 @@ internal sealed class PostService(
     IMarkupHelperService _markupHelperService,
     ITelegramBotClient _botClient,
     IUserService _userService,
-    IOptions<OptionsSetting> options,
+    IOptions<OptionsSetting> _options,
     TagRepository _tagRepository,
     IMediaGroupService _mediaGroupService,
-    ISqlSugarClient _context) : BaseService<NewPosts>(_context), IPostService
+    IImageHelperService _imageHelperService,
+    ISqlSugarClient _context) : BaseService<Posts>(_context), IPostService, IDisposable
 {
-    private readonly PostOption _postOption = options.Value.Post;
-    private readonly bool _enableWebPagePreview = options.Value.Bot.EnableWebPagePreview;
-
+    /// <inheritdoc/>
     public async Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null)
     {
+        var postOption = _options.Value.Post;
+
         //未开启限制或者用户为管理员时不受限制
-        if ((dbUser.AcceptCount > 0 && !_postOption.EnablePostLimit) || dbUser.Right.HasFlag(EUserRights.Admin))
+        if ((dbUser.AcceptCount > 0 && !postOption.EnablePostLimit) || dbUser.Right.HasFlag(EUserRights.Admin))
         {
             return true;
         }
 
         //待定确认稿件上限
-        int paddingLimit = _postOption.DailyPaddingLimit;
+        int paddingLimit = postOption.DailyPaddingLimit;
         //上限基数
-        int baseRatio = Math.Min(dbUser.AcceptCount / _postOption.RatioDivisor + 1, _postOption.MaxRatio);
+        int baseRatio = Math.Min(dbUser.AcceptCount / postOption.RatioDivisor + 1, postOption.MaxRatio);
         //审核中稿件上限
-        int reviewLimit = baseRatio * _postOption.DailyReviewLimit;
+        int reviewLimit = baseRatio * postOption.DailyReviewLimit;
         //每日投稿上限
-        int dailyLimit = baseRatio * _postOption.DailyPostLimit;
+        int dailyLimit = baseRatio * postOption.DailyPostLimit;
 
         //没有通过稿件的用户收到更严格的限制
         if (dbUser.AcceptCount == 0)
@@ -109,6 +110,55 @@ internal sealed class PostService(
         return true;
     }
 
+    /// <summary>
+    /// 纯链接解析机器人字典
+    /// </summary>
+    private readonly Dictionary<string, string> LinkParserBotDict = new() {
+        { "b23.tv", "@bilifeedbot" },
+        { "bilibili.cn", "@bilifeedbot" },
+        { "bilibili.com", "@bilifeedbot" },
+        { "twitter.com", "@TwPicBot" },
+        { "x.com", "@TwPicBot" },
+        { "fxtwitter.com", "@TwPicBot" },
+        { "fixupx.com", "@TwPicBot" },
+        { "fixvx.com", "@TwPicBot" },
+        { "twittpr.com","@TwPicBot" },
+        { "weibo.com", "@web2album_bot" },
+        { "xiaohongshu.com", "@web2album_bot" },
+        { "douyin.com", "@icbcbot" },
+        { "youtube.com", "@icbcbot" },
+        { "youtu.be", "@icbcbot" },
+        { "pixiv.net", "@Pixiv_bot" },
+        { "pximg.net", "@Pixiv_bot" },
+    };
+
+    /// <summary>
+    /// 判断是否为纯链接
+    /// </summary>
+    /// <param name="msgText"></param>
+    /// <returns></returns>
+    private string? CheckIfRawLink(string msgText)
+    {
+        if (_options.Value.Bot.WarnRawLinkPost)
+        {
+            var matches = RegexUtils.MatchUrlHost().Matches(msgText).ToList();
+            foreach (var match in matches)
+            {
+                string? urlHost = match.Groups[1].Value.ToLowerInvariant();
+                foreach (var (host, botName) in LinkParserBotDict)
+                {
+                    if (urlHost.EndsWith(host))
+                    {
+                        return $"检测到来自 {host} 的纯链接投稿，建议先将链接发送至 {botName} 进行处理后再投稿";
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /// <inheritdoc/>
     public async Task HandleTextPosts(Users dbUser, Message message)
     {
         if (!dbUser.Right.HasFlag(EUserRights.SendPost))
@@ -167,7 +217,7 @@ internal sealed class PostService(
         string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
         //生成数据库实体
-        var newPost = new NewPosts {
+        var newPost = new Posts {
             Anonymous = anonymous,
             Text = text,
             RawText = message.Text ?? "",
@@ -176,7 +226,7 @@ internal sealed class PostService(
             Status = directPost ? EPostStatus.Reviewing : EPostStatus.Padding,
             PostType = message.Type,
             Tags = newTags,
-            HasSpoiler = message.HasMediaSpoiler,
+            HasSpoiler = message.HasMediaSpoiler ?? false,
             PosterUID = dbUser.UserID
         };
 
@@ -200,6 +250,8 @@ internal sealed class PostService(
 
         var actionMsg = await _botClient.SendMessageEx(message, postText, replyMarkup: keyboard).ConfigureAwait(false);
 
+        var actionMsg = await _botClient.SendTextMessageAsync(message.Chat, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true).ConfigureAwait(false);
+
         //修改数据库实体
         newPost.OriginChatID = message.Chat.Id;
         newPost.OriginMsgID = message.MessageId;
@@ -217,6 +269,7 @@ internal sealed class PostService(
         await Insertable(newPost).ExecuteCommandAsync().ConfigureAwait(false);
     }
 
+    /// <inheritdoc/>
     public async Task HandleMediaPosts(Users dbUser, Message message)
     {
         if (!dbUser.Right.HasFlag(EUserRights.SendPost))
@@ -266,7 +319,7 @@ internal sealed class PostService(
         string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
         //生成数据库实体
-        var newPost = new NewPosts {
+        var newPost = new Posts {
             Anonymous = anonymous,
             Text = text,
             RawText = message.Text ?? "",
@@ -299,6 +352,8 @@ internal sealed class PostService(
 
         var actionMsg = await _botClient.SendMessageEx(message, postText, replyMarkup: keyboard).ConfigureAwait(false);
 
+        var actionMsg = await _botClient.SendTextMessageAsync(message.Chat, postText, replyToMessageId: message.MessageId, replyMarkup: keyboard, allowSendingWithoutReply: true).ConfigureAwait(false);
+
         //修改数据库实体
         newPost.OriginChatID = message.Chat.Id;
         newPost.OriginMsgID = message.MessageId;
@@ -315,7 +370,8 @@ internal sealed class PostService(
 
         long postID = await Insertable(newPost).ExecuteReturnBigIdentityAsync().ConfigureAwait(false);
 
-        var attachment = _attachmentService.GenerateAttachment(message, postID);
+        await _attachmentService.CreateAttachment(message, postID).ConfigureAwait(false);
+    }
 
         if (attachment != null)
         {
@@ -328,6 +384,7 @@ internal sealed class PostService(
     /// </summary>
     private ConcurrentDictionary<string, int> MediaGroupIDs { get; } = new();
 
+    /// <inheritdoc/>
     public async Task HandleMediaGroupPosts(Users dbUser, Message message)
     {
         if (!dbUser.Right.HasFlag(EUserRights.SendPost))
@@ -378,10 +435,10 @@ internal sealed class PostService(
 
                 //直接发布模式
                 bool directPost = dbUser.Right.HasFlag(EUserRights.DirectPost);
-                bool? hasSpoiler = message.CanSpoiler() ? message.HasMediaSpoiler : null;
+                bool? hasSpoiler = message.CanSpoiler() ? message.HasMediaSpoiler ?? false : null;
 
                 //发送确认消息
-                var keyboard = directPost ?
+                mgCache.Keyboard = directPost ?
                     _markupHelperService.DirectPostKeyboard(anonymous, newTags, hasSpoiler) :
                     _markupHelperService.PostKeyboard(anonymous);
                 string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
@@ -389,41 +446,25 @@ internal sealed class PostService(
                 var actionMsg = await _botClient.SendMessageEx(message, "处理中, 请稍后").ConfigureAwait(false);
 
                 //生成数据库实体
-                var newPost = new NewPosts {
+                var newPost = new Posts {
                     OriginChatID = message.Chat.Id,
                     OriginMsgID = message.MessageId,
-                    OriginActionChatID = actionMsg.Chat.Id,
-                    OriginActionMsgID = actionMsg.MessageId,
+                    OriginActionChatID = mgCache.ActionMessage.Chat.Id,
+                    OriginActionMsgID = mgCache.ActionMessage.MessageId,
                     Anonymous = anonymous,
                     Text = text,
                     RawText = message.Text ?? "",
                     ChannelID = channelId,
                     ChannelMsgID = channelMsgId,
-                    Status = directPost ? EPostStatus.Reviewing : EPostStatus.Padding,
+                    Status = channelOption == EChannelOption.AutoReject ?
+                        EPostStatus.Rejected :
+                        (directPost ? EPostStatus.Reviewing : EPostStatus.Padding),
                     PostType = message.Type,
                     OriginMediaGroupID = mediaGroupId,
                     Tags = newTags,
                     HasSpoiler = hasSpoiler ?? false,
                     PosterUID = dbUser.UserID,
                 };
-
-                //套用频道设定
-                switch (channelOption)
-                {
-                    case EChannelOption.Normal:
-                        break;
-                    case EChannelOption.PurgeOrigin:
-                        postText += "\n由于系统设定, 来自该频道的投稿将不会显示来源";
-                        break;
-                    case EChannelOption.AutoReject:
-                        postText = "由于系统设定, 暂不接受来自此频道的投稿";
-                        keyboard = null;
-                        newPost.Status = EPostStatus.Rejected;
-                        break;
-                    default:
-                        _logger.LogError("未知的频道选项 {channelOption}", channelOption);
-                        return;
-                }
 
                 if (directPost)
                 {
@@ -494,7 +535,8 @@ internal sealed class PostService(
         await _botClient.EditMessageReplyMarkup(callbackQuery.Message!, keyboard).ConfigureAwait(false);
     }
 
-    public async Task SetPostTag(NewPosts post, string payload, CallbackQuery callbackQuery)
+    /// <inheritdoc/>
+    public async Task SetPostTag(Posts post, string payload, CallbackQuery callbackQuery)
     {
         payload = payload.ToLowerInvariant();
         var tag = _tagRepository.GetTagByPayload(payload);
@@ -504,7 +546,8 @@ internal sealed class PostService(
         }
     }
 
-    public async Task RejectPost(NewPosts post, Users dbUser, RejectReasons rejectReason, string? htmlRejectMessage)
+    /// <inheritdoc/>
+    public async Task RejectPost(Posts post, Users dbUser, RejectReasons rejectReason, string? htmlRejectMessage)
     {
         var poster = await _userService.FetchUserByUserID(post.PosterUID).ConfigureAwait(false);
 
@@ -547,12 +590,12 @@ internal sealed class PostService(
 
                 var inputFile = new InputFileId(attachment.FileID);
                 var handler = post.PostType switch {
-                    MessageType.Photo => _botClient.SendPhoto(_channelService.RejectChannel.Id, inputFile),
-                    MessageType.Audio => _botClient.SendAudio(_channelService.RejectChannel.Id, inputFile),
-                    MessageType.Video => _botClient.SendVideo(_channelService.RejectChannel.Id, inputFile),
-                    MessageType.Voice => _botClient.SendVoice(_channelService.RejectChannel.Id, inputFile),
-                    MessageType.Document => _botClient.SendDocument(_channelService.RejectChannel.Id, inputFile),
-                    MessageType.Animation => _botClient.SendAnimation(_channelService.RejectChannel.Id, inputFile),
+                    MessageType.Photo => _botClient.SendPhotoAsync(_channelService.RejectChannel.Id, inputFile),
+                    MessageType.Audio => _botClient.SendAudioAsync(_channelService.RejectChannel.Id, inputFile),
+                    MessageType.Video => _botClient.SendVideoAsync(_channelService.RejectChannel.Id, inputFile),
+                    MessageType.Voice => _botClient.SendVoiceAsync(_channelService.RejectChannel.Id, inputFile),
+                    MessageType.Document => _botClient.SendDocumentAsync(_channelService.RejectChannel.Id, inputFile),
+                    MessageType.Animation => _botClient.SendAnimationAsync(_channelService.RejectChannel.Id, inputFile),
                     _ => throw new Exception("未知的稿件类型"),
                 };
 
@@ -632,7 +675,7 @@ internal sealed class PostService(
     /// <param name="reviewer"></param>
     /// <param name="callbackQuery"></param>
     /// <returns></returns>
-    private async Task RejectIfBan(NewPosts post, Users poster, Users reviewer, CallbackQuery? callbackQuery)
+    private async Task RejectIfBan(Posts post, Users poster, Users reviewer, CallbackQuery? callbackQuery)
     {
         post.RejectReason = "封禁自动拒绝";
         post.CountReject = true;
@@ -656,7 +699,8 @@ internal sealed class PostService(
         }
     }
 
-    public async Task AcceptPost(NewPosts post, Users dbUser, bool inPlan, bool second, CallbackQuery callbackQuery)
+    /// <inheritdoc/>
+    public async Task AcceptPost(Posts post, Users dbUser, bool inPlan, bool second, CallbackQuery callbackQuery)
     {
         var poster = await _userService.FetchUserByUserID(post.PosterUID).ConfigureAwait(false);
 
@@ -714,12 +758,12 @@ internal sealed class PostService(
 
                     var inputFile = new InputFileId(attachment.FileID);
                     var handler = post.PostType switch {
-                        MessageType.Photo => _botClient.SendPhoto(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
-                        MessageType.Audio => _botClient.SendAudio(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, title: attachment.FileName),
-                        MessageType.Video => _botClient.SendVideo(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
-                        MessageType.Voice => _botClient.SendVoice(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html),
-                        MessageType.Document => _botClient.SendDocument(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html),
-                        MessageType.Animation => _botClient.SendAnimation(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Photo => _botClient.SendPhotoAsync(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Audio => _botClient.SendAudioAsync(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, title: attachment.FileName),
+                        MessageType.Video => _botClient.SendVideoAsync(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Voice => _botClient.SendVoiceAsync(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html),
+                        MessageType.Document => _botClient.SendDocumentAsync(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html),
+                        MessageType.Animation => _botClient.SendAnimationAsync(acceptChannel, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
                         _ => null,
                     };
 
@@ -841,7 +885,8 @@ internal sealed class PostService(
         }
     }
 
-    public async Task<bool> PublicInPlanPost(NewPosts post)
+    /// <inheritdoc/>
+    public async Task<bool> PublicInPlanPost(Posts post)
     {
         var poster = await _userService.FetchUserByUserID(post.PosterUID).ConfigureAwait(false);
 
@@ -886,12 +931,12 @@ internal sealed class PostService(
 
                     var inputFile = new InputFileId(attachment.FileID);
                     var handler = post.PostType switch {
-                        MessageType.Photo => _botClient.SendPhoto(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
-                        MessageType.Audio => _botClient.SendAudio(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, title: attachment.FileName),
-                        MessageType.Video => _botClient.SendVideo(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
-                        MessageType.Voice => _botClient.SendVoice(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html),
-                        MessageType.Document => _botClient.SendDocument(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html),
-                        MessageType.Animation => _botClient.SendAnimation(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Photo => _botClient.SendPhotoAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Audio => _botClient.SendAudioAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, title: attachment.FileName),
+                        MessageType.Video => _botClient.SendVideoAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
+                        MessageType.Voice => _botClient.SendVoiceAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html),
+                        MessageType.Document => _botClient.SendDocumentAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html),
+                        MessageType.Animation => _botClient.SendAnimationAsync(_channelService.AcceptChannel.Id, inputFile, caption: postText, parseMode: ParseMode.Html, hasSpoiler: hasSpoiler),
                         _ => null,
                     };
 
@@ -958,7 +1003,8 @@ internal sealed class PostService(
         return true;
     }
 
-    public async Task<NewPosts?> FetchPostFromReplyToMessage(Message message)
+    /// <inheritdoc/>
+    public async Task<Posts?> FetchPostFromReplyToMessage(Message message)
     {
         var replyMessage = message.ReplyToMessage;
         if (replyMessage == null)
@@ -966,7 +1012,7 @@ internal sealed class PostService(
             return null;
         }
 
-        NewPosts? post;
+        Posts? post;
 
         var msgGroupId = message.MediaGroupId;
         if (string.IsNullOrEmpty(msgGroupId))
@@ -987,7 +1033,8 @@ internal sealed class PostService(
         return post;
     }
 
-    public async Task<NewPosts?> FetchPostFromCallbackQuery(CallbackQuery query)
+    /// <inheritdoc/>
+    public async Task<Posts?> FetchPostFromCallbackQuery(CallbackQuery query)
     {
         if (query.Message == null)
         {
@@ -997,7 +1044,8 @@ internal sealed class PostService(
         return post;
     }
 
-    public async Task<NewPosts?> GetLatestReviewingPostLink()
+    /// <inheritdoc/>
+    public async Task<Posts?> GetLatestReviewingPostLink()
     {
         var now = DateTime.Now;
         var today = now.AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
@@ -1006,166 +1054,230 @@ internal sealed class PostService(
         return post;
     }
 
-    public async Task<NewPosts?> GetPostByPostId(int postId)
+    /// <inheritdoc/>
+    public async Task<Posts?> GetPostByPostId(int postId)
     {
         return await Queryable().FirstAsync(x => x.Id == postId).ConfigureAwait(false);
     }
 
+    /// <inheritdoc/>
     public Task<int> CountAllPosts()
     {
         return Queryable().Where(x => x.Status > EPostStatus.Cancel).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountAllPosts(DateTime afterTime)
     {
         return Queryable().Where(x => x.CreateAt >= afterTime && x.Status > EPostStatus.Cancel).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountAllPosts(DateTime afterTime, DateTime beforeTime)
     {
         return Queryable().Where(x => x.CreateAt >= afterTime && x.CreateAt < beforeTime && x.Status > EPostStatus.Cancel).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountAcceptedPosts()
     {
         return Queryable().Where(x => x.Status == EPostStatus.Accepted).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountAcceptedPosts(DateTime afterTime)
     {
         return Queryable().Where(x => x.CreateAt >= afterTime && x.Status == EPostStatus.Accepted).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountAcceptedPosts(DateTime afterTime, DateTime beforeTime)
     {
         return Queryable().Where(x => x.CreateAt >= afterTime && x.CreateAt < beforeTime && x.Status == EPostStatus.Accepted).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountAcceptedSecondPosts()
     {
         return Queryable().Where(x => x.Status == EPostStatus.AcceptedSecond).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountAcceptedSecondPosts(DateTime afterTime)
     {
         return Queryable().Where(x => x.CreateAt >= afterTime && x.Status == EPostStatus.AcceptedSecond).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountAcceptedSecondPosts(DateTime afterTime, DateTime beforeTime)
     {
         return Queryable().Where(x => x.CreateAt >= afterTime && x.CreateAt < beforeTime && x.Status == EPostStatus.AcceptedSecond).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountRejectedPosts()
     {
         return Queryable().Where(x => x.Status == EPostStatus.Rejected).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountRejectedPosts(DateTime afterTime)
     {
         return Queryable().Where(x => x.CreateAt >= afterTime && x.Status == EPostStatus.Rejected).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountRejectedPosts(DateTime afterTime, DateTime beforeTime)
     {
         return Queryable().Where(x => x.CreateAt >= afterTime && x.CreateAt < beforeTime && x.Status == EPostStatus.Rejected).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountExpiredPosts()
     {
         return Queryable().Where(x => x.Status < 0).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountExpiredPosts(DateTime afterTime)
     {
         return Queryable().Where(x => x.CreateAt >= afterTime && x.Status < 0).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountReviewingPosts(DateTime afterTime)
     {
         return Queryable().Where(x => x.CreateAt >= afterTime && x.Status == EPostStatus.Reviewing).CountAsync();
     }
 
+    /// <inheritdoc/>
     public Task<int> CountReviewingPosts(DateTime afterTime, DateTime beforeTime)
     {
         return Queryable().Where(x => x.CreateAt >= afterTime && x.CreateAt < beforeTime && x.Status == EPostStatus.Reviewing).CountAsync();
     }
 
-    public Task RevocationPost(NewPosts post)
+    /// <inheritdoc/>
+    public Task RevocationPost(Posts post)
     {
         post.Status = EPostStatus.Revocation;
         post.ModifyAt = DateTime.Now;
         return Updateable(post).UpdateColumns(static x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
     }
 
-    public Task CancelPost(NewPosts post)
+    /// <inheritdoc/>
+    public Task CancelPost(Posts post)
     {
         post.Status = EPostStatus.Cancel;
         post.ModifyAt = DateTime.Now;
         return Updateable(post).UpdateColumns(static x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
     }
 
-    public Task EditPostText(NewPosts post, string text)
+    /// <inheritdoc/>
+    public Task EditPostText(Posts post, string text)
     {
         post.Text = text;
         post.ModifyAt = DateTime.Now;
         return Updateable(post).UpdateColumns(static x => new { x.Text }).ExecuteCommandAsync();
     }
 
-    public Task SetPostAnonymous(NewPosts post, bool anonymous)
+    /// <inheritdoc/>
+    public Task SetPostAnonymous(Posts post, bool anonymous)
     {
         post.Anonymous = anonymous;
         post.ModifyAt = DateTime.Now;
         return Updateable(post).UpdateColumns(static x => new { x.Anonymous, x.ModifyAt }).ExecuteCommandAsync();
     }
 
-    public Task SetPostSpoiler(NewPosts post, bool spoiler)
+    /// <inheritdoc/>
+    public Task SetPostForceAnonymous(Posts post, bool anonymous)
+    {
+        post.ForceAnonymous = anonymous;
+        post.ModifyAt = DateTime.Now;
+        return Updateable(post).UpdateColumns(static x => new { x.ForceAnonymous, x.ModifyAt }).ExecuteCommandAsync();
+    }
+
+    /// <inheritdoc/>
+    public Task SetPostSpoiler(Posts post, bool spoiler)
     {
         post.HasSpoiler = spoiler;
         post.ModifyAt = DateTime.Now;
         return Updateable(post).UpdateColumns(static x => new { x.HasSpoiler, x.ModifyAt }).ExecuteCommandAsync();
     }
 
+    /// <inheritdoc/>
     public Task<bool> IfExistsMediaGroupId(string mediaGroupId)
     {
         return Queryable().AnyAsync(x => x.OriginMediaGroupID == mediaGroupId);
     }
 
-    public async Task<NewPosts?> GetRandomPost()
+    /// <inheritdoc/>
+    public async Task<Posts?> GetRandomPost()
     {
         return await Queryable()
                     .Where(static x => x.Status == EPostStatus.Accepted && x.PostType == MessageType.Photo)
                     .OrderBy(static x => SqlFunc.GetRandom()).FirstAsync().ConfigureAwait(false);
     }
 
-    public Task<NewPosts> GetInPlanPost()
+    /// <inheritdoc/>
+    public Task<Posts> GetInPlanPost()
     {
         return Queryable().Where(static x => x.Status == EPostStatus.InPlan).FirstAsync();
     }
 
-    public Task UpdatePostStatus(NewPosts post, EPostStatus status)
+    /// <inheritdoc/>
+    public Task UpdatePostStatus(Posts post, EPostStatus status)
     {
         post.Status = status;
         post.ModifyAt = DateTime.Now;
         return Updateable(post).UpdateColumns(static x => new { x.Status, x.ModifyAt }).ExecuteCommandAsync();
     }
 
-    public Task<int> CreateNewPosts(NewPosts post)
+    /// <inheritdoc/>
+    public Task<int> CreateNewPosts(Posts post)
     {
         return Insertable(post).ExecuteReturnIdentityAsync();
     }
 
-    public Task<List<NewPosts>> GetExpiredPosts(DateTime beforeTime)
+    /// <inheritdoc/>
+    public Task<List<Posts>> GetExpiredPosts(DateTime beforeTime)
     {
         return Queryable()
             .Where(x => (x.Status == EPostStatus.Padding || x.Status == EPostStatus.Reviewing) && x.ModifyAt < beforeTime)
             .ToListAsync();
     }
 
-    public Task<List<NewPosts>> GetExpiredPosts(long userID, DateTime beforeTime)
+    /// <inheritdoc/>
+    public Task<List<Posts>> GetExpiredPosts(long userID, DateTime beforeTime)
     {
         return Queryable()
             .Where(x => x.PosterUID == userID && (x.Status == EPostStatus.Padding || x.Status == EPostStatus.Reviewing) && x.ModifyAt < beforeTime)
             .ToListAsync();
+    }
+
+    /// <inheritdoc/>
+    public void Dispose() => MediaGroupTtlTimer?.Dispose();
+}
+
+/// <summary>
+/// 媒体组缓存
+/// </summary>
+internal sealed record MediaGroupCache
+{
+    public int PostId { get; set; } = -1;
+    public DateTime ExpireAt { get; set; }
+    public string? PostText { get; set; }
+    public InlineKeyboardMarkup? Keyboard { get; set; }
+    public Message? ActionMessage { get; set; }
+
+    public string? WarnMsg { get; set; }
+
+    public MediaGroupCache()
+    {
+        RenewTtl();
+    }
+
+    public void RenewTtl()
+    {
+        ExpireAt = DateTime.Now.AddSeconds(IPostService.MediaGroupReceiveTtl);
     }
 }

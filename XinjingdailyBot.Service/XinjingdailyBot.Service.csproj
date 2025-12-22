@@ -8,6 +8,9 @@
 		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
 		<PackageReference Include="Microsoft.Extensions.Http" />
+		<PackageReference Include="SkiaSharp" />
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" />
+		<PackageReference Include="SkiaSharp.NativeAssets.Win32" />
 	</ItemGroup>
 
 	<ItemGroup>

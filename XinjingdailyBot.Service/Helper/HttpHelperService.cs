@@ -11,47 +11,29 @@ namespace XinjingdailyBot.Service.Helper;
 
 /// <inheritdoc cref="IHttpHelperService"/>
 [AppService(typeof(IHttpHelperService), LifeTime.Transient)]
-public sealed class HttpHelperService : IHttpHelperService, IDisposable
+public sealed class HttpHelperService(
+    ILogger<HttpHelperService> _logger,
+    IHttpClientFactory _httpClientFactory,
+    IOptions<OptionsSetting> _options) : IHttpHelperService
 {
-    private readonly ILogger<HttpHelperService> _logger;
-    private readonly IHttpClientFactory _httpClientFactory;
 
-    public HttpHelperService(
-        ILogger<HttpHelperService> logger,
-        IHttpClientFactory httpClientFactory,
-        IOptions<OptionsSetting> options)
+    /// <inheritdoc/>
+    public HttpClient CreateClient(string name) => _httpClientFactory.CreateClient(name);
+
+    /// <inheritdoc/>
+    public Task SendStatistic()
     {
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-
-        //统计
-        if (options.Value.System.Statistic)
+        try
         {
             var client = _httpClientFactory.CreateClient("Statistic");
-
-            StatisticTimer = new Timer(
-                async (_) => {
-                    try
-                    {
-                        await client.GetAsync("/XinjingdailyBot");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "统计信息出错");
-                    }
-                },
-                null,
-                TimeSpan.FromSeconds(30),
-                TimeSpan.FromHours(24)
-            );
+            return client.GetAsync("/XinjingdailyBot");
         }
-
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "统计信息出错");
+            return Task.CompletedTask;
+        }
     }
-
-    /// <summary>
-    /// 统计Timer
-    /// </summary>
-    private Timer? StatisticTimer { get; init; }
 
     /// <summary>
     /// 发送网络请求
@@ -64,9 +46,9 @@ public sealed class HttpHelperService : IHttpHelperService, IDisposable
         try
         {
             var client = _httpClientFactory.CreateClient(clientName);
-            var httpRequestMessage = await client.SendAsync(request);
+            var httpRequestMessage = await client.SendAsync(request).ConfigureAwait(false);
             httpRequestMessage.EnsureSuccessStatusCode();
-            var contentStream = await httpRequestMessage.Content.ReadAsStreamAsync();
+            var contentStream = await httpRequestMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
             return contentStream;
         }
         catch (Exception ex)
@@ -86,7 +68,7 @@ public sealed class HttpHelperService : IHttpHelperService, IDisposable
     {
         try
         {
-            var obj = await JsonSerializer.DeserializeAsync<T>(stream);
+            var obj = await JsonSerializer.DeserializeAsync<T>(stream).ConfigureAwait(false);
             return obj;
         }
         catch (Exception ex)
@@ -96,38 +78,49 @@ public sealed class HttpHelperService : IHttpHelperService, IDisposable
         }
     }
 
+    /// <inheritdoc/>
     public async Task<GitHubReleaseResponse?> GetLatestRelease()
     {
         var request = new HttpRequestMessage(HttpMethod.Get, "/XinjingdailyBot/releases/latest");
-        using var rawResponse = await SendRequestToStream("GitHub", request);
+        using var rawResponse = await SendRequestToStream("GitHub", request).ConfigureAwait(false);
         if (rawResponse == null)
         {
             return null;
         }
-        var response = await StreamToObject<GitHubReleaseResponse>(rawResponse);
+        var response = await StreamToObject<GitHubReleaseResponse>(rawResponse).ConfigureAwait(false);
         return response;
     }
 
+    /// <inheritdoc/>
     public async Task<Stream?> DownloadRelease(string? downloadUrl)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, downloadUrl);
-        var rawResponse = await SendRequestToStream("GitHub", request);
+        var rawResponse = await SendRequestToStream("GitHub", request).ConfigureAwait(false);
         return rawResponse;
     }
 
+    /// <inheritdoc/>
     public async Task<IpInfoResponse?> GetIpInformation(IPAddress ip)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"/{ip}");
-        using var rawResponse = await SendRequestToStream("IpInfo", request);
+        using var rawResponse = await SendRequestToStream("IpInfo", request).ConfigureAwait(false);
         if (rawResponse == null)
         {
             return null;
         }
-        var response = await StreamToObject<IpInfoResponse>(rawResponse);
+        var response = await StreamToObject<IpInfoResponse>(rawResponse).ConfigureAwait(false);
         return response;
     }
 
-    public HttpClient CreateClient(string name) => _httpClientFactory.CreateClient(name);
+    /// <inheritdoc/>
+    public async Task<Stream?> GetTelegramFileHeader(Telegram.Bot.Types.TGFile tgFile, int length)
+    {
+        var token = _options.Value.Bot.BotToken;
+        var filePath = tgFile.FilePath;
 
-    public void Dispose() => StatisticTimer?.Dispose();
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/file/bot{token}/{filePath}");
+        request.Headers.Add("Range", $"bytes=0-{length}");
+        var rawStream = await SendRequestToStream("Telegram", request).ConfigureAwait(false);
+        return rawStream;
+    }
 }
