@@ -49,7 +49,7 @@ public class ReviewCommand(
                 return "请回复审核消息并输入拒绝理由";
             }
 
-            var post = await _postService.FetchPostFromReplyToMessage(message);
+            var post = await _postService.FetchPostFromReplyToMessage(message).ConfigureAwait(false);
             if (post == null)
             {
                 return "未找到稿件";
@@ -73,13 +73,13 @@ public class ReviewCommand(
                 Name = reason,
                 FullText = reason,
             };
-            await _postService.RejectPost(post, dbUser, rejectReason, htmlText);
+            await _postService.RejectPost(post, dbUser, rejectReason, htmlText).ConfigureAwait(false);
 
             return $"已拒绝该稿件, 理由: {htmlText}";
         }
 
-        var text = await exec();
-        await _botClient.SendCommandReply(text, message, false, ParseMode.Html);
+        var text = await exec().ConfigureAwait(false);
+        await _botClient.SendCommandReply(text, message, false, ParseMode.Html).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -103,7 +103,7 @@ public class ReviewCommand(
                 return "请回复审核消息并输入需要替换的描述";
             }
 
-            var post = await _postService.FetchPostFromReplyToMessage(message);
+            var post = await _postService.FetchPostFromReplyToMessage(message).ConfigureAwait(false);
             if (post == null)
             {
                 return "未找到稿件";
@@ -114,20 +114,20 @@ public class ReviewCommand(
                 return "仅能编辑状态为审核中的稿件";
             }
 
-            var postUser = await _userService.FetchUserByUserID(post.PosterUID);
+            var postUser = await _userService.FetchUserByUserID(post.PosterUID).ConfigureAwait(false);
             if (postUser == null)
             {
                 return "未找到投稿用户";
             }
 
             var text = string.Join(' ', args).Trim();
-            await _postService.EditPostText(post, text);
+            await _postService.EditPostText(post, text).ConfigureAwait(false);
 
             return "稿件描述已更新";
         }
 
-        var text = await exec();
-        await _botClient.SendCommandReply(text, message, false);
+        var text = await exec().ConfigureAwait(false);
+        await _botClient.SendCommandReply(text, message, false).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -140,76 +140,76 @@ public class ReviewCommand(
     public async Task HandleQuery(Users dbUser, CallbackQuery query)
     {
         var message = query.Message!;
-        var post = await _postService.FetchPostFromCallbackQuery(query);
+        var post = await _postService.FetchPostFromCallbackQuery(query).ConfigureAwait(false);
         if (post == null)
         {
-            await _botClient.AutoReply("未找到稿件", query, true);
-            await _botClient.EditMessageReplyMarkup(message, null);
+            await _botClient.AutoReply("未找到稿件", query, true).ConfigureAwait(false);
+            await _botClient.EditMessageReplyMarkup(message, null).ConfigureAwait(false);
             return;
         }
 
         if (post.Status == EPostStatus.ReviewTimeout || post.Status == EPostStatus.ConfirmTimeout)
         {
             var msg = "该稿件已过期, 无法操作";
-            await _botClient.AutoReply(msg, query);
-            await _botClient.EditMessageText(message, msg);
+            await _botClient.AutoReply(msg, query).ConfigureAwait(false);
+            await _botClient.EditMessageText(message, msg).ConfigureAwait(false);
             return;
         }
 
         if (post.Status != EPostStatus.Reviewing)
         {
-            await _botClient.AutoReply("请不要重复操作", query, true);
-            await _botClient.EditMessageReplyMarkup(message, null);
+            await _botClient.AutoReply("请不要重复操作", query, true).ConfigureAwait(false);
+            await _botClient.EditMessageReplyMarkup(message, null).ConfigureAwait(false);
             return;
         }
 
         if (!dbUser.Right.HasFlag(EUserRights.ReviewPost))
         {
-            await _botClient.AutoReply("无权操作", query, true);
+            await _botClient.AutoReply("无权操作", query, true).ConfigureAwait(false);
             return;
         }
 
         var data = query.Data;
         if (string.IsNullOrEmpty(data))
         {
-            await _botClient.AutoReply("内部错误", query, true);
+            await _botClient.AutoReply("内部错误", query, true).ConfigureAwait(false);
             return;
         }
 
         switch (data)
         {
             case "review reject":
-                await SwitchKeyboard(true, post, query);
+                await SwitchKeyboard(true, post, query).ConfigureAwait(false);
                 break;
 
             //兼容旧的callback data
             case "reject back":
             case "review reject back":
-                await SwitchKeyboard(false, post, query);
+                await SwitchKeyboard(false, post, query).ConfigureAwait(false);
                 break;
 
             case "review spoiler":
-                await SetSpoiler(post, query);
+                await SetSpoiler(post, query).ConfigureAwait(false);
                 break;
 
             case "review inplan":
-                await _postService.AcceptPost(post, dbUser, true, false, query);
+                await _postService.AcceptPost(post, dbUser, true, false, query).ConfigureAwait(false);
                 break;
 
             case "review accept":
-                await _postService.AcceptPost(post, dbUser, false, false, query);
+                await _postService.AcceptPost(post, dbUser, false, false, query).ConfigureAwait(false);
                 break;
 
             case "review accept second":
-                await _postService.AcceptPost(post, dbUser, false, true, query);
+                await _postService.AcceptPost(post, dbUser, false, true, query).ConfigureAwait(false);
                 break;
 
             case "review anymouse":
-                await SetAnonymous(post, query);
+                await SetAnonymous(post, query).ConfigureAwait(false);
                 break;
 
             case "review cancel":
-                await CancelPost(post, query);
+                await CancelPost(post, query).ConfigureAwait(false);
                 break;
 
             default:
@@ -218,17 +218,17 @@ public class ReviewCommand(
                     var payload = data[11..];
                     if (payload != "spoiler")
                     {
-                        await _postService.SetPostTag(post, payload, query);
+                        await _postService.SetPostTag(post, payload, query).ConfigureAwait(false);
                     }
                     else
                     {
-                        await SetSpoiler(post, query);
+                        await SetSpoiler(post, query).ConfigureAwait(false);
                     }
                 }
                 else if (data.StartsWith("reject "))
                 {
                     var payload = data[7..];
-                    await RejectPostHelper(post, dbUser, query, payload);
+                    await RejectPostHelper(post, dbUser, query, payload).ConfigureAwait(false);
                 }
                 break;
         }
@@ -243,15 +243,15 @@ public class ReviewCommand(
     /// <returns></returns>
     private async Task SetAnonymous(NewPosts post, CallbackQuery query)
     {
-        await _botClient.AutoReply("可以使用命令 /anonymous 切换默认匿名投稿", query);
+        await _botClient.AutoReply("可以使用命令 /anonymous 切换默认匿名投稿", query).ConfigureAwait(false);
 
         bool anonymous = !post.Anonymous;
-        await _postService.SetPostAnonymous(post, anonymous);
+        await _postService.SetPostAnonymous(post, anonymous).ConfigureAwait(false);
 
         bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
 
         var keyboard = _markupHelperService.DirectPostKeyboard(anonymous, post.Tags, hasSpoiler);
-        await _botClient.EditMessageReplyMarkup(query.Message!, keyboard);
+        await _botClient.EditMessageReplyMarkup(query.Message!, keyboard).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -264,20 +264,20 @@ public class ReviewCommand(
     {
         if (!post.CanSpoiler)
         {
-            await _botClient.AutoReply("当前稿件类型无法设置遮罩", query, true);
+            await _botClient.AutoReply("当前稿件类型无法设置遮罩", query, true).ConfigureAwait(false);
             return;
         }
 
         var hasSpoiler = !post.HasSpoiler;
 
-        await _postService.SetPostSpoiler(post, hasSpoiler);
+        await _postService.SetPostSpoiler(post, hasSpoiler).ConfigureAwait(false);
 
-        await _botClient.AutoReply(hasSpoiler ? "启用遮罩" : "禁用遮罩", query);
+        await _botClient.AutoReply(hasSpoiler ? "启用遮罩" : "禁用遮罩", query).ConfigureAwait(false);
 
         var keyboard = post.IsDirectPost ?
             _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags, hasSpoiler) :
             _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
-        await _botClient.EditMessageReplyMarkup(query.Message!, keyboard);
+        await _botClient.EditMessageReplyMarkup(query.Message!, keyboard).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -288,11 +288,11 @@ public class ReviewCommand(
     /// <returns></returns>
     private async Task CancelPost(NewPosts post, CallbackQuery query)
     {
-        await _postService.CancelPost(post);
+        await _postService.CancelPost(post).ConfigureAwait(false);
 
-        await _botClient.EditMessageText(query.Message!, Langs.PostCanceled, replyMarkup: null);
+        await _botClient.EditMessageText(query.Message!, Langs.PostCanceled, replyMarkup: null).ConfigureAwait(false);
 
-        await _botClient.AutoReply(Langs.PostCanceled, query);
+        await _botClient.AutoReply(Langs.PostCanceled, query).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -308,10 +308,10 @@ public class ReviewCommand(
         var reason = _rejectReasonRepository.GetReasonByPayload(payload);
         if (reason == null)
         {
-            await _botClient.AutoReply($"找不到 {payload} 对应的拒绝理由", query, true);
+            await _botClient.AutoReply($"找不到 {payload} 对应的拒绝理由", query, true).ConfigureAwait(false);
             return;
         }
-        await _postService.RejectPost(post, dbUser, reason, null);
+        await _postService.RejectPost(post, dbUser, reason, null).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -325,7 +325,7 @@ public class ReviewCommand(
     {
         if (rejectMode)
         {
-            await _botClient.AutoReply("请选择拒稿原因", callbackQuery);
+            await _botClient.AutoReply("请选择拒稿原因", callbackQuery).ConfigureAwait(false);
         }
 
         bool? hasSpoiler = post.CanSpoiler ? post.HasSpoiler : null;
@@ -334,6 +334,6 @@ public class ReviewCommand(
             _markupHelperService.ReviewKeyboardB() :
             _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
 
-        await _botClient.EditMessageReplyMarkup(callbackQuery.Message!, keyboard);
+        await _botClient.EditMessageReplyMarkup(callbackQuery.Message!, keyboard).ConfigureAwait(false);
     }
 }

@@ -159,6 +159,44 @@ public static class BotClientExtension
     /// <returns></returns>
     public static Task<Message> SendMessage(
         this ITelegramBotClient botClient,
+        long chatId,
+        string text,
+        int? messageThreadId,
+        int? replyToMessageId,
+        ParseMode parseMode = ParseMode.None,
+        bool disableWebPagePreview = false,
+        bool disableNotification = false,
+        InlineKeyboardMarkup? replyMarkup = default,
+        CancellationToken cancellationToken = default)
+    {
+        var linkPreviewOptions = new LinkPreviewOptions {
+            IsDisabled = disableWebPagePreview,
+        };
+
+        var replyParameters = replyToMessageId != null ? new ReplyParameters {
+            AllowSendingWithoutReply = true,
+            MessageId = replyToMessageId.Value,
+        } : null;
+
+        return botClient.SendMessage(chatId, text, parseMode: parseMode, messageThreadId: messageThreadId, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, replyParameters: replyParameters, disableNotification: disableNotification, cancellationToken: cancellationToken);
+    }
+
+    /// <summary>
+    /// 发送消息
+    /// </summary>
+    /// <param name="botClient"></param>
+    /// <param name="chatId"></param>
+    /// <param name="text"></param>
+    /// <param name="messageThreadId"></param>
+    /// <param name="replyToMessageId"></param>
+    /// <param name="parseMode"></param>
+    /// <param name="disableWebPagePreview"></param>
+    /// <param name="disableNotification"></param>
+    /// <param name="replyMarkup"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public static Task<Message> SendMessage(
+        this ITelegramBotClient botClient,
         ChatId chatId,
         string text,
         int? messageThreadId,
@@ -194,7 +232,7 @@ public static class BotClientExtension
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static Task<Message> SendMessage(
+    public static Task<Message> SendMessageEx(
         this ITelegramBotClient botClient,
         Message message,
         string text,

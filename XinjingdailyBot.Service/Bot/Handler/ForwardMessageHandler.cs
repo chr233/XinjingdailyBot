@@ -90,7 +90,7 @@ public class ForwardMessageHandler(
                         sb.AppendLine($"模式: {postMode}");
                         sb.AppendLine($"状态: {postStatus}");
 
-                        await _botClient.SendMessage(message, sb.ToString(), parseMode: ParseMode.Html, replyToMessage: true, disableWebPagePreview: true, disableNotification: true, replyMarkup: keyboard);
+                        await _botClient.SendMessageEx(message, sb.ToString(), parseMode: ParseMode.Html, replyToMessage: true, disableWebPagePreview: true, disableNotification: true, replyMarkup: keyboard);
                         return true;
                     }
                 }

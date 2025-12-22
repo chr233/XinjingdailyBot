@@ -266,7 +266,7 @@ public sealed class PostController(
         var keyboard = _markupHelperService.ReviewKeyboardA(newTags, post.HasSpoiler);
         string msg = _textHelperService.MakeReviewMessage(dbUser, newPost.Anonymous);
 
-        var actionMsg = await _botClient.SendMessage(originMsg, msg, parseMode: ParseMode.Html, true, disableWebPagePreview: true, replyMarkup: keyboard);
+        var actionMsg = await _botClient.SendMessageEx(originMsg, msg, parseMode: ParseMode.Html, true, disableWebPagePreview: true, replyMarkup: keyboard);
 
         newPost.Id = newPostId;
         newPost.OriginMsgID = originMsg.MessageId;
@@ -504,7 +504,7 @@ public sealed class PostController(
         var keyboard = _markupHelperService.ReviewKeyboardA(newTags, post.HasSpoiler);
         string msg = _textHelperService.MakeReviewMessage(dbUser, newPost.Anonymous);
 
-        var actionMsg = await _botClient.SendMessage(originMsg, msg, parseMode: ParseMode.Html, replyToMessage: true, disableWebPagePreview: true, replyMarkup: keyboard);
+        var actionMsg = await _botClient.SendMessageEx(originMsg, msg, parseMode: ParseMode.Html, replyToMessage: true, disableWebPagePreview: true, replyMarkup: keyboard);
 
         newPost.Id = newPostId;
         newPost.OriginMsgID = originMsg.MessageId;

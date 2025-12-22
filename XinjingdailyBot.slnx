@@ -1,0 +1,50 @@
+<Solution>
+  <Folder Name="/0. 杂项文件/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="README.md" />
+    <File Path="scan_services.ps1" />
+  </Folder>
+  <Folder Name="/1. 基础设施/">
+    <Project Path="XinjingdailyBot.Generator/XinjingdailyBot.Generator.csproj" />
+    <Project Path="XinjingdailyBot.Infrastructure/XinjingdailyBot.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/2. 实体/">
+    <Project Path="XinjingdailyBot.Model/XinjingdailyBot.Model.csproj">
+      <BuildDependency Project="XinjingdailyBot.Infrastructure/XinjingdailyBot.Infrastructure.csproj" />
+    </Project>
+    <Project Path="XinjingdailyBot.Repository/XinjingdailyBot.Repository.csproj">
+      <BuildDependency Project="XinjingdailyBot.Infrastructure/XinjingdailyBot.Infrastructure.csproj" />
+      <BuildDependency Project="XinjingdailyBot.Model/XinjingdailyBot.Model.csproj" />
+    </Project>
+  </Folder>
+  <Folder Name="/3. 服务/">
+    <Project Path="XinjingdailyBot.Command/XinjingdailyBot.Command.csproj" />
+    <Project Path="XinjingdailyBot.Interface/XinjingdailyBot.Interface.csproj">
+      <BuildDependency Project="XinjingdailyBot.Infrastructure/XinjingdailyBot.Infrastructure.csproj" />
+      <BuildDependency Project="XinjingdailyBot.Model/XinjingdailyBot.Model.csproj" />
+      <BuildDependency Project="XinjingdailyBot.Repository/XinjingdailyBot.Repository.csproj" />
+    </Project>
+    <Project Path="XinjingdailyBot.Service/XinjingdailyBot.Service.csproj">
+      <BuildDependency Project="XinjingdailyBot.Infrastructure/XinjingdailyBot.Infrastructure.csproj" />
+      <BuildDependency Project="XinjingdailyBot.Interface/XinjingdailyBot.Interface.csproj" />
+      <BuildDependency Project="XinjingdailyBot.Model/XinjingdailyBot.Model.csproj" />
+      <BuildDependency Project="XinjingdailyBot.Repository/XinjingdailyBot.Repository.csproj" />
+    </Project>
+    <Project Path="XinjingdailyBot.Tasks/XinjingdailyBot.Tasks.csproj" />
+  </Folder>
+  <Folder Name="/4. 启动/">
+    <Project Path="XinjingdailyBot.WebAPI/XinjingdailyBot.WebAPI.csproj">
+      <BuildDependency Project="XinjingdailyBot.Command/XinjingdailyBot.Command.csproj" />
+      <BuildDependency Project="XinjingdailyBot.Infrastructure/XinjingdailyBot.Infrastructure.csproj" />
+      <BuildDependency Project="XinjingdailyBot.Interface/XinjingdailyBot.Interface.csproj" />
+      <BuildDependency Project="XinjingdailyBot.Model/XinjingdailyBot.Model.csproj" />
+      <BuildDependency Project="XinjingdailyBot.Repository/XinjingdailyBot.Repository.csproj" />
+      <BuildDependency Project="XinjingdailyBot.Service/XinjingdailyBot.Service.csproj" />
+    </Project>
+  </Folder>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
+</Solution>
