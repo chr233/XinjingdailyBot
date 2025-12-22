@@ -1,4 +1,5 @@
 using System.Net;
+using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure.Model;
 
 namespace XinjingdailyBot.Interface.Helper;
@@ -32,4 +33,5 @@ public interface IHttpHelperService
     /// </summary>
     /// <returns></returns>
     Task<GitHubReleaseResponse?> GetLatestRelease();
+    Task<Stream?> GetTelegramFileHeader(TGFile tgFile, int length);
 }
