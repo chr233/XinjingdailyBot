@@ -1,6 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-
 using NLog;
 using NLog.Config;
 using NLog.Extensions.Logging;
@@ -20,11 +17,10 @@ public static class NLogExtensions
     /// <param name="services"></param>
     public static void AddNLogEx(this IServiceCollection services)
     {
-        var path = Path.Combine(BuildInfo.AppDir, "nlog.config");
+        var path = Path.Combine(BuildInfo.AppDir, "config", "nlog.config");
         if (File.Exists(path))
         {
-            services.AddLogging(loggingBuilder =>
-            {
+            services.AddLogging(loggingBuilder => {
                 loggingBuilder.ClearProviders();
 #if !DEBUG
                 loggingBuilder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Debug);
@@ -37,39 +33,32 @@ public static class NLogExtensions
             var config = new LoggingConfiguration();
 
             // 创建彩色控制台目标
-            var consoleTarget = new ColoredConsoleTarget("coloredConsole")
-            {
+            var consoleTarget = new ColoredConsoleTarget("coloredConsole") {
                 Layout = "${level:format=FirstCharacter} ${time} [${logger:shortName=false}] ${message} ${exception:format=toString,Data}"
             };
 
             // 配置不同日志级别的颜色
-            consoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule
-            {
+            consoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule {
                 Condition = "level == LogLevel.Trace",
                 ForegroundColor = ConsoleOutputColor.DarkGray
             });
-            consoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule
-            {
+            consoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule {
                 Condition = "level == LogLevel.Debug",
                 ForegroundColor = ConsoleOutputColor.White
             });
-            consoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule
-            {
+            consoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule {
                 Condition = "level == LogLevel.Info",
                 ForegroundColor = ConsoleOutputColor.Cyan
             });
-            consoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule
-            {
+            consoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule {
                 Condition = "level == LogLevel.Warn",
                 ForegroundColor = ConsoleOutputColor.Yellow
             });
-            consoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule
-            {
+            consoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule {
                 Condition = "level == LogLevel.Error",
                 ForegroundColor = ConsoleOutputColor.Red
             });
-            consoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule
-            {
+            consoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule {
                 Condition = "level == LogLevel.Fatal",
                 ForegroundColor = ConsoleOutputColor.Red,
                 BackgroundColor = ConsoleOutputColor.DarkGray
@@ -84,8 +73,7 @@ public static class NLogExtensions
 
             LogManager.Configuration = config;
 
-            services.AddLogging(loggingBuilder =>
-            {
+            services.AddLogging(loggingBuilder => {
                 loggingBuilder.ClearProviders();
 #if !DEBUG
                 loggingBuilder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Debug);

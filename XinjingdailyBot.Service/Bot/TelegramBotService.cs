@@ -1,28 +1,28 @@
+using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
+using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Infrastructure.Extensions;
+using XinjingdailyBot.Interface.Bot;
 
-namespace XinjingdailyBot.Infrastructure.Extensions;
+namespace XinjingdailyBot.Service.Bot;
 
-/// <summary>
-/// BotClient扩展
-/// </summary>
-public static class BotClientExtension
+[AppService(typeof(ITelegramBotService), LifeTime.Singleton)]
+public class TelegramBotService(
+    ITelegramBotClient _botClient,
+    ILogger<TelegramBotService> _logger) : ITelegramBotService
 {
-    private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-
     /// <summary>
     /// 发送回复
     /// </summary>
-    /// <param name="botClient"></param>
     /// <param name="text"></param>
     /// <param name="message"></param>
     /// <param name="parsemode"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static Task<Message> AutoReply(
-        this ITelegramBotService botClient,
+    public Task<Message> AutoReply(
         string text,
         Message message,
         ParseMode parsemode = ParseMode.None,
@@ -32,65 +32,57 @@ public static class BotClientExtension
             AllowSendingWithoutReply = true,
             MessageId = message.MessageId,
         };
-        return botClient.SendMessage(message.Chat, text, parseMode: parsemode, replyParameters: replyParameters, cancellationToken: cancellationToken);
+        return _botClient.SendMessage(message.Chat, text, parseMode: parsemode, replyParameters: replyParameters, cancellationToken: cancellationToken);
     }
 
     /// <summary>
     /// 发送回复
     /// </summary>
-    /// <param name="botClient"></param>
     /// <param name="text"></param>
     /// <param name="query"></param>
     /// <param name="showAlert"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static Task AutoReply(
-        this ITelegramBotClient botClient,
+    public Task AutoReply(
         string text,
         CallbackQuery query,
         bool showAlert = false,
         CancellationToken cancellationToken = default)
     {
-        return botClient.AnswerCallbackQuery(query.Id, text, showAlert: showAlert, cancellationToken: cancellationToken);
+        return _botClient.AnswerCallbackQuery(query.Id, text, showAlert: showAlert, cancellationToken: cancellationToken);
     }
 
     /// <summary>
     /// 编辑消息Markup
     /// </summary>
-    /// <param name="botClient"></param>
     /// <param name="message"></param>
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static Task<Message> EditMessageReplyMarkup
-        (
-        this ITelegramBotClient botClient,
+    public Task<Message> EditMessageReplyMarkup(
         Message message,
         InlineKeyboardMarkup? replyMarkup = default,
         CancellationToken cancellationToken = default)
     {
-        return botClient.EditMessageReplyMarkup(message.Chat, message.MessageId, replyMarkup, cancellationToken: cancellationToken);
+        return _botClient.EditMessageReplyMarkup(message.Chat, message.MessageId, replyMarkup, cancellationToken: cancellationToken);
     }
 
     /// <summary>
     /// 删除消息Markup
     /// </summary>
-    /// <param name="botClient"></param>
     /// <param name="message"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static Task<Message> RemoveMessageReplyMarkup(
-        this ITelegramBotClient botClient,
+    public Task<Message> RemoveMessageReplyMarkup(
         Message message,
         CancellationToken cancellationToken = default)
     {
-        return botClient.EditMessageReplyMarkup(message.Chat, message.MessageId, null, cancellationToken: cancellationToken);
+        return _botClient.EditMessageReplyMarkup(message.Chat, message.MessageId, null, cancellationToken: cancellationToken);
     }
 
     /// <summary>
     /// 编辑消息
     /// </summary>
-    /// <param name="botClient"></param>
     /// <param name="message"></param>
     /// <param name="text"></param>
     /// <param name="replyMarkup"></param>
@@ -98,8 +90,7 @@ public static class BotClientExtension
     /// <param name="disableWebPagePreview"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static Task<Message> EditMessageText(
-        this ITelegramBotClient botClient,
+    public Task<Message> EditMessageText(
         Message message,
         string text,
         ParseMode parseMode = ParseMode.None,
@@ -111,13 +102,12 @@ public static class BotClientExtension
             IsDisabled = disableWebPagePreview,
         };
 
-        return botClient.EditMessageText(message.Chat, message.MessageId, text, parseMode: parseMode, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken);
+        return _botClient.EditMessageText(message.Chat, message.MessageId, text, parseMode: parseMode, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken);
     }
 
     /// <summary>
     /// 编辑消息
     /// </summary>
-    /// <param name="botClient"></param>
     /// <param name="chatId"></param>
     /// <param name="messageId"></param>
     /// <param name="text"></param>
@@ -126,8 +116,7 @@ public static class BotClientExtension
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static Task<Message> EditMessageText(
-        this ITelegramBotClient botClient,
+    public Task<Message> EditMessageText(
         ChatId chatId,
         int messageId,
         string text,
@@ -140,13 +129,12 @@ public static class BotClientExtension
             IsDisabled = disableWebPagePreview,
         };
 
-        return botClient.EditMessageText(chatId, messageId, text, parseMode: parseMode, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken);
+        return _botClient.EditMessageText(chatId, messageId, text, parseMode: parseMode, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken);
     }
 
     /// <summary>
     /// 发送消息
     /// </summary>
-    /// <param name="botClient"></param>
     /// <param name="chatId"></param>
     /// <param name="text"></param>
     /// <param name="messageThreadId"></param>
@@ -157,8 +145,8 @@ public static class BotClientExtension
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static Task<Message> SendMessage(
-        this ITelegramBotClient botClient,
+    public Task<Message> SendMessage(
+
         long chatId,
         string text,
         int? messageThreadId,
@@ -178,13 +166,13 @@ public static class BotClientExtension
             MessageId = replyToMessageId.Value,
         } : null;
 
-        return botClient.SendMessage(chatId, text, parseMode: parseMode, messageThreadId: messageThreadId, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, replyParameters: replyParameters, disableNotification: disableNotification, cancellationToken: cancellationToken);
+        return _botClient.SendMessage(chatId, text, parseMode: parseMode, messageThreadId: messageThreadId, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, replyParameters: replyParameters, disableNotification: disableNotification, cancellationToken: cancellationToken);
     }
 
     /// <summary>
     /// 发送消息
     /// </summary>
-    /// <param name="botClient"></param>
+
     /// <param name="chatId"></param>
     /// <param name="text"></param>
     /// <param name="messageThreadId"></param>
@@ -195,8 +183,8 @@ public static class BotClientExtension
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static Task<Message> SendMessage(
-        this ITelegramBotClient botClient,
+    public Task<Message> SendMessage(
+
         ChatId chatId,
         string text,
         int? messageThreadId,
@@ -216,13 +204,13 @@ public static class BotClientExtension
             MessageId = replyToMessageId.Value,
         } : null;
 
-        return botClient.SendMessage(chatId, text, parseMode: parseMode, messageThreadId: messageThreadId, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, replyParameters: replyParameters, disableNotification: disableNotification, cancellationToken: cancellationToken);
+        return _botClient.SendMessage(chatId, text, parseMode: parseMode, messageThreadId: messageThreadId, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, replyParameters: replyParameters, disableNotification: disableNotification, cancellationToken: cancellationToken);
     }
 
     /// <summary>
     /// 发送消息
     /// </summary>
-    /// <param name="botClient"></param>
+
     /// <param name="message"></param>
     /// <param name="text"></param>
     /// <param name="parseMode"></param>
@@ -232,8 +220,8 @@ public static class BotClientExtension
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static Task<Message> SendMessageEx(
-        this ITelegramBotClient botClient,
+    public Task<Message> SendMessageEx(
+
         Message message,
         string text,
         ParseMode parseMode = ParseMode.None,
@@ -252,13 +240,13 @@ public static class BotClientExtension
             MessageId = message.MessageId,
         } : null;
 
-        return botClient.SendMessage(message.Chat, text, parseMode: parseMode, messageThreadId: message.MessageThreadId, replyMarkup: replyMarkup, replyParameters: replyParameters, linkPreviewOptions: linkPreviewOptions, disableNotification: disableNotification, cancellationToken: cancellationToken);
+        return _botClient.SendMessage(message.Chat, text, parseMode: parseMode, messageThreadId: message.MessageThreadId, replyMarkup: replyMarkup, replyParameters: replyParameters, linkPreviewOptions: linkPreviewOptions, disableNotification: disableNotification, cancellationToken: cancellationToken);
     }
 
     /// <summary>
     /// 发送命令回复
     /// </summary>
-    /// <param name="botClient"></param>
+
     /// <param name="text"></param>
     /// <param name="message"></param>
     /// <param name="autoDelete">私聊始终不删除消息, 群聊中默认删除消息, 但可以指定不删除</param>
@@ -266,8 +254,8 @@ public static class BotClientExtension
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static async Task<Message> SendCommandReply(
-        this ITelegramBotClient botClient,
+    public async Task<Message> SendCommandReply(
+
         string text,
         Message message,
         bool? autoDelete = null,
@@ -286,7 +274,7 @@ public static class BotClientExtension
             IsDisabled = true,
         };
 
-        var msg = await botClient.SendMessage(message.Chat, text, parseMode: parsemode, messageThreadId: message.MessageThreadId,
+        var msg = await _botClient.SendMessage(message.Chat, text, parseMode: parsemode, messageThreadId: message.MessageThreadId,
             replyParameters: replyParameters, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken);
 
         if (delete)
@@ -295,11 +283,11 @@ public static class BotClientExtension
                 await Task.Delay(TimeSpan.FromSeconds(30));
                 try
                 {
-                    await botClient.DeleteMessage(msg.Chat, msg.MessageId, cancellationToken);
+                    await _botClient.DeleteMessage(msg.Chat, msg.MessageId, cancellationToken);
                 }
                 catch
                 {
-                    _logger.Error("删除消息 {messageId} 失败", msg.MessageId);
+                    _logger.LogError("删除消息 {messageId} 失败", msg.MessageId);
                 }
             }, cancellationToken);
         }
@@ -310,25 +298,24 @@ public static class BotClientExtension
     /// <summary>
     /// 发送会话状态
     /// </summary>
-    /// <param name="botClient"></param>
     /// <param name="message"></param>
     /// <param name="chatAction"></param>
     /// <param name="threadId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static Task SendChatAction(
-        this ITelegramBotClient botClient,
+    public Task SendChatAction(
+
         Message message,
         ChatAction chatAction,
         CancellationToken cancellationToken = default)
     {
         try
         {
-            return botClient.SendChatAction(message.Chat, chatAction, message.MessageThreadId, null, cancellationToken);
+            return _botClient.SendChatAction(message.Chat, chatAction, message.MessageThreadId, null, cancellationToken);
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, "SendChatAction出错");
+            _logger.LogError(ex, "SendChatAction出错");
             return Task.CompletedTask;
         }
     }
@@ -336,12 +323,11 @@ public static class BotClientExtension
     /// <summary>
     /// 获取群成员状态
     /// </summary>
-    /// <param name="botClient"></param>
     /// <param name="chat"></param>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public static async Task<string> GetChatMemberStatus(
-        this ITelegramBotClient botClient,
+    public async Task<string> GetChatMemberStatus(
+
         Chat? chat,
         long userId)
     {
@@ -352,7 +338,7 @@ public static class BotClientExtension
         {
             try
             {
-                var chatMember = await botClient.GetChatMember(chat, userId);
+                var chatMember = await _botClient.GetChatMember(chat, userId);
                 status = chatMember.Status switch {
                     ChatMemberStatus.Creator or
                     ChatMemberStatus.Administrator or
@@ -365,7 +351,7 @@ public static class BotClientExtension
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "读取用户状态出错");
+                _logger.LogError(ex, "读取用户状态出错");
                 status = "出错";
             }
         }
@@ -375,5 +361,15 @@ public static class BotClientExtension
         }
 
         return string.Format("{0}: {1}", title, status);
+    }
+
+    public Task<TGFile> GetFile(string fileId, CancellationToken cancellationToken = default)
+    {
+        return _botClient.GetFile(fileId, cancellationToken);
+    }
+
+    public Task<Message> SendPhoto(ChatId chatId, InputFile inputFile)
+    {
+        return _botClient.SendPhoto(chatId, inputFile);
     }
 }

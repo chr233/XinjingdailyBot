@@ -1,6 +1,6 @@
 using Telegram.Bot.Types.Enums;
 
-namespace XinjingdailyBot.WebAPI.IPC.Responses;
+namespace XinjingdailyBot.Controller.Responses;
 
 /// <summary>
 /// 投稿数据

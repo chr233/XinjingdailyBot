@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+
 using System.Net;
 using XinjingdailyBot.Controller.Responses;
 using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.WebAPI.IPC.Controllers;
 
-namespace XinjingdailyBot.WebAPI.IPC.Controllers;
+namespace XinjingdailyBot.Controller.Controllers;
 
 /// <summary>
 /// 主页控制器

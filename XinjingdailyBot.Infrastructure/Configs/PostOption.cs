@@ -48,4 +48,6 @@ public sealed record PostOption
     /// 稿件自动过期时间
     /// </summary>
     public uint PostExpiredTime { get; set; } = 3;
+
+    public int MediaGroupReceiveTtl { get; set; } = 30;
 }

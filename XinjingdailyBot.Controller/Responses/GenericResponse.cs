@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace XinjingdailyBot.WebAPI.IPC.Responses;
+namespace XinjingdailyBot.Controller.Responses;
 
 /// <summary>
 /// 通用响应

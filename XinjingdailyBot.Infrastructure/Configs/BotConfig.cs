@@ -41,4 +41,9 @@ public sealed record BotConfig
     /// 文本稿件发布时是否启用链接预览
     /// </summary>
     public bool EnableWebPagePreview { get; init; }
+
+    /// <summary>
+    /// 纯链接警告
+    /// </summary>
+    public bool WarnRawLinkPost { get; init; }
 }

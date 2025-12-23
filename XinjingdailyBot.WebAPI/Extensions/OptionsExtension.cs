@@ -14,7 +14,8 @@ public static class OptionsExtension
     public static void AddCustomJsonFiles(this WebApplicationBuilder builder)
     {
         var config = builder.Configuration
-            .AddJsonFile("config.json", false, false)
+            .SetBasePath(BuildInfo.AppDir)
+            .AddJsonFile("config/config.json", false, false)
             .AddEnvironmentVariables()
             .AddUserSecrets<Program>()
             .Build();

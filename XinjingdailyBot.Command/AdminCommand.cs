@@ -11,6 +11,7 @@ using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Localization;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
@@ -25,7 +26,7 @@ namespace XinjingdailyBot.Command;
 [AppService(LifeTime.Scoped)]
 public class AdminCommand(
     ILogger<AdminCommand> _logger,
-    ITelegramBotClient _botClient,
+    ITelegramBotService _botClient,
     IUserService _userService,
     GroupRepository groupRepository,
     IBanRecordService banRecordService,

@@ -8,6 +8,7 @@ using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
@@ -21,7 +22,7 @@ namespace XinjingdailyBot.Command;
 [AppService(LifeTime.Scoped)]
 public class NormalCommand(
     ILogger<NormalCommand> _logger,
-    ITelegramBotClient _botClient,
+    ITelegramBotService _botClient,
     IUserService _userService,
     GroupRepository _groupRepository,
     IMarkupHelperService _markupHelperService,

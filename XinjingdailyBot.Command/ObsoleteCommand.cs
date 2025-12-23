@@ -4,6 +4,7 @@ using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
@@ -19,7 +20,7 @@ namespace XinjingdailyBot.Command;
 [AppService(LifeTime.Scoped)]
 public class ObsoleteCommand(
         ILogger<SuperCommand> _logger,
-        ITelegramBotClient _botClient,
+        ITelegramBotService _botClient,
         IPostService _postService,
         OldPostRepository _oldPostService,
         IChannelOptionService _channelOptionService,

@@ -5,6 +5,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Extensions;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Helper;
 
 namespace XinjingdailyBot.Service.Helper;
@@ -13,7 +14,7 @@ namespace XinjingdailyBot.Service.Helper;
 [AppService(typeof(IImageHelperService), LifeTime.Transient)]
 public sealed class ImageHelperService(
     ILogger<ImageHelperService> _logger,
-    ITelegramBotClient _botClient,
+    ITelegramBotService _botClient,
     ITextHelperService _textHelperService,
     IHttpHelperService _httpHelperService) : IImageHelperService
 {

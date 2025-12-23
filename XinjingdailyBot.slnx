@@ -11,6 +11,7 @@
     <Project Path="XinjingdailyBot.Infrastructure/XinjingdailyBot.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/2. 实体/">
+    <Project Path="XinjingdailyBot.Data/XinjingdailyBot.Data.csproj" Id="4b04bef1-6df8-4a0c-885b-83918f676c7a" />
     <Project Path="XinjingdailyBot.Model/XinjingdailyBot.Model.csproj">
       <BuildDependency Project="XinjingdailyBot.Infrastructure/XinjingdailyBot.Infrastructure.csproj" />
     </Project>
@@ -32,9 +33,12 @@
       <BuildDependency Project="XinjingdailyBot.Model/XinjingdailyBot.Model.csproj" />
       <BuildDependency Project="XinjingdailyBot.Repository/XinjingdailyBot.Repository.csproj" />
     </Project>
+  </Folder>
+  <Folder Name="/4. 控制器/">
+    <Project Path="XinjingdailyBot.Controller/XinjingdailyBot.Controller.csproj" />
     <Project Path="XinjingdailyBot.Tasks/XinjingdailyBot.Tasks.csproj" />
   </Folder>
-  <Folder Name="/4. 启动/">
+  <Folder Name="/5. 应用/">
     <Project Path="XinjingdailyBot.WebAPI/XinjingdailyBot.WebAPI.csproj">
       <BuildDependency Project="XinjingdailyBot.Command/XinjingdailyBot.Command.csproj" />
       <BuildDependency Project="XinjingdailyBot.Infrastructure/XinjingdailyBot.Infrastructure.csproj" />

@@ -172,6 +172,11 @@ public sealed record NewPosts : BaseModel, IModifyAt, ICreateAt
     /// </summary>
     public long ReviewerUID { get; set; } = -1;
 
+    /// <summary>
+    /// 强制匿名
+    /// </summary>
+    public bool ForceAnonymous { get; set; }
+
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;
     /// <inheritdoc cref="IModifyAt"/>

@@ -1,20 +1,23 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using XinjingdailyBot.Controller.Authorization;
+using XinjingdailyBot.Controller.Requests;
+using XinjingdailyBot.Controller.Responses;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Repository;
-using XinjingdailyBot.WebAPI.Authorization;
-using XinjingdailyBot.WebAPI.IPC.Requests;
-using XinjingdailyBot.WebAPI.IPC.Responses;
+using XinjingdailyBot.WebAPI.IPC.Controllers;
 
-namespace XinjingdailyBot.WebAPI.IPC.Controllers;
+namespace XinjingdailyBot.Controller.Controllers;
 
 /// <summary>
 /// 主页控制器
@@ -25,7 +28,7 @@ public sealed class PostController(
         IPostService _postService,
         IChannelOptionService _channelOptionService,
         IUserService _userService,
-        ITelegramBotClient _botClient,
+        ITelegramBotService _botClient,
         IChannelService _channelService,
         IMarkupHelperService _markupHelperService,
         ITextHelperService _textHelperService,

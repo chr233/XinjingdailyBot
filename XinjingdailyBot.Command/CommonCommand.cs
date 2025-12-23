@@ -7,6 +7,7 @@ using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
@@ -20,12 +21,12 @@ namespace XinjingdailyBot.Command;
 /// </summary>
 [AppService(LifeTime.Scoped)]
 public class CommonCommand(
-        ITelegramBotClient _botClient,
-        IOptions<OptionsSetting> _configuration,
-        IBanRecordService _banRecordService,
-        ITextHelperService _textHelperService,
-        ICommandHandler _commandHandler,
-        IChannelService _channelService)
+    ITelegramBotService _botClient,
+    IOptions<OptionsSetting> _configuration,
+    IBanRecordService _banRecordService,
+    ITextHelperService _textHelperService,
+    ICommandHandler _commandHandler,
+    IChannelService _channelService)
 {
     private readonly OptionsSetting _optionsSetting = _configuration.Value;
 

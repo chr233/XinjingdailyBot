@@ -16,7 +16,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" />
-		<PackageReference Include="SkiaSharp" />
 		<PackageReference Include="NLog.Extensions.Logging" />
 		<PackageReference Include="NSwag.AspNetCore" />
 		<PackageReference Include="NSwag.Generation.AspNetCore" />
@@ -30,9 +29,12 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\XinjingdailyBot.Command\XinjingdailyBot.Command.csproj" />
+		<ProjectReference Include="..\XinjingdailyBot.Controller\XinjingdailyBot.Controller.csproj" />
+		<ProjectReference Include="..\XinjingdailyBot.Generator\XinjingdailyBot.Generator.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Infrastructure\XinjingdailyBot.Infrastructure.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Interface\XinjingdailyBot.Interface.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Model\XinjingdailyBot.Model.csproj" />
+		<ProjectReference Include="..\XinjingdailyBot.Repository\XinjingdailyBot.Repository.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Service\XinjingdailyBot.Service.csproj" />
 		<ProjectReference Include="..\XinjingdailyBot.Tasks\XinjingdailyBot.Tasks.csproj" />
 	</ItemGroup>
@@ -69,7 +71,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Update="nlog.config">
+		<Content Update="config\nlog.config">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
