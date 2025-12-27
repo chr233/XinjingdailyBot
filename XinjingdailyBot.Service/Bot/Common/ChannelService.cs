@@ -5,6 +5,7 @@ using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Extensions;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
 
 namespace XinjingdailyBot.Service.Bot.Common;
@@ -13,7 +14,7 @@ namespace XinjingdailyBot.Service.Bot.Common;
 
 public class ChannelService(
         ILogger<ChannelService> _logger,
-        ITelegramBotClient _botClient,
+        ITelegramBotService _botClient,
         IOptions<OptionsSetting> _options) : IChannelService
 {
     private readonly OptionsSetting _optionsSetting = _options.Value;

@@ -6,6 +6,7 @@ using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Data;
 
 namespace XinjingdailyBot.Tasks;
@@ -18,7 +19,7 @@ internal class ExpiredPostsTask(
         ILogger<ExpiredPostsTask> _logger,
         IPostService _postService,
         IUserService _userService,
-        ITelegramBotClient _botClient,
+        ITelegramBotService _botClient,
         IOptions<OptionsSetting> _options) : IJob
 {
 

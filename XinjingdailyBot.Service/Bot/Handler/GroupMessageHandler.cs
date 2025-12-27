@@ -1,11 +1,10 @@
 using Microsoft.Extensions.Logging;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
-using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Localization;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Model.Models;
@@ -15,7 +14,7 @@ namespace XinjingdailyBot.Service.Bot.Handler;
 /// <inheritdoc cref="IGroupMessageHandler"/>
 [AppService(typeof(IGroupMessageHandler), LifeTime.Singleton)]
 public sealed class GroupMessageHandler(
-        ITelegramBotClient _botClient,
+        ITelegramBotService _botClient,
         IChannelService _channelService,
         ILogger<GroupMessageHandler> _logger) : IGroupMessageHandler
 {

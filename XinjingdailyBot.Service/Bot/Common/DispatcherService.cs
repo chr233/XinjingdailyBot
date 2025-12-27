@@ -3,6 +3,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
@@ -19,7 +20,7 @@ public class DispatcherService(
         ICommandHandler _commandHandler,
         IChannelPostHandler _channelPostHandler,
         IChannelService _channelService,
-        ITelegramBotClient _botClient,
+        ITelegramBotService _botClient,
         IJoinRequestHandler _joinRequestHandler,
         IInlineQueryHandler _inlineQueryHandler,
         IDialogueService _dialogueService,

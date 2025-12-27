@@ -4,6 +4,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
@@ -17,7 +18,7 @@ namespace XinjingdailyBot.Tasks;
 internal class ReviewStatusTask(
     ILogger<ReviewStatusTask> _logger,
     IPostService _postService,
-    ITelegramBotClient _botClient,
+    ITelegramBotService _botClient,
     IChannelService _channelService,
     IReviewStatusService _reviewStatusService,
     IMarkupHelperService _markupHelperService) : IJob

@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Extensions;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
 
 namespace XinjingdailyBot.Tasks;
@@ -14,12 +15,12 @@ internal class RejectChannelTask : IJob
 {
     private readonly ILogger<RejectChannelTask> _logger;
     private readonly IChannelService _channelService;
-    private readonly ITelegramBotClient _botClient;
+    private readonly ITelegramBotService _botClient;
 
     public RejectChannelTask(
         ILogger<RejectChannelTask> logger,
         IChannelService channelService,
-        ITelegramBotClient botClient)
+        ITelegramBotService botClient)
     {
         _logger = logger;
         _channelService = channelService;
@@ -35,7 +36,7 @@ internal class RejectChannelTask : IJob
         string descText = string.Format("此频道为 {0}({1}) 的附属频道\r\n此频道仅用于存档未通过的投稿, 频道中的内容均来自用户投稿\r\n本频道中的一切内容不代表 {0} 的立场", acceptChannel.Title, acceptChannel.ChatID());
 
         var rejectChannel = _channelService.RejectChannel;
-        var message = await _botClient.SendMessage(rejectChannel, descText);
+        var message = await _botClient.SendMessage(rejectChannel.Id, descText);
         await _botClient.PinChatMessage(rejectChannel, message.MessageId, true);
     }
 }

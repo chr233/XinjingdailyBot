@@ -182,7 +182,7 @@ public class PostCommand(
 
 
 
-        var manageMsg = await _botClient.SendMessageEx(reviewMsg, msg, parseMode: ParseMode.Html, true, disableWebPagePreview: true, replyMarkup: keyboard);
+        var manageMsg = await _botClient.SendMessage(reviewMsg, msg, parseMode: ParseMode.Html, true, disableWebPagePreview: true, replyMarkup: keyboard);
 
         post.ReviewChatID = reviewMsg.Chat.Id;
         post.ReviewMsgID = reviewMsg.MessageId;

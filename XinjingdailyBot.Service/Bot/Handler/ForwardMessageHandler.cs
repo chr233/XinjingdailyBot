@@ -5,6 +5,7 @@ using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
@@ -15,7 +16,7 @@ namespace XinjingdailyBot.Service.Bot.Handler;
 
 [AppService(typeof(IForwardMessageHandler), LifeTime.Singleton)]
 public class ForwardMessageHandler(
-     ITelegramBotClient _botClient,
+     ITelegramBotService _botClient,
      IChannelService _channelService,
      IPostService _postService,
      IMarkupHelperService _markupHelperService,

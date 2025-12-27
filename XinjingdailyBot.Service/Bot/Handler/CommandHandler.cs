@@ -12,6 +12,7 @@ using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Model;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
@@ -28,7 +29,7 @@ public class CommandHandler(
     ILogger<CommandHandler> _logger,
     IChannelService _channelService,
     IServiceProvider _serviceProvider,
-    ITelegramBotClient _botClient,
+    ITelegramBotService _botClient,
     ICmdRecordService _cmdRecordService,
     IOptions<OptionsSetting> _options) : ICommandHandler
 {

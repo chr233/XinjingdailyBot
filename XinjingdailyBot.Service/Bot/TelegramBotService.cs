@@ -14,6 +14,30 @@ public class TelegramBotService(
     ITelegramBotClient _botClient,
     ILogger<TelegramBotService> _logger) : ITelegramBotService
 {
+    private ReplyParameters? CreateReplyParameters(Message? message)
+    {
+        if (message == null)
+        {
+            return null;
+        }
+        return new ReplyParameters {
+            AllowSendingWithoutReply = true,
+            MessageId = message.MessageId,
+        };
+    }
+
+    private ReplyParameters? CreateReplyParameters(int? messageId)
+    {
+        if (messageId == null)
+        {
+            return null;
+        }
+        return new ReplyParameters {
+            AllowSendingWithoutReply = true,
+            MessageId = messageId.Value,
+        };
+    }
+
     /// <summary>
     /// 发送回复
     /// </summary>
@@ -146,11 +170,10 @@ public class TelegramBotService(
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     public Task<Message> SendMessage(
-
         long chatId,
         string text,
-        int? messageThreadId,
-        int? replyToMessageId,
+        int? messageThreadId = null,
+        int? replyToMessageId = null,
         ParseMode parseMode = ParseMode.None,
         bool disableWebPagePreview = false,
         bool disableNotification = false,
@@ -172,7 +195,6 @@ public class TelegramBotService(
     /// <summary>
     /// 发送消息
     /// </summary>
-
     /// <param name="chatId"></param>
     /// <param name="text"></param>
     /// <param name="messageThreadId"></param>
@@ -184,7 +206,6 @@ public class TelegramBotService(
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     public Task<Message> SendMessage(
-
         ChatId chatId,
         string text,
         int? messageThreadId,
@@ -207,10 +228,32 @@ public class TelegramBotService(
         return _botClient.SendMessage(chatId, text, parseMode: parseMode, messageThreadId: messageThreadId, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, replyParameters: replyParameters, disableNotification: disableNotification, cancellationToken: cancellationToken);
     }
 
+    public Task<Message> SendMessage(
+    Chat chat,
+    string text,
+    int? messageThreadId,
+    int? replyToMessageId,
+    ParseMode parseMode = ParseMode.None,
+    bool disableWebPagePreview = false,
+    bool disableNotification = false,
+    InlineKeyboardMarkup? replyMarkup = default,
+    CancellationToken cancellationToken = default)
+    {
+        var linkPreviewOptions = new LinkPreviewOptions {
+            IsDisabled = disableWebPagePreview,
+        };
+
+        var replyParameters = replyToMessageId != null ? new ReplyParameters {
+            AllowSendingWithoutReply = true,
+            MessageId = replyToMessageId.Value,
+        } : null;
+
+        return _botClient.SendMessage(chat, text, parseMode: parseMode, messageThreadId: messageThreadId, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, replyParameters: replyParameters, disableNotification: disableNotification, cancellationToken: cancellationToken);
+    }
+
     /// <summary>
     /// 发送消息
     /// </summary>
-
     /// <param name="message"></param>
     /// <param name="text"></param>
     /// <param name="parseMode"></param>
@@ -220,7 +263,7 @@ public class TelegramBotService(
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<Message> SendMessageEx(
+    public Task<Message> SendMessage(
 
         Message message,
         string text,
@@ -243,10 +286,29 @@ public class TelegramBotService(
         return _botClient.SendMessage(message.Chat, text, parseMode: parseMode, messageThreadId: message.MessageThreadId, replyMarkup: replyMarkup, replyParameters: replyParameters, linkPreviewOptions: linkPreviewOptions, disableNotification: disableNotification, cancellationToken: cancellationToken);
     }
 
+
+    public Task DeleteMessage(
+      ChatId chatId,
+      int messageId,
+      CancellationToken cancellationToken = default
+  )
+    {
+        return _botClient.DeleteMessage(chatId, messageId, cancellationToken);
+    }
+
+
+    public Task DeleteMessages(
+        ChatId chatId,
+        IEnumerable<int> messageIds,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.DeleteMessages(chatId, messageIds, cancellationToken);
+    }
+
     /// <summary>
     /// 发送命令回复
     /// </summary>
-
     /// <param name="text"></param>
     /// <param name="message"></param>
     /// <param name="autoDelete">私聊始终不删除消息, 群聊中默认删除消息, 但可以指定不删除</param>
@@ -368,8 +430,130 @@ public class TelegramBotService(
         return _botClient.GetFile(fileId, cancellationToken);
     }
 
-    public Task<Message> SendPhoto(ChatId chatId, InputFile inputFile)
+    public Task<Message> SendPhoto(
+        ChatId chatId,
+        InputFile photo,
+        string? caption = default,
+        ParseMode parseMode = default,
+        ReplyParameters? replyParameters = default,
+        ReplyMarkup? replyMarkup = default,
+        int? messageThreadId = default,
+        IEnumerable<MessageEntity>? captionEntities = default,
+        bool showCaptionAboveMedia = default,
+        bool hasSpoiler = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        string? messageEffectId = default,
+        string? businessConnectionId = default,
+        bool allowPaidBroadcast = default,
+        long? directMessagesTopicId = default,
+        SuggestedPostParameters? suggestedPostParameters = default,
+        CancellationToken cancellationToken = default)
     {
-        return _botClient.SendPhoto(chatId, inputFile);
+        return _botClient.SendPhoto(chatId, photo, caption, parseMode, replyParameters);
+    }
+
+    public Task<Message> SendPhoto(
+        ChatId chatId,
+        InputFile photo,
+        string? caption = default,
+        ParseMode parseMode = default,
+        Message? replyMessage = null,
+        ReplyMarkup? replyMarkup = default,
+        int? messageThreadId = default,
+        IEnumerable<MessageEntity>? captionEntities = default,
+        bool showCaptionAboveMedia = default,
+        bool hasSpoiler = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        string? messageEffectId = default,
+        string? businessConnectionId = default,
+        bool allowPaidBroadcast = default,
+        long? directMessagesTopicId = default,
+        SuggestedPostParameters? suggestedPostParameters = default,
+        CancellationToken cancellationToken = default)
+    {
+        var replyParameters = CreateReplyParameters(replyMessage);
+
+        return _botClient.SendPhoto(chatId, photo, caption, parseMode, replyParameters);
+    }
+
+    public Task RestrictChatMember(
+        ChatId chatId,
+        long userId,
+        ChatPermissions permissions,
+        bool useIndependentChatPermissions = default,
+        DateTime? untilDate = default,
+        CancellationToken cancellationToken = default)
+    {
+        return _botClient.RestrictChatMember(chatId, userId, permissions, useIndependentChatPermissions, untilDate, cancellationToken);
+    }
+
+
+    public Task BanChatMember(
+       ChatId chatId,
+       long userId,
+       DateTime? untilDate = default,
+       bool revokeMessages = default,
+       CancellationToken cancellationToken = default)
+    {
+        return _botClient.BanChatMember(chatId, userId, untilDate, revokeMessages, cancellationToken);
+    }
+
+    public Task UnbanChatMember(
+        ChatId chatId,
+        long userId,
+        bool onlyIfBanned = default,
+        CancellationToken cancellationToken = default)
+    {
+        return _botClient.UnbanChatMember(chatId, userId, onlyIfBanned, cancellationToken);
+    }
+
+    public Task<ChatInviteLink> CreateChatInviteLink(
+        ChatId chatId,
+        string? name = default,
+        DateTime? expireDate = default,
+        int? memberLimit = default,
+        bool createsJoinRequest = default,
+        CancellationToken cancellationToken = default)
+    {
+        return _botClient.CreateChatInviteLink(chatId, name, expireDate, memberLimit, createsJoinRequest, cancellationToken);
+    }
+
+    public Task PinChatMessage(
+       ChatId chatId,
+       int messageId,
+       bool disableNotification = default,
+       string? businessConnectionId = default,
+       CancellationToken cancellationToken = default
+   )
+    {
+        return _botClient.PinChatMessage(chatId, messageId, disableNotification, businessConnectionId, cancellationToken);
+    }
+
+    public Task UnpinChatMessage(
+        ChatId chatId,
+        int? messageId = default,
+        string? businessConnectionId = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.UnpinChatMessage(chatId, messageId, businessConnectionId, cancellationToken);
+    }
+
+    public Task UnpinAllChatMessages(
+       ChatId chatId,
+       CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.UnpinAllChatMessages(chatId, cancellationToken);
+    }
+
+    public Task LeaveChat(
+       ChatId chatId,
+       CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.LeaveChat(chatId, cancellationToken);
     }
 }

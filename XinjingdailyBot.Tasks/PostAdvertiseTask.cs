@@ -4,6 +4,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
@@ -17,7 +18,7 @@ namespace XinjingdailyBot.Tasks;
 internal class PostAdvertiseTask(
     ILogger<PostAdvertiseTask> _logger,
     IServiceProvider _serviceProvider,
-    ITelegramBotClient _botClient,
+    ITelegramBotService _botClient,
     IAdvertiseService _advertisesService,
     IAdvertisePostService _advertisePostService,
     IMarkupHelperService _markupHelperService) : IJob

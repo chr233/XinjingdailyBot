@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using SqlSugar;
 using Telegram.Bot;
 using XinjingdailyBot.Infrastructure.Attribute;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Service.Data.Base;
@@ -13,11 +14,11 @@ namespace XinjingdailyBot.Service.Data;
 public sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdvertisePostService
 {
     private readonly ILogger<AdvertisePostsService> _logger;
-    private readonly ITelegramBotClient _botClient;
+    private readonly ITelegramBotService _botClient;
 
     public AdvertisePostsService(
         ILogger<AdvertisePostsService> logger,
-        ITelegramBotClient botClient,
+        ITelegramBotService botClient,
         ISqlSugarClient context) : base(context)
     {
         _logger = logger;
@@ -28,18 +29,18 @@ public sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdvert
     {
         var oldPosts = await Queryable()
             .Where(x => x.AdId == advertises.Id && !x.Deleted)
-            .ToListAsync();
+            .ToListAsync().ConfigureAwait(false);
 
         foreach (var oldPost in oldPosts)
         {
             try
             {
-                await _botClient.DeleteMessage(oldPost.ChatID, (int)oldPost.MessageID);
+                await _botClient.DeleteMessage(oldPost.ChatID, (int)oldPost.MessageID).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "删除消息失败");
-                await Task.Delay(500);
+                await Task.Delay(500).ConfigureAwait(false);
             }
             finally
             {
@@ -47,7 +48,7 @@ public sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdvert
                 oldPost.ModifyAt = DateTime.Now;
                 await Updateable(oldPost)
                     .UpdateColumns(static x => new { x.Deleted, x.ModifyAt })
-                    .ExecuteCommandAsync();
+                    .ExecuteCommandAsync().ConfigureAwait(false);
             }
         }
     }
@@ -56,18 +57,18 @@ public sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdvert
     {
         var oldPosts = await Queryable()
             .Where(x => x.AdId == advertises.Id && x.Pined)
-            .ToListAsync();
+            .ToListAsync().ConfigureAwait(false);
 
         foreach (var oldPost in oldPosts)
         {
             try
             {
-                await _botClient.UnpinChatMessage(oldPost.ChatID, (int)oldPost.MessageID);
+                await _botClient.UnpinChatMessage(oldPost.ChatID, (int)oldPost.MessageID).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "取消置顶消息失败");
-                await Task.Delay(500);
+                await Task.Delay(500).ConfigureAwait(false);
             }
             finally
             {
@@ -75,7 +76,7 @@ public sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdvert
                 oldPost.ModifyAt = DateTime.Now;
                 await Updateable(oldPost)
                     .UpdateColumns(static x => new { x.Pined, x.ModifyAt })
-                    .ExecuteCommandAsync();
+                    .ExecuteCommandAsync().ConfigureAwait(false);
             }
         }
     }
@@ -91,6 +92,6 @@ public sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdvert
             ModifyAt = DateTime.Now,
         };
 
-        await Insertable(adpost).ExecuteCommandAsync();
+        await Insertable(adpost).ExecuteCommandAsync().ConfigureAwait(false);
     }
 }

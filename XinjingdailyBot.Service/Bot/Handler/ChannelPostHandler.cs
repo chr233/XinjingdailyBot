@@ -5,6 +5,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
@@ -23,7 +24,7 @@ public class ChannelPostHandler(
         IUserService _userService,
         IChannelOptionService _channelOptionService,
         TagRepository _tagRepository,
-        ITelegramBotClient _botClient,
+        ITelegramBotService _botClient,
         IMediaGroupService _mediaGroupService,
         IChannelService _channelService) : IChannelPostHandler
 {

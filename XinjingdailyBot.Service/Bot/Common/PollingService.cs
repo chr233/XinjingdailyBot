@@ -7,6 +7,7 @@ using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Repository;
@@ -25,7 +26,7 @@ public class PollingService(
         LevelRepository _levelRepository,
         TagRepository _tagRepository,
         RejectReasonRepository _rejectReasonRepository,
-        ITelegramBotClient _botClient,
+        ITelegramBotService _botClient,
         IOptions<OptionsSetting> options) : BackgroundService
 {
 

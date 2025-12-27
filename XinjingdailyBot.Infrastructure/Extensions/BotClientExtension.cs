@@ -21,8 +21,9 @@ public static class BotClientExtension
     /// <param name="parsemode"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
+    [Obsolete]
     public static Task<Message> AutoReply(
-        this ITelegramBotService botClient,
+        this ITelegramBotClient botClient,
         string text,
         Message message,
         ParseMode parsemode = ParseMode.None,
@@ -44,6 +45,7 @@ public static class BotClientExtension
     /// <param name="showAlert"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
+    [Obsolete]
     public static Task AutoReply(
         this ITelegramBotClient botClient,
         string text,
@@ -62,6 +64,7 @@ public static class BotClientExtension
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
+    [Obsolete]
     public static Task<Message> EditMessageReplyMarkup
         (
         this ITelegramBotClient botClient,
@@ -79,6 +82,7 @@ public static class BotClientExtension
     /// <param name="message"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
+    [Obsolete]
     public static Task<Message> RemoveMessageReplyMarkup(
         this ITelegramBotClient botClient,
         Message message,
@@ -98,6 +102,7 @@ public static class BotClientExtension
     /// <param name="disableWebPagePreview"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
+    [Obsolete]
     public static Task<Message> EditMessageText(
         this ITelegramBotClient botClient,
         Message message,
@@ -126,6 +131,7 @@ public static class BotClientExtension
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
+    [Obsolete]
     public static Task<Message> EditMessageText(
         this ITelegramBotClient botClient,
         ChatId chatId,
@@ -157,6 +163,7 @@ public static class BotClientExtension
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
+    [Obsolete]
     public static Task<Message> SendMessage(
         this ITelegramBotClient botClient,
         long chatId,
@@ -195,6 +202,7 @@ public static class BotClientExtension
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
+    [Obsolete]
     public static Task<Message> SendMessage(
         this ITelegramBotClient botClient,
         ChatId chatId,
@@ -232,6 +240,7 @@ public static class BotClientExtension
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
+    [Obsolete]
     public static Task<Message> SendMessageEx(
         this ITelegramBotClient botClient,
         Message message,
@@ -266,6 +275,7 @@ public static class BotClientExtension
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
+    [Obsolete]
     public static async Task<Message> SendCommandReply(
         this ITelegramBotClient botClient,
         string text,
@@ -316,6 +326,7 @@ public static class BotClientExtension
     /// <param name="threadId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
+    [Obsolete]
     public static Task SendChatAction(
         this ITelegramBotClient botClient,
         Message message,
@@ -340,6 +351,7 @@ public static class BotClientExtension
     /// <param name="chat"></param>
     /// <param name="userId"></param>
     /// <returns></returns>
+    [Obsolete]
     public static async Task<string> GetChatMemberStatus(
         this ITelegramBotClient botClient,
         Chat? chat,
