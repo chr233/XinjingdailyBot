@@ -409,8 +409,8 @@ public sealed class ImageHelperService(
         // Skip the remaining header to reach the first chunk.
         _ = reader.ReadBytes(15);
 
-        int width = reader.ReadInt32BE();
-        int height = reader.ReadInt32BE();
+        int width = reader.ReadInt32();
+        int height = reader.ReadInt32();
 
         return new Size(width, height);
     }

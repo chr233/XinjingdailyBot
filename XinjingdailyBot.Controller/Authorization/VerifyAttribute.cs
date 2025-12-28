@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Net;
+using XinjingdailyBot.Controller.Responses;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Repository;
-using XinjingdailyBot.WebAPI.IPC.Responses;
 
 namespace XinjingdailyBot.Controller.Authorization;
 

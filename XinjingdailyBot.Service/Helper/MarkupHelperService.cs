@@ -115,7 +115,7 @@ public sealed class MarkupHelperService : IMarkupHelperService
         return new InlineKeyboardMarkup(btns);
     }
 
-    public InlineKeyboardMarkup ReviewKeyboardA(int tagNum, bool? hasSpoiler)
+    public InlineKeyboardMarkup ReviewKeyboardA(int tagNum, bool? hasSpoiler, bool? anymouse = null)
     {
         var tags = _tagRepository.GetTagsPayload(tagNum);
 
@@ -142,11 +142,20 @@ public sealed class MarkupHelperService : IMarkupHelperService
 
         if (hasSpoiler.HasValue)
         {
-            btns.Add(new[]
-            {
+            btns.Add(
+            [
                  InlineKeyboardButton.WithCallbackData(hasSpoiler.Value? Langs.TagSpoilerOn: Langs.TagSpoilerOff, "review spoiler"),
-            });
+            ]);
         }
+
+        if (anymouse.HasValue)
+        {
+            btns.Add(
+               [
+                     InlineKeyboardButton.WithCallbackData(anymouse.Value ? Langs.AnymouseOn: Langs.AnymouseOff, "review forceAnymouse"),
+                ]);
+        }
+
 
         if (!_botOption.PostSecondMenu)
         {
@@ -236,7 +245,7 @@ public sealed class MarkupHelperService : IMarkupHelperService
 
     public async Task<InlineKeyboardMarkup?> SetUserGroupKeyboard(Users dbUser, Users targetUser)
     {
-        var groups = await _groupRepository.Queryable().Where(x => x.Id > 0 && x.Id < dbUser.GroupID).ToListAsync();
+        var groups = await _groupRepository.Queryable().Where(x => x.Id > 0 && x.Id < dbUser.GroupID).ToListAsync().ConfigureAwait(false);
 
         if (!groups.Any())
         {

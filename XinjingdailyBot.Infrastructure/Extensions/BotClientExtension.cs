@@ -297,15 +297,15 @@ public static class BotClientExtension
         };
 
         var msg = await botClient.SendMessage(message.Chat, text, parseMode: parsemode, messageThreadId: message.MessageThreadId,
-            replyParameters: replyParameters, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken);
+            replyParameters: replyParameters, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         if (delete)
         {
             _ = Task.Run(async () => {
-                await Task.Delay(TimeSpan.FromSeconds(30));
+                await Task.Delay(TimeSpan.FromSeconds(30)).ConfigureAwait(false);
                 try
                 {
-                    await botClient.DeleteMessage(msg.Chat, msg.MessageId, cancellationToken);
+                    await botClient.DeleteMessage(msg.Chat, msg.MessageId, cancellationToken).ConfigureAwait(false);
                 }
                 catch
                 {
@@ -364,7 +364,7 @@ public static class BotClientExtension
         {
             try
             {
-                var chatMember = await botClient.GetChatMember(chat, userId);
+                var chatMember = await botClient.GetChatMember(chat, userId).ConfigureAwait(false);
                 status = chatMember.Status switch {
                     ChatMemberStatus.Creator or
                     ChatMemberStatus.Administrator or

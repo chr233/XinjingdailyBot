@@ -22,7 +22,7 @@ public sealed class UserTokenService : BaseService<UserTokens>, IUserTokenServic
 
     public async Task<UserTokens> GenerateNewUserToken(Users dbUser)
     {
-        var token = await Queryable().Where(x => x.UID == dbUser.Id).FirstAsync();
+        var token = await Queryable().Where(x => x.UID == dbUser.Id).FirstAsync().ConfigureAwait(false);
         if (token == null)
         {
             token = new UserTokens {
@@ -31,12 +31,12 @@ public sealed class UserTokenService : BaseService<UserTokens>, IUserTokenServic
                 APIToken = Guid.NewGuid(),
                 ExpiredAt = IUserTokenService.MaxExpiredValue,
             };
-            await Insertable(token).ExecuteCommandAsync();
+            await Insertable(token).ExecuteCommandAsync().ConfigureAwait(false);
         }
         else
         {
             token.APIToken = Guid.NewGuid();
-            await Updateable(token).ExecuteCommandAsync();
+            await Updateable(token).ExecuteCommandAsync().ConfigureAwait(false);
         }
 
         _logger.LogInformation("为 {user} 生成新 Token {token}", dbUser, token.APIToken);
@@ -46,7 +46,7 @@ public sealed class UserTokenService : BaseService<UserTokens>, IUserTokenServic
 
     public async Task<UserTokens?> FetchUserToken(Users dbUser)
     {
-        var token = await Queryable().Where(x => x.UID == dbUser.Id).FirstAsync();
+        var token = await Queryable().Where(x => x.UID == dbUser.Id).FirstAsync().ConfigureAwait(false);
         if (token == null || token.ExpiredAt < DateTime.Now)
         {
             return null;
@@ -58,7 +58,7 @@ public sealed class UserTokenService : BaseService<UserTokens>, IUserTokenServic
     {
         var userToken = await Queryable()
             .Includes(static x => x.User)
-            .FirstAsync(x => x.APIToken == token);
+            .FirstAsync(x => x.APIToken == token).ConfigureAwait(false);
 
         if (userToken?.User != null && userToken.ExpiredAt > DateTime.Now)
         {

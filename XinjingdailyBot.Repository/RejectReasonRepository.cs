@@ -41,14 +41,14 @@ public class RejectReasonRepository : BaseRepository<RejectReasons>
     /// <returns></returns>
     public async Task InitRejectReasonCache()
     {
-        var reasonCount = await CountAsync(x => true);
+        var reasonCount = await CountAsync(x => true).ConfigureAwait(false);
         if (reasonCount == 0)
         {
             _logger.LogInformation("未设置拒绝理由，正在创建内置拒绝理由");
-            await InsertBuildInRejectReasons();
+            await InsertBuildInRejectReasons().ConfigureAwait(false);
         }
 
-        var reasons = await GetListAsync();
+        var reasons = await GetListAsync().ConfigureAwait(false);
         if (reasons.Any())
         {
             RejectReasonCache.Clear();
@@ -76,7 +76,7 @@ public class RejectReasonRepository : BaseRepository<RejectReasons>
 
             if (changed)
             {
-                await Storageable(reasons).ExecuteCommandAsync();
+                await Storageable(reasons).ExecuteCommandAsync().ConfigureAwait(false);
             }
 
             _logger.LogInformation("已加载 {Count} 个拒绝理由", reasons.Count);
@@ -106,7 +106,7 @@ public class RejectReasonRepository : BaseRepository<RejectReasons>
             new RejectReasons { Id = 8, Name = "太多了", Payload = "toomuch", FullText = "今天此类型的稿件的数量太多了" },
         };
 
-        await Storageable(levels).ExecuteCommandAsync();
+        await Storageable(levels).ExecuteCommandAsync().ConfigureAwait(false);
     }
 
     /// <summary>

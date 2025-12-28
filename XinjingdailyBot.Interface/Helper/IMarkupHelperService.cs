@@ -88,7 +88,8 @@ public interface IMarkupHelperService
     /// <param name="tagNum"></param>
     /// <param name="hasSpoiler"></param>
     /// <returns></returns>
-    InlineKeyboardMarkup ReviewKeyboardA(int tagNum, bool? hasSpoiler);
+    /// <param name="anymouse"></param>
+    InlineKeyboardMarkup ReviewKeyboardA(int tagNum, bool? hasSpoiler, bool? anymouse = null);
     /// <summary>
     /// 审核键盘B(选择拒绝理由)
     /// </summary>

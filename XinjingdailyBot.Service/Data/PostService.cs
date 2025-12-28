@@ -2,15 +2,15 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SqlSugar;
 using System.Collections.Concurrent;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
+using XinjingdailyBot.Data;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
 using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Localization;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Interface.Helper;
@@ -23,14 +23,14 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IPostService"/>
 [AppService(typeof(IPostService), LifeTime.Singleton)]
-internal sealed class PostService(
+public sealed class PostService(
     ILogger<PostService> _logger,
     IAttachmentService _attachmentService,
     IChannelService _channelService,
     IChannelOptionService _channelOptionService,
     ITextHelperService _textHelperService,
     IMarkupHelperService _markupHelperService,
-    ITelegramBotClient _botClient,
+    ITelegramBotService _botClient,
     IUserService _userService,
     IOptions<OptionsSetting> _options,
     TagRepository _tagRepository,
@@ -38,6 +38,20 @@ internal sealed class PostService(
     IImageHelperService _imageHelperService,
     ISqlSugarClient _context) : BaseService<NewPosts>(_context), IPostService
 {
+    private readonly bool _disableWebPreview = !_options.Value.Bot.EnableWebPagePreview;
+
+    private readonly int _mediaGroupReceiveTtl = _options.Value.Post.MediaGroupReceiveTtl;
+
+    /// <summary>
+    /// 缓存Ttl控制定时器
+    /// </summary>
+    private Timer? MediaGroupTtlTimer { get; set; }
+
+    /// <summary>
+    /// mediaGroupID字典
+    /// </summary>
+    private ConcurrentDictionary<string, MediaGroupCache> MediaGroupCaches { get; } = new();
+
     /// <inheritdoc/>
     public async Task<bool> CheckPostLimit(Users dbUser, Message? message = null, CallbackQuery? query = null)
     {
@@ -249,7 +263,7 @@ internal sealed class PostService(
                 return;
         }
 
-        var actionMsg = await _botClient.SendMessageEx(message, postText, replyMarkup: keyboard).ConfigureAwait(false);
+        var actionMsg = await _botClient.SendMessage(message, postText, replyMarkup: keyboard).ConfigureAwait(false);
 
         //修改数据库实体
         newPost.OriginChatID = message.Chat.Id;
@@ -349,7 +363,7 @@ internal sealed class PostService(
                 return;
         }
 
-        var actionMsg = await _botClient.SendMessageEx(message, postText, replyMarkup: keyboard).ConfigureAwait(false);
+        var actionMsg = await _botClient.SendMessage(message, postText, replyMarkup: keyboard).ConfigureAwait(false);
 
         //修改数据库实体
         newPost.OriginChatID = message.Chat.Id;
@@ -365,15 +379,10 @@ internal sealed class PostService(
             newPost.ReviewActionMsgID = newPost.OriginActionMsgID;
         }
 
-        long postID = await Insertable(newPost).ExecuteReturnBigIdentityAsync().ConfigureAwait(false);
+        var postID = await Insertable(newPost).ExecuteReturnIdentityAsync().ConfigureAwait(false);
 
         await _attachmentService.CreateAttachment(message, postID).ConfigureAwait(false);
     }
-
-    /// <summary>
-    /// mediaGroupID字典
-    /// </summary>
-    private ConcurrentDictionary<string, int> MediaGroupIDs { get; } = new();
 
     /// <inheritdoc/>
     public async Task HandleMediaGroupPosts(Users dbUser, Message message)
@@ -390,9 +399,9 @@ internal sealed class PostService(
         }
 
         string mediaGroupId = message.MediaGroupId!;
-        if (!MediaGroupIDs.TryGetValue(mediaGroupId, out int postID)) //如果mediaGroupId不存在则创建新Post
+        if (!MediaGroupCaches.TryGetValue(mediaGroupId, out var cache)) //如果mediaGroupId不存在则创建新Post
         {
-            MediaGroupIDs.TryAdd(mediaGroupId, -1);
+            cache = new MediaGroupCache(_mediaGroupReceiveTtl);
 
             bool exists = await Queryable().AnyAsync(x => x.OriginMediaGroupID == mediaGroupId).ConfigureAwait(false);
             if (!exists)
@@ -426,22 +435,45 @@ internal sealed class PostService(
 
                 //直接发布模式
                 bool directPost = dbUser.Right.HasFlag(EUserRights.DirectPost);
-                bool? hasSpoiler = message.CanSpoiler() ? message.HasMediaSpoiler : null;
+                bool hasSpoiler = message.CanSpoiler() ? message.HasMediaSpoiler : false;
 
                 //发送确认消息
-                mgCache.Keyboard = directPost ?
+                cache.Keyboard = directPost ?
                     _markupHelperService.DirectPostKeyboard(anonymous, newTags, hasSpoiler) :
                     _markupHelperService.PostKeyboard(anonymous);
-                string postText = directPost ? "您具有直接投稿权限, 您的稿件将会直接发布" : "真的要投稿吗";
 
-                var actionMsg = await _botClient.SendMessageEx(message, "处理中, 请稍后").ConfigureAwait(false);
+                string processText = "处理中, 请稍后";
+                //套用频道设定
+                switch (channelOption)
+                {
+                    case EChannelOption.Normal:
+                        break;
+                    case EChannelOption.PurgeOrigin:
+                        processText += "\n由于系统设定, 来自该频道的投稿将不会显示来源";
+                        cache.PostText += "\n由于系统设定, 来自该频道的投稿将不会显示来源";
+                        break;
+                    case EChannelOption.AutoReject:
+                        processText = "由于系统设定, 暂不接受来自此频道的投稿";
+                        //清空状态量, 将不进行后续操作
+                        cache.PostText = null;
+                        cache.Keyboard = null;
+                        break;
+                    default:
+                        _logger.LogError("未知的频道选项 {channelOption}", channelOption);
+                        return;
+                }
+
+                cache.ActionMessage = await _botClient.SendMessage(message, processText, replyToMessage: true).ConfigureAwait(false);
+
+
+                var actionMsg = await _botClient.SendMessage(message, "处理中, 请稍后").ConfigureAwait(false);
 
                 //生成数据库实体
                 var newPost = new NewPosts {
                     OriginChatID = message.Chat.Id,
                     OriginMsgID = message.MessageId,
-                    OriginActionChatID = mgCache.ActionMessage.Chat.Id,
-                    OriginActionMsgID = mgCache.ActionMessage.MessageId,
+                    OriginActionChatID = cache.ActionMessage.Chat.Id,
+                    OriginActionMsgID = cache.ActionMessage.MessageId,
                     Anonymous = anonymous,
                     Text = text,
                     RawText = message.Text ?? "",
@@ -453,7 +485,7 @@ internal sealed class PostService(
                     PostType = message.Type,
                     OriginMediaGroupID = mediaGroupId,
                     Tags = newTags,
-                    HasSpoiler = hasSpoiler ?? false,
+                    HasSpoiler = hasSpoiler,
                     PosterUID = dbUser.UserID,
                 };
 
@@ -466,24 +498,22 @@ internal sealed class PostService(
                     newPost.ReviewMediaGroupID = mediaGroupId;
                 }
 
-                postID = await Insertable(newPost).ExecuteReturnIdentityAsync().ConfigureAwait(false);
+                cache.PostId = await Insertable(newPost).ExecuteReturnIdentityAsync().ConfigureAwait(false);
 
-                MediaGroupIDs[mediaGroupId] = postID;
-
-                //两秒后停止接收媒体组消息
-                _ = Task.Run(async () => {
-                    await Task.Delay(1500).ConfigureAwait(false);
-                    MediaGroupIDs.Remove(mediaGroupId, out _);
-
-                    await _botClient.EditMessageText(actionMsg, postText, replyMarkup: keyboard).ConfigureAwait(false);
-                });
+                MediaGroupCaches.TryAdd(mediaGroupId, cache);
             }
         }
+        else
+        {
+            cache.RenewTtl(_mediaGroupReceiveTtl);
+        }
 
-        if (postID > 0)
+        if (cache.PostId > 0)
         {
             //更新附件
-            var attachment = _attachmentService.GenerateAttachment(message, postID);
+            var attachment = _attachmentService.GenerateAttachment(message, cache.PostId);
+
+            //检查每张图片是否模糊
             if (attachment != null)
             {
                 await _attachmentService.CreateAttachment(attachment).ConfigureAwait(false);
@@ -522,7 +552,7 @@ internal sealed class PostService(
 
         var keyboard = post.IsDirectPost ?
             _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags, hasSpoiler) :
-            _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
+            _markupHelperService.ReviewKeyboardA(post.Tags, post.Anonymous, hasSpoiler);
         await _botClient.EditMessageReplyMarkup(callbackQuery.Message!, keyboard).ConfigureAwait(false);
     }
 
@@ -741,7 +771,7 @@ internal sealed class PostService(
                 Message? postMessage = null;
                 if (post.PostType == MessageType.Text)
                 {
-                    postMessage = await _botClient.SendMessageEx(acceptChannel, postText, null, null, ParseMode.Html, !_enableWebPagePreview).ConfigureAwait(false);
+                    postMessage = await _botClient.SendMessage(acceptChannel, postText, null, null, ParseMode.Html, _disableWebPreview).ConfigureAwait(false);
                 }
                 else
                 {
@@ -829,7 +859,7 @@ internal sealed class PostService(
         else // 直接投稿, 在审核群留档
         {
             string reviewMsg = _textHelperService.MakeReviewMessage(poster, post.Anonymous, second, publicMsg);
-            var msg = await _botClient.SendMessage(_channelService.ReviewGroup.Id, reviewMsg, null, null, parseMode: ParseMode.Html, disableWebPagePreview: !_enableWebPagePreview).ConfigureAwait(false);
+            var msg = await _botClient.SendMessage(_channelService.ReviewGroup.Id, reviewMsg, null, null, parseMode: ParseMode.Html, disableWebPagePreview: _disableWebPreview).ConfigureAwait(false);
             post.ReviewMsgID = msg.MessageId;
         }
 

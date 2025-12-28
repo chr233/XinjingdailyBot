@@ -18,6 +18,6 @@ public sealed class NameHistoryService(ISqlSugarClient context) : BaseService<Na
             LastName = dbUser.LastName,
             CreateAt = DateTime.Now,
         };
-        await InsertAsync(history);
+        await InsertAsync(history).ConfigureAwait(false);
     }
 }

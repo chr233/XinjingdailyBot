@@ -55,7 +55,7 @@ public class CommonCommand(
         sb.AppendLine();
         sb.AppendLine(_commandHandler.GetAvilabeCommands(dbUser));
 
-        await _botClient.SendCommandReply(sb.ToString(), message);
+        await _botClient.SendCommandReply(sb.ToString(), message).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -85,7 +85,7 @@ public class CommonCommand(
         }
 
         sb.AppendLine("查看命令帮助: /help");
-        await _botClient.SendCommandReply(sb.ToString(), message);
+        await _botClient.SendCommandReply(sb.ToString(), message).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -103,7 +103,7 @@ public class CommonCommand(
             sb.AppendLine(msg);
         }
         sb.AppendLine("Powered by @xinjingdaily");
-        await _botClient.SendCommandReply(sb.ToString(), message);
+        await _botClient.SendCommandReply(sb.ToString(), message).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -121,7 +121,7 @@ public class CommonCommand(
         sb.AppendLine($"子版本: <code>{variant}</code>");
         sb.AppendLine(string.Format("获取开源程序: {0}", _textHelperService.HtmlLink("https://github.com/chr233/XinjingdailyBot/", "XinjingdailyBot")));
         sb.AppendLine(string.Format("爱发电: {0}", _textHelperService.HtmlLink("https://afdian.net/@ylnflp", "@ylnflp")));
-        await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
+        await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -134,7 +134,7 @@ public class CommonCommand(
     public async Task ResponseMyBan(Users dbUser, Message message)
     {
         var expireTime = DateTime.Now.AddDays(-WarnDuration);
-        var records = await _banRecordService.GetBanRecords(dbUser, expireTime);
+        var records = await _banRecordService.GetBanRecords(dbUser, expireTime).ConfigureAwait(false);
 
         var sb = new StringBuilder();
 
@@ -179,17 +179,17 @@ public class CommonCommand(
 
         sb.AppendLine();
         sb.AppendLine("频道和群组封禁状态:");
-        sb.AppendLine(await _botClient.GetChatMemberStatus(_channelService.AcceptChannel, dbUser.UserID));
-        sb.AppendLine(await _botClient.GetChatMemberStatus(_channelService.RejectChannel, dbUser.UserID));
-        sb.AppendLine(await _botClient.GetChatMemberStatus(_channelService.CommentGroup, dbUser.UserID));
-        sb.AppendLine(await _botClient.GetChatMemberStatus(_channelService.SubGroup, dbUser.UserID));
+        sb.AppendLine(await _botClient.GetChatMemberStatus(_channelService.AcceptChannel, dbUser.UserID).ConfigureAwait(false));
+        sb.AppendLine(await _botClient.GetChatMemberStatus(_channelService.RejectChannel, dbUser.UserID).ConfigureAwait(false));
+        sb.AppendLine(await _botClient.GetChatMemberStatus(_channelService.CommentGroup, dbUser.UserID).ConfigureAwait(false));
+        sb.AppendLine(await _botClient.GetChatMemberStatus(_channelService.SubGroup, dbUser.UserID).ConfigureAwait(false));
 
         if (_channelService.HasSecondChannel)
         {
-            sb.AppendLine(await _botClient.GetChatMemberStatus(_channelService.SecondChannel, dbUser.UserID));
-            sb.AppendLine(await _botClient.GetChatMemberStatus(_channelService.SecondCommentGroup, dbUser.UserID));
+            sb.AppendLine(await _botClient.GetChatMemberStatus(_channelService.SecondChannel, dbUser.UserID).ConfigureAwait(false));
+            sb.AppendLine(await _botClient.GetChatMemberStatus(_channelService.SecondCommentGroup, dbUser.UserID).ConfigureAwait(false));
         }
 
-        await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
+        await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html).ConfigureAwait(false);
     }
 }

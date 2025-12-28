@@ -125,7 +125,7 @@ public sealed class PostController(
         if (!string.IsNullOrEmpty(post.ChannelName) && !string.IsNullOrEmpty(post.ChannelTitle) && post.ChannelID != 0 && post.ChannelMsgID != 0)
         {
             // 如果消息来自频道就更新频道信息
-            var option = await _channelOptionService.FetchChannelOption(post.ChannelID, post.ChannelTitle, post.ChannelName);
+            var option = await _channelOptionService.FetchChannelOption(post.ChannelID, post.ChannelTitle, post.ChannelName).ConfigureAwait(false);
             if (option == EChannelOption.AutoReject)
             {
                 return BadRequest(new GenericResponse {
@@ -161,7 +161,7 @@ public sealed class PostController(
             PosterUID = dbUser.UserID,
         };
 
-        var newPostId = await _postService.CreateNewPosts(newPost);
+        var newPostId = await _postService.CreateNewPosts(newPost).ConfigureAwait(false);
 
         Message? originMsg = null;
 
@@ -175,7 +175,7 @@ public sealed class PostController(
                 });
             }
 
-            originMsg = await _botClient.SendMessage(userChatId, postText, null, null, parseMode: ParseMode.None, disableNotification: true, disableWebPagePreview: false);
+            originMsg = await _botClient.SendMessage(userChatId, postText, null, null, parseMode: ParseMode.None, disableNotification: true, disableWebPagePreview: false).ConfigureAwait(false);
 
         }
         else if (post.Media != null && mediaCount == 1) // 非媒体组消息
@@ -202,13 +202,13 @@ public sealed class PostController(
                 });
             }
 
-            originMsg = await handler;
+            originMsg = await handler.ConfigureAwait(false);
 
             // 记录Attachment
             var attachment = _attachmentService.GenerateAttachment(originMsg, newPostId);
             if (attachment != null)
             {
-                await _attachmentService.CreateAttachment(attachment);
+                await _attachmentService.CreateAttachment(attachment).ConfigureAwait(false);
             }
             else
             {
@@ -244,15 +244,15 @@ public sealed class PostController(
                 };
             }
 
-            var messages = await _botClient.SendMediaGroup(userChatId, group);
+            var messages = await _botClient.SendMediaGroup(userChatId, group).ConfigureAwait(false);
             originMsg = messages.First();
 
             // 记录Attachment
             var attachments = messages.Select(x => _attachmentService.GenerateAttachment(x, newPostId)).ToList();
-            await _attachmentService.CreateAttachments(attachments!);
+            await _attachmentService.CreateAttachments(attachments!).ConfigureAwait(false);
 
             // 记录媒体组消息
-            await _mediaGroupService.AddPostMediaGroup(messages);
+            await _mediaGroupService.AddPostMediaGroup(messages).ConfigureAwait(false);
 
             newPost.OriginMediaGroupID = originMsg.MediaGroupId ?? "";
             newPost.ReviewMediaGroupID = originMsg.MediaGroupId ?? "";
@@ -269,7 +269,7 @@ public sealed class PostController(
         var keyboard = _markupHelperService.ReviewKeyboardA(newTags, post.HasSpoiler);
         string msg = _textHelperService.MakeReviewMessage(dbUser, newPost.Anonymous);
 
-        var actionMsg = await _botClient.SendMessage(originMsg, msg, parseMode: ParseMode.Html, true, disableWebPagePreview: true, replyMarkup: keyboard);
+        var actionMsg = await _botClient.SendMessage(originMsg, msg, parseMode: ParseMode.Html, true, disableWebPagePreview: true, replyMarkup: keyboard).ConfigureAwait(false);
 
         newPost.Id = newPostId;
         newPost.OriginMsgID = originMsg.MessageId;
@@ -285,10 +285,10 @@ public sealed class PostController(
             x.OriginMediaGroupID,
             x.ReviewMediaGroupID,
             x.ModifyAt
-        }).ExecuteCommandAsync();
+        }).ExecuteCommandAsync().ConfigureAwait(false);
 
         dbUser.PostCount++;
-        await _userService.UpdateUserPostCount(dbUser);
+        await _userService.UpdateUserPostCount(dbUser).ConfigureAwait(false);
 
         var response = new GenericResponse<NewPosts> {
             Code = HttpStatusCode.OK,
@@ -363,7 +363,7 @@ public sealed class PostController(
         if (!string.IsNullOrEmpty(post.ChannelName) && !string.IsNullOrEmpty(post.ChannelTitle) && post.ChannelID != 0 && post.ChannelMsgID != 0)
         {
             // 如果消息来自频道就更新频道信息
-            var option = await _channelOptionService.FetchChannelOption(post.ChannelID, post.ChannelTitle, post.ChannelName);
+            var option = await _channelOptionService.FetchChannelOption(post.ChannelID, post.ChannelTitle, post.ChannelName).ConfigureAwait(false);
             if (option == EChannelOption.AutoReject)
             {
                 return BadRequest(new GenericResponse {
@@ -399,7 +399,7 @@ public sealed class PostController(
             PosterUID = dbUser.UserID,
         };
 
-        var newPostId = await _postService.CreateNewPosts(newPost);
+        var newPostId = await _postService.CreateNewPosts(newPost).ConfigureAwait(false);
 
         Message? originMsg = null;
 
@@ -413,7 +413,7 @@ public sealed class PostController(
                 });
             }
 
-            originMsg = await _botClient.SendMessage(userChatId, postText, null, null, ParseMode.None, disableNotification: true, disableWebPagePreview: false);
+            originMsg = await _botClient.SendMessage(userChatId, postText, null, null, ParseMode.None, disableNotification: true, disableWebPagePreview: false).ConfigureAwait(false);
 
         }
         else if (post.Media != null && mediaCount == 1) // 非媒体组消息
@@ -440,13 +440,13 @@ public sealed class PostController(
                 });
             }
 
-            originMsg = await handler;
+            originMsg = await handler.ConfigureAwait(false);
 
             // 记录Attachment
             var attachment = _attachmentService.GenerateAttachment(originMsg, newPostId);
             if (attachment != null)
             {
-                await _attachmentService.CreateAttachment(attachment);
+                await _attachmentService.CreateAttachment(attachment).ConfigureAwait(false);
             }
             else
             {
@@ -482,15 +482,15 @@ public sealed class PostController(
                 };
             }
 
-            var messages = await _botClient.SendMediaGroup(userChatId, group);
+            var messages = await _botClient.SendMediaGroup(userChatId, group).ConfigureAwait(false);
             originMsg = messages.First();
 
             // 记录Attachment
             var attachments = messages.Select(x => _attachmentService.GenerateAttachment(x, newPostId)).ToList();
-            await _attachmentService.CreateAttachments(attachments!);
+            await _attachmentService.CreateAttachments(attachments!).ConfigureAwait(false);
 
             // 记录媒体组消息
-            await _mediaGroupService.AddPostMediaGroup(messages);
+            await _mediaGroupService.AddPostMediaGroup(messages).ConfigureAwait(false);
 
             newPost.OriginMediaGroupID = originMsg.MediaGroupId ?? "";
             newPost.ReviewMediaGroupID = originMsg.MediaGroupId ?? "";
@@ -507,7 +507,7 @@ public sealed class PostController(
         var keyboard = _markupHelperService.ReviewKeyboardA(newTags, post.HasSpoiler);
         string msg = _textHelperService.MakeReviewMessage(dbUser, newPost.Anonymous);
 
-        var actionMsg = await _botClient.SendMessage(originMsg, msg, parseMode: ParseMode.Html, replyToMessage: true, disableWebPagePreview: true, replyMarkup: keyboard);
+        var actionMsg = await _botClient.SendMessage(originMsg, msg, parseMode: ParseMode.Html, replyToMessage: true, disableWebPagePreview: true, replyMarkup: keyboard).ConfigureAwait(false);
 
         newPost.Id = newPostId;
         newPost.OriginMsgID = originMsg.MessageId;
@@ -523,10 +523,10 @@ public sealed class PostController(
             x.OriginMediaGroupID,
             x.ReviewMediaGroupID,
             x.ModifyAt
-        }).ExecuteCommandAsync();
+        }).ExecuteCommandAsync().ConfigureAwait(false);
 
         dbUser.PostCount++;
-        await _userService.UpdateUserPostCount(dbUser);
+        await _userService.UpdateUserPostCount(dbUser).ConfigureAwait(false);
 
         var response = new GenericResponse<NewPosts> {
             Code = HttpStatusCode.OK,

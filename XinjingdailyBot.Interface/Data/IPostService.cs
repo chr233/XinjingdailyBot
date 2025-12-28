@@ -286,4 +286,5 @@ public interface IPostService : IBaseService<NewPosts>
     /// <param name="beforeTime"></param>
     /// <returns></returns>
     Task<List<NewPosts>> GetExpiredPosts(long userID, DateTime beforeTime);
+    Task SetPostForceAnonymous(NewPosts post, bool anonymous);
 }

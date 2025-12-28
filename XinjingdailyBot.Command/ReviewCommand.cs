@@ -1,9 +1,7 @@
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
-using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Localization;
 using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
@@ -205,6 +203,11 @@ public class ReviewCommand(
                 await _postService.AcceptPost(post, dbUser, false, true, query).ConfigureAwait(false);
                 break;
 
+            case "review forceAnymouse":
+                await _postService.SetPostForceAnonymous(post, !post.ForceAnonymous).ConfigureAwait(false);
+                await UpdateKeyboard(post, query).ConfigureAwait(false);
+                break;
+
             case "review anymouse":
                 await SetAnonymous(post, query).ConfigureAwait(false);
                 break;
@@ -277,8 +280,22 @@ public class ReviewCommand(
 
         var keyboard = post.IsDirectPost ?
             _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags, hasSpoiler) :
-            _markupHelperService.ReviewKeyboardA(post.Tags, hasSpoiler);
+            _markupHelperService.ReviewKeyboardA(post.Tags, post.Anonymous, hasSpoiler);
         await _botClient.EditMessageReplyMarkup(query.Message!, keyboard).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// 更新键盘
+    /// </summary>
+    /// <param name="post"></param>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    private Task UpdateKeyboard(NewPosts post, CallbackQuery query)
+    {
+        var keyboard = post.IsDirectPost ?
+            _markupHelperService.DirectPostKeyboard(post.Anonymous, post.Tags, post.HasSpoiler) :
+            _markupHelperService.ReviewKeyboardA(post.Tags, post.CanSpoiler ? post.HasSpoiler : null, post.Anonymous ? null : post.ForceAnonymous);
+        return _botClient.EditMessageReplyMarkup(query.Message!, keyboard);
     }
 
     /// <summary>

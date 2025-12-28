@@ -32,7 +32,7 @@ public sealed class GroupMessageHandler(
                 {
                     if (dbUser.Right.HasFlag(EUserRights.AdminCmd) || dbUser.Right.HasFlag(EUserRights.SuperCmd))
                     {
-                        await _botClient.AutoReply("原来是狗管理, 惹不起惹不起...", message);
+                        await _botClient.AutoReply("原来是狗管理, 惹不起惹不起...", message).ConfigureAwait(false);
                     }
                     else
                     {
@@ -53,13 +53,13 @@ public sealed class GroupMessageHandler(
                                 CanSendPolls = false,
                                 CanSendOtherMessages = false,
                             };
-                            await _botClient.RestrictChatMember(chatId, dbUser.UserID, permission, untilDate: banTime);
-                            await _botClient.AutoReply($"学我说话很好玩{Emojis.Horse}? 劳资反手就是禁言 <code>{seconds}</code> 秒.", message, ParseMode.Html);
+                            await _botClient.RestrictChatMember(chatId, dbUser.UserID, permission, untilDate: banTime).ConfigureAwait(false);
+                            await _botClient.AutoReply($"学我说话很好玩{Emojis.Horse}? 劳资反手就是禁言 <code>{seconds}</code> 秒.", message, ParseMode.Html).ConfigureAwait(false);
                         }
                         catch (Exception ex)
                         {
                             _logger.LogError(ex, "禁言失败");
-                            await _botClient.AutoReply("原来是狗管理, 惹不起惹不起...", message);
+                            await _botClient.AutoReply("原来是狗管理, 惹不起惹不起...", message).ConfigureAwait(false);
                         }
                     }
                     return;
@@ -69,7 +69,7 @@ public sealed class GroupMessageHandler(
                 {
                     if (dbUser.Right.HasFlag(EUserRights.AdminCmd) || dbUser.Right.HasFlag(EUserRights.SuperCmd))
                     {
-                        await _botClient.AutoReply("嗻", message);
+                        await _botClient.AutoReply("嗻", message).ConfigureAwait(false);
                     }
                 }
             }
@@ -84,7 +84,7 @@ public sealed class GroupMessageHandler(
 
         if (text.Contains("投稿") && dbUser.GroupID == 1)
         {
-            await _botClient.AutoReply("如果想要投稿, 直接将稿件通过私信发给我即可.", message);
+            await _botClient.AutoReply("如果想要投稿, 直接将稿件通过私信发给我即可.", message).ConfigureAwait(false);
         }
     }
 }

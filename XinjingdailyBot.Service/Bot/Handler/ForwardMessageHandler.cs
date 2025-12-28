@@ -36,41 +36,41 @@ public class ForwardMessageHandler(
             {
                 NewPosts? post = null;
 
-                var mediaGroup = await _mediaGroupService.QueryMediaGroup(forwardChatId, forwardMsgId);
+                var mediaGroup = await _mediaGroupService.QueryMediaGroup(forwardChatId, forwardMsgId).ConfigureAwait(false);
                 if (mediaGroup == null)
                 {
                     if (_channelService.IsChannelMessage(forwardChatId)) //转发自发布频道或拒绝存档
                     {
-                        post = await _postService.GetFirstAsync(x => x.PublicMsgID == forwardMsgId);
+                        post = await _postService.GetFirstAsync(x => x.PublicMsgID == forwardMsgId).ConfigureAwait(false);
                     }
                     else //转发自关联群组
                     {
                         post = await _postService.GetFirstAsync(x =>
                             (x.ReviewChatID == forwardChatId && x.ReviewMsgID == forwardMsgId) ||
                             (x.ReviewActionChatID == forwardChatId && x.ReviewActionMsgID == forwardMsgId)
-                        );
+                        ).ConfigureAwait(false);
                     }
                 }
                 else
                 {
                     if (_channelService.IsChannelMessage(forwardChatId)) //转发自发布频道或拒绝存档
                     {
-                        post = await _postService.GetFirstAsync(x => x.PublishMediaGroupID == mediaGroup.MediaGroupID);
+                        post = await _postService.GetFirstAsync(x => x.PublishMediaGroupID == mediaGroup.MediaGroupID).ConfigureAwait(false);
                     }
                     else //转发自关联群组 (仅支持审核群)
                     {
-                        post = await _postService.GetFirstAsync(x => x.ReviewMediaGroupID == mediaGroup.MediaGroupID);
+                        post = await _postService.GetFirstAsync(x => x.ReviewMediaGroupID == mediaGroup.MediaGroupID).ConfigureAwait(false);
                     }
                 }
 
                 if (post != null)
                 {
-                    var poster = await _userService.FetchUserByUserID(post.PosterUID);
+                    var poster = await _userService.FetchUserByUserID(post.PosterUID).ConfigureAwait(false);
                     if (poster != null)
                     {
                         if (post.Status == EPostStatus.Reviewing)
                         {
-                            await _botClient.AutoReply("无法操作审核中的稿件", message);
+                            await _botClient.AutoReply("无法操作审核中的稿件", message).ConfigureAwait(false);
                             return false;
                         }
 
@@ -91,7 +91,7 @@ public class ForwardMessageHandler(
                         sb.AppendLine($"模式: {postMode}");
                         sb.AppendLine($"状态: {postStatus}");
 
-                        await _botClient.SendMessageEx(message, sb.ToString(), parseMode: ParseMode.Html, replyToMessage: true, disableWebPagePreview: true, disableNotification: true, replyMarkup: keyboard);
+                        await _botClient.SendMessage(message, sb.ToString(), parseMode: ParseMode.Html, replyToMessage: true, disableWebPagePreview: true, disableNotification: true, replyMarkup: keyboard).ConfigureAwait(false);
                         return true;
                     }
                 }

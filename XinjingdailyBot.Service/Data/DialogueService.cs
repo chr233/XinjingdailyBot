@@ -43,7 +43,7 @@ public sealed class DialogueService(
             CreateAt = message.Date,
         };
 
-        await InsertAsync(dialogue);
+        await InsertAsync(dialogue).ConfigureAwait(false);
     }
 
     public Task<List<Dialogue>> FetchUserGroupMessages(Users user, int startId = 0, int takeCount = 30)

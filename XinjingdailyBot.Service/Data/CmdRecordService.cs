@@ -37,7 +37,7 @@ public sealed class CmdRecordService : BaseService<CmdRecords>, ICmdRecordServic
             ExecuteAt = DateTime.Now,
         };
 
-        await Insertable(record).ExecuteCommandAsync();
+        await Insertable(record).ExecuteCommandAsync().ConfigureAwait(false);
     }
 
     public async Task AddCmdRecord(CallbackQuery query, Users dbUser, bool handled, bool isQuery, string? exception)
@@ -63,7 +63,7 @@ public sealed class CmdRecordService : BaseService<CmdRecords>, ICmdRecordServic
             ExecuteAt = DateTime.Now,
         };
 
-        await Insertable(record).ExecuteCommandAsync();
+        await Insertable(record).ExecuteCommandAsync().ConfigureAwait(false);
     }
 
     public Task<CmdRecords> FetchCmdRecordByMessageId(int msgId)

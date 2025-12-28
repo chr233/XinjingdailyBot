@@ -2,7 +2,6 @@ using Microsoft.Extensions.Logging;
 using SqlSugar;
 using System.Net;
 using System.Text;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
@@ -41,7 +40,7 @@ public class NormalCommand(
     [TextCmd("PING", EUserRights.NormalCmd, Description = "检测机器人是否存活")]
     public async Task ResponsePing(Message message)
     {
-        await _botClient.SendCommandReply("PONG!", message);
+        await _botClient.SendCommandReply("PONG!", message).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -55,16 +54,16 @@ public class NormalCommand(
     {
         if (message.Chat.Type != ChatType.Private)
         {
-            await _botClient.SendCommandReply("仅能在私聊中使用", message);
+            await _botClient.SendCommandReply("仅能在私聊中使用", message).ConfigureAwait(false);
             return;
         }
 
         bool anymouse = !dbUser.PreferAnonymous;
-        await _userService.SetUserPreferAnonymous(dbUser, anymouse);
+        await _userService.SetUserPreferAnonymous(dbUser, anymouse).ConfigureAwait(false);
 
         var mode = anymouse ? "匿名投稿" : "保留来源";
         var text = $"后续投稿将默认使用【{mode}】";
-        await _botClient.SendCommandReply(text, message);
+        await _botClient.SendCommandReply(text, message).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -78,16 +77,16 @@ public class NormalCommand(
     {
         if (message.Chat.Type != ChatType.Private)
         {
-            await _botClient.SendCommandReply("仅能在私聊中使用", message);
+            await _botClient.SendCommandReply("仅能在私聊中使用", message).ConfigureAwait(false);
             return;
         }
 
         bool notification = !dbUser.Notification;
-        await _userService.SetUserNotification(dbUser, notification);
+        await _userService.SetUserNotification(dbUser, notification).ConfigureAwait(false);
 
         var mode = notification ? "接收通知" : "静默模式";
         var text = $"稿件被审核或者过期时将会尝试通知用户\n当前通知设置: {mode}";
-        await _botClient.SendCommandReply(text, message);
+        await _botClient.SendCommandReply(text, message).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -106,9 +105,9 @@ public class NormalCommand(
 
         sb.AppendLine();
         sb.AppendLine("-- 用户排名 --");
-        sb.AppendLine(await _userService.GetUserRank(dbUser));
+        sb.AppendLine(await _userService.GetUserRank(dbUser).ConfigureAwait(false));
 
-        await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
+        await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html).ConfigureAwait(false);
     }
 
 
@@ -150,7 +149,7 @@ public class NormalCommand(
         sb.AppendLine($"功能: <code>{string.Join(", ", functions)}</code>");
         sb.AppendLine($"命令: <code>{string.Join(", ", commands)}</code>");
 
-        await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html);
+        await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -164,12 +163,12 @@ public class NormalCommand(
     {
         if (message.Chat.Type != ChatType.Group && message.Chat.Type != ChatType.Supergroup)
         {
-            await _botClient.SendCommandReply("该命令仅在群组内有效", message, false, ParseMode.Html);
+            await _botClient.SendCommandReply("该命令仅在群组内有效", message, false, ParseMode.Html).ConfigureAwait(false);
         }
         else
         {
             var sb = new StringBuilder();
-            var admins = await _botClient.GetChatAdministrators(message.Chat.Id);
+            var admins = await _botClient.GetChatAdministrators(message.Chat.Id).ConfigureAwait(false);
             foreach (var menber in admins)
             {
                 var admin = menber.User;
@@ -179,12 +178,12 @@ public class NormalCommand(
                 }
             }
 
-            var msg = await _botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html);
-            await Task.Delay(2000);
+            var msg = await _botClient.SendCommandReply(sb.ToString(), message, false, ParseMode.Html).ConfigureAwait(false);
+            await Task.Delay(2000).ConfigureAwait(false);
 
             try
             {
-                await _botClient.EditMessageText(msg, $"用户 {dbUser} 呼叫群管理", ParseMode.Html);
+                await _botClient.EditMessageText(msg, $"用户 {dbUser} 呼叫群管理", ParseMode.Html).ConfigureAwait(false);
             }
             catch (Exception)
             {
@@ -204,8 +203,8 @@ public class NormalCommand(
     {
         string text = args.Length > 1 ? string.Join(' ', args[1..]) : "操作已取消";
 
-        await _botClient.AutoReply(text, query);
-        await _botClient.EditMessageText(query.Message!, text, replyMarkup: null);
+        await _botClient.AutoReply(text, query).ConfigureAwait(false);
+        await _botClient.EditMessageText(query.Message!, text, replyMarkup: null).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -226,7 +225,7 @@ public class NormalCommand(
         {
             text = string.Join(' ', args[1..]);
         }
-        await _botClient.AutoReply(text, query);
+        await _botClient.AutoReply(text, query).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -242,12 +241,12 @@ public class NormalCommand(
         {
             if (message.Chat.Type != ChatType.Private)
             {
-                await _botClient.SendCommandReply("该功能仅限私聊使用", message, autoDelete: false);
+                await _botClient.SendCommandReply("该功能仅限私聊使用", message, autoDelete: false).ConfigureAwait(false);
                 return;
             }
         }
         var keyboard = _markupHelperService.RandomPostMenuKeyboard(dbUser);
-        await _botClient.SendCommandReply("请选择感兴趣的稿件标签", message, autoDelete: false, replyMarkup: keyboard);
+        await _botClient.SendCommandReply("请选择感兴趣的稿件标签", message, autoDelete: false, replyMarkup: keyboard).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -262,7 +261,7 @@ public class NormalCommand(
     {
         if (args.Length < 1)
         {
-            await _botClient.EditMessageText(callbackQuery.Message!, "参数有误", replyMarkup: null);
+            await _botClient.EditMessageText(callbackQuery.Message!, "参数有误", replyMarkup: null).ConfigureAwait(false);
             return;
         }
 
@@ -280,7 +279,7 @@ public class NormalCommand(
         }
 
         var keyboard = _markupHelperService.RandomPostMenuKeyboard(dbUser, tagId);
-        await _botClient.EditMessageText(callbackQuery.Message!, text, replyMarkup: keyboard);
+        await _botClient.EditMessageText(callbackQuery.Message!, text, replyMarkup: keyboard).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -293,7 +292,7 @@ public class NormalCommand(
     public async Task QResponseBackRandomPost(Users dbUser, CallbackQuery callbackQuery)
     {
         var keyboard = _markupHelperService.RandomPostMenuKeyboard(dbUser);
-        await _botClient.EditMessageText(callbackQuery.Message!, "请选择感兴趣的稿件标签", replyMarkup: keyboard);
+        await _botClient.EditMessageText(callbackQuery.Message!, "请选择感兴趣的稿件标签", replyMarkup: keyboard).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -308,7 +307,7 @@ public class NormalCommand(
     {
         if (args.Length < 3 || !int.TryParse(args[1], out int tagId))
         {
-            await _botClient.EditMessageText(callbackQuery.Message!, "参数有误", replyMarkup: null);
+            await _botClient.EditMessageText(callbackQuery.Message!, "参数有误", replyMarkup: null).ConfigureAwait(false);
             return;
         }
 
@@ -329,7 +328,7 @@ public class NormalCommand(
                     .WhereIF(postType == null, static x => x.PostType != MessageType.Text)
                     .WhereIF(postType != null, x => x.PostType == postType)
                     .WhereIF(tag != null, x => (x.Tags & tag!.Seg) > 0)
-                    .OrderBy(static x => SqlFunc.GetRandom()).FirstAsync();
+                    .OrderBy(static x => SqlFunc.GetRandom()).FirstAsync().ConfigureAwait(false);
 
         if (randomPost != null)
         {
@@ -339,7 +338,7 @@ public class NormalCommand(
 
             if (randomPost.IsMediaGroup)
             {
-                var attachments = await _attachmentService.FetchAttachmentsByPostId(randomPost.Id);
+                var attachments = await _attachmentService.FetchAttachmentsByPostId(randomPost.Id).ConfigureAwait(false);
                 var group = new IAlbumInputMedia[attachments.Count];
                 for (int i = 0; i < attachments.Count; i++)
                 {
@@ -358,15 +357,15 @@ public class NormalCommand(
                     };
                 }
 
-                var messages = await _botClient.SendMediaGroup(chat, group);
-                await _botClient.SendMessage(chat, "随机稿件操作", replyMarkup: keyboard);
+                var messages = await _botClient.SendMediaGroup(chat, group).ConfigureAwait(false);
+                await _botClient.SendMessage(chat, "随机稿件操作", replyMarkup: keyboard).ConfigureAwait(false);
 
                 //记录媒体组消息
-                await _mediaGroupService.AddPostMediaGroup(messages);
+                await _mediaGroupService.AddPostMediaGroup(messages).ConfigureAwait(false);
             }
             else
             {
-                var attachment = await _attachmentService.FetchAttachmentByPostId(randomPost.Id);
+                var attachment = await _attachmentService.FetchAttachmentByPostId(randomPost.Id).ConfigureAwait(false);
                 var handler = randomPost.PostType switch {
                     MessageType.Text => _botClient.SendMessage(chat, randomPost.Text),
                     MessageType.Photo => _botClient.SendPhoto(chat, new InputFileId(attachment.FileID), caption: randomPost.Text, parseMode: ParseMode.Html, replyMarkup: keyboard, hasSpoiler: hasSpoiler),
@@ -380,28 +379,28 @@ public class NormalCommand(
 
                 if (handler == null)
                 {
-                    await _botClient.AutoReply($"不支持的稿件类型: {randomPost.PostType}", callbackQuery, true);
-                    await _botClient.EditMessageText(callbackQuery.Message!, $"不支持的稿件类型: {randomPost.PostType}");
+                    await _botClient.AutoReply($"不支持的稿件类型: {randomPost.PostType}", callbackQuery, true).ConfigureAwait(false);
+                    await _botClient.EditMessageText(callbackQuery.Message!, $"不支持的稿件类型: {randomPost.PostType}").ConfigureAwait(false);
                     return;
                 }
 
-                var message = await handler;
+                var message = await handler.ConfigureAwait(false);
             }
 
             //去除第一条消息的按钮
             if (args.Length > 3 && long.TryParse(args[3], out long msgId))
             {
                 var kbd = _markupHelperService.LinkToOriginPostKeyboard(msgId);
-                await _botClient.EditMessageReplyMarkup(callbackQuery.Message!, kbd);
+                await _botClient.EditMessageReplyMarkup(callbackQuery.Message!, kbd).ConfigureAwait(false);
             }
             else
             {
-                await _botClient.EditMessageReplyMarkup(callbackQuery.Message!, null);
+                await _botClient.EditMessageReplyMarkup(callbackQuery.Message!, null).ConfigureAwait(false);
             }
         }
         else
         {
-            await _botClient.EditMessageText(callbackQuery.Message!, "无可用稿件", replyMarkup: null);
+            await _botClient.EditMessageText(callbackQuery.Message!, "无可用稿件", replyMarkup: null).ConfigureAwait(false);
         }
     }
 
@@ -417,7 +416,7 @@ public class NormalCommand(
         {
             if (IPAddress.TryParse(args[0], out var ip))
             {
-                var response = await _httpHelperService.GetIpInformation(ip);
+                var response = await _httpHelperService.GetIpInformation(ip).ConfigureAwait(false);
                 if (response == null)
                 {
                     sb.AppendLine("读取出错");
@@ -440,6 +439,6 @@ public class NormalCommand(
                 sb.AppendLine("参数错误, 输入的IP无效");
             }
         }
-        await _botClient.AutoReply(sb.ToString(), message, ParseMode.Html);
+        await _botClient.AutoReply(sb.ToString(), message, ParseMode.Html).ConfigureAwait(false);
     }
 }

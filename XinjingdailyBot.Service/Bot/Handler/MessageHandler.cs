@@ -40,20 +40,20 @@ public class MessageHandler : IMessageHandler
         {
             if (message.ForwardFromChat != null)
             {
-                var handled = await _forwardMessageHandler.OnForwardMessageReceived(dbUser, message);
+                var handled = await _forwardMessageHandler.OnForwardMessageReceived(dbUser, message).ConfigureAwait(false);
                 if (handled)
                 {
                     return;
                 }
             }
-            if (await _postService.CheckPostLimit(dbUser, message, null))
+            if (await _postService.CheckPostLimit(dbUser, message, null).ConfigureAwait(false))
             {
-                await _postService.HandleTextPosts(dbUser, message);
+                await _postService.HandleTextPosts(dbUser, message).ConfigureAwait(false);
             }
         }
         else if (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup)
         {
-            await _groupMessageHandler.OnGroupTextMessageReceived(dbUser, message);
+            await _groupMessageHandler.OnGroupTextMessageReceived(dbUser, message).ConfigureAwait(false);
         }
     }
 
@@ -68,7 +68,7 @@ public class MessageHandler : IMessageHandler
         {
             if (message.ForwardFromChat != null)
             {
-                var handled = await _forwardMessageHandler.OnForwardMessageReceived(dbUser, message);
+                var handled = await _forwardMessageHandler.OnForwardMessageReceived(dbUser, message).ConfigureAwait(false);
                 if (handled)
                 {
                     return;
@@ -82,21 +82,21 @@ public class MessageHandler : IMessageHandler
                 case MessageType.Voice:
                 case MessageType.Document:
                 case MessageType.Animation:
-                    if (await _postService.CheckPostLimit(dbUser, message, null))
+                    if (await _postService.CheckPostLimit(dbUser, message, null).ConfigureAwait(false))
                     {
                         if (message.MediaGroupId != null)
                         {
-                            await _postService.HandleMediaGroupPosts(dbUser, message);
+                            await _postService.HandleMediaGroupPosts(dbUser, message).ConfigureAwait(false);
                         }
                         else
                         {
-                            await _postService.HandleMediaPosts(dbUser, message);
+                            await _postService.HandleMediaPosts(dbUser, message).ConfigureAwait(false);
                         }
                     }
 
                     break;
                 default:
-                    await _botClient.AutoReply($"暂不支持的投稿类型 {message.Type}", message);
+                    await _botClient.AutoReply($"暂不支持的投稿类型 {message.Type}", message).ConfigureAwait(false);
                     break;
             }
         }

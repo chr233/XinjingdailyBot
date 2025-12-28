@@ -25,7 +25,7 @@ public sealed class MediaGroupService(ISqlSugarClient context) : BaseService<Med
             CreateAt = DateTime.Now,
         };
 
-        await Insertable(postGeoup).ExecuteCommandAsync();
+        await Insertable(postGeoup).ExecuteCommandAsync().ConfigureAwait(false);
     }
 
     public async Task AddPostMediaGroup(IEnumerable<Message> messages)
@@ -43,30 +43,30 @@ public sealed class MediaGroupService(ISqlSugarClient context) : BaseService<Med
             CreateAt = now,
         }).ToList();
 
-        await Storageable(postGeoups).ExecuteCommandAsync();
+        await Storageable(postGeoups).ExecuteCommandAsync().ConfigureAwait(false);
     }
 
     public async Task<MediaGroups?> QueryMediaGroup(Message message)
     {
-        var mediaGroup = await Queryable().FirstAsync(x => x.ChatID == message.Chat.Id && x.MessageID == message.MessageId);
+        var mediaGroup = await Queryable().FirstAsync(x => x.ChatID == message.Chat.Id && x.MessageID == message.MessageId).ConfigureAwait(false);
         return mediaGroup;
     }
 
     public async Task<List<MediaGroups>> QueryMediaGroup(string? mediaGroupId)
     {
-        var mediaGroups = await Queryable().Where(x => x.MediaGroupID == mediaGroupId).ToListAsync();
+        var mediaGroups = await Queryable().Where(x => x.MediaGroupID == mediaGroupId).ToListAsync().ConfigureAwait(false);
         return mediaGroups;
     }
 
     public async Task<MediaGroups?> QueryMediaGroup(Chat chat, long msgId)
     {
-        var mediaGroup = await Queryable().FirstAsync(x => x.ChatID == chat.Id && x.MessageID == msgId);
+        var mediaGroup = await Queryable().FirstAsync(x => x.ChatID == chat.Id && x.MessageID == msgId).ConfigureAwait(false);
         return mediaGroup;
     }
 
     public async Task<MediaGroups?> QueryMediaGroup(long chatId, int msgId)
     {
-        var mediaGroup = await Queryable().FirstAsync(x => x.ChatID == chatId && x.MessageID == msgId);
+        var mediaGroup = await Queryable().FirstAsync(x => x.ChatID == chatId && x.MessageID == msgId).ConfigureAwait(false);
         return mediaGroup;
     }
 }

@@ -53,7 +53,7 @@ public sealed class UserService(
             _ => null
         };
 
-        await AutoLeaveChat(msgChat);
+        await AutoLeaveChat(msgChat).ConfigureAwait(false);
 
         var message = update.Type switch {
             UpdateType.Message => update.Message!,
@@ -64,13 +64,13 @@ public sealed class UserService(
         // 自动删除置顶通知 和 群名修改通知
         if (message != null && (message.Type == MessageType.PinnedMessage || message.Type == MessageType.NewChatTitle))
         {
-            await AutoDeleteNotification(message);
+            await AutoDeleteNotification(message).ConfigureAwait(false);
             return null;
         }
 
         if (update.Type == UpdateType.ChannelPost)
         {
-            return await QueryUserFromChannelPost(update.ChannelPost!);
+            return await QueryUserFromChannelPost(update.ChannelPost!).ConfigureAwait(false);
         }
         else
         {
@@ -86,7 +86,7 @@ public sealed class UserService(
                 _ => null
             };
 
-            return await QueryUserFromChat(msgUser, msgChat);
+            return await QueryUserFromChat(msgUser, msgChat).ConfigureAwait(false);
         }
     }
 
@@ -126,7 +126,7 @@ public sealed class UserService(
         {
             try
             {
-                await _botClient.LeaveChat(msgChat.Id);
+                await _botClient.LeaveChat(msgChat.Id).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -162,7 +162,7 @@ public sealed class UserService(
             return null;
         }
 
-        var dbUser = await Queryable().FirstAsync(x => x.UserID == msgUser.Id);
+        var dbUser = await Queryable().FirstAsync(x => x.UserID == msgUser.Id).ConfigureAwait(false);
 
         var chatID = msgChat?.Type == ChatType.Private ? msgChat.Id : -1;
 
@@ -192,7 +192,7 @@ public sealed class UserService(
 
             try
             {
-                await Insertable(dbUser).ExecuteCommandAsync();
+                await Insertable(dbUser).ExecuteCommandAsync().ConfigureAwait(false);
                 if (isDebug)
                 {
                     _logger.LogDebug("创建用户 {dbUser} 成功", dbUser);
@@ -212,7 +212,7 @@ public sealed class UserService(
             if (dbUser.UserName != (msgUser.Username ?? "")
                 || dbUser.FirstName != msgUser.FirstName || dbUser.LastName != (msgUser.LastName ?? ""))
             {
-                await _nameHistoryService.CreateNameHistory(dbUser);
+                await _nameHistoryService.CreateNameHistory(dbUser).ConfigureAwait(false);
 
                 dbUser.UserName = msgUser.Username ?? "";
                 dbUser.FirstName = msgUser.FirstName;
@@ -267,7 +267,7 @@ public sealed class UserService(
                         x.GroupID,
                         x.PrivateChatID,
                         x.ModifyAt
-                    }).ExecuteCommandAsync();
+                    }).ExecuteCommandAsync().ConfigureAwait(false);
                     if (isDebug)
                     {
                         _logger.LogDebug("更新用户 {dbUser} 成功", dbUser);
@@ -305,7 +305,7 @@ public sealed class UserService(
 
     public async Task<Users?> QueryUserByUserId(long UserId)
     {
-        var user = await Queryable().FirstAsync(x => x.UserID == UserId);
+        var user = await Queryable().FirstAsync(x => x.UserID == UserId).ConfigureAwait(false);
         return user;
     }
 
@@ -334,11 +334,11 @@ public sealed class UserService(
 
         if (_channelUserIdCache.TryGetValue(author, out long userId))
         {
-            return await QueryUserByUserId(userId);
+            return await QueryUserByUserId(userId).ConfigureAwait(false);
         }
         else //缓存中没有该用户, 更新缓存
         {
-            var admins = await _botClient.GetChatAdministrators(message.Chat);
+            var admins = await _botClient.GetChatAdministrators(message.Chat).ConfigureAwait(false);
             if (admins == null)
             {
                 return null;
@@ -351,7 +351,7 @@ public sealed class UserService(
 
             if (_channelUserIdCache.TryGetValue(author, out userId))
             {
-                return await QueryUserByUserId(userId);
+                return await QueryUserByUserId(userId).ConfigureAwait(false);
             }
         }
         return null;
@@ -368,7 +368,7 @@ public sealed class UserService(
         {
             try
             {
-                await _botClient.DeleteMessage(message.Chat, message.MessageId);
+                await _botClient.DeleteMessage(message.Chat, message.MessageId).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -379,7 +379,7 @@ public sealed class UserService(
 
     public async Task<Users?> FetchUserByUserID(long userID)
     {
-        var dbUser = await Queryable().FirstAsync(x => x.UserID == userID);
+        var dbUser = await Queryable().FirstAsync(x => x.UserID == userID).ConfigureAwait(false);
         return dbUser;
     }
 
@@ -391,7 +391,7 @@ public sealed class UserService(
         }
         else
         {
-            var dbUser = await Queryable().FirstAsync(x => x.UserName == userName);
+            var dbUser = await Queryable().FirstAsync(x => x.UserName == userName).ConfigureAwait(false);
             return dbUser;
         }
     }
@@ -421,38 +421,38 @@ public sealed class UserService(
             {
                 NewPosts? post;
 
-                var mediaGroup = await _mediaGroupService.QueryMediaGroup(chatId, msgId);
+                var mediaGroup = await _mediaGroupService.QueryMediaGroup(chatId, msgId).ConfigureAwait(false);
                 if (mediaGroup == null)//单条稿件
                 {
                     post = await _postRepository.Queryable().FirstAsync(x =>
                         (x.ReviewChatID == chatId && x.ReviewMsgID == msgId) || (x.ReviewActionChatID == chatId && x.ReviewActionMsgID == msgId)
-                    );
+                    ).ConfigureAwait(false);
                 }
                 else //媒体组稿件
                 {
-                    post = await _postRepository.Queryable().FirstAsync(x => x.ReviewChatID == chatId && x.ReviewMediaGroupID == mediaGroup.MediaGroupID);
+                    post = await _postRepository.Queryable().FirstAsync(x => x.ReviewChatID == chatId && x.ReviewMediaGroupID == mediaGroup.MediaGroupID).ConfigureAwait(false);
                 }
 
                 //判断是不是审核相关消息
                 if (post != null)
                 {
                     //通过稿件读取用户信息
-                    return await FetchUserByUserID(post.PosterUID);
+                    return await FetchUserByUserID(post.PosterUID).ConfigureAwait(false);
                 }
             }
 
             //在CMD回调表里查看
-            var cmdAction = await _cmdRecordService.FetchCmdRecordByMessageId(replyToMsg.MessageId);
+            var cmdAction = await _cmdRecordService.FetchCmdRecordByMessageId(replyToMsg.MessageId).ConfigureAwait(false);
             if (cmdAction != null)
             {
-                return await FetchUserByUserID(cmdAction.UserID);
+                return await FetchUserByUserID(cmdAction.UserID).ConfigureAwait(false);
             }
 
             return null;
         }
 
         //获取消息发送人
-        return await FetchUserByUserID(replyToMsg.From.Id);
+        return await FetchUserByUserID(replyToMsg.From.Id).ConfigureAwait(false);
     }
 
     public async Task<Users?> FetchTargetUser(long chatId, int msgId)
@@ -462,33 +462,33 @@ public sealed class UserService(
         {
             NewPosts? post;
 
-            var mediaGroup = await _mediaGroupService.QueryMediaGroup(chatId, msgId);
+            var mediaGroup = await _mediaGroupService.QueryMediaGroup(chatId, msgId).ConfigureAwait(false);
             if (mediaGroup == null)//单条稿件
             {
                 post = await _postRepository.Queryable().FirstAsync(x =>
                     (x.ReviewChatID == chatId && x.ReviewMsgID == msgId) || (x.ReviewActionChatID == chatId && x.ReviewActionMsgID == msgId)
-                );
+                ).ConfigureAwait(false);
             }
             else //媒体组稿件
             {
-                post = await _postRepository.Queryable().FirstAsync(x => x.ReviewChatID == chatId && x.ReviewMediaGroupID == mediaGroup.MediaGroupID);
+                post = await _postRepository.Queryable().FirstAsync(x => x.ReviewChatID == chatId && x.ReviewMediaGroupID == mediaGroup.MediaGroupID).ConfigureAwait(false);
             }
 
             //判断是不是审核相关消息
             if (post != null)
             {
                 //通过稿件读取用户信息
-                return await FetchUserByUserID(post.PosterUID);
+                return await FetchUserByUserID(post.PosterUID).ConfigureAwait(false);
             }
 
             return null;
         }
 
         //在CMD回调表里查看
-        var cmdAction = await _cmdRecordService.FetchCmdRecordByMessageId(msgId);
+        var cmdAction = await _cmdRecordService.FetchCmdRecordByMessageId(msgId).ConfigureAwait(false);
         if (cmdAction != null)
         {
-            return await FetchUserByUserID(cmdAction.UserID);
+            return await FetchUserByUserID(cmdAction.UserID).ConfigureAwait(false);
         }
 
         return null;
@@ -503,17 +503,17 @@ public sealed class UserService(
 
         if (target.StartsWith('@'))
         {
-            return await FetchUserByUserName(target[1..]);
+            return await FetchUserByUserName(target[1..]).ConfigureAwait(false);
         }
 
 
         if (long.TryParse(target, out var userID))
         {
-            return await FetchUserByUserID(userID) ?? await FetchUserByUserName(target);
+            return await FetchUserByUserID(userID).ConfigureAwait(false) ?? await FetchUserByUserName(target).ConfigureAwait(false);
         }
         else
         {
-            return await FetchUserByUserName(target);
+            return await FetchUserByUserName(target).ConfigureAwait(false);
         }
     }
 
@@ -551,7 +551,7 @@ public sealed class UserService(
             exp.Or(x => x.UserName.Contains(query) && x.ModifyAt > date);
         }
 
-        var userListCount = await Queryable().Where(exp.ToExpression()).CountAsync();
+        var userListCount = await Queryable().Where(exp.ToExpression()).CountAsync().ConfigureAwait(false);
 
         if (userListCount == 0)
         {
@@ -566,7 +566,7 @@ public sealed class UserService(
 
         page = Math.Max(1, Math.Min(page, totalPages));
 
-        var userList = await Queryable().Where(exp.ToExpression()).ToPageListAsync(page, pageSize);
+        var userList = await Queryable().Where(exp.ToExpression()).ToPageListAsync(page, pageSize).ConfigureAwait(false);
 
         var sb = new StringBuilder();
 
@@ -633,7 +633,7 @@ public sealed class UserService(
             exp.Or(x => x.UserName.Contains(query));
         }
 
-        var userListCount = await Queryable().Where(exp.ToExpression()).CountAsync();
+        var userListCount = await Queryable().Where(exp.ToExpression()).CountAsync().ConfigureAwait(false);
 
         if (userListCount == 0)
         {
@@ -648,7 +648,7 @@ public sealed class UserService(
 
         page = Math.Max(1, Math.Min(page, totalPages));
 
-        var userList = await Queryable().Where(exp.ToExpression()).ToPageListAsync(page, pageSize);
+        var userList = await Queryable().Where(exp.ToExpression()).ToPageListAsync(page, pageSize).ConfigureAwait(false);
 
         var sb = new StringBuilder();
 
@@ -727,16 +727,16 @@ public sealed class UserService(
         {
             if (dbUser.AcceptCount >= MiniumRankPost)
             {
-                int acceptCountRank = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > dbUser.AcceptCount && x.ModifyAt >= prev30Days).CountAsync() + 1;
+                int acceptCountRank = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > dbUser.AcceptCount && x.ModifyAt >= prev30Days).CountAsync().ConfigureAwait(false) + 1;
 
                 double ratio = 1.0 * dbUser.AcceptCount / dbUser.PostCount;
                 int acceptRatioRank = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.AcceptCount > MiniumRankPost && x.ModifyAt >= prev30Days)
-                .Select(y => 100.0 * y.AcceptCount / y.PostCount).Where(x => x > ratio).CountAsync() + 1;
+                .Select(y => 100.0 * y.AcceptCount / y.PostCount).Where(x => x > ratio).CountAsync().ConfigureAwait(false) + 1;
 
                 sb.AppendLine($"通过数排名: <code>{acceptCountRank}</code>");
                 sb.AppendLine($"通过率排名: <code>{acceptRatioRank}</code>");
 
-                int activeUser = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.ModifyAt >= prev30Days).CountAsync();
+                int activeUser = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID == 1 && x.ModifyAt >= prev30Days).CountAsync().ConfigureAwait(false);
                 sb.AppendLine($"活跃用户总数: <code>{activeUser}</code>");
             }
             else
@@ -746,13 +746,13 @@ public sealed class UserService(
         }
         else
         {
-            int acceptCountRank = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.AcceptCount > dbUser.AcceptCount && x.ModifyAt >= prev30Days).CountAsync() + 1;
-            int reviewCountRank = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.ReviewCount > dbUser.ReviewCount && x.ModifyAt >= prev30Days).CountAsync() + 1;
+            int acceptCountRank = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.AcceptCount > dbUser.AcceptCount && x.ModifyAt >= prev30Days).CountAsync().ConfigureAwait(false) + 1;
+            int reviewCountRank = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.ReviewCount > dbUser.ReviewCount && x.ModifyAt >= prev30Days).CountAsync().ConfigureAwait(false) + 1;
 
             sb.AppendLine($"投稿数排名: <code>{acceptCountRank}</code>");
             sb.AppendLine($"审核数排名: <code>{reviewCountRank}</code>");
 
-            int activeAdmin = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.ModifyAt >= prev30Days).CountAsync();
+            int activeAdmin = await Queryable().Where(x => !x.IsBan && !x.IsBot && x.GroupID > 1 && x.ModifyAt >= prev30Days).CountAsync().ConfigureAwait(false);
             sb.AppendLine($"活跃管理员总数: <code>{activeAdmin}</code>");
         }
 
@@ -763,7 +763,7 @@ public sealed class UserService(
     {
         targetUser.IsBan = isBan;
         targetUser.ModifyAt = DateTime.Now;
-        await Updateable(targetUser).UpdateColumns(static x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync();
+        await Updateable(targetUser).UpdateColumns(static x => new { x.IsBan, x.ModifyAt }).ExecuteCommandAsync().ConfigureAwait(false);
     }
 
     /// <summary>
@@ -798,7 +798,7 @@ public sealed class UserService(
             x.ExpiredPostCount,
             x.ReviewCount,
             x.ModifyAt
-        }).ExecuteCommandAsync();
+        }).ExecuteCommandAsync().ConfigureAwait(false);
     }
 
     public Task<int> CountUser()

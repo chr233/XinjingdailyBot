@@ -40,7 +40,7 @@ public sealed class AdvertiseService(
         var ads = await Queryable()
             .Where(static x => x.Enable)
             .OrderBy(static x => x.Weight)
-            .ToListAsync();
+            .ToListAsync().ConfigureAwait(false);
 
         var now = DateTime.Now;
         //检查是否过期
@@ -50,9 +50,9 @@ public sealed class AdvertiseService(
                 now >= ad.ExpiredAt || ad.Weight == 0)
             {
                 ad.Enable = false;
-                await Updateable(ad).UpdateColumns(static x => new { x.Enable }).ExecuteCommandAsync();
+                await Updateable(ad).UpdateColumns(static x => new { x.Enable }).ExecuteCommandAsync().ConfigureAwait(false);
                 //删除过期广告
-                await _advertisePostService.DeleteOldAdPosts(ad);
+                await _advertisePostService.DeleteOldAdPosts(ad).ConfigureAwait(false);
             }
         }
 
