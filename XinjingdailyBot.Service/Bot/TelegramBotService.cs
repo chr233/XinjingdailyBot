@@ -304,7 +304,7 @@ public class TelegramBotService(
             MessageId = message.MessageId,
         } : null;
 
-        return _botClient.SendMessage(message.Chat, text, parseMode: parseMode, messageThreadId: message.MessageThreadId, replyMarkup: replyMarkup, replyParameters: replyParameters, linkPreviewOptions: linkPreviewOptions, disableNotification: disableNotification, cancellationToken: cancellationToken);
+        return _botClient.SendMessage(message.Chat, text, parseMode: parseMode, messageThreadId: message.Chat.IsForum ? message.MessageThreadId : null, replyMarkup: replyMarkup, replyParameters: replyParameters, linkPreviewOptions: linkPreviewOptions, disableNotification: disableNotification, cancellationToken: cancellationToken);
     }
 
 
@@ -357,7 +357,9 @@ public class TelegramBotService(
             IsDisabled = true,
         };
 
-        var msg = await _botClient.SendMessage(message.Chat, text, parseMode: parsemode, messageThreadId: message.MessageThreadId,
+        _logger.LogWarning("msg thread id :{id}", message.MessageThreadId);
+
+        var msg = await _botClient.SendMessage(message.Chat, text, parseMode: parsemode, messageThreadId: message.Chat.IsForum ? message.MessageThreadId : null,
             replyParameters: replyParameters, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         if (delete)
@@ -394,7 +396,7 @@ public class TelegramBotService(
     {
         try
         {
-            return _botClient.SendChatAction(message.Chat, chatAction, message.MessageThreadId, null, cancellationToken);
+            return _botClient.SendChatAction(message.Chat, chatAction, message.Chat.IsForum ? message.MessageThreadId : null, null, cancellationToken);
         }
         catch (Exception ex)
         {

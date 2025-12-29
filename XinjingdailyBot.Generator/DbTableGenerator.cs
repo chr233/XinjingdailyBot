@@ -24,7 +24,7 @@ internal sealed class DbTableGenerator : IIncrementalGenerator
         context.RegisterSourceOutput(additionalFiles, (context, fileText) => {
             try
             {
-                ProcessSettingsFile(fileText, context);
+                ProcessSettingsFile(fileText ?? "{}", context);
             }
             catch (IOException e)
             {
@@ -41,7 +41,7 @@ internal sealed class DbTableGenerator : IIncrementalGenerator
         });
     }
 
-    private void ProcessSettingsFile(string? fileText, SourceProductionContext context)
+    private void ProcessSettingsFile(string fileText, SourceProductionContext context)
     {
         if (string.IsNullOrEmpty(fileText))
         {

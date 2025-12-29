@@ -22,10 +22,9 @@
 		<PackageReference Include="NSwag.Generation.AspNetCore" />
 		<PackageReference Include="Quartz.AspNetCore" />
 		<PackageReference Include="SqlSugarCore" />
-		<PackageReference Include="Swashbuckle.AspNetCore" />
-		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
 		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
 		<PackageReference Include="Telegram.Bot" />
+		<PackageReference Include="Scalar.AspNetCore" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -49,6 +49,8 @@ public static class BuildInfo
     public static string AppDir => !string.IsNullOrEmpty(_assembly.Location) ? Directory.GetParent(_assembly.Location)?.FullName ?? "." : AppContext.BaseDirectory;
     public static string AppPath => _assembly.Location;
 
+    public static string AppName => nameof(XinjingdailyBot);
+
     /// <summary>
     /// 版本
     /// </summary>

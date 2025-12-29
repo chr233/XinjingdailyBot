@@ -1,4 +1,5 @@
 namespace XinjingdailyBot.Infrastructure.Configs;
+
 public sealed record DatabaseConfig
 {
     /// <summary>
@@ -20,11 +21,11 @@ public sealed record DatabaseConfig
     /// <summary>
     /// MySQL主机IP
     /// </summary>
-    public string? Host { get; init; }
+    public string? DbHost { get; init; }
     /// <summary>
     /// MySQL主机端口
     /// </summary>
-    public uint Port { get; init; } = 3306;
+    public uint DbPort { get; init; } = 3306;
     /// <summary>
     /// MySQL数据库名称
     /// </summary>
@@ -32,9 +33,9 @@ public sealed record DatabaseConfig
     /// <summary>
     /// MySQL用户名
     /// </summary>
-    public string? User { get; init; }
+    public string? DbUser { get; init; }
     /// <summary>
     /// MySQL密码
     /// </summary>
-    public string? Password { get; init; }
+    public string? DbPassword { get; init; }
 }
