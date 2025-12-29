@@ -57,8 +57,15 @@ public class DbInitializationService(
 
             foreach (var type in types)
             {
-                _logger.LogInformation("开始创建 {type} 表", type);
-                _dbClient.CodeFirst.InitTables(type);
+                try
+                {
+                    _logger.LogInformation("开始创建 {type} 表", type);
+                    _dbClient.CodeFirst.InitTables(type);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "创建 {type} 表失败", type);
+                }
             }
             _logger.LogWarning("数据库结构生成完毕, 建议禁用 Database.Generate 来加快启动速度");
         }

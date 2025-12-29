@@ -24,7 +24,7 @@ public static class DatabaseExtension
     [RequiresUnreferencedCode("不兼容剪裁")]
     public static void AddSqlSugarSetup(this IServiceCollection services)
     {
-        services.AddHttpContextAccessor();
+        bool inited = false;
 
         services.AddTransient<ISqlSugarClient>(s => {
             var config = s.GetRequiredService<IOptions<OptionsSetting>>().Value.Database;
@@ -36,15 +36,15 @@ public static class DatabaseExtension
                 _ => DbType.Custom,
             };
 
-            _logger.Info("数据库驱动: {0}", dbType);
+
 
             var connStr = dbType switch {
                 DbType.MySql => new MySqlConnectionStringBuilder {
-                    Server = config.Host,
-                    Port = config.Port,
+                    Server = config.DbHost,
+                    Port = config.DbPort,
                     Database = config.DbName,
-                    UserID = config.User,
-                    Password = config.Password,
+                    UserID = config.DbUser,
+                    Password = config.DbPassword,
                     CharacterSet = "utf8mb4",
                     AllowZeroDateTime = true,
                 }.ToString(),
@@ -54,11 +54,11 @@ public static class DatabaseExtension
                 }.ToString(),
 
                 DbType.PostgreSQL => new NpgsqlConnectionStringBuilder {
-                    Host = config.Host,
-                    Port = (int)config.Port,
+                    Host = config.DbHost,
+                    Port = (int)config.DbPort,
                     Database = config.DbName,
-                    Username = config.User,
-                    Password = config.Password,
+                    Username = config.DbUser,
+                    Password = config.DbPassword,
                 }.ToString(),
 
                 DbType.Custom => config.ConnectionString,
@@ -66,21 +66,25 @@ public static class DatabaseExtension
                 _ => null,
             };
 
+            if (!inited && !string.IsNullOrEmpty(connStr))
+            {
+                if (string.IsNullOrEmpty(config.DbPassword))
+                {
+                    _logger.Info("数据库连接: {0}", connStr);
+                }
+                else
+                {
+                    _logger.Info("数据库连接: {0}", connStr.Replace(config.DbPassword, "***"));
+                }
+                inited = true;
+            }
+
             if (string.IsNullOrEmpty(connStr))
             {
                 _logger.Error("数据库配置有误, 请检查 DbType 和 DbConnectionString");
                 _logger.Info("按任意键退出...");
                 Console.ReadKey();
                 Environment.Exit(1);
-            }
-
-            if (string.IsNullOrEmpty(config.Password))
-            {
-                _logger.Info("数据库连接: {0}", connStr);
-            }
-            else
-            {
-                _logger.Info("数据库连接: {0}", connStr.Replace(config.Password, "***"));
             }
 
             var sqlSugar = new SqlSugarClient(new ConnectionConfig {

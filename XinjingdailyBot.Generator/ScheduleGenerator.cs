@@ -24,7 +24,7 @@ internal sealed class ScheduleGenerator : IIncrementalGenerator
         context.RegisterSourceOutput(additionalFiles, (context, fileText) => {
             try
             {
-                ProcessSettingsFile(fileText, context);
+                ProcessSettingsFile(fileText ?? "{}", context);
             }
             catch (IOException e)
             {
@@ -46,7 +46,7 @@ internal sealed class ScheduleGenerator : IIncrementalGenerator
     /// </summary>
     /// <param name="fileText"></param>
     /// <param name="context"></param>
-    private void ProcessSettingsFile(string? fileText, SourceProductionContext context)
+    private void ProcessSettingsFile(string fileText, SourceProductionContext context)
     {
         if (string.IsNullOrEmpty(fileText))
         {

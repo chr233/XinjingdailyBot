@@ -1,8 +1,7 @@
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Infrastructure.Extensions;
+using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Handler;
 using XinjingdailyBot.Interface.Data;
 using XinjingdailyBot.Model.Models;
@@ -10,25 +9,12 @@ using XinjingdailyBot.Model.Models;
 namespace XinjingdailyBot.Service.Bot.Handler;
 
 [AppService(typeof(IMessageHandler), LifeTime.Singleton)]
-public class MessageHandler : IMessageHandler
+public class MessageHandler(
+        IPostService _postService,
+        IGroupMessageHandler _groupMessageHandler,
+        ITelegramBotService _botClient,
+        IForwardMessageHandler _forwardMessageHandler) : IMessageHandler
 {
-    private readonly IPostService _postService;
-    private readonly IGroupMessageHandler _groupMessageHandler;
-    private readonly ITelegramBotClient _botClient;
-    private readonly IForwardMessageHandler _forwardMessageHandler;
-
-    public MessageHandler(
-        IPostService postService,
-        IGroupMessageHandler groupMessageHandler,
-        ITelegramBotClient botClient,
-        IForwardMessageHandler forwardMessageHandler)
-    {
-        _postService = postService;
-        _groupMessageHandler = groupMessageHandler;
-        _botClient = botClient;
-        _forwardMessageHandler = forwardMessageHandler;
-    }
-
     public async Task OnTextMessageReceived(Users dbUser, Message message)
     {
         if (dbUser.IsBan)

@@ -120,7 +120,7 @@ public class CommonCommand(
         sb.AppendLine($"程序版本: <code>{version}</code>");
         sb.AppendLine($"子版本: <code>{variant}</code>");
         sb.AppendLine(string.Format("获取开源程序: {0}", _textHelperService.HtmlLink("https://github.com/chr233/XinjingdailyBot/", "XinjingdailyBot")));
-        sb.AppendLine(string.Format("爱发电: {0}", _textHelperService.HtmlLink("https://afdian.net/@ylnflp", "@ylnflp")));
+        sb.AppendLine(string.Format("爱发电: {0}", _textHelperService.HtmlLink("https://afdian.com/a/ylnflp", "@ylnflp")));
         await _botClient.SendCommandReply(sb.ToString(), message, parsemode: ParseMode.Html).ConfigureAwait(false);
     }
 

@@ -6,12 +6,17 @@
 
 	<ItemGroup>
 		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
-		<PackageReference Include="Microsoft.AspNetCore.Http" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
 		<PackageReference Include="Microsoft.Extensions.Http" />
+		<PackageReference Include="Microsoft.Extensions.Logging" />
+		<PackageReference Include="NLog.Extensions.Logging" />
+		<PackageReference Include="NLog.Web.AspNetCore" />
+		<PackageReference Include="NSwag.AspNetCore" />
+		<PackageReference Include="NSwag.Generation" />
 	</ItemGroup>
-
+	
 	<ItemGroup>
 		<None Include="..\.editorconfig" Link=".editorconfig" />
 	</ItemGroup>

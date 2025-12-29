@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
 using System.Text;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
@@ -23,6 +22,7 @@ internal class ReviewStatusTask(
     IReviewStatusService _reviewStatusService,
     IMarkupHelperService _markupHelperService) : IJob
 {
+    private DateTime CodeTime = DateTime.MinValue;
 
     public async Task Execute(IJobExecutionContext context)
     {
@@ -30,7 +30,6 @@ internal class ReviewStatusTask(
 
         var now = DateTime.Now;
         var today = now.AddHours(-now.Hour).AddMinutes(-now.Minute).AddSeconds(-now.Second);
-
 
         var todayPost = await _postService.CountAllPosts(today).ConfigureAwait(false);
         var todayAcceptPost = await _postService.CountAcceptedPosts(today).ConfigureAwait(false);
@@ -124,9 +123,17 @@ internal class ReviewStatusTask(
 
         if (statusMsg == null)
         {
-            statusMsg = await _botClient.SendMessage(reviewGroup, sb.ToString(), parseMode: ParseMode.Html, replyMarkup: kbd).ConfigureAwait(false);
-            await _botClient.PinChatMessage(reviewGroup, statusMsg.MessageId).ConfigureAwait(false);
-            await _reviewStatusService.CreateNewReviewStatus(statusMsg).ConfigureAwait(false);
+            try
+            {
+                statusMsg = await _botClient.SendMessage(reviewGroup, sb.ToString(), parseMode: ParseMode.Html, replyMarkup: kbd).ConfigureAwait(false);
+                await _botClient.PinChatMessage(reviewGroup, statusMsg.MessageId).ConfigureAwait(false);
+                await _reviewStatusService.CreateNewReviewStatus(statusMsg).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "发送统计信息失败, 可能没有设置为管理员");
+            }
+
         }
     }
 }

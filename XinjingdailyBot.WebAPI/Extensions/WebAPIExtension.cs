@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Options;
+using SteamFamily.API.Extensions;
 using System.Text.Json.Serialization;
 using XinjingdailyBot.Infrastructure;
 
@@ -41,7 +42,11 @@ public static class WebAPIExtension
         //获取客户端 IP
         services.Configure<ForwardedHeadersOptions>(o => {
             o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+#if NET10_0_OR_GREATER
+            o.KnownIPNetworks.Clear();
+#else
             o.KnownNetworks.Clear();
+#endif
             o.KnownProxies.Clear();
         });
     }

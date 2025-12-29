@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 		<IsRoslynComponent>true</IsRoslynComponent>
 		<GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
@@ -45,7 +45,17 @@
 
 	<Target Name="GetDependencyTargetPaths">
 		<ItemGroup>
-			<TargetPathWithTargetPlatformMoniker Include="$(PKGNewtonsoft_Json)\lib\netstandard2.0\Newtonsoft.Json.dll" IncludeRuntimeDependency="false" />
+			<!-- 优先使用 NuGet 生成的 Pkg 属性（需要已还原） -->
+			<TargetPathWithTargetPlatformMoniker
+				Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\Newtonsoft.Json.dll"
+				IncludeRuntimeDependency="false"
+				Condition=" '$(PkgNewtonsoft_Json)' != '' " />
+
+			<!-- 回退到 NuGet 全局包缓存（当未生成 Pkg 属性时） -->
+			<TargetPathWithTargetPlatformMoniker
+				Include="$(NuGetPackageRoot)newtonsoft.json\13.0.4\lib\netstandard2.0\Newtonsoft.Json.dll"
+				IncludeRuntimeDependency="false"
+				Condition=" '$(PkgNewtonsoft_Json)' == '' " />
 		</ItemGroup>
 	</Target>
 

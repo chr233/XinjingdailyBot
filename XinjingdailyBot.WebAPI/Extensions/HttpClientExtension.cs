@@ -20,6 +20,8 @@ public static class HttpClientExtension
     {
         string publicIdentifier = $"{nameof(XinjingdailyBot)}-{BuildInfo.Variant}";
 
+        services.AddHttpContextAccessor();
+
         services.AddHttpClient("Telegram", (serviceProvider, httpClient) => {
             var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
             string? baseUrl = config.Bot.BaseUrl;
