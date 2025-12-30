@@ -404,6 +404,12 @@ public class NormalCommand(
         }
     }
 
+    /// <summary>
+    /// 获取IP信息
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="args"></param>
+    /// <returns></returns>
     [TextCmd("IP", EUserRights.NormalCmd, Alias = "IPINFO", Description = "查询IP信息")]
     public async Task GetIpInfo(Message message, string[] args)
     {

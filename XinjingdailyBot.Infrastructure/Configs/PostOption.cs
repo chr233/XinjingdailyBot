@@ -49,5 +49,8 @@ public sealed record PostOption
     /// </summary>
     public uint PostExpiredTime { get; set; } = 3;
 
-    public int MediaGroupReceiveTtl { get; set; } = 30;
+    /// <summary>
+    /// 媒体组投稿生存期
+    /// </summary>
+    public int MediaGroupReceiveTtl { get; set; } = 15;
 }

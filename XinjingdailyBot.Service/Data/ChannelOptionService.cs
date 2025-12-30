@@ -12,6 +12,7 @@ namespace XinjingdailyBot.Service.Data;
 [AppService(typeof(IChannelOptionService), LifeTime.Transient)]
 public sealed class ChannelOptionService(ISqlSugarClient context) : BaseService<ChannelOptions>(context), IChannelOptionService
 {
+    /// <inheritdoc/>
     public async Task<EChannelOption> FetchChannelOption(Chat channelChat)
     {
         var chatId = channelChat.Id;
@@ -47,6 +48,7 @@ public sealed class ChannelOptionService(ISqlSugarClient context) : BaseService<
         return channel.Option;
     }
 
+    /// <inheritdoc/>
     public async Task<EChannelOption> FetchChannelOption(long chatId, string chatTitle, string chatUserName)
     {
         var channel = await Queryable().Where(x => x.ChannelID == chatId).FirstAsync().ConfigureAwait(false);
@@ -78,24 +80,28 @@ public sealed class ChannelOptionService(ISqlSugarClient context) : BaseService<
         return channel.Option;
     }
 
+    /// <inheritdoc/>
     public async Task<ChannelOptions?> FetchChannelByTitle(string channelTitle)
     {
         var channel = await Queryable().Where(x => x.ChannelTitle == channelTitle).FirstAsync().ConfigureAwait(false);
         return channel;
     }
 
+    /// <inheritdoc/>
     public async Task<ChannelOptions?> FetchChannelByNameOrTitle(string channelName, string channelTitle)
     {
         var channel = await Queryable().Where(x => x.ChannelName == channelName || x.ChannelTitle == channelTitle).FirstAsync().ConfigureAwait(false);
         return channel;
     }
 
+    /// <inheritdoc/>
     public async Task<ChannelOptions?> FetchChannelByChannelId(long channelId)
     {
         var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync().ConfigureAwait(false);
         return channel;
     }
 
+    /// <inheritdoc/>
     public async Task<ChannelOptions?> UpdateChannelOptionById(long channelId, EChannelOption channelOption)
     {
         var channel = await Queryable().Where(x => x.ChannelID == channelId).FirstAsync().ConfigureAwait(false);
@@ -108,6 +114,7 @@ public sealed class ChannelOptionService(ISqlSugarClient context) : BaseService<
         return channel;
     }
 
+    /// <inheritdoc/>
     public Task<int> ChannelCount()
     {
         return Queryable().CountAsync();

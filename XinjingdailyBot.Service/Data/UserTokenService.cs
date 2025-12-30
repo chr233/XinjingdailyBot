@@ -9,17 +9,11 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IUserTokenService"/>
 [AppService(typeof(IUserTokenService), LifeTime.Singleton)]
-public sealed class UserTokenService : BaseService<UserTokens>, IUserTokenService
+public sealed class UserTokenService(
+    ILogger<UserTokenService> _logger,
+    ISqlSugarClient context) : BaseService<UserTokens>(context), IUserTokenService
 {
-    private readonly ILogger<UserTokenService> _logger;
-
-    public UserTokenService(
-        ILogger<UserTokenService> logger,
-        ISqlSugarClient context) : base(context)
-    {
-        _logger = logger;
-    }
-
+    /// <inheritdoc/>
     public async Task<UserTokens> GenerateNewUserToken(Users dbUser)
     {
         var token = await Queryable().Where(x => x.UID == dbUser.Id).FirstAsync().ConfigureAwait(false);
@@ -44,6 +38,7 @@ public sealed class UserTokenService : BaseService<UserTokens>, IUserTokenServic
         return token;
     }
 
+    /// <inheritdoc/>
     public async Task<UserTokens?> FetchUserToken(Users dbUser)
     {
         var token = await Queryable().Where(x => x.UID == dbUser.Id).FirstAsync().ConfigureAwait(false);
@@ -54,6 +49,7 @@ public sealed class UserTokenService : BaseService<UserTokens>, IUserTokenServic
         return token;
     }
 
+    /// <inheritdoc/>
     public async Task<Users?> VerifyToken(Guid token)
     {
         var userToken = await Queryable()

@@ -4,8 +4,19 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace XinjingdailyBot.Interface.Bot;
 
+/// <summary>
+/// Telegram 机器人服务接口
+/// </summary>
 public interface ITelegramBotService
 {
+    /// <summary>
+    /// 自动回复
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="query"></param>
+    /// <param name="showAlert"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     Task AutoReply(string text, CallbackQuery query, bool showAlert = false, CancellationToken cancellationToken = default);
     Task<Message> AutoReply(string text, Message message, ParseMode parsemode = ParseMode.None, CancellationToken cancellationToken = default);
     Task BanChatMember(ChatId chatId, long userId, DateTime? untilDate = null, bool revokeMessages = false, CancellationToken cancellationToken = default);

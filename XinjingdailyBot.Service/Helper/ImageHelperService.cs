@@ -1,10 +1,8 @@
 using Microsoft.Extensions.Logging;
 using System.Drawing;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
-using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Helper;
 

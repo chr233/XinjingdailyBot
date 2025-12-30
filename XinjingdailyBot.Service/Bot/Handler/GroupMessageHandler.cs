@@ -18,6 +18,7 @@ public sealed class GroupMessageHandler(
         IChannelService _channelService,
         ILogger<GroupMessageHandler> _logger) : IGroupMessageHandler
 {
+    /// <inheritdoc/>
     public async Task OnGroupTextMessageReceived(Users dbUser, Message message)
     {
         var replyMessage = message.ReplyToMessage;

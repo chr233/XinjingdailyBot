@@ -45,4 +45,17 @@ public sealed class TextCmdAttribute : System.Attribute
         Command = command;
         Rights = rights;
     }
+
+    /// <summary>
+    /// 创建特性
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="alias"></param>
+    /// <param name="rights"></param>
+    public TextCmdAttribute(string command, string alias, EUserRights rights)
+    {
+        Command = command;
+        Alias = alias;
+        Rights = rights;
+    }
 }

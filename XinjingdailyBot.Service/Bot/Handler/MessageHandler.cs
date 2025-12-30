@@ -8,6 +8,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Handler;
 
+/// <inheritdoc cref="IMessageHandler" />
 [AppService(typeof(IMessageHandler), LifeTime.Singleton)]
 public class MessageHandler(
         IPostService _postService,
@@ -15,6 +16,7 @@ public class MessageHandler(
         ITelegramBotService _botClient,
         IForwardMessageHandler _forwardMessageHandler) : IMessageHandler
 {
+    /// <inheritdoc />
     public async Task OnTextMessageReceived(Users dbUser, Message message)
     {
         if (dbUser.IsBan)
@@ -43,6 +45,7 @@ public class MessageHandler(
         }
     }
 
+    /// <inheritdoc />
     public async Task OnMediaMessageReceived(Users dbUser, Message message)
     {
         if (dbUser.IsBan)

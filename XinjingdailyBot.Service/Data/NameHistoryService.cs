@@ -10,6 +10,7 @@ namespace XinjingdailyBot.Service.Data;
 [AppService(typeof(INameHistoryService), LifeTime.Singleton)]
 public sealed class NameHistoryService(ISqlSugarClient context) : BaseService<NameHistory>(context), INameHistoryService
 {
+    /// <inheritdoc/>
     public async Task CreateNameHistory(Users dbUser)
     {
         var history = new NameHistory {

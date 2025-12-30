@@ -11,6 +11,7 @@ namespace XinjingdailyBot.Service.Data;
 [AppService(typeof(IMediaGroupService), LifeTime.Singleton)]
 public sealed class MediaGroupService(ISqlSugarClient context) : BaseService<MediaGroups>(context), IMediaGroupService
 {
+    /// <inheritdoc/>
     public async Task AddPostMediaGroup(Message message)
     {
         if (string.IsNullOrEmpty(message.MediaGroupId))
@@ -28,6 +29,7 @@ public sealed class MediaGroupService(ISqlSugarClient context) : BaseService<Med
         await Insertable(postGeoup).ExecuteCommandAsync().ConfigureAwait(false);
     }
 
+    /// <inheritdoc/>
     public async Task AddPostMediaGroup(IEnumerable<Message> messages)
     {
         if (messages.Any(x => string.IsNullOrEmpty(x.MediaGroupId)))
@@ -46,24 +48,28 @@ public sealed class MediaGroupService(ISqlSugarClient context) : BaseService<Med
         await Storageable(postGeoups).ExecuteCommandAsync().ConfigureAwait(false);
     }
 
+    /// <inheritdoc/>
     public async Task<MediaGroups?> QueryMediaGroup(Message message)
     {
         var mediaGroup = await Queryable().FirstAsync(x => x.ChatID == message.Chat.Id && x.MessageID == message.MessageId).ConfigureAwait(false);
         return mediaGroup;
     }
 
+    /// <inheritdoc/>
     public async Task<List<MediaGroups>> QueryMediaGroup(string? mediaGroupId)
     {
         var mediaGroups = await Queryable().Where(x => x.MediaGroupID == mediaGroupId).ToListAsync().ConfigureAwait(false);
         return mediaGroups;
     }
 
+    /// <inheritdoc/>
     public async Task<MediaGroups?> QueryMediaGroup(Chat chat, long msgId)
     {
         var mediaGroup = await Queryable().FirstAsync(x => x.ChatID == chat.Id && x.MessageID == msgId).ConfigureAwait(false);
         return mediaGroup;
     }
 
+    /// <inheritdoc/>
     public async Task<MediaGroups?> QueryMediaGroup(long chatId, int msgId)
     {
         var mediaGroup = await Queryable().FirstAsync(x => x.ChatID == chatId && x.MessageID == msgId).ConfigureAwait(false);

@@ -18,6 +18,11 @@ public sealed class TextHelperService : ITextHelperService
 {
     private readonly TagRepository _tagRepository;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="options"></param>
+    /// <param name="tagRepository"></param>
     public TextHelperService(
         IOptions<OptionsSetting> options,
         TagRepository tagRepository)
@@ -36,6 +41,7 @@ public sealed class TextHelperService : ITextHelperService
 
     private static readonly char[] Separator = ['|'];
 
+    /// <inheritdoc/>
     public string PureText(string? text)
     {
         if (string.IsNullOrEmpty(text))
@@ -60,6 +66,7 @@ public sealed class TextHelperService : ITextHelperService
         return text;
     }
 
+    /// <inheritdoc/>
     public string HtmlUserLink(long userId, string userName, string userNick)
     {
         var nick = EscapeHtml(userNick).ReEscapeHtml();
@@ -74,21 +81,25 @@ public sealed class TextHelperService : ITextHelperService
         }
     }
 
+    /// <inheritdoc/>
     public string HtmlLink(string url, string text)
     {
         return $"<a href=\"{url}\">{text}</a>";
     }
 
+    /// <inheritdoc/>
     public string HtmlUserLink(Users user)
     {
         return HtmlUserLink(user.UserID, user.UserName, user.FullName);
     }
 
+    /// <inheritdoc/>
     public string HtmlMessageLink(long messageID, string chatName, string linkName)
     {
         return $"<a href=\"https://t.me/{chatName}/{messageID}\">{linkName}</a>";
     }
 
+    /// <inheritdoc/>
     public string HtmlMessageLink(long messageID, long chatId, string linkName)
     {
         if (chatId < 0)
@@ -98,6 +109,7 @@ public sealed class TextHelperService : ITextHelperService
         return $"<a href=\"https://t.me/c/{chatId}/{messageID}\">{linkName}</a>";
     }
 
+    /// <inheritdoc/>
     public string EscapeHtml(string? text)
     {
         if (string.IsNullOrEmpty(text))
@@ -118,6 +130,7 @@ public sealed class TextHelperService : ITextHelperService
         }
     }
 
+    /// <inheritdoc/>
     public string MakeReviewMessage(Users poster, bool anymouse)
     {
         var pUser = HtmlUserLink(poster);
@@ -128,6 +141,7 @@ public sealed class TextHelperService : ITextHelperService
         return msg;
     }
 
+    /// <inheritdoc/>
     public string MakeReviewMessage(Users poster, Users reviewer, bool anymouse, bool second, Message? message)
     {
         var pUser = HtmlUserLink(poster);
@@ -140,6 +154,7 @@ public sealed class TextHelperService : ITextHelperService
         return msg;
     }
 
+    /// <inheritdoc/>
     public string MakeReviewMessage(Users poster, bool anymouse, bool second, Message? message)
     {
         var pUser = HtmlUserLink(poster);
@@ -151,6 +166,7 @@ public sealed class TextHelperService : ITextHelperService
         return msg;
     }
 
+    /// <inheritdoc/>
     public string MakeReviewMessage(Users poster, Users reviewer, bool anymouse, string rejectReason)
     {
         var pUser = HtmlUserLink(poster);
@@ -162,6 +178,7 @@ public sealed class TextHelperService : ITextHelperService
         return msg;
     }
 
+    /// <inheritdoc/>
     public string MakeNotification(bool isDirect, bool inPlan, Message? message)
     {
         var msgLink = message != null ? HtmlLink(message.GetMessageLink(), "消息直链") : "无";
@@ -176,12 +193,14 @@ public sealed class TextHelperService : ITextHelperService
         }
     }
 
+    /// <inheritdoc/>
     public string MakeNotification(string reason)
     {
         var msg = string.Join('\n', "稿件未通过", $"原因: {reason}");
         return msg;
     }
 
+    /// <inheritdoc/>
     public string MakePoster(NewPosts post, Users poster, ChannelOptions? channel)
     {
         var user = HtmlUserLink(poster);
@@ -211,6 +230,7 @@ public sealed class TextHelperService : ITextHelperService
         }
     }
 
+    /// <inheritdoc/>
     public string MakePostText(NewPosts post, Users poster, ChannelOptions? channel)
     {
         var tag = _tagRepository.GetActiviedHashTags(post.Tags);
@@ -239,6 +259,7 @@ public sealed class TextHelperService : ITextHelperService
         return sb.ToString();
     }
 
+    /// <inheritdoc/>
     public string ParseMessage(Message message)
     {
         MessageEntity[]? entities;

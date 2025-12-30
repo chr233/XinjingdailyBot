@@ -1,10 +1,8 @@
 using System.Text;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
-using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
@@ -14,6 +12,7 @@ using XinjingdailyBot.Model.Models;
 
 namespace XinjingdailyBot.Service.Bot.Handler;
 
+/// <inheritdoc  cref="IForwardMessageHandler"/>
 [AppService(typeof(IForwardMessageHandler), LifeTime.Singleton)]
 public class ForwardMessageHandler(
      ITelegramBotService _botClient,
@@ -23,6 +22,7 @@ public class ForwardMessageHandler(
      IUserService _userService,
      IMediaGroupService _mediaGroupService) : IForwardMessageHandler
 {
+    /// <inheritdoc />
     public async Task<bool> OnForwardMessageReceived(Users dbUser, Message message)
     {
         if (dbUser.Right.HasFlag(EUserRights.AdminCmd))

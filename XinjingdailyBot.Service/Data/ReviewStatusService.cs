@@ -16,12 +16,14 @@ public sealed class ReviewStatusService(
     ITelegramBotClient _botClient,
     ISqlSugarClient _context) : BaseService<ReviewStatus>(_context), IReviewStatusService
 {
+    /// <inheritdoc/>
     public async Task<ReviewStatus?> GetOldReviewStatu()
     {
         var oldPost = await Queryable().FirstAsync(static x => !x.Deleted).ConfigureAwait(false);
         return oldPost;
     }
 
+    /// <inheritdoc/>
     public async Task DeleteOldReviewStatus()
     {
         var oldPosts = await Queryable()
@@ -50,6 +52,7 @@ public sealed class ReviewStatusService(
         }
     }
 
+    /// <inheritdoc/>
     public Task CreateNewReviewStatus(Message message)
     {
         var reviewStatus = new ReviewStatus {
@@ -63,6 +66,7 @@ public sealed class ReviewStatusService(
         return Insertable(reviewStatus).ExecuteCommandAsync();
     }
 
+    /// <inheritdoc/>
     public Task DeleteReviewStatus(ReviewStatus reviewStatus)
     {
         reviewStatus.Deleted = true;

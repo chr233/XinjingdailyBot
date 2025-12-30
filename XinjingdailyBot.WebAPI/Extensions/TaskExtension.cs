@@ -23,7 +23,7 @@ public static class TaskExtension
     public static void AddQuartzSetup(this IServiceCollection services, IConfiguration configuration)
     {
         var scheduleConfig = configuration.GetSection("Schedule").Get<ScheduleOption>();
-        var cron = scheduleConfig?.Cron ?? new Dictionary<string, string>();
+        var cron = scheduleConfig?.Cron ?? [];
 
         var tasks = Assembly.Load("XinjingdailyBot.Tasks").GetTypes();
         if (tasks == null)

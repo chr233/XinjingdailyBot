@@ -1,4 +1,5 @@
 namespace XinjingdailyBot.Infrastructure.Configs;
+
 public sealed record RedisConfig
 {
     public bool Enable { get; init; } = false;

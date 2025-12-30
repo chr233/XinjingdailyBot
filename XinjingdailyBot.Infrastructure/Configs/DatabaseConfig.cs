@@ -1,5 +1,8 @@
 namespace XinjingdailyBot.Infrastructure.Configs;
 
+/// <summary>
+/// 数据库设置
+/// </summary>
 public sealed record DatabaseConfig
 {
     /// <summary>

@@ -15,28 +15,16 @@ namespace XinjingdailyBot.Service.Helper;
 
 /// <inheritdoc cref="IMarkupHelperService"/>
 [AppService(typeof(IMarkupHelperService), LifeTime.Transient)]
-public sealed class MarkupHelperService : IMarkupHelperService
+public sealed class MarkupHelperService(
+    GroupRepository _groupRepository,
+    IChannelService _channelService,
+    TagRepository _tagRepository,
+    RejectReasonRepository _rejectReasonRepository,
+    IOptions<OptionsSetting> _options) : IMarkupHelperService
 {
-    private readonly GroupRepository _groupRepository;
-    private readonly IChannelService _channelService;
-    private readonly TagRepository _tagRepository;
-    private readonly RejectReasonRepository _rejectReasonRepository;
-    private readonly BotConfig _botOption;
+    private readonly BotConfig _botOption = _options.Value.Bot;
 
-    public MarkupHelperService(
-        GroupRepository groupRepository,
-        IChannelService channelService,
-        TagRepository tagRepository,
-        RejectReasonRepository rejectReasonRepository,
-        IOptions<OptionsSetting> options)
-    {
-        _groupRepository = groupRepository;
-        _channelService = channelService;
-        _tagRepository = tagRepository;
-        _rejectReasonRepository = rejectReasonRepository;
-        _botOption = options.Value.Bot;
-    }
-
+    /// <inheritdoc/>
     public InlineKeyboardMarkup PostKeyboard(bool anymouse)
     {
         var keyboard = new InlineKeyboardMarkup(new[]
@@ -54,6 +42,7 @@ public sealed class MarkupHelperService : IMarkupHelperService
         return keyboard;
     }
 
+    /// <inheritdoc/>
     public InlineKeyboardMarkup DirectPostKeyboard(bool anymouse, int tagNum, bool? hasSpoiler)
     {
         var tags = _tagRepository.GetTagsPayload(tagNum);
@@ -115,6 +104,7 @@ public sealed class MarkupHelperService : IMarkupHelperService
         return new InlineKeyboardMarkup(btns);
     }
 
+    /// <inheritdoc/>
     public InlineKeyboardMarkup ReviewKeyboardA(int tagNum, bool? hasSpoiler, bool? anymouse = null)
     {
         var tags = _tagRepository.GetTagsPayload(tagNum);
@@ -188,6 +178,7 @@ public sealed class MarkupHelperService : IMarkupHelperService
         return new InlineKeyboardMarkup(btns);
     }
 
+    /// <inheritdoc/>
     public InlineKeyboardMarkup ReviewKeyboardB()
     {
         var reasons = _rejectReasonRepository.GetAllRejectReasons();
@@ -243,6 +234,7 @@ public sealed class MarkupHelperService : IMarkupHelperService
         return new InlineKeyboardMarkup(btns);
     }
 
+    /// <inheritdoc/>
     public async Task<InlineKeyboardMarkup?> SetUserGroupKeyboard(Users dbUser, Users targetUser)
     {
         var groups = await _groupRepository.Queryable().Where(x => x.Id > 0 && x.Id < dbUser.GroupID).ToListAsync().ConfigureAwait(false);
@@ -277,6 +269,7 @@ public sealed class MarkupHelperService : IMarkupHelperService
         }
     }
 
+    /// <inheritdoc/>
     public InlineKeyboardMarkup? UserListPageKeyboard(Users dbUser, string query, int current, int total)
     {
         var btnClose = InlineKeyboardButton.WithCallbackData("关闭", $"cmd {dbUser.UserID} cancelsearchuser 已关闭");
@@ -320,6 +313,7 @@ public sealed class MarkupHelperService : IMarkupHelperService
         }
     }
 
+    /// <inheritdoc/>
     public InlineKeyboardMarkup? SetChannelOptionKeyboard(Users dbUser, long channelId)
     {
         var keyboard = new InlineKeyboardMarkup(new[]
@@ -345,6 +339,7 @@ public sealed class MarkupHelperService : IMarkupHelperService
         return keyboard;
     }
 
+    /// <inheritdoc/>
     public InlineKeyboardMarkup? LinkToOriginPostKeyboard(NewPosts post)
     {
         var channel = _channelService.AcceptChannel;
@@ -360,6 +355,7 @@ public sealed class MarkupHelperService : IMarkupHelperService
         return keyboard;
     }
 
+    /// <inheritdoc/>
     public InlineKeyboardMarkup? LinkToOriginPostKeyboard(long messageId)
     {
         var channel = _channelService.AcceptChannel;
@@ -375,6 +371,7 @@ public sealed class MarkupHelperService : IMarkupHelperService
         return keyboard;
     }
 
+    /// <inheritdoc/>
     public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser)
     {
         var tags = _tagRepository.GetAllTags();
@@ -415,6 +412,7 @@ public sealed class MarkupHelperService : IMarkupHelperService
         return new InlineKeyboardMarkup(btns);
     }
 
+    /// <inheritdoc/>
     public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, int tagNum)
     {
         var keyboard = new InlineKeyboardMarkup(new[]
@@ -444,6 +442,7 @@ public sealed class MarkupHelperService : IMarkupHelperService
         return keyboard;
     }
 
+    /// <inheritdoc/>
     public InlineKeyboardMarkup RandomPostMenuKeyboard(Users dbUser, NewPosts post, int tagId, string postType)
     {
         var channel = _channelService.AcceptChannel;
@@ -461,6 +460,7 @@ public sealed class MarkupHelperService : IMarkupHelperService
         return keyboard;
     }
 
+    /// <inheritdoc/>
     public InlineKeyboardMarkup QueryPostMenuKeyboard(Users dbUser, NewPosts post)
     {
         InlineKeyboardMarkup keyboard;
@@ -497,6 +497,7 @@ public sealed class MarkupHelperService : IMarkupHelperService
         return keyboard;
     }
 
+    /// <inheritdoc/>
     public InlineKeyboardMarkup NukeMenuKeyboard(Users dbUser, Users targetUser, string reason)
     {
         var keyboard = new InlineKeyboardMarkup(new[]
@@ -526,6 +527,7 @@ public sealed class MarkupHelperService : IMarkupHelperService
         return keyboard;
     }
 
+    /// <inheritdoc/>
     public InlineKeyboardMarkup? AdvertiseExternalLinkButton(string? externalLink, string? extrnalLinkName)
     {
         if (string.IsNullOrEmpty(externalLink))
@@ -549,6 +551,7 @@ public sealed class MarkupHelperService : IMarkupHelperService
         return line.Any() ? new InlineKeyboardMarkup(new[] { line }) : null;
     }
 
+    /// <inheritdoc/>
     public InlineKeyboardMarkup ReviewStatusButton(NewPosts? post)
     {
         InlineKeyboardMarkup keyboard;

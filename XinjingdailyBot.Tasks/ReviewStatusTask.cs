@@ -26,6 +26,11 @@ internal class ReviewStatusTask(
 
     public async Task Execute(IJobExecutionContext context)
     {
+        if (DateTime.Now < CodeTime)
+        {
+            return;
+        }
+
         _logger.LogInformation("开始定时任务, 更新投稿状态显示");
 
         var now = DateTime.Now;
@@ -132,8 +137,9 @@ internal class ReviewStatusTask(
             catch (Exception ex)
             {
                 _logger.LogError(ex, "发送统计信息失败, 可能没有设置为管理员");
-            }
 
+                CodeTime = DateTime.Now.AddMinutes(10);
+            }
         }
     }
 }

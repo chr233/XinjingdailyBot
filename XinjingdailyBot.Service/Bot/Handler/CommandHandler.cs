@@ -4,13 +4,11 @@ using Microsoft.Extensions.Options;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
-using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Infrastructure.Model;
 using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
@@ -56,6 +54,7 @@ public class CommandHandler(
 
     private static readonly char[] separator = [','];
 
+    /// <inheritdoc />
     [RequiresUnreferencedCode("不兼容剪裁")]
     public void InstallCommands()
     {
@@ -67,10 +66,7 @@ public class CommandHandler(
         }
     }
 
-    /// <summary>
-    /// 注册命令
-    /// </summary>
-    /// <param name="type"></param>
+    /// <inheritdoc />
     [RequiresUnreferencedCode("不兼容剪裁")]
     private void RegisterCommands([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type type)
     {
@@ -151,6 +147,7 @@ public class CommandHandler(
         }
     }
 
+    /// <inheritdoc />
     public async Task OnCommandReceived(Users dbUser, Message message)
     {
         if (string.IsNullOrEmpty(message.Text))
@@ -278,12 +275,13 @@ public class CommandHandler(
             }
         }
         //调用方法
-        if (method.Invoke(service, methodParameters.ToArray()) is Task task)
+        if (method.Invoke(service, [.. methodParameters]) is Task task)
         {
             await task.ConfigureAwait(false);
         }
     }
 
+    /// <inheritdoc />
     public async Task OnQueryCommandReceived(Users dbUser, CallbackQuery query)
     {
         var message = query.Message;
@@ -410,12 +408,13 @@ public class CommandHandler(
             }
         }
         //调用方法
-        if (method.Invoke(service, methodParameters.ToArray()) is Task task)
+        if (method.Invoke(service, [.. methodParameters]) is Task task)
         {
             await task.ConfigureAwait(false);
         }
     }
 
+    /// <inheritdoc />
     public string GetAvilabeCommands(Users dbUser)
     {
         var cmds = new Dictionary<string, string>();
@@ -455,6 +454,7 @@ public class CommandHandler(
         }
     }
 
+    /// <inheritdoc />
     public async Task<bool> SetCommandsMenu()
     {
         var cmds = new List<BotCommand>();
@@ -492,6 +492,7 @@ public class CommandHandler(
         return true;
     }
 
+    /// <inheritdoc />
     public async Task<bool> ClearCommandsMenu()
     {
         var cmds = new List<BotCommand>();

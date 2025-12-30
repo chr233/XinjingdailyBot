@@ -2,14 +2,12 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Text;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using XinjingdailyBot.Infrastructure;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Infrastructure.Enums;
-using XinjingdailyBot.Infrastructure.Extensions;
 using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Bot.Common;
 using XinjingdailyBot.Interface.Bot.Handler;
@@ -186,13 +184,18 @@ public class SuperCommand(
     /// </summary>
     /// <param name="message"></param>
     /// <returns></returns>
-    [TextCmd("COMMAND", EUserRights.SuperCmd, Description = "设置命令菜单")]
+    [TextCmd("SETCOMMAND", "COMMAND", EUserRights.SuperCmd, Description = "设置命令菜单")]
     public async Task ResponseCommand(Message message)
     {
         bool result = await _commandHandler.SetCommandsMenu().ConfigureAwait(false);
         await _botClient.SendCommandReply(result ? "设置菜单成功" : "设置菜单失败", message, autoDelete: false).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// 清除命令菜单
+    /// </summary>
+    /// <param name="message"></param>
+    /// <returns></returns>
     [TextCmd("CLEARCOMMAND", EUserRights.SuperCmd, Description = "设置命令菜单")]
     public async Task ResponseClearCommand(Message message)
     {
@@ -278,7 +281,9 @@ public class SuperCommand(
                 return "当前版本不支持自动升级";
             }
 
+#pragma warning disable CS0162 // 检测到无法访问的代码
             var releaseResponse = await _httpHelperService.GetLatestRelease().ConfigureAwait(false);
+#pragma warning restore CS0162 // 检测到无法访问的代码
 
             if (releaseResponse == null)
             {

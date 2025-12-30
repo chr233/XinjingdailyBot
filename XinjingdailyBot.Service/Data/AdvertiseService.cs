@@ -14,6 +14,7 @@ public sealed class AdvertiseService(
     IAdvertisePostService _advertisePostService,
     ISqlSugarClient context) : BaseService<Advertises>(context), IAdvertiseService
 {
+    /// <inheritdoc/>
     public Task CreateAdvertise(Message message)
     {
         var newAd = new Advertises {
@@ -35,6 +36,7 @@ public sealed class AdvertiseService(
         return Insertable(newAd).ExecuteCommandAsync();
     }
 
+    /// <inheritdoc/>
     public async Task<Advertises?> GetPostableAdvertise()
     {
         var ads = await Queryable()
@@ -81,6 +83,7 @@ public sealed class AdvertiseService(
         return randomAd;
     }
 
+    /// <inheritdoc/>
     public Task UpdateAdvertiseStatistics(Advertises ad)
     {
         return Updateable(ad).UpdateColumns(static x => new {

@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingdailyBot.Infrastructure.Attribute;
@@ -15,6 +14,7 @@ using XinjingdailyBot.Repository;
 
 namespace XinjingdailyBot.Service.Bot.Handler;
 
+/// <inheritdoc cref="IChannelPostHandler"/>
 [AppService(typeof(IChannelPostHandler), LifeTime.Singleton)]
 public class ChannelPostHandler(
         ILogger<ChannelPostHandler> _logger,
@@ -29,6 +29,7 @@ public class ChannelPostHandler(
         IChannelService _channelService) : IChannelPostHandler
 {
 
+    /// <inheritdoc/>
     public async Task OnTextChannelPostReceived(Users dbUser, Message message)
     {
         if (string.IsNullOrEmpty(message.Text))
@@ -91,6 +92,7 @@ public class ChannelPostHandler(
         await _userService.UpdateUserPostCount(dbUser).ConfigureAwait(false);
     }
 
+    /// <inheritdoc/>
     public async Task OnMediaChannelPostReceived(Users dbUser, Message message)
     {
         var second = message.Chat.Id == _channelService.SecondChannel?.Id;
@@ -156,6 +158,7 @@ public class ChannelPostHandler(
     /// </summary>
     private ConcurrentDictionary<string, long> MediaGroupIDs { get; } = new();
 
+    /// <inheritdoc/>
     public async Task OnMediaGroupChannelPostReceived(Users dbUser, Message message)
     {
         string mediaGroupId = message.MediaGroupId!;

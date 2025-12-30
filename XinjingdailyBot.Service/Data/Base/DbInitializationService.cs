@@ -16,7 +16,7 @@ namespace XinjingdailyBot.Service.Data.Base;
 /// </remarks>
 /// <param name="_logger"></param>
 /// <param name="_options"></param>
-/// <param name="dbClient"></param>
+/// <param name="_dbClient"></param>
 public class DbInitializationService(
     ILogger<DbInitializationService> _logger,
     IOptions<OptionsSetting> _options,

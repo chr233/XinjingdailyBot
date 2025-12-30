@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
 using SqlSugar;
-using Telegram.Bot;
 using XinjingdailyBot.Infrastructure.Attribute;
 using XinjingdailyBot.Interface.Bot;
 using XinjingdailyBot.Interface.Data;
@@ -11,20 +10,13 @@ namespace XinjingdailyBot.Service.Data;
 
 /// <inheritdoc cref="IAdvertisePostService"/>
 [AppService(typeof(IAdvertisePostService), LifeTime.Transient)]
-public sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdvertisePostService
+public sealed class AdvertisePostsService(
+    ILogger<AdvertisePostsService> _logger,
+    ITelegramBotService _botClient,
+    ISqlSugarClient context) : BaseService<AdvertisePosts>(context), IAdvertisePostService
 {
-    private readonly ILogger<AdvertisePostsService> _logger;
-    private readonly ITelegramBotService _botClient;
 
-    public AdvertisePostsService(
-        ILogger<AdvertisePostsService> logger,
-        ITelegramBotService botClient,
-        ISqlSugarClient context) : base(context)
-    {
-        _logger = logger;
-        _botClient = botClient;
-    }
-
+    /// <inheritdoc/>
     public async Task DeleteOldAdPosts(Advertises advertises)
     {
         var oldPosts = await Queryable()
@@ -53,6 +45,7 @@ public sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdvert
         }
     }
 
+    /// <inheritdoc/>
     public async Task UnPinOldAdPosts(Advertises advertises)
     {
         var oldPosts = await Queryable()
@@ -81,6 +74,7 @@ public sealed class AdvertisePostsService : BaseService<AdvertisePosts>, IAdvert
         }
     }
 
+    /// <inheritdoc/>
     public async Task AddAdPost(Advertises ad, long chatId, int msgId)
     {
         var adpost = new AdvertisePosts {

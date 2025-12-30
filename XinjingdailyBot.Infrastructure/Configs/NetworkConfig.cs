@@ -1,4 +1,5 @@
 namespace XinjingdailyBot.Infrastructure.Configs;
+
 public sealed record NetworkConfig
 {
     public string? TelegramProxy { get; init; }

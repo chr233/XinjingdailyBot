@@ -54,22 +54,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="..\LICENSE.txt">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-			<Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-		</Content>
-	</ItemGroup>
-
-	<ItemGroup>
-		<Content Include="..\README.md">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-			<Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-		</Content>
-	</ItemGroup>
-
-	<ItemGroup>
 		<Content Update="config\nlog.config">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>

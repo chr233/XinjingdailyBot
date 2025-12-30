@@ -178,7 +178,7 @@ public abstract class BaseRepository<T> : SimpleClient<T>, IBaseRepository<T> wh
     {
         return Context.CopyNew().Queryable<T>();
     }
-    
+
     /// <summary>
     /// 根据主值查询单条数据
     /// </summary>

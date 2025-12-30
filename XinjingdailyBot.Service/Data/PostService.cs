@@ -435,7 +435,7 @@ public sealed class PostService(
 
                 //直接发布模式
                 bool directPost = dbUser.Right.HasFlag(EUserRights.DirectPost);
-                bool hasSpoiler = message.CanSpoiler() ? message.HasMediaSpoiler : false;
+                bool hasSpoiler = message.CanSpoiler() && message.HasMediaSpoiler;
 
                 //发送确认消息
                 cache.Keyboard = directPost ?
@@ -524,6 +524,7 @@ public sealed class PostService(
         }
     }
 
+    /// <inheritdoc/>
     public async Task SetPostTag(NewPosts post, int tagId, CallbackQuery callbackQuery)
     {
         var tag = _tagRepository.GetTagById(tagId);
