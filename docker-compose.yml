@@ -1,8 +1,0 @@
-version: '3.4'
-
-services:
-  xinjingdailybot.webapi:
-    image: ${DOCKER_REGISTRY-}xinjingdailybotwebapi
-    build:
-      context: .
-      dockerfile: XinjingdailyBot.WebAPI/Dockerfile

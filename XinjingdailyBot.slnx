@@ -48,7 +48,4 @@
       <BuildDependency Project="XinjingdailyBot.Service/XinjingdailyBot.Service.csproj" />
     </Project>
   </Folder>
-  <Project Path="docker-compose.dcproj">
-    <Build />
-  </Project>
 </Solution>
