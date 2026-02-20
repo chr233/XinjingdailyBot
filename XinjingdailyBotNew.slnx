@@ -11,6 +11,7 @@
   </Folder>
   <Folder Name="/2. 实体/">
     <Project Path="XinjingdailyBot.Data/XinjingdailyBot.Data.csproj" />
+    <Project Path="XinjingdailyBot.Entry/XinjingdailyBot.Entry.csproj" />
     <Project Path="XinjingdailyBot.Model/XinjingdailyBot.Model.csproj">
       <BuildDependency Project="XinjingdailyBot.Infrastructure/XinjingdailyBot.Infrastructure.csproj" />
     </Project>
