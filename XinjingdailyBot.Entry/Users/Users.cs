@@ -10,13 +10,20 @@ namespace XinjingdailyBot.Model.Models.Users;
 /// </summary>
 [SugarTable("xjb_user", TableDescription = "用户表")]
 [SugarIndex("index_username", nameof(UserName), OrderByType.Asc)]
+[SugarIndex("index_tg_id", nameof(TelegramId), OrderByType.Asc, true)]
 public sealed record Users : BaseModel, IModifyAt, ICreateAt
 {
     /// <summary>
-    /// 用户ID
+    /// 主键
     /// </summary>
-    [SugarColumn(IsPrimaryKey = true)]
+    [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public long Id { get; set; }
+
+    /// <summary>
+    /// Telegram用户ID, 通过Telegram API获取, 全局唯一
+    /// </summary>
+    public long TelegramId { get; set; }
+
     /// <summary>
     /// 用户名@
     /// </summary>
