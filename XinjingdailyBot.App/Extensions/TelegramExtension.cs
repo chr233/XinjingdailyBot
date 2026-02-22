@@ -1,5 +1,4 @@
 using XinjingdailyBot.Infrastructure;
-using XinjingdailyBot.Service.HostedService;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
 
@@ -59,6 +58,6 @@ public static class TelegramExtension
         //services.AddHostedService<PollingService>();
         //services.AddHostedService<StatisticService>();
 
-        services.AddHostedService<BotInitializationServices>();
+        //services.AddHostedService<BotInitializationServices>();
     }
 }

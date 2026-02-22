@@ -43,7 +43,8 @@
     "Port": 3306,
     "DbName": "xinjingdaily_db",
     "User": "root",
-    "Password": "root"
+    "Password": "root",
+    "TablePrefix": "xjb"
   },
   // 投稿设置
   "Post": {

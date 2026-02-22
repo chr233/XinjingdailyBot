@@ -6,9 +6,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
+		<PackageReference Include="Injectio" />
 		<PackageReference Include="NRedisStack" />
 		<PackageReference Include="StackExchange.Redis" />
-		<PackageReference Include="System.Private.Uri" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -18,6 +18,12 @@
 
 	<ItemGroup>
 		<None Include="..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Base\" />
+	  <Folder Include="LocalLow\" />
+	  <Folder Include="Services\" />
 	</ItemGroup>
 
 </Project>

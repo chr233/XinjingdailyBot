@@ -1,6 +1,7 @@
 using XinjingdailyBot.Infrastructure;
 
 namespace XinjingdailyBot.Controllers.Responses;
+
 public sealed record AboutResponse
 {
     public string? Message { get; init; }

@@ -7,7 +7,6 @@
 	<ItemGroup>
 		<PackageReference Include="SqlSugarCore" />
 		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
-		<PackageReference Include="System.Private.Uri" />
 	</ItemGroup>
 
 	<ItemGroup>

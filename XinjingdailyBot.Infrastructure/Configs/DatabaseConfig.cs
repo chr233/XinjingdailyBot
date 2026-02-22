@@ -1,4 +1,8 @@
 namespace XinjingdailyBot.Infrastructure.Options;
+
+/// <summary>
+/// 数据库设置
+/// </summary>
 public sealed record DatabaseConfig
 {
     /// <summary>
@@ -8,33 +12,35 @@ public sealed record DatabaseConfig
     /// <summary>
     /// 打印SQL日志
     /// </summary>
-    public bool LogSQL { get; init; }
+    public bool LogSql { get; init; }
     /// <summary>
     /// 数据库类型
     /// </summary>
     public string? Type { get; init; }
-    /// <summary>
-    /// 数据库连接字符串(DbType选Custom时生效)
+    /// <summary> 
+    /// 自定义数据库连接字符串 (DbType 为 Custom 时生效)
     /// </summary>
-    public string? ConnectionString { get; init; }
+    public string? CustomConnectionString { get; init; }
     /// <summary>
-    /// MySQL主机IP
+    /// 数据库主机IP
     /// </summary>
     public string? Host { get; init; }
     /// <summary>
-    /// MySQL主机端口
+    /// 数据库主机端口
     /// </summary>
     public uint Port { get; init; } = 3306;
     /// <summary>
-    /// MySQL数据库名称
+    /// 数据库名称 (Sqlite 数据库名称)
     /// </summary>
-    public string? DbName { get; init; }
+    public string? Database { get; init; }
     /// <summary>
-    /// MySQL用户名
+    /// 数据库用户名 (Sqlite忽略)
     /// </summary>
     public string? User { get; init; }
     /// <summary>
-    /// MySQL密码
+    /// 数据库密码 (Sqlite忽略)
     /// </summary>
     public string? Password { get; init; }
+
+    public string? TablePrefix { get; set; }
 }

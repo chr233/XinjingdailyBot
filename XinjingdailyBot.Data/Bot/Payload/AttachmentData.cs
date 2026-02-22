@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Telegram.Bot.Types.Enums;
 
 namespace XinjingdailyBot.Data.Bot.Payload;
+
 public sealed record AttachmentData
 {
     /// <summary>

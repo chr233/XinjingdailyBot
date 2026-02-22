@@ -4,7 +4,9 @@ using MySqlConnector;
 using Npgsql;
 using SqlSugar;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using XinjingdailyBot.Infrastructure;
+using XinjingdailyBot.Model.Columns;
 using XinjingdailyBot.Service.HostedService;
 
 namespace XinjingdailyBot.WebAPI.Extensions;
@@ -24,7 +26,7 @@ public static class DatabaseExtension
     [RequiresUnreferencedCode("不兼容剪裁")]
     public static void AddSqlSugarSetup(this IServiceCollection services)
     {
-        services.AddSingleton<ISqlSugarClient>(s => {
+        services.AddScoped<ISqlSugarClient>(s => {
             var config = s.GetRequiredService<IOptions<OptionSettings>>().Value.Database;
 
             var dbType = config.Type?.ToUpperInvariant() switch {
@@ -40,7 +42,7 @@ public static class DatabaseExtension
                 DbType.MySql => new MySqlConnectionStringBuilder {
                     Server = config.Host,
                     Port = config.Port,
-                    Database = config.DbName,
+                    Database = config.Database,
                     UserID = config.User,
                     Password = config.Password,
                     CharacterSet = "utf8mb4",
@@ -48,25 +50,25 @@ public static class DatabaseExtension
                 }.ToString(),
 
                 DbType.Sqlite => new SqliteConnectionStringBuilder {
-                    DataSource = $"{config.DbName}.db",
+                    DataSource = $"{config.Database}.db",
                 }.ToString(),
 
                 DbType.PostgreSQL => new NpgsqlConnectionStringBuilder {
                     Host = config.Host,
                     Port = (int)config.Port,
-                    Database = config.DbName,
+                    Database = config.Database,
                     Username = config.User,
                     Password = config.Password,
                 }.ToString(),
 
-                DbType.Custom => config.ConnectionString,
+                DbType.Custom => config.CustomConnectionString,
 
                 _ => null,
             };
 
-            if (string.IsNullOrEmpty(connStr))
+            if (string.IsNullOrEmpty(config.Database) || string.IsNullOrEmpty(connStr))
             {
-                _logger.Error("数据库配置有误, 请检查 DbType 和 DbConnectionString");
+                _logger.Error("数据库配置有误, 请检查 Database 节配置");
                 _logger.Info("按任意键退出...");
                 Console.ReadKey();
                 Environment.Exit(1);
@@ -81,35 +83,54 @@ public static class DatabaseExtension
                 _logger.Info("数据库连接: {0}", connStr.Replace(config.Password, "***"));
             }
 
-            var sqlSugar = new SqlSugarScope(new ConnectionConfig {
+            var sqlSugarConfig = new ConnectionConfig {
                 ConnectionString = connStr,
                 DbType = dbType,
                 IsAutoCloseConnection = true,
-            }, db => {
-                if (config.LogSQL)
-                {
-                    db.Aop.OnLogExecuting = (sql, pars) => {
-                        _logger.Debug("查询语句: {sql}", sql);
+            };
 
-                        if (pars != null && pars.Length > 0)
+            if (!string.IsNullOrEmpty(config.TablePrefix))
+            {
+                var externalService = new ConfigureExternalServices {
+                    EntityNameService = (type, entity) => {
+                        var attribute = type.GetCustomAttribute<SugarTable>(true);
+                        var tableName = attribute?.TableName ?? type.Name;
+                        entity.DbTableName = $"{config.TablePrefix}_{tableName}";
+                    }
+                };
+
+                sqlSugarConfig.ConfigureExternalServices = externalService;
+            }
+
+            var db = new SqlSugarClient(sqlSugarConfig);
+
+            if (config.LogSql)
+            {
+                db.Aop.OnLogExecuting = (sql, pars) => {
+                    _logger.Debug("查询语句: {sql}", sql);
+
+                    if (pars != null && pars.Length > 0)
+                    {
+                        List<string> values = [];
+                        foreach (var par in pars)
                         {
-                            List<string> values = [];
-                            foreach (var par in pars)
-                            {
-                                values.Add(string.Format("{0} = {1}", par.ParameterName, par.Value ?? "NULL"));
-                            }
-                            _logger.Debug("查询参数: {values}", string.Join(", ", values));
+                            values.Add(string.Format("{0} = {1}", par.ParameterName, par.Value ?? "NULL"));
                         }
+                        _logger.Debug("查询参数: {values}", string.Join(", ", values));
+                    }
 
-                    };
+                };
 
-                    db.Aop.OnLogExecuted = (_, _) => _logger.Trace("查询时间 {time} ms ", db.Ado.SqlExecutionTime.TotalMilliseconds);
+                db.Aop.OnLogExecuted = (_, _) => _logger.Trace("查询时间 {time} ms ", db.Ado.SqlExecutionTime.TotalMilliseconds);
 
-                    db.Aop.OnError = (e) => _logger.Error("执行SQL出错：", e);
-                }
-            });
+            }
 
-            return sqlSugar;
+            db.Aop.OnError = (e) => _logger.Error("执行SQL出错：", e);
+
+            // 2. 全局软删除过滤
+            db.QueryFilter.AddTableFilter<ISoftDelete>(t => t.IsDeleted == false);
+
+            return db;
         });
 
         services.AddHostedService<DbInitializationService>();

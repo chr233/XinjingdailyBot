@@ -1,11 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
 using StackExchange.Redis;
-using Telegram.Bot;
 using XinjingdailyBot.Controllers.Controllers.Base;
-using XinjingdailyBot.Model.Models;
 using XinjingdailyBot.Service.Common;
-using XinjingdailyBot.WebAPI.IPC.Responses;
 
 namespace XinjingdailyBot.Controllers.Controllers;
 

@@ -96,7 +96,7 @@ public class UpdateHandler(
     async Task<Message> Test(ITelegramBotClient botClient, Message msg)
     {
         var json = JsonSerializer.Serialize(msg, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull })[..1000];
-        return await botClient.SendMessage(msg.Chat, $"<code>{json}</code>",  ParseMode.Html,messageThreadId: msg.MessageThreadId);
+        return await botClient.SendMessage(msg.Chat, $"<code>{json}</code>", ParseMode.Html, messageThreadId: msg.MessageThreadId);
     }
 
     async Task<Message> SendPhoto(ITelegramBotClient botClient, Message msg)

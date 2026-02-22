@@ -1,4 +1,5 @@
 namespace XinjingdailyBot.Infrastructure.Enums;
+
 public enum EAnonymousType : byte
 {
     /// <summary>
