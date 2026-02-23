@@ -1,6 +1,6 @@
 using SqlSugar;
 
-namespace XinjingdailyBot.Entry.Entries.Rbac;
+namespace XinjingdailyBot.Entry.Entries.Users.Rbac;
 
 
 [SugarTable("claim", TableDescription = "权限表")]

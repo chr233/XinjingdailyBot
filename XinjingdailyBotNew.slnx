@@ -15,6 +15,7 @@
     <Project Path="XinjingdailyBot.Model/XinjingdailyBot.Model.csproj">
       <BuildDependency Project="XinjingdailyBot.Infrastructure/XinjingdailyBot.Infrastructure.csproj" />
     </Project>
+    <Project Path="XinjingdailyBot.ObsoleteEntry/XinjingdailyBot.ObsoleteEntry.csproj" Id="e942140a-404f-4406-b00d-483f9c07917b" />
     <Project Path="XinjingdailyBot.Repository/XinjingdailyBot.Repository.csproj">
       <BuildDependency Project="XinjingdailyBot.Infrastructure/XinjingdailyBot.Infrastructure.csproj" />
       <BuildDependency Project="XinjingdailyBot.Model/XinjingdailyBot.Model.csproj" />

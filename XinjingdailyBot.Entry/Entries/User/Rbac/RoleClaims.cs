@@ -1,6 +1,6 @@
 using SqlSugar;
 
-namespace XinjingdailyBot.Entry.Entries.System;
+namespace XinjingdailyBot.Entry.Entries.Users.Rbac;
 
 [SugarTable("role_claim", TableDescription = "角色权限表")]
 public sealed record RoleClaims

@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Http;
-using XinjingdailyBot.Model.Legacy;
-
 namespace XinjingdailyBot.Controllers;
 
 /// <summary>
@@ -13,20 +10,20 @@ public static class HttpContextAccessorExtension
     /// </summary>
     /// <param name="httpContextAccessor"></param>
     /// <returns></returns>
-    public static UsersLegacy GetUser(this IHttpContextAccessor httpContextAccessor)
-    {
-        UsersLegacy? user = null;
+    //public static UsersLegacy GetUser(this IHttpContextAccessor httpContextAccessor)
+    //{
+    //    UsersLegacy? user = null;
 
-        if (httpContextAccessor.HttpContext?.Items.TryGetValue("Users", out var obj) ?? false)
-        {
-            if (obj != null)
-            {
-                user = obj as UsersLegacy;
-            }
-        }
+    //    if (httpContextAccessor.HttpContext?.Items.TryGetValue("Users", out var obj) ?? false)
+    //    {
+    //        if (obj != null)
+    //        {
+    //            user = obj as UsersLegacy;
+    //        }
+    //    }
 
-        ArgumentNullException.ThrowIfNull(user);
+    //    ArgumentNullException.ThrowIfNull(user);
 
-        return user;
-    }
+    //    return user;
+    //}
 }

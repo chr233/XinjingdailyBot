@@ -8,7 +8,7 @@ namespace XinjingdailyBot.Entry.Entries.Users;
 /// 用户基础信息表
 /// </summary>
 [SugarTable("user_info", TableDescription = "用户基础信息表")]
-[SugarIndex("i_user_username", nameof(UserName), OrderByType.Asc)]
+[SugarIndex("i_user_username", nameof(TelegramName), OrderByType.Asc)]
 [SugarIndex("i_user_telegramid", nameof(TelegramId), OrderByType.Asc, true)]
 public sealed record UserInfos : IModifyAt, ICreateAt
 {
@@ -27,7 +27,7 @@ public sealed record UserInfos : IModifyAt, ICreateAt
     /// 用户名@
     /// </summary>
     [SugarColumn(IsNullable = true)]
-    public string? UserName { get; set; }
+    public string? TelegramName { get; set; }
     /// <summary>
     /// 用户昵称 姓
     /// </summary>
@@ -65,13 +65,13 @@ public sealed record UserInfos : IModifyAt, ICreateAt
     /// <returns></returns>
     public override string ToString()
     {
-        if (string.IsNullOrEmpty(UserName))
+        if (string.IsNullOrEmpty(TelegramName))
         {
             return $"{FullName}(#{Id})".EscapeHtml();
         }
         else
         {
-            return $"{FullName}(@{UserName})".EscapeHtml();
+            return $"{FullName}(@{TelegramName})".EscapeHtml();
         }
     }
 
@@ -83,13 +83,13 @@ public sealed record UserInfos : IModifyAt, ICreateAt
     {
         var nick = FullName.EscapeHtml();
 
-        if (string.IsNullOrEmpty(UserName))
+        if (string.IsNullOrEmpty(TelegramName))
         {
             return $"<a href=\"tg://user?id={Id}\">{nick}</a>";
         }
         else
         {
-            return $"<a href=\"https://t.me/{UserName}\">{nick}</a>";
+            return $"<a href=\"https://t.me/{TelegramName}\">{nick}</a>";
         }
     }
 

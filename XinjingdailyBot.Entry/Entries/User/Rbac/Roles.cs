@@ -1,8 +1,8 @@
 using SqlSugar;
 
-namespace XinjingdailyBot.Entry.Entries.System;
+namespace XinjingdailyBot.Entry.Entries.Users.Rbac;
 
-[SugarTable("role", TableDescription = "系统角色表")]
+[SugarTable("role", TableDescription = "角色表")]
 public sealed record Roles
 {
 

@@ -1,8 +1,8 @@
 using SqlSugar;
 
-namespace XinjingdailyBot.Entry.Entries.Rbac;
+namespace XinjingdailyBot.Entry.Entries.Users.Rbac;
 
-[SugarTable("user_claim", TableDescription = "用户角色表")]
+[SugarTable("user_claim", TableDescription = "用户权限表")]
 public sealed record class UserClaims
 {
     /// <summary>

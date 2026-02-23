@@ -8,7 +8,7 @@ namespace XinjingdailyBot.Entry.Entries.Posts;
 /// <summary>
 /// 新的稿件表
 /// </summary>
-[SugarTable("xjb_post", TableDescription = "投稿记录")]
+[SugarTable("post", TableDescription = "投稿记录")]
 public sealed record Posts : IModifyAt, ICreateAt
 {
     /// <summary>

@@ -1,6 +1,6 @@
 using SqlSugar;
 
-namespace XinjingdailyBot.Entry.Entries.Rbac;
+namespace XinjingdailyBot.Entry.Entries.Users.Rbac;
 
 /// <summary>
 /// 用户设置表
