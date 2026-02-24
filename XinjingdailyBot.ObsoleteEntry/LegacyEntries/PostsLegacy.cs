@@ -1,7 +1,7 @@
 using SqlSugar;
 using Telegram.Bot.Types.Enums;
+using XinjingdailyBot.Entry.Columns;
 using XinjingdailyBot.Infrastructure.Enums;
-using XinjingdailyBot.Model.Columns;
 
 namespace XinjingdailyBot.Model.Legacy;
 

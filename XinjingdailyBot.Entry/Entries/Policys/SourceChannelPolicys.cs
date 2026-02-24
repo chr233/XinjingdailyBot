@@ -1,13 +1,13 @@
 using SqlSugar;
+using XinjingdailyBot.Entry.Columns;
 using XinjingdailyBot.Infrastructure.Enums;
-using XinjingdailyBot.Model.Columns;
 
 namespace XinjingdailyBot.Entry.Entries.Policys;
 
 /// <summary>
 /// 来源频道设定
 /// </summary>
-[SugarTable("xjb_channel_option", TableDescription = "投稿来源频道设定")]
+[SugarTable("channel_option", TableDescription = "投稿来源频道设定")]
 [SugarIndex("co_channel_id", nameof(ChatId), OrderByType.Asc, true)]
 [SugarIndex("index_channel_name", nameof(ChatName), OrderByType.Asc, false)]
 public sealed record SourceChannelPolicys : ICreateAt, IModifyAt

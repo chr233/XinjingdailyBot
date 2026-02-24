@@ -1,24 +1,18 @@
 using SqlSugar;
 using Telegram.Bot.Types.Enums;
+using XinjingdailyBot.Entry.Columns;
 
-namespace XinjingdailyBot.Entry.Entries.Posts;
+namespace XinjingdailyBot.Entry.Entries.Chats;
 
-/// <summary>
-/// 投稿附件
-/// </summary>
-[SugarTable("post_attachment", TableDescription = "投稿附件")]
-[SugarIndex("index_post_id", nameof(PostId), OrderByType.Asc)]
-public sealed record PostAttachments
+[SugarTable("message_attachment", TableDescription = "聊天附件")]
+public sealed record MessageAttachments : ICreateAt
 {
     /// <summary>
     /// 主键
     /// </summary>
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
-    /// <summary>
-    /// PostInfo主键
-    /// </summary>
-    public long PostId { get; set; }
+
     /// <summary>
     /// 文件ID
     /// </summary>
@@ -55,4 +49,7 @@ public sealed record PostAttachments
     /// 消息类型
     /// </summary>
     public MessageType Type { get; set; } = MessageType.Unknown;
+
+    public DateTime CreateAt { get; set; }
+    public DateTime ModifyAt { get; set; }
 }

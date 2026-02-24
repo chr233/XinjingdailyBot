@@ -1,13 +1,13 @@
 using SqlSugar;
-using XinjingdailyBot.Model.Columns;
+using XinjingdailyBot.Entry.Columns;
 
-namespace XinjingdailyBot.Entry.Entries.Posts;
+namespace XinjingdailyBot.Entry.Entries.Channel;
 
 /// <summary>
 /// 来源频道设定
 /// </summary>
-[SugarTable("channel", TableDescription = "机器人频道")]
-public sealed record Channels : ICreateAt, IModifyAt
+[SugarTable("bot_channel", TableDescription = "投稿发布频道")]
+public sealed record BotChannels : ICreateAt, IModifyAt
 {
     /// <summary>
     /// 主键
@@ -17,21 +17,21 @@ public sealed record Channels : ICreateAt, IModifyAt
     /// <summary>
     /// 频道ID
     /// </summary>
-    public long ChannelId { get; set; }
+    public long TelegramId { get; set; }
     /// <summary>
     /// 频道ID @
     /// </summary>
     [SugarColumn(IsNullable = true)]
-    public string? ChannelName { get; set; }
+    public string? TelegranName { get; set; }
     /// <summary>
     /// 频道名称
     /// </summary>
-    [SugarColumn(IsNullable = true)]
-    public string? ChannelTitle { get; set; }
+    [SugarColumn(IsNullable = true, Length = 512)]
+    public string? Title { get; set; }
 
     public bool IsEnable { get; set; }
-    public bool IsPublish { get; set; }
-    public bool AllowInvite { get; set; }
+
+    public string? ShortName { get; set; }
 
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;

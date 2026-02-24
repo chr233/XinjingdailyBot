@@ -1,5 +1,5 @@
 using SqlSugar;
-using XinjingdailyBot.Model.Columns;
+using XinjingdailyBot.Entry.Columns;
 
 namespace XinjingdailyBot.Entry.Entries.Ads;
 

@@ -1,4 +1,4 @@
-namespace XinjingdailyBot.Model.Columns;
+namespace XinjingdailyBot.Entry.Columns;
 
 /// <summary>
 /// 修改时间

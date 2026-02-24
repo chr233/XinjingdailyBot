@@ -1,6 +1,6 @@
 using SqlSugar;
+using XinjingdailyBot.Entry.Columns;
 using XinjingdailyBot.Infrastructure.Extensions;
-using XinjingdailyBot.Model.Columns;
 
 namespace XinjingdailyBot.Model.Legacy;
 

@@ -5,8 +5,8 @@ using Npgsql;
 using SqlSugar;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using XinjingdailyBot.Entry.Columns;
 using XinjingdailyBot.Infrastructure;
-using XinjingdailyBot.Model.Columns;
 using XinjingdailyBot.Service.HostedService;
 
 namespace XinjingdailyBot.WebAPI.Extensions;

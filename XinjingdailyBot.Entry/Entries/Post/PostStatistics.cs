@@ -1,32 +1,33 @@
 using SqlSugar;
 using XinjingdailyBot.Entry.Columns;
 
-namespace XinjingdailyBot.Model.Legacy;
+namespace XinjingdailyBot.Entry.Entries.Posts;
 
 /// <summary>
-/// 广告消息表
+/// 新的稿件表
 /// </summary>
-[Obsolete]
-[SugarTable("review_status", TableDescription = "审核统计")]
-public sealed record ReviewStatusLegacy : IModifyAt, ICreateAt
+[SugarTable("post_statistic", TableDescription = "投稿统计")]
+public sealed record PostStatistics : IModifyAt, ICreateAt
 {
     /// <summary>
     /// 主键
     /// </summary>
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
+
     /// <summary>
-    /// 原会话ID
+    /// PostInfo主键
     /// </summary>
-    public long ChatID { get; set; }
-    /// <summary>
-    /// 原消息ID
-    /// </summary>
-    public long MessageID { get; set; }
-    /// <summary>
-    /// 是否被删除
-    /// </summary>
-    public bool Deleted { get; set; }
+    public int PostId { get; set; }
+
+    public int ViewCount { get; set; }
+
+    public int ReactionCount { get; set; }
+
+    public int PostiveReactionRate { get; set; }
+
+    public int ReplyCount { get; set; }
+
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;
     /// <inheritdoc cref="IModifyAt"/>

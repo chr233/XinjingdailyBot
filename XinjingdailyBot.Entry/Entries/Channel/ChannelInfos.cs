@@ -1,14 +1,13 @@
 using SqlSugar;
-using Telegram.Bot.Types.Enums;
-using XinjingdailyBot.Model.Columns;
+using XinjingdailyBot.Entry.Columns;
 
 namespace XinjingdailyBot.Entry.Entries.Posts;
 
 /// <summary>
 /// 来源频道设定
 /// </summary>
-[SugarTable("forward_policy", TableDescription = "频道来源设定")]
-public sealed record ForwardPolicies : ICreateAt, IModifyAt
+[SugarTable("channel_info", TableDescription = "机器人频道")]
+public sealed record ChannelInfos : ICreateAt, IModifyAt
 {
     /// <summary>
     /// 主键
@@ -18,33 +17,24 @@ public sealed record ForwardPolicies : ICreateAt, IModifyAt
     /// <summary>
     /// 频道ID
     /// </summary>
-    public long ChatId { get; set; }
+    public long TelegramId { get; set; }
     /// <summary>
     /// 频道ID @
     /// </summary>
     [SugarColumn(IsNullable = true)]
-    public string? ChannelName { get; set; }
+    public string? TelegranName { get; set; }
     /// <summary>
     /// 频道名称
     /// </summary>
-    [SugarColumn(IsNullable = true)]
+    [SugarColumn(IsNullable = true, Length = 512)]
     public string? Title { get; set; }
 
     /// <summary>
-    /// 来源类型 Channel / Group
+    /// 是否为公开频道
     /// </summary>
-    public ChatType Type { get; set; }
+    public bool IsPublish { get; set; }
 
-    /// <summary>
-    /// 禁止从该频道/群组转发消息
-    /// </summary>
-    public bool IsDeny { get; set; }
-
-    /// <summary>
-    /// 转发时去除来源
-    /// </summary>
-    public bool IsPureFrom { get; set; }
-
+    public bool IsEnable { get; set; }
 
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;

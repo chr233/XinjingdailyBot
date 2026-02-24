@@ -1,12 +1,12 @@
 using SqlSugar;
-using XinjingdailyBot.Model.Columns;
+using XinjingdailyBot.Entry.Columns;
 
 namespace XinjingdailyBot.Entry.Entries.Users;
 
 /// <summary>
 /// 用户设置表
 /// </summary>
-[SugarTable("xjb_user_setting", TableDescription = "用户设置表")]
+[SugarTable("user_setting", TableDescription = "用户设置表")]
 [SugarIndex("i_usersetting_userid", nameof(UserId), OrderByType.Asc, true)]
 public sealed record UserSettings : IModifyAt, ICreateAt
 {

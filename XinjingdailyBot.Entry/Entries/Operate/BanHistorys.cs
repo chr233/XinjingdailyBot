@@ -6,12 +6,9 @@ namespace XinjingdailyBot.Entry.Entries.Historys;
 /// <summary>
 /// 用户封禁记录
 /// </summary>
-[Obsolete]
-[SugarTable("xjb_ban_history", TableDescription = "用户w封禁记录户表")]
+[SugarTable("ban_history", TableDescription = "用户封禁记录户表")]
 [SugarIndex("index_userid", nameof(UserId), OrderByType.Asc)]
-[SugarIndex("index_operatorid", nameof(OperatorId), OrderByType.Asc)]
-[SugarIndex("index_userid_type", nameof(UserId), OrderByType.Asc, nameof(Type), OrderByType.Asc)]
-[SugarIndex("index_userid_bantime", nameof(UserId), OrderByType.Asc, nameof(BanTime), OrderByType.Desc)]
+[SugarIndex("index_operatorid", nameof(OperatorUserId), OrderByType.Asc)]
 public sealed record BanHistorys
 {
     /// <summary>
@@ -20,17 +17,19 @@ public sealed record BanHistorys
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
     /// <summary>
-    /// 用户ID
+    /// UserInfo主键
     /// </summary>
-    public long UserId { get; set; }
+    public int UserId { get; set; }
     /// <summary>
-    /// 执行封禁操作的管理员ID
+    /// UserInfo主键, 操作者Id
     /// </summary>
-    public long OperatorId { get; set; }
+    public int OperatorUserId { get; set; }
+
     /// <summary>
     /// 是否封禁 true: 封禁, false: 解封
     /// </summary>
     public EBanType Type { get; set; } = EBanType.UnBan;
+
     /// <summary>
     /// 封禁时间
     /// </summary>

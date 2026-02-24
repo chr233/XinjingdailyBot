@@ -1,16 +1,13 @@
 using SqlSugar;
 using XinjingdailyBot.Entry.Columns;
 
-namespace XinjingdailyBot.Model.Legacy;
+namespace XinjingdailyBot.Entry.Entries.Posts;
 
 /// <summary>
-/// 媒体组记录
+/// 新的稿件表
 /// </summary>
-[Obsolete]
-[SugarTable("post_group", TableDescription = "媒体组稿件记录")]
-[SugarIndex("index_msg", nameof(ChatId), OrderByType.Asc, nameof(MessageId), OrderByType.Asc)]
-[SugarIndex("index_groupid", nameof(MediaGroupId), OrderByType.Asc)]
-public sealed record MediaGroupsLegacy : ICreateAt
+[SugarTable("media_group_info", TableDescription = "投稿记录")]
+public sealed record MediaGroupInfos : ICreateAt
 {
     /// <summary>
     /// 主键
@@ -29,6 +26,7 @@ public sealed record MediaGroupsLegacy : ICreateAt
     /// 稿件ID
     /// </summary>
     public string MediaGroupId { get; set; } = "";
+
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;
 }

@@ -5,9 +5,9 @@ namespace XinjingdailyBot.Entry.Entries.Posts;
 /// <summary>
 /// 投稿标签
 /// </summary>
-[SugarTable("xjb_tag", TableDescription = "投稿标签")]
+[SugarTable("post_tag", TableDescription = "投稿标签")]
 [SugarIndex("payload", nameof(Payload), OrderByType.Asc, true)]
-public sealed record Tags
+public sealed record PostTags
 {
     /// <summary>
     /// 主键

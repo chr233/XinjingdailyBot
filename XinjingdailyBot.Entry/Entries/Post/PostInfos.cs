@@ -1,21 +1,22 @@
 using SqlSugar;
 using Telegram.Bot.Types.Enums;
+using XinjingdailyBot.Entry.Columns;
 using XinjingdailyBot.Infrastructure.Enums;
-using XinjingdailyBot.Model.Columns;
 
 namespace XinjingdailyBot.Entry.Entries.Posts;
 
 /// <summary>
 /// 新的稿件表
 /// </summary>
-[SugarTable("post", TableDescription = "投稿记录")]
-public sealed record Posts : IModifyAt, ICreateAt
+[SugarTable("post_info", TableDescription = "投稿记录")]
+public sealed record PostInfos : IModifyAt, ICreateAt
 {
     /// <summary>
     /// 主键
     /// </summary>
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
+
     /// <summary>
     /// 原始消息会话ID
     /// </summary>

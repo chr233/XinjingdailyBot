@@ -1,5 +1,5 @@
 using SqlSugar;
-using XinjingdailyBot.Model.Columns;
+using XinjingdailyBot.Entry.Columns;
 
 namespace XinjingdailyBot.Entry.Entries.Ads;
 
@@ -11,7 +11,7 @@ public sealed record Advertises : ICreateAt, IExpiredAt
 {
     /// <summary>
     /// 主键
-    /// </summary>
+    /// </summary> 
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
 
@@ -36,12 +36,6 @@ public sealed record Advertises : ICreateAt, IExpiredAt
     public bool IsPinBottom { get; set; }
 
     /// <summary>
-    /// 广告发布位置
-    /// </summary>
-    [SugarColumn(IsJson = true)]
-    public List<long> ChannelIds { get; set; } = null!;
-
-    /// <summary>
     /// 展示权重, 数值越大概率越高, 0为不展示
     /// </summary>
     public int Weight { get; set; }
@@ -51,10 +45,7 @@ public sealed record Advertises : ICreateAt, IExpiredAt
     /// </summary>
     public DateTime LastPostAt { get; set; } = DateTime.MinValue;
 
-    /// <summary>
-    /// 广告展示次数
-    /// </summary>
-    public uint ShowCount { get; set; }
+    public bool AutoDelete { get; set; }
 
     /// <summary>
     /// 外部链接1
