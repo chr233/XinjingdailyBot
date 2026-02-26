@@ -1,0 +1,42 @@
+{
+  "BotChatRepository": {
+    "Class": "XinjingDaily.Bot.Repository.Services.BotChatRepository",
+    "LifeTime": "Transient"
+  },
+  "RejectReasonRepository": {
+    "Class": "XinjingDaily.Bot.Repository.Repositorys.RejectReasonRepository",
+    "LifeTime": "Singleton"
+  },
+  "BotRepository": {
+    "Class": "XinjingDaily.Bot.Repository.Services.BotRepository",
+    "LifeTime": "Transient"
+  },
+  "BotManagerService": {
+    "Class": "XinjingDaily.Bot.Service.Common.BotManagerService",
+    "LifeTime": "Singleton"
+  },
+  "PostRepository": {
+    "Class": "XinjingDaily.Bot.Repository.Repositorys.PostRepository",
+    "LifeTime": "Transient"
+  },
+  "GroupRepository": {
+    "Class": "XinjingDaily.Bot.Repository.Repositorys.GroupRepository",
+    "LifeTime": "Singleton"
+  },
+  "TagRepository": {
+    "Class": "XinjingDaily.Bot.Repository.Repositorys.TagRepository",
+    "LifeTime": "Singleton"
+  },
+  "UpdateHandler": {
+    "Class": "XinjingDaily.Bot.Service.Bot.UpdateHandler",
+    "LifeTime": "Singleton"
+  },
+  "UserRepository": {
+    "Class": "XinjingDaily.Bot.Repository.Services.UserRepository",
+    "LifeTime": "Transient"
+  },
+  "LevelRepository": {
+    "Class": "XinjingDaily.Bot.Repository.Repositorys.LevelRepository",
+    "LifeTime": "Singleton"
+  }
+}

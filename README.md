@@ -1,24 +1,24 @@
-# Xinjingdaily Bot Telegram 投稿机器人
+# XinjingDaily Bot Telegram 投稿机器人
 
-![XinjingdailyBot](https://socialify.git.ci/chr233/XinjingdailyBot/image?description=1&font=Raleway&forks=1&language=1&name=1&owner=1&pattern=Circuit%20Board&stargazers=1&theme=Auto)
+![XinjingDaily.Bot](https://socialify.git.ci/chr233/XinjingDaily.Bot/image?description=1&font=Raleway&forks=1&language=1&name=1&owner=1&pattern=Circuit%20Board&stargazers=1&theme=Auto)
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/67ca08867b7a4afda91db3b70bcd303c)](https://www.codacy.com/gh/chr233/XinjingdailyBot/dashboard)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/chr233/XinjingdailyBot/publish.yml?logo=github)
-[![License](https://img.shields.io/github/license/chr233/XinjingdailyBot?logo=apache)](https://github.com/chr233/XinjingdailyBot/blob/master/license)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/67ca08867b7a4afda91db3b70bcd303c)](https://www.codacy.com/gh/chr233/XinjingDaily.Bot/dashboard)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/chr233/XinjingDaily.Bot/publish.yml?logo=github)
+[![License](https://img.shields.io/github/license/chr233/XinjingDaily.Bot?logo=apache)](https://github.com/chr233/XinjingDaily.Bot/blob/master/license)
 
-![GitHub Repo stars](https://img.shields.io/github/stars/chr233/XinjingdailyBot?style=flat&logo=github)
-![GitHub forks](https://img.shields.io/github/forks/chr233/XinjingdailyBot?style=flat&logo=github)
-[![GitHub Download](https://img.shields.io/github/downloads/chr233/XinjingdailyBot/total?logo=github)](https://img.shields.io/github/v/release/chr233/XinjingdailyBot)
+![GitHub Repo stars](https://img.shields.io/github/stars/chr233/XinjingDaily.Bot?style=flat&logo=github)
+![GitHub forks](https://img.shields.io/github/forks/chr233/XinjingDaily.Bot?style=flat&logo=github)
+[![GitHub Download](https://img.shields.io/github/downloads/chr233/XinjingDaily.Bot/total?logo=github)](https://img.shields.io/github/v/release/chr233/XinjingDaily.Bot)
 
-[![GitHub Release](https://img.shields.io/github/v/release/chr233/XinjingdailyBot?logo=github)](https://github.com/chr233/XinjingdailyBot/releases)
-[![GitHub Release](https://img.shields.io/github/v/release/chr233/XinjingdailyBot?include_prereleases&label=pre-release&logo=github)](https://github.com/chr233/XinjingdailyBot/releases)
-![GitHub last commit](https://img.shields.io/github/last-commit/chr233/XinjingdailyBot?logo=github)
+[![GitHub Release](https://img.shields.io/github/v/release/chr233/XinjingDaily.Bot?logo=github)](https://github.com/chr233/XinjingDaily.Bot/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/chr233/XinjingDaily.Bot?include_prereleases&label=pre-release&logo=github)](https://github.com/chr233/XinjingDaily.Bot/releases)
+![GitHub last commit](https://img.shields.io/github/last-commit/chr233/XinjingDaily.Bot?logo=github)
 
 [![爱发电](https://img.shields.io/badge/爱发电-chr__-ea4aaa.svg?logo=github-sponsors)](https://afdian.net/@chr233)
 
-## 心惊报 [@xinjingdaily](https://t.me/xinjingdaily) 自主开发的投稿机器人
+## 心惊报 [@XinjingDaily](https://t.me/XinjingDaily) 自主开发的投稿机器人
 
-心惊报投稿机器人 [@xinjingdaily_bot](https://t.me/xinjingdaily_bot)
+心惊报投稿机器人 [@XinjingDaily_bot](https://t.me/XinjingDaily_bot)
 
 承接定制开发, 功能修改
 
@@ -30,17 +30,17 @@
 
 ## 使用文档
 
-> 使用文档已迁移至 [Wiki](https://github.com/chr233/XinjingdailyBot/wiki/Customization.md)
+> 使用文档已迁移至 [Wiki](https://github.com/chr233/XinjingDaily.Bot/wiki/Customization.md)
 
 - 基础
-  - [首页](https://github.com/chr233/XinjingdailyBot/wiki/Home)
-  - [安装](https://github.com/chr233/XinjingdailyBot/wiki/Install)
-  - [配置](https://github.com/chr233/XinjingdailyBot/wiki/Configuration)
-  - [命令说明](https://github.com/chr233/XinjingdailyBot/wiki/Command)
+  - [首页](https://github.com/chr233/XinjingDaily.Bot/wiki/Home)
+  - [安装](https://github.com/chr233/XinjingDaily.Bot/wiki/Install)
+  - [配置](https://github.com/chr233/XinjingDaily.Bot/wiki/Configuration)
+  - [命令说明](https://github.com/chr233/XinjingDaily.Bot/wiki/Command)
 - 进阶
-  - [自定义](https://github.com/chr233/XinjingdailyBot/wiki/Customizatio)
+  - [自定义](https://github.com/chr233/XinjingDaily.Bot/wiki/Customizatio)
 - 信息
-  - [改动历史](https://github.com/chr233/XinjingdailyBot/wiki/ChangeLog)
+  - [改动历史](https://github.com/chr233/XinjingDaily.Bot/wiki/ChangeLog)
 
 ## 功能特性
 
@@ -69,6 +69,6 @@
 
 ## 衍生项目
 
-- [PagerMaid xinjingdailybot_ipc 插件](https://github.com/chr233/PagerMaid_Plugins_Pyro/tree/v2/xinjingdailybot_ipc) 使用 PagerMaid 自动转载频道投稿
+- [PagerMaid XinjingDailybot_ipc 插件](https://github.com/chr233/PagerMaid_Plugins_Pyro/tree/v2/XinjingDailybot_ipc) 使用 PagerMaid 自动转载频道投稿
 
 - [Mars Bot](https://github.com/MicroCBer/MarsBot) 图片/视频查重机器人

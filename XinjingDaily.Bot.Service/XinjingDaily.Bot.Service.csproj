@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Injectio" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+		<PackageReference Include="Microsoft.Extensions.Http" />
+		<PackageReference Include="SkiaSharp" />
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" />
+		<PackageReference Include="SkiaSharp.NativeAssets.macOS" />
+		<PackageReference Include="SkiaSharp.NativeAssets.Win32" />
+		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\XinjingDaily.Bot.Data\XinjingDaily.Bot.Data.csproj" />
+		<ProjectReference Include="..\XinjingDaily.Bot.Infrastructure\XinjingDaily.Bot.Infrastructure.csproj" />
+		<ProjectReference Include="..\XinjingDaily.Bot.Interface\XinjingDaily.Bot.Interface.csproj" />
+		<ProjectReference Include="..\XinjingDaily.Bot.Repository\XinjingDaily.Bot.Repository.csproj" />
+	</ItemGroup>
+
+</Project>

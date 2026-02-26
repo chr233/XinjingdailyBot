@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Xinjingdaily.Bot.Data\Xinjingdaily.Bot.Data.csproj" />
+		<ProjectReference Include="..\Xinjingdaily.Bot.Infrastructure\Xinjingdaily.Bot.Infrastructure.csproj" />
+		<ProjectReference Include="..\Xinjingdaily.Bot.Repository\Xinjingdaily.Bot.Repository.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
+
+</Project>

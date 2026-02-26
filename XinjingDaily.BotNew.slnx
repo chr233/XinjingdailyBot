@@ -1,0 +1,44 @@
+<Solution>
+  <Folder Name="/0. 杂项文件/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/1. 基础设施/">
+    <Project Path="XinjingDaily.Bot.Generator/XinjingDaily.Bot.Generator.csproj" />
+    <Project Path="XinjingDaily.Bot.Infrastructure/XinjingDaily.Bot.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/2. 实体/">
+    <Project Path="XinjingDaily.Bot.Data/XinjingDaily.Bot.Data.csproj" />
+    <Project Path="XinjingDaily.Bot.Entry/XinjingDaily.Bot.Entry.csproj" />
+    <Project Path="XinjingDaily.Bot.ObsoleteEntry/XinjingDaily.Bot.ObsoleteEntry.csproj" Id="e942140a-404f-4406-b00d-483f9c07917b" />
+  </Folder>
+  <Folder Name="/3. 仓储/">
+    <Project Path="XinjingDaily.Bot.IRepository/XinjingDaily.Bot.IRepository.csproj" Id="503d2e12-cfab-46b8-8d16-df8952152511" />
+    <Project Path="XinjingDaily.Bot.Repository/XinjingDaily.Bot.Repository.csproj">
+      <BuildDependency Project="XinjingDaily.Bot.Infrastructure/XinjingDaily.Bot.Infrastructure.csproj" />
+    </Project>
+  </Folder>
+  <Folder Name="/4. 服务/">
+    <Project Path="XinjingDaily.Bot.Command/XinjingDaily.Bot.Command.csproj" />
+    <Project Path="XinjingDaily.Bot.Interface/XinjingDaily.Bot.Interface.csproj">
+      <BuildDependency Project="XinjingDaily.Bot.Infrastructure/XinjingDaily.Bot.Infrastructure.csproj" />
+      <BuildDependency Project="XinjingDaily.Bot.Repository/XinjingDaily.Bot.Repository.csproj" />
+    </Project>
+    <Project Path="XinjingDaily.Bot.Service/XinjingDaily.Bot.Service.csproj">
+      <BuildDependency Project="XinjingDaily.Bot.Infrastructure/XinjingDaily.Bot.Infrastructure.csproj" />
+      <BuildDependency Project="XinjingDaily.Bot.Interface/XinjingDaily.Bot.Interface.csproj" />
+      <BuildDependency Project="XinjingDaily.Bot.Repository/XinjingDaily.Bot.Repository.csproj" />
+    </Project>
+    <Project Path="XinjingDaily.Bot.Tasks/XinjingDaily.Bot.Tasks.csproj" />
+  </Folder>
+  <Folder Name="/5. 控制器/">
+    <Project Path="XinjingDaily.Bot.Controllers/XinjingDaily.Bot.Controllers.csproj" />
+    <Project Path="XinjingDaily.Bot.SignalR/XinjingDaily.Bot.SignalR.csproj" />
+  </Folder>
+  <Folder Name="/6. 启动/">
+    <Project Path="XinjingDaily.Bot.App/XinjingDaily.Bot.App.csproj" />
+    <Project Path="XinjingDaily.Bot.Setup/XinjingDaily.Bot.Setup.csproj" />
+  </Folder>
+</Solution>
