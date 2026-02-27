@@ -1,20 +1,11 @@
-using NLog.Extensions.Logging;
+using XinjingDaily.Bot.App.Extensions;
 using XinjingDaily.Bot.Infrastructure;
 using XinjingDaily.Bot.Infrastructure.Utils;
 using XinjingDaily.Bot.WebAPI.Extensions;
 
-const string banner = @"
-__  _ _             _  _            ___       _  _      
-\ \/ <_>._ _  ___  <_><_>._ _  ___ | . \ ___ <_>| | _ _ 
- \ \ | || ' |/ . | | || || ' |/ . || | |<_> || || || | |
-_/\_\|_||_|_|\_. | | ||_||_|_|\_. ||___/<___||_||_|`_. |
-             <___'<__'        <___'                <___'
-New
-"
-;
 
 Console.WriteLine(Langs.Line);
-Console.WriteLine(banner);
+Console.WriteLine(BuildInfo.Banner);
 Console.WriteLine(Langs.Line);
 Console.WriteLine("框架: {0}", BuildInfo.FrameworkName);
 Console.WriteLine("版本: {0} {1} {2}", BuildInfo.Version, BuildInfo.Configuration, BuildInfo.Variant);
@@ -24,7 +15,7 @@ Console.WriteLine("源码: {0}", BuildInfo.Repo);
 Console.WriteLine(Langs.Line);
 Console.WriteLine("欢迎使用 XinjingDaily.Bot");
 Console.WriteLine(Langs.Line);
-Console.WriteLine("欢迎订阅心惊报 https://t.me/XinjingDaily");
+Console.WriteLine("欢迎订阅心惊报 https://t.me/xinjingdaily");
 Console.WriteLine(Langs.Line);
 
 #if !DEBUG
@@ -39,13 +30,7 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 
 // NLog
-services.AddLogging(loggingBuilder => {
-    loggingBuilder.ClearProviders();
-#if !DEBUG
-    loggingBuilder.SetMinimumLevel(LogLevel.Debug);
-#endif
-    loggingBuilder.AddNLog("nlog.config");
-});
+services.AddNLogEx();
 
 // 配置类支持
 builder.AddCustomJsonFiles();

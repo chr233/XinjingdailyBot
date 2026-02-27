@@ -7,22 +7,27 @@ namespace XhhControlSystem.Server.Extensions;
 /// </summary>
 public static class SignalRExtension
 {
-    /// <summary>
-    /// 添加SignalR服务
-    /// </summary>
-    /// <param name="services"></param>
-    public static void AddSignalREx(this IServiceCollection services)
+    extension(IServiceCollection services)
     {
-        services.AddSignalR();//.AddMessagePackProtocol();
+        /// <summary>
+        /// 添加SignalR服务
+        /// </summary>
+        /// <param name="services"></param>
+        public void AddSignalREx()
+        {
+            services.AddSignalR();//.AddMessagePackProtocol();
+        }
     }
 
-
-    /// <summary>
-    /// 注册SignalR Hub
-    /// </summary>
-    /// <param name="app"></param>
-    public static void UseSignalRHub(this WebApplication app)
+    extension(WebApplication app)
     {
-        app.MapHub<PluginHub>("/plugin");
+        /// <summary>
+        /// 注册SignalR Hub
+        /// </summary>
+        /// <param name="app"></param>
+        public void UseSignalRHub()
+        {
+            app.MapHub<PluginHub>("/plugin");
+        }
     }
 }

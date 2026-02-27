@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Options;
+using System.Text.Json;
 using System.Text.Json.Serialization;
+using XinjingDaily.Bot.Controllers.Middleware;
 using XinjingDaily.Bot.Infrastructure;
 
 namespace XinjingDaily.Bot.WebAPI.Extensions;
@@ -8,7 +10,7 @@ namespace XinjingDaily.Bot.WebAPI.Extensions;
 /// <summary>
 /// WebAPI扩展
 /// </summary>
-public static class WebAPIExtension
+public static class WebApiExtension
 {
     /// <summary>
     /// 注册WebAPI
@@ -17,9 +19,6 @@ public static class WebAPIExtension
     /// <param name="webHost"></param>
     public static void AddWebAPI(this IServiceCollection services, IWebHostBuilder webHost)
     {
-        // 设置最大文件上传尺寸
-        webHost.UseKestrel(options => options.Limits.MaxRequestBodySize = 1073741824);
-
         // 响应缓存
         services.AddResponseCaching();
 
@@ -33,7 +32,19 @@ public static class WebAPIExtension
         services.AddSwaggerEx();
 
         // 控制器
-        services.AddControllers().AddJsonOptions(static o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+        var mvcBuilder = services.AddControllers();
+
+        // 设置Json序列化行为
+        mvcBuilder.AddJsonOptions(static o => {
+            var option = o.JsonSerializerOptions;
+
+            option.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            option.WriteIndented = false;
+            option.NumberHandling = JsonNumberHandling.AllowReadingFromString;
+            option.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            option.PropertyNameCaseInsensitive = false;
+            option.ReadCommentHandling = JsonCommentHandling.Skip;
+        });
 
         // 注册服务
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -41,7 +52,11 @@ public static class WebAPIExtension
         //获取客户端 IP
         services.Configure<ForwardedHeadersOptions>(o => {
             o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+#if NET10_0_OR_GREATER
+            o.KnownIPNetworks.Clear();
+#else 
             o.KnownNetworks.Clear();
+#endif
             o.KnownProxies.Clear();
         });
     }
@@ -80,6 +95,12 @@ public static class WebAPIExtension
         }
 
         app.UseStatusCodePages();
+
+        //app.UseAuthentication();
+        //app.UseAuthorization();
+
+        // 添加自定义中间件
+        app.UseMiddleware<ErrorHandlingMiddleware>();
 
         // 控制器
         app.MapControllers();

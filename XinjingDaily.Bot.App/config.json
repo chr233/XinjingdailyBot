@@ -46,6 +46,22 @@
     "Password": "root",
     "TablePrefix": "xjb"
   },
+  // Redis设置
+  "Redis": {
+    "Host": "127.0.0.1",
+    "Port": 6379,
+    "Password": null,
+    "DefaultDatabase": 3,
+    "Ssl": false,
+    "SslHost": null,
+    "KeyPrefix": "xjb",
+    "ConnectTimeout": 5000,
+    "SyncTimeout": 5000,
+    "AsyncTimeout": 5000,
+    "ConnectRetry": 5,
+    "KeepAlive": 60
+  },
+
   // 投稿设置
   "Post": {
     "EnablePostLimit": true,

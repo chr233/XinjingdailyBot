@@ -8,7 +8,7 @@ public sealed record ChatInfos
     [SugarColumn(IsIdentity = true, IsPrimaryKey = true)]
     public int Id { get; set; }
 
-    public int TelegramId { get; set; }
+    public long TelegramId { get; set; }
 
     [SugarColumn(IsNullable = true)]
     public string? TelegramName { get; set; }

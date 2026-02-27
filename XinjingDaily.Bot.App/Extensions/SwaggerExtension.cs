@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+using Scalar.AspNetCore;
 using XinjingDaily.Bot.Infrastructure;
 
 namespace XinjingDaily.Bot.WebAPI.Extensions;
@@ -17,7 +19,7 @@ public static class SwaggerExtension
         services.AddEndpointsApiExplorer();
 
         services.AddOpenApiDocument(static o => {
-            o.Title = "XinjingDaily.Bot API";
+            o.Title = BuildInfo.AppName.Replace('.', '_');
             o.Description = BuildInfo.Copyright;
         });
     }
@@ -28,13 +30,13 @@ public static class SwaggerExtension
     /// <param name="app"></param>
     public static void UseSwaggerEx(this WebApplication app)
     {
-        app.MapOpenApi();
+        var optionsAccessor = app.Services.GetService<IOptions<OptionSettings>>();
+        if (optionsAccessor == null || !optionsAccessor.Value.System.Swagger)
+        {
+            return;
+        }
 
-        app.UseOpenApi();
-        app.UseSwaggerUi(static o => {
-            o.DocExpansion = "list";
-            o.EnableTryItOut = true;
-        });
-        app.UseReDoc();
+        app.UseOpenApi(static o => o.Path = "/openapi/{documentName}.json");
+        app.MapScalarApiReference("/swagger");
     }
 }

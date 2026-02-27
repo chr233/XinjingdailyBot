@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System.Net;
-using XinjingDaily.Bot.WebAPI.IPC.Responses;
+using XinjingDaily.Bot.Controllers.Responses;
 
 namespace XinjingDaily.Bot.Controllers.Authorization;
 
@@ -35,21 +34,13 @@ public class VerifyAttribute : Attribute, IAsyncAuthorizationFilter
         var request = context.HttpContext.Request;
         if (!request.Headers.TryGetValue(HeaderName, out var token) && !request.Query.TryGetValue(QueryName, out token))
         {
-            context.Result = new JsonResult(new GenericResponse {
-                Code = HttpStatusCode.Unauthorized,
-                Success = false,
-                Message = "Authorization header is missing",
-            });
+            context.Result = new JsonResult(GenericResponse.AuthorizeParamMissingResponse);
             return;
         }
 
         if (!Guid.TryParse(token, out var guid))
         {
-            context.Result = new JsonResult(new GenericResponse {
-                Code = HttpStatusCode.Unauthorized,
-                Success = false,
-                Message = "Invalid authorization key",
-            });
+            context.Result = new JsonResult(GenericResponse.AuthorizeFailedResponse);
             return;
         }
 

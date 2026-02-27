@@ -20,6 +20,9 @@ public sealed record OptionSettings
     /// <inheritdoc cref="MessageOption"/>
     public MessageOption Message { get; set; } = new();
 
+    /// <inheritdoc cref="RedisConfig"/>
+    public RedisConfig Redis { get; set; } = new();
+
     /// <inheritdoc cref="DatabaseConfig"/>
     public DatabaseConfig Database { get; set; } = new();
 

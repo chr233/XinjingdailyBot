@@ -7,18 +7,21 @@ namespace XinjingDaily.Bot.WebAPI.Extensions;
 /// </summary>
 public static class OptionsExtension
 {
-    /// <summary>
-    /// 添加自定义配置文件
-    /// </summary>
-    /// <param name="builder"></param>
-    public static void AddCustomJsonFiles(this WebApplicationBuilder builder)
+    extension(WebApplicationBuilder builder)
     {
-        var config = builder.Configuration
-            .AddJsonFile("config.json", false, false)
-            .AddEnvironmentVariables()
-            .AddUserSecrets<Program>()
-            .Build();
+        /// <summary>
+        /// 添加自定义配置文件
+        /// </summary>
+        /// <param name="builder"></param>
+        public void AddCustomJsonFiles()
+        {
+            var config = builder.Configuration
+                .AddJsonFile("config.json", false, false)
+                .AddEnvironmentVariables()
+                .AddUserSecrets<Program>()
+                .Build();
 
-        builder.Services.Configure<OptionSettings>(config);
+            builder.Services.Configure<OptionSettings>(config);
+        }
     }
 }

@@ -15,8 +15,6 @@
 		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
 		<PackageReference Include="NLog.Extensions.Logging" />
 		<PackageReference Include="Quartz.AspNetCore" />
-		<PackageReference Include="Swashbuckle.AspNetCore" />
-		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -28,12 +26,9 @@
 		<ProjectReference Include="..\XinjingDaily.Bot.Entry\XinjingDaily.Bot.Entry.csproj" />
 		<ProjectReference Include="..\XinjingDaily.Bot.Infrastructure\XinjingDaily.Bot.Infrastructure.csproj" />
 		<ProjectReference Include="..\XinjingDaily.Bot.Interface\XinjingDaily.Bot.Interface.csproj" />
+		<ProjectReference Include="..\XinjingDaily.Bot.IRepository\XinjingDaily.Bot.IRepository.csproj" />
 		<ProjectReference Include="..\XinjingDaily.Bot.Repository\XinjingDaily.Bot.Repository.csproj" />
 		<ProjectReference Include="..\XinjingDaily.Bot.Service\XinjingDaily.Bot.Service.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Middlewares\" />
 	</ItemGroup>
 
 </Project>

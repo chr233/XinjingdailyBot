@@ -8,30 +8,33 @@ namespace XinjingDaily.Bot.WebAPI.Extensions;
 /// </summary>
 public static class KestrelExtension
 {
-    /// <summary>
-    /// 设置Kestrel
-    /// </summary>
-    /// <param name="webHost"></param>
-    public static void SetupKestrel(this IWebHostBuilder webHost)
+    extension(IWebHostBuilder webHost)
     {
+        /// <summary>
+        /// 设置Kestrel
+        /// </summary>
+        /// <param name="webHost"></param>
+        public void SetupKestrel()
+        {
 
-        webHost.UseKestrel(o => {
-            // 设置最大文件上传尺寸
-            o.Limits.MaxRequestBodySize = 500000000;
+            webHost.UseKestrel(o => {
+                // 设置最大文件上传尺寸
+                o.Limits.MaxRequestBodySize = 30000000;
 
-            var services = o.ApplicationServices;
+                var services = o.ApplicationServices;
 
-            // 设置 Http 监听地址
-            var apiOption = services.GetRequiredService<IOptions<OptionSettings>>().Value;
-            var port = apiOption.System.HttpPort;
+                // 设置 Http 监听地址
+                var apiOption = services.GetRequiredService<IOptions<OptionSettings>>().Value;
+                var port = apiOption.System.HttpPort;
 
-            if (port < 1024)
-            {
-                var _logger = NLog.LogManager.GetCurrentClassLogger();
-                _logger.Warn("Api.Port 不建议低于 1024, 当前设置: {port}", port);
-            }
+                if (port < 1024)
+                {
+                    var _logger = NLog.LogManager.GetCurrentClassLogger();
+                    _logger.Warn("System.Port 不建议低于 1024, 当前设置: {port}", port);
+                }
 
-            o.ListenAnyIP(port);
-        });
+                o.ListenAnyIP(port);
+            });
+        }
     }
 }

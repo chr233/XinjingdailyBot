@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using XinjingDaily.Bot.Infrastructure.Options;
 
@@ -9,32 +8,27 @@ public sealed class DatabaseConfigJsonConverter : JsonConverter<DatabaseConfig>
 {
     public override DatabaseConfig? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var safeOptions = CreateOptionsWithoutThis(options);
-        return JsonSerializer.Deserialize<DatabaseConfig>(ref reader, safeOptions);
+        return JsonSerializer.Deserialize<DatabaseConfig>(ref reader);
     }
 
     public override void Write(Utf8JsonWriter writer, DatabaseConfig value, JsonSerializerOptions options)
     {
-        var safeOptions = CreateOptionsWithoutThis(options);
-        var node = JsonSerializer.SerializeToNode(value, safeOptions) as JsonObject ?? [];
+        writer.WriteStartObject();
 
-        node[nameof(DatabaseConfig.Password)] = "***";
+        writer.WriteBoolean(nameof(DatabaseConfig.Generate), value.Generate);
+        writer.WriteBoolean(nameof(DatabaseConfig.LogSql), value.LogSql);
+        writer.WriteString(nameof(DatabaseConfig.Type), value.Type);
+        writer.WriteString(nameof(DatabaseConfig.CustomConnectionString), value.CustomConnectionString);
+        writer.WriteString(nameof(DatabaseConfig.Host), value.Host);
+        writer.WriteNumber(nameof(DatabaseConfig.Port), value.Port);
+        writer.WriteString(nameof(DatabaseConfig.Database), value.Database);
+        writer.WriteString(nameof(DatabaseConfig.User), value.User);
 
-        node.WriteTo(writer, safeOptions);
-    }
+        var password = string.IsNullOrEmpty(value.Password) ? null : "***";
 
-    private static JsonSerializerOptions CreateOptionsWithoutThis(JsonSerializerOptions options)
-    {
-        var safeOptions = new JsonSerializerOptions(options);
+        writer.WriteString(nameof(DatabaseConfig.Password), password);
+        writer.WriteString(nameof(DatabaseConfig.TablePrefix), value.TablePrefix);
 
-        for (var i = safeOptions.Converters.Count - 1; i >= 0; i--)
-        {
-            if (safeOptions.Converters[i] is DatabaseConfigJsonConverter)
-            {
-                safeOptions.Converters.RemoveAt(i);
-            }
-        }
-
-        return safeOptions;
+        writer.WriteEndObject();
     }
 }

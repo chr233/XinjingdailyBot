@@ -1,10 +1,9 @@
 using System.Collections.ObjectModel;
 using Telegram.Bot;
-using XinjingDaily.Bot.Infrastructure.Attribute;
 
 namespace XinjingDaily.Bot.Service.Common;
 
-[AppService(LifeTime.Singleton)]
+[RegisterSingleton]
 public sealed class BotManagerService
 {
     private Dictionary<int, ITelegramBotClient> telegremBots = [];

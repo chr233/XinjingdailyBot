@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.Net;
 using XinjingDaily.Bot.Controllers.Controllers.Base;
 using XinjingDaily.Bot.Controllers.Responses;
 using XinjingDaily.Bot.Infrastructure.Options;
-using XinjingDaily.Bot.WebAPI.IPC.Responses;
 
 namespace XinjingDaily.Bot.Controllers.Controllers;
 
@@ -37,12 +35,9 @@ public class RootController(IOptions<SystemConfig> _options) : AbstractControlle
     /// </summary>
     /// <returns></returns>
     [HttpGet("/Error")]
-    public ActionResult<GenericResponse<string>> Error()
+    public ActionResult<GenericResponse> Error()
     {
-        var response = new GenericResponse<IExceptionHandlerPathFeature> {
-            Code = HttpStatusCode.InternalServerError,
-            Success = false,
-        };
+        var response = GenericResponse.InternalErrorResponse;
 
         if (_options.Value.Debug)
         {

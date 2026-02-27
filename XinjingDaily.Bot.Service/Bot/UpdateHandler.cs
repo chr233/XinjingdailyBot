@@ -7,11 +7,10 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
-using XinjingDaily.Bot.Infrastructure.Attribute;
 
 namespace XinjingDaily.Bot.Service.Bot;
 
-[AppService(LifeTime.Singleton)]
+[RegisterSingleton]
 public class UpdateHandler(
     ILogger<UpdateHandler> _logger) : IUpdateHandler
 {
