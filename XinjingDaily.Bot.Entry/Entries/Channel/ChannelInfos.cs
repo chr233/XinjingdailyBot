@@ -4,9 +4,9 @@ using XinjingDaily.Bot.Entry.Columns;
 namespace XinjingDaily.Bot.Entry.Entries.Posts;
 
 /// <summary>
-/// 来源频道设定
+/// 发布频道表
 /// </summary>
-[SugarTable("channel_info", TableDescription = "机器人频道")]
+[SugarTable("channel_info", TableDescription = "发布频道")]
 public sealed record ChannelInfos : ICreateAt, IModifyAt
 {
     /// <summary>

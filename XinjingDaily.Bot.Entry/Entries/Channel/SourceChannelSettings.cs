@@ -6,8 +6,8 @@ namespace XinjingDaily.Bot.Entry.Entries.Channel;
 /// <summary>
 /// 来源频道设定
 /// </summary>
-[SugarTable("bot_channel", TableDescription = "投稿发布频道")]
-public sealed record BotChannels : ICreateAt, IModifyAt
+[SugarTable("source_channel_setting", TableDescription = "来源频道设定")]
+public sealed record SourceChannelSettings : ICreateAt, IModifyAt
 {
     /// <summary>
     /// 主键
@@ -29,9 +29,20 @@ public sealed record BotChannels : ICreateAt, IModifyAt
     [SugarColumn(IsNullable = true, Length = 512)]
     public string? Title { get; set; }
 
-    public bool IsEnable { get; set; }
+    /// <summary>
+    /// 是否为公开频道
+    /// </summary>
+    public bool IsPublish { get; set; }
 
-    public string? ShortName { get; set; }
+    /// <summary>
+    /// 是否自动拒绝频道投稿
+    /// </summary>
+    public bool IsAutoReject { get; set; }
+
+    /// <summary>
+    /// 允许投稿携带来源
+    /// </summary>
+    public bool IsKeepFrom { get; set; } = true;
 
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;

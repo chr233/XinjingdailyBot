@@ -9,7 +9,7 @@ namespace XinjingDaily.Bot.Repository.Channel;
 /// 频道设置仓储实现
 /// </summary>
 [RegisterScoped]
-public class ChannelSettingsRepository : RepositoryInt<ChannelSettings>, IChannelSettingsRepository
+public class ChannelSettingsRepository : RepositoryInt<SourceChannelSettings>, IChannelSettingsRepository
 {
     /// <summary>
     /// 构造函数

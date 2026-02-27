@@ -9,6 +9,9 @@ namespace XinjingDaily.Bot.Entry.Entries.Posts;
 /// 投稿基础信息表
 /// </summary>
 [SugarTable("post_info", TableDescription = "投稿基础信息")]
+[SugarIndex("i_post_info_posteruid", nameof(PosterUId), OrderByType.Asc)]
+[SugarIndex("i_post_info_status", nameof(Status), OrderByType.Asc)]
+[SugarIndex("i_post_info_createtime", nameof(CreateAt), OrderByType.Desc)]
 public sealed record PostInfos : IModifyAt, ICreateAt
 {
     /// <summary>

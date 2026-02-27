@@ -9,7 +9,7 @@ namespace XinjingDaily.Bot.Repository.Chat;
 /// 聊天信息仓储实现
 /// </summary>
 [RegisterScoped]
-public class ChatInfosRepository : RepositoryInt<ChatInfos>, IChatInfosRepository
+public class ChatInfosRepository : RepositoryInt<GroupInfos>, IChatInfosRepository
 {
     /// <summary>
     /// 构造函数

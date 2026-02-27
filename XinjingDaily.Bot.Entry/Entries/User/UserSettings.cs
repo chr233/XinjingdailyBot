@@ -31,6 +31,11 @@ public sealed record UserSettings : IModifyAt, ICreateAt
     /// </summary>
     public bool AllowNotification { get; set; }
 
+    /// <summary>
+    /// 当前佩戴的徽章ID
+    /// </summary>
+    public int CurrentBadgeId { get; set; } = 0;
+
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;
     /// <inheritdoc cref="IModifyAt"/>
