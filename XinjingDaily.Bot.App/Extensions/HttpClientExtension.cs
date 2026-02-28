@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using XinjingDaily.Bot.Infrastructure;
 
-namespace XinjingDaily.Bot.WebAPI.Extensions;
+namespace XinjingDaily.Bot.App.Extensions;
 
 /// <summary>
 /// HttpClient扩展

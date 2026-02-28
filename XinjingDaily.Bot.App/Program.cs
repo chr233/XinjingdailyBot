@@ -1,7 +1,6 @@
 using XinjingDaily.Bot.App.Extensions;
 using XinjingDaily.Bot.Infrastructure;
 using XinjingDaily.Bot.Infrastructure.Utils;
-using XinjingDaily.Bot.WebAPI.Extensions;
 
 
 Console.WriteLine(Langs.Line);
@@ -69,5 +68,8 @@ var app = builder.Build();
 
 // Web API
 app.UseWebAPI();
+
+// 尝试初始化服务
+await app.TryInitializeServicesAsync().ConfigureAwait(false);
 
 app.Run();

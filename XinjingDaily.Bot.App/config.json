@@ -40,19 +40,20 @@
     "Host": "localhost",
     "Port": 3306,
     "Database": "xinjingdaily_db",
+    "User": "root",
+    "Password": "root"
 
     //pgsql
     //"Type": "postgresql",
     //"Host": "localhost",
     //"Port": 5432,
     //"Database": "xinjingdaily_db",
+    //"User": "root",
+    //"Password": "root"
 
     //sqlite
     //"Type": "sqlite",
-    //"Database": "xinjingdaily_db",
-
-    "User": "root",
-    "Password": "root"
+    //"Database": "xinjingdaily_db"
   },
 
   // Redis设置

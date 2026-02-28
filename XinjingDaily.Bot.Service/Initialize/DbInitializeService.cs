@@ -1,35 +1,32 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SqlSugar;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using XinjingDaily.Bot.Infrastructure;
+using XinjingDaily.Bot.Interface.InitService;
 
-namespace XinjingDaily.Bot.Service.HostedService.Init;
+namespace XinjingDaily.Bot.Service.InitService;
 
 /// <summary>
-/// 消息接收服务
-/// </summary>
-/// <remarks>
-/// 消息接收服务
+/// 数据库初始化服务
 /// </remarks>
 /// <param name="_logger"></param>
-/// <param name="options"></param>
-/// <param name="dbClient"></param>
-public class DbInitHostedService(
-    ILogger<DbInitHostedService> _logger,
+public class DbInitializeService(
+    ILogger<DbInitializeService> _logger,
     IOptions<AppSettings> _options,
-    IServiceProvider _serviceProvider) : BackgroundService
+    IServiceProvider _serviceProvider) : IInitializeService
 {
+    public int Order => 1;
+
     /// <summary>
     /// 执行
     /// </summary>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [RequiresUnreferencedCode("不兼容剪裁")]
-    protected override Task ExecuteAsync(CancellationToken cancellationToken)
+    public Task<bool> InitializeAsync(CancellationToken cancellationToken)
     {
         var config = _options.Value.Database;
 
@@ -58,7 +55,7 @@ public class DbInitHostedService(
             _logger.LogWarning("数据库结构生成完毕, 建议禁用 Database.Generate 来加快启动速度");
         }
 
-        return Task.CompletedTask;
+        return Task.FromResult(true);
     }
 
     private void SafeCreateDatabase(ISqlSugarClient db)

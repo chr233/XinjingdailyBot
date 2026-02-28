@@ -5,9 +5,8 @@ using System.Text.Json;
 using XinjingDaily.Bot.Infrastructure;
 using XinjingDaily.Bot.Infrastructure.Convertor;
 using XinjingDaily.Bot.Infrastructure.Options;
-using XinjingDaily.Bot.Service.HostedService.Init;
 
-namespace XinjingDaily.Bot.WebAPI.Extensions;
+namespace XinjingDaily.Bot.App.Extensions;
 
 /// <summary>
 /// HttpClient扩展
@@ -130,8 +129,6 @@ public static class RedisExtension
 
                 return ConnectionMultiplexer.Connect(options);
             });
-
-            services.AddHostedService<RedisInitHostedService>();
         }
     }
 }

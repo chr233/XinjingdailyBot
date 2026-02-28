@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace XinjingDaily.Bot.WebAPI.Extensions;
+namespace XinjingDaily.Bot.App.Extensions;
 
 /// <summary>
 /// Telegram扩展

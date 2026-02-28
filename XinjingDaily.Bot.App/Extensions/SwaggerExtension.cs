@@ -2,7 +2,7 @@ using Microsoft.Extensions.Options;
 using Scalar.AspNetCore;
 using XinjingDaily.Bot.Infrastructure;
 
-namespace XinjingDaily.Bot.WebAPI.Extensions;
+namespace XinjingDaily.Bot.App.Extensions;
 
 /// <summary>
 /// Swagger扩展

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Options;
 using XinjingDaily.Bot.Infrastructure;
 
-namespace XinjingDaily.Bot.WebAPI.Extensions;
+namespace XinjingDaily.Bot.App.Extensions;
 
 /// <summary>
 /// WebAPI扩展

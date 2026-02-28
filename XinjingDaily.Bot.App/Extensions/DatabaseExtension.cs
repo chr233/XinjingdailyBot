@@ -9,9 +9,8 @@ using XinjingDaily.Bot.Entry.Columns;
 using XinjingDaily.Bot.Infrastructure;
 using XinjingDaily.Bot.Infrastructure.Convertor;
 using XinjingDaily.Bot.Infrastructure.Options;
-using XinjingDaily.Bot.Service.HostedService.Init;
 
-namespace XinjingDaily.Bot.WebAPI.Extensions;
+namespace XinjingDaily.Bot.App.Extensions;
 
 
 /// <summary>
@@ -154,8 +153,6 @@ public static class DatabaseExtension
 
                 return db;
             });
-
-            services.AddHostedService<DbInitHostedService>();
         }
     }
 }

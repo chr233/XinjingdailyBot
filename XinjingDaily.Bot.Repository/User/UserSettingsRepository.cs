@@ -16,3 +16,4 @@ namespace XinjingDaily.Bot.Repository.User;
 public class UserSettingsRepository(ISqlSugarClient db) : RepositoryInt<UserSettings>(db), IUserSettingRepository
 {
 }
+ 

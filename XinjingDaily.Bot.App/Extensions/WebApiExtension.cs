@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 using XinjingDaily.Bot.Controllers.Middleware;
 using XinjingDaily.Bot.Infrastructure;
 
-namespace XinjingDaily.Bot.WebAPI.Extensions;
+namespace XinjingDaily.Bot.App.Extensions;
 
 /// <summary>
 /// WebAPI扩展

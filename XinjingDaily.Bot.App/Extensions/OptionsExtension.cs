@@ -1,6 +1,6 @@
 using XinjingDaily.Bot.Infrastructure;
 
-namespace XinjingDaily.Bot.WebAPI.Extensions;
+namespace XinjingDaily.Bot.App.Extensions;
 
 /// <summary>
 /// 配置文件扩展

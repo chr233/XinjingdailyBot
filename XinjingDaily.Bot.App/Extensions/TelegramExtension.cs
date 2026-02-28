@@ -4,7 +4,7 @@ using Telegram.Bot;
 using XinjingDaily.Bot.Infrastructure;
 using XinjingDaily.Bot.Service.HostedService;
 
-namespace XinjingDaily.Bot.WebAPI.Extensions;
+namespace XinjingDaily.Bot.App.Extensions;
 
 /// <summary>
 /// Telegram扩展
