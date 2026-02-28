@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using StackExchange.Redis;
 using XinjingDaily.Bot.Infrastructure;
+using XinjingDaily.Bot.Interface.Bot;
 using XinjingDaily.Bot.Interface.InitService;
 
 namespace XinjingDaily.Bot.Service.InitService;
@@ -13,7 +13,7 @@ namespace XinjingDaily.Bot.Service.InitService;
 public class BotInitializeService(
     ILogger<BotInitializeService> _logger,
     IOptions<AppSettings> _options,
-    IConnectionMultiplexer _multiplexer) : IInitializeService
+    ITelegramBotService _botClient) : IInitializeService
 {
     public int Order => 10;
 
@@ -25,6 +25,10 @@ public class BotInitializeService(
     public async Task<bool> InitializeAsync(CancellationToken cancellationToken)
     {
         var config = _options.Value.Redis;
+
+        var me = await _botClient.GetMe();
+
+        _logger.LogWarning(me.ToString());
 
         //try
         //{

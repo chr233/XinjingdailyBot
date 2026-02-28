@@ -34,7 +34,7 @@ public static class NLogExtensions
 
                 // 创建彩色控制台目标
                 var consoleTarget = new ColoredConsoleTarget("coloredConsole") {
-                    Layout = "${level:format=FirstCharacter} ${time} [${logger:shortName=false}] ${message} ${exception:format=toString,Data}"
+                    Layout = "${level:format=FirstCharacter} ${time} [${logger:shortName=true}] ${message} ${exception:format=toString,Data}"
                 };
 
                 // 配置不同日志级别的颜色

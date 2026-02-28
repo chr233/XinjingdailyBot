@@ -12,7 +12,8 @@ public class TestController(
     public async Task<ActionResult> Set(string key = "test", string value = "123")
     {
         await _redisCache.SetAsync(key, value, TimeSpan.FromSeconds(30));
-        return Ok();
+        value = await _redisCache.GetAsync(key);
+        return Ok(value);
     }
 
     [HttpGet]
