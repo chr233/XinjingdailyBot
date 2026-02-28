@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using XinjingDaily.Bot.Infrastructure;
 
-namespace XinjingDaily.Bot.Service.HostedService;
+namespace XinjingDaily.Bot.Service.HostedService.Init;
 
 /// <summary>
 /// 消息接收服务
@@ -18,9 +18,9 @@ namespace XinjingDaily.Bot.Service.HostedService;
 /// <param name="_logger"></param>
 /// <param name="options"></param>
 /// <param name="dbClient"></param>
-public class DbInitializationService(
-    ILogger<DbInitializationService> _logger,
-    IOptions<OptionSettings> _options,
+public class DbInitHostedService(
+    ILogger<DbInitHostedService> _logger,
+    IOptions<AppSettings> _options,
     IServiceProvider _serviceProvider) : BackgroundService
 {
     /// <summary>
@@ -47,9 +47,7 @@ public class DbInitializationService(
             //创建数据表
             var assembly = Assembly.Load("XinjingDaily.Bot.Entry");
             var types = assembly.GetTypes()
-                .Where(x => x.GetCustomAttribute<SugarTable>() != null)
-                //.Where(x => x.GetCustomAttribute<ObsoleteAttribute>() == null)
-                ;
+                .Where(x => x.GetCustomAttribute<SugarTable>() != null);
 
             foreach (var type in types)
             {

@@ -7,13 +7,14 @@ namespace XinjingDaily.Bot.Entry.Entries.Posts;
 /// 发布频道表
 /// </summary>
 [SugarTable("channel_info", TableDescription = "发布频道")]
-public sealed record ChannelInfos : ICreateAt, IModifyAt
+public sealed record ChannelInfo : ICreateAt, IModifyAt
 {
     /// <summary>
     /// 主键
     /// </summary>
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
+    
     /// <summary>
     /// 频道ID
     /// </summary>
@@ -22,7 +23,7 @@ public sealed record ChannelInfos : ICreateAt, IModifyAt
     /// 频道ID @
     /// </summary>
     [SugarColumn(IsNullable = true)]
-    public string? TelegranName { get; set; }
+    public string? TelegramName { get; set; }
     /// <summary>
     /// 频道名称
     /// </summary>

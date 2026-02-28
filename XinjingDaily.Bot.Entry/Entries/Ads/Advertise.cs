@@ -7,7 +7,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Ads;
 /// 广告投放
 /// </summary>
 [SugarTable("advertise", TableDescription = "广告投放")]
-public sealed record Advertises : ICreateAt, IExpiredAt
+public sealed record Advertise : ICreateAt, IExpiredAt
 {
     /// <summary>
     /// 主键

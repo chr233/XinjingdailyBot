@@ -5,7 +5,7 @@ namespace XinjingDaily.Bot.WebAPI.Extensions;
 /// <summary>
 /// Telegram扩展
 /// </summary>
-public static class TaskExtension
+public static class QuartzExtension
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 

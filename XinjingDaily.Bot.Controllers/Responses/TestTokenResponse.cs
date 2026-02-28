@@ -1,6 +1,6 @@
 using XinjingDaily.Bot.Infrastructure.Enums;
 
-namespace XinjingDaily.Bot.WebAPI.IPC.Responses;
+namespace XinjingDaily.Bot.Controllers.Responses;
 
 /// <summary>
 /// 连接测试响应

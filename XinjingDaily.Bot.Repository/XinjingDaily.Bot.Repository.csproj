@@ -6,7 +6,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
-		<PackageReference Include="Injectio" />
+		<PackageReference Include="Injectio" PrivateAssets="all" />
 		<PackageReference Include="NRedisStack" />
 		<PackageReference Include="StackExchange.Redis" />
 	</ItemGroup>

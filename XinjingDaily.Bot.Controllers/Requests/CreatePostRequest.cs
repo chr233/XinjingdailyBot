@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Telegram.Bot.Types.Enums;
 
-namespace XinjingDaily.Bot.WebAPI.IPC.Requests;
+namespace XinjingDaily.Bot.Controllers.Requests;
 
 /// <summary>
 /// 投稿数据

@@ -18,7 +18,6 @@ public static class AppServiceExtensions
             services.AddXinjingDailyBotRepository();
             services.AddXinjingDailyBotService();
             services.AddXinjingDailyBotCommand();
-            services.AddXinjingDailyBotControllers();
         }
     }
 }

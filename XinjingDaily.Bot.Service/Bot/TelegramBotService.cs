@@ -1,0 +1,1050 @@
+using Microsoft.Extensions.Logging;
+using Telegram.Bot;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
+using XinjingDaily.Bot.Infrastructure.Extensions;
+using XinjingDaily.Bot.Interface.Bot;
+
+namespace XinjingDaily.Bot.Service.Bot;
+
+[RegisterSingleton]
+public class TelegramBotService(
+    ITelegramBotClient _botClient,
+    ILogger<TelegramBotService> _logger) : ITelegramBotService
+{
+    private ReplyParameters? CreateReplyParameters(Message? message)
+    {
+        if (message == null)
+        {
+            return null;
+        }
+        return new ReplyParameters {
+            AllowSendingWithoutReply = true,
+            MessageId = message.MessageId,
+        };
+    }
+
+    private ReplyParameters? CreateReplyParameters(int? messageId)
+    {
+        if (messageId == null)
+        {
+            return null;
+        }
+        return new ReplyParameters {
+            AllowSendingWithoutReply = true,
+            MessageId = messageId.Value,
+        };
+    }
+
+    /// <inheritdoc />
+    public Task<Message> AutoReply(
+        string text,
+        Message message,
+        ParseMode parsemode = ParseMode.None,
+        CancellationToken cancellationToken = default)
+    {
+        var replyParameters = new ReplyParameters {
+            AllowSendingWithoutReply = true,
+            MessageId = message.MessageId,
+        };
+        return _botClient.SendMessage(message.Chat, text, parseMode: parsemode, replyParameters: replyParameters, cancellationToken: cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task AutoReply(
+        string text,
+        CallbackQuery query,
+        bool showAlert = false,
+        CancellationToken cancellationToken = default)
+    {
+        return _botClient.AnswerCallbackQuery(query.Id, text, showAlert: showAlert, cancellationToken: cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<Message> EditMessageReplyMarkup(
+        ChatId chatId,
+        int messageId,
+        InlineKeyboardMarkup? replyMarkup = default,
+        string? businessConnectionId = default,
+        CancellationToken cancellationToken = default)
+    {
+        return _botClient.EditMessageReplyMarkup(chatId, messageId, replyMarkup, businessConnectionId, cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public Task<Message> EditMessageReplyMarkup(
+        Message message,
+        InlineKeyboardMarkup? replyMarkup = default,
+        string? businessConnectionId = default,
+        CancellationToken cancellationToken = default)
+    {
+        return _botClient.EditMessageReplyMarkup(message.Chat, message.Id, replyMarkup, businessConnectionId, cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public Task EditMessageReplyMarkup(
+        string inlineMessageId,
+        InlineKeyboardMarkup? replyMarkup = default,
+        string? businessConnectionId = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.EditMessageReplyMarkup(inlineMessageId, replyMarkup, businessConnectionId, cancellationToken);
+    }
+
+    /// <summary>
+    /// 删除消息Markup
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<Message> RemoveMessageReplyMarkup(
+        Message message,
+        CancellationToken cancellationToken = default)
+    {
+        return _botClient.EditMessageReplyMarkup(message.Chat, message.MessageId, null, cancellationToken: cancellationToken);
+    }
+
+    /// <summary>
+    /// 编辑消息
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="text"></param>
+    /// <param name="replyMarkup"></param>
+    /// <param name="parseMode"></param>
+    /// <param name="disableWebPagePreview"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<Message> EditMessageText(
+        Message message,
+        string text,
+        ParseMode parseMode = ParseMode.None,
+        bool disableWebPagePreview = false,
+        InlineKeyboardMarkup? replyMarkup = default,
+        CancellationToken cancellationToken = default)
+    {
+        var linkPreviewOptions = new LinkPreviewOptions {
+            IsDisabled = disableWebPagePreview,
+        };
+
+        return _botClient.EditMessageText(message.Chat, message.MessageId, text, parseMode: parseMode, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken);
+    }
+
+    /// <summary>
+    /// 编辑消息
+    /// </summary>
+    /// <param name="chatId"></param>
+    /// <param name="messageId"></param>
+    /// <param name="text"></param>
+    /// <param name="parseMode"></param>
+    /// <param name="disableWebPagePreview"></param>
+    /// <param name="replyMarkup"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<Message> EditMessageText(
+        ChatId chatId,
+        int messageId,
+        string text,
+        ParseMode parseMode = ParseMode.None,
+        bool disableWebPagePreview = false,
+        InlineKeyboardMarkup? replyMarkup = default,
+        CancellationToken cancellationToken = default)
+    {
+        var linkPreviewOptions = new LinkPreviewOptions {
+            IsDisabled = disableWebPagePreview,
+        };
+
+        return _botClient.EditMessageText(chatId, messageId, text, parseMode: parseMode, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken);
+    }
+
+    /// <summary>
+    /// 发送消息
+    /// </summary>
+    /// <param name="chatId"></param>
+    /// <param name="text"></param>
+    /// <param name="messageThreadId"></param>
+    /// <param name="replyToMessageId"></param>
+    /// <param name="parseMode"></param>
+    /// <param name="disableWebPagePreview"></param>
+    /// <param name="disableNotification"></param>
+    /// <param name="replyMarkup"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<Message> SendMessage(
+        long chatId,
+        string text,
+        int? messageThreadId = null,
+        int? replyToMessageId = null,
+        ParseMode parseMode = ParseMode.None,
+        bool disableWebPagePreview = false,
+        bool disableNotification = false,
+        InlineKeyboardMarkup? replyMarkup = default,
+        CancellationToken cancellationToken = default)
+    {
+        var linkPreviewOptions = new LinkPreviewOptions {
+            IsDisabled = disableWebPagePreview,
+        };
+
+        var replyParameters = replyToMessageId != null ? new ReplyParameters {
+            AllowSendingWithoutReply = true,
+            MessageId = replyToMessageId.Value,
+        } : null;
+
+        return _botClient.SendMessage(chatId, text, parseMode: parseMode, messageThreadId: messageThreadId, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, replyParameters: replyParameters, disableNotification: disableNotification, cancellationToken: cancellationToken);
+    }
+
+    /// <summary>
+    /// 发送消息
+    /// </summary>
+    /// <param name="chatId"></param>
+    /// <param name="text"></param>
+    /// <param name="messageThreadId"></param>
+    /// <param name="replyToMessageId"></param>
+    /// <param name="parseMode"></param>
+    /// <param name="disableWebPagePreview"></param>
+    /// <param name="disableNotification"></param>
+    /// <param name="replyMarkup"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<Message> SendMessage(
+        ChatId chatId,
+        string text,
+        int? messageThreadId,
+        int? replyToMessageId,
+        ParseMode parseMode = ParseMode.None,
+        bool disableWebPagePreview = false,
+        bool disableNotification = false,
+        InlineKeyboardMarkup? replyMarkup = default,
+        CancellationToken cancellationToken = default)
+    {
+        var linkPreviewOptions = new LinkPreviewOptions {
+            IsDisabled = disableWebPagePreview,
+        };
+
+        var replyParameters = replyToMessageId != null ? new ReplyParameters {
+            AllowSendingWithoutReply = true,
+            MessageId = replyToMessageId.Value,
+        } : null;
+
+        return _botClient.SendMessage(chatId, text, parseMode: parseMode, messageThreadId: messageThreadId, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, replyParameters: replyParameters, disableNotification: disableNotification, cancellationToken: cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<Message> SendMessage(
+        Chat chat,
+        string text,
+        int? messageThreadId = null,
+        int? replyToMessageId = null,
+        ParseMode parseMode = ParseMode.None,
+        bool disableWebPagePreview = false,
+        bool disableNotification = false,
+        InlineKeyboardMarkup? replyMarkup = default,
+        CancellationToken cancellationToken = default)
+    {
+        var linkPreviewOptions = new LinkPreviewOptions {
+            IsDisabled = disableWebPagePreview,
+        };
+
+        var replyParameters = replyToMessageId != null ? new ReplyParameters {
+            AllowSendingWithoutReply = true,
+            MessageId = replyToMessageId.Value,
+        } : null;
+
+        return _botClient.SendMessage(chat, text, parseMode: parseMode, messageThreadId: messageThreadId, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, replyParameters: replyParameters, disableNotification: disableNotification, cancellationToken: cancellationToken);
+    }
+
+    /// <summary>
+    /// 发送消息
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="text"></param>
+    /// <param name="parseMode"></param>
+    /// <param name="replyToMessage"></param>
+    /// <param name="disableWebPagePreview"></param>
+    /// <param name="disableNotification"></param>
+    /// <param name="replyMarkup"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<Message> SendMessage(
+
+        Message message,
+        string text,
+        ParseMode parseMode = ParseMode.None,
+        bool replyToMessage = false,
+        bool disableWebPagePreview = false,
+        bool disableNotification = false,
+        InlineKeyboardMarkup? replyMarkup = default,
+        CancellationToken cancellationToken = default)
+    {
+        var linkPreviewOptions = new LinkPreviewOptions {
+            IsDisabled = disableWebPagePreview,
+        };
+
+        var replyParameters = replyToMessage ? new ReplyParameters {
+            AllowSendingWithoutReply = true,
+            MessageId = message.MessageId,
+        } : null;
+
+        return _botClient.SendMessage(message.Chat, text, parseMode: parseMode, messageThreadId: message.Chat.IsForum ? message.MessageThreadId : null, replyMarkup: replyMarkup, replyParameters: replyParameters, linkPreviewOptions: linkPreviewOptions, disableNotification: disableNotification, cancellationToken: cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task DeleteMessage(
+      ChatId chatId,
+      int messageId,
+      CancellationToken cancellationToken = default
+  )
+    {
+        return _botClient.DeleteMessage(chatId, messageId, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task DeleteMessages(
+        ChatId chatId,
+        IEnumerable<int> messageIds,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.DeleteMessages(chatId, messageIds, cancellationToken);
+    }
+
+    /// <summary>
+    /// 发送命令回复
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="message"></param>
+    /// <param name="autoDelete">私聊始终不删除消息, 群聊中默认删除消息, 但可以指定不删除</param>
+    /// <param name="parsemode"></param>
+    /// <param name="replyMarkup"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task<Message> SendCommandReply(
+
+        string text,
+        Message message,
+        bool? autoDelete = null,
+        ParseMode parsemode = ParseMode.None,
+        ReplyMarkup? replyMarkup = null,
+        CancellationToken cancellationToken = default)
+    {
+        //私聊始终不删除消息, 群聊中默认删除消息, 但可以指定不删除
+        bool delete = (autoDelete != null ? autoDelete.Value : (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup)) && message.Chat.Type != ChatType.Private;
+
+        var replyParameters = new ReplyParameters {
+            AllowSendingWithoutReply = true,
+            MessageId = message.MessageId,
+        };
+        var linkPreviewOptions = new LinkPreviewOptions {
+            IsDisabled = true,
+        };
+
+        _logger.LogWarning("msg thread id :{id}", message.MessageThreadId);
+
+        var msg = await _botClient.SendMessage(message.Chat, text, parseMode: parsemode, messageThreadId: message.Chat.IsForum ? message.MessageThreadId : null,
+            replyParameters: replyParameters, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        if (delete)
+        {
+            _ = Task.Run(async () => {
+                await Task.Delay(TimeSpan.FromSeconds(30)).ConfigureAwait(false);
+                try
+                {
+                    await _botClient.DeleteMessage(msg.Chat, msg.MessageId, cancellationToken).ConfigureAwait(false);
+                }
+                catch
+                {
+                    _logger.LogError("删除消息 {messageId} 失败", msg.MessageId);
+                }
+            }, cancellationToken);
+        }
+
+        return msg;
+    }
+
+    /// <summary>
+    /// 发送会话状态
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="chatAction"></param>
+    /// <param name="threadId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task SendChatAction(
+
+        Message message,
+        ChatAction chatAction,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return _botClient.SendChatAction(message.Chat, chatAction, message.Chat.IsForum ? message.MessageThreadId : null, null, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "SendChatAction出错");
+            return Task.CompletedTask;
+        }
+    }
+
+    /// <summary>
+    /// 获取群成员状态
+    /// </summary>
+    /// <param name="chat"></param>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    public async Task<string> GetChatMemberStatus(
+        Chat? chat,
+        long userId)
+    {
+        string title = chat?.Title?.EscapeHtml() ?? "未设置群组";
+
+        string status;
+        if (chat != null)
+        {
+            try
+            {
+                var chatMember = await _botClient.GetChatMember(chat, userId).ConfigureAwait(false);
+                status = chatMember.Status switch {
+                    ChatMemberStatus.Creator or
+                    ChatMemberStatus.Administrator or
+                    ChatMemberStatus.Member or
+                    ChatMemberStatus.Left => "正常",
+                    ChatMemberStatus.Kicked => "封禁",
+                    ChatMemberStatus.Restricted => "受限",
+                    _ => "未知",
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "读取用户状态出错");
+                status = "出错";
+            }
+        }
+        else
+        {
+            status = "---";
+        }
+
+        return string.Format("{0}: {1}", title, status);
+    }
+
+    /// <inheritdoc />
+    public Task<TGFile> GetFile(string fileId, CancellationToken cancellationToken = default)
+    {
+        return _botClient.GetFile(fileId, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<Message> SendPhoto(
+        ChatId chatId,
+        InputFile photo,
+        string? caption = default,
+        ParseMode parseMode = default,
+        ReplyParameters? replyParameters = default,
+        ReplyMarkup? replyMarkup = default,
+        int? messageThreadId = default,
+        IEnumerable<MessageEntity>? captionEntities = default,
+        bool showCaptionAboveMedia = default,
+        bool hasSpoiler = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        string? messageEffectId = default,
+        string? businessConnectionId = default,
+        bool allowPaidBroadcast = default,
+        long? directMessagesTopicId = default,
+        SuggestedPostParameters? suggestedPostParameters = default,
+        CancellationToken cancellationToken = default)
+    {
+        return _botClient.SendPhoto(chatId, photo, caption, parseMode, replyParameters, replyMarkup, messageThreadId, captionEntities, showCaptionAboveMedia, hasSpoiler, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<Message> SendPhotoM(
+        ChatId chatId,
+        InputFile photo,
+        string? caption = default,
+        ParseMode parseMode = default,
+        Message? replyMessage = null,
+        ReplyMarkup? replyMarkup = default,
+        int? messageThreadId = default,
+        IEnumerable<MessageEntity>? captionEntities = default,
+        bool showCaptionAboveMedia = default,
+        bool hasSpoiler = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        string? messageEffectId = default,
+        string? businessConnectionId = default,
+        bool allowPaidBroadcast = default,
+        long? directMessagesTopicId = default,
+        SuggestedPostParameters? suggestedPostParameters = default,
+        CancellationToken cancellationToken = default)
+    {
+        var replyParameters = CreateReplyParameters(replyMessage);
+
+        return _botClient.SendPhoto(chatId, photo, caption, parseMode, replyParameters, replyMarkup, messageThreadId, captionEntities, showCaptionAboveMedia, hasSpoiler, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<Message> SendAudio(
+        ChatId chatId,
+        InputFile audio,
+        string? caption = default,
+        ParseMode parseMode = default,
+        ReplyParameters? replyParameters = default,
+        ReplyMarkup? replyMarkup = default,
+        int? duration = default,
+        string? performer = default,
+        string? title = default,
+        InputFile? thumbnail = default,
+        int? messageThreadId = default,
+        IEnumerable<MessageEntity>? captionEntities = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        string? messageEffectId = default,
+        string? businessConnectionId = default,
+        bool allowPaidBroadcast = default,
+        long? directMessagesTopicId = default,
+        SuggestedPostParameters? suggestedPostParameters = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.SendAudio(chatId, audio, caption, parseMode, replyParameters, replyMarkup, duration, performer, title, thumbnail, messageThreadId, captionEntities, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<Message> SendAudioM(
+        ChatId chatId,
+        InputFile audio,
+        string? caption = default,
+        ParseMode parseMode = default,
+        Message? replyMessage = null,
+        ReplyMarkup? replyMarkup = default,
+        int? duration = default,
+        string? performer = default,
+        string? title = default,
+        InputFile? thumbnail = default,
+        int? messageThreadId = default,
+        IEnumerable<MessageEntity>? captionEntities = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        string? messageEffectId = default,
+        string? businessConnectionId = default,
+        bool allowPaidBroadcast = default,
+        long? directMessagesTopicId = default,
+        SuggestedPostParameters? suggestedPostParameters = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var replyParameters = CreateReplyParameters(replyMessage);
+
+        return _botClient.SendAudio(chatId, audio, caption, parseMode, replyParameters, replyMarkup, duration, performer, title, thumbnail, messageThreadId, captionEntities, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<Message> SendDocument(
+        ChatId chatId,
+        InputFile document,
+        string? caption = default,
+        ParseMode parseMode = default,
+        ReplyParameters? replyParameters = default,
+        ReplyMarkup? replyMarkup = default,
+        InputFile? thumbnail = default,
+        int? messageThreadId = default,
+        IEnumerable<MessageEntity>? captionEntities = default,
+        bool disableContentTypeDetection = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        string? messageEffectId = default,
+        string? businessConnectionId = default,
+        bool allowPaidBroadcast = default,
+        long? directMessagesTopicId = default,
+        SuggestedPostParameters? suggestedPostParameters = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.SendDocument(chatId, document, caption, parseMode, replyParameters, replyMarkup, thumbnail, messageThreadId, captionEntities, disableContentTypeDetection, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<Message> SendDocumentM(
+        ChatId chatId,
+        InputFile document,
+        string? caption = default,
+        ParseMode parseMode = default,
+        Message? replyMessage = null,
+        ReplyMarkup? replyMarkup = default,
+        InputFile? thumbnail = default,
+        int? messageThreadId = default,
+        IEnumerable<MessageEntity>? captionEntities = default,
+        bool disableContentTypeDetection = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        string? messageEffectId = default,
+        string? businessConnectionId = default,
+        bool allowPaidBroadcast = default,
+        long? directMessagesTopicId = default,
+        SuggestedPostParameters? suggestedPostParameters = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var replyParameters = CreateReplyParameters(replyMessage);
+
+        return _botClient.SendDocument(chatId, document, caption, parseMode, replyParameters, replyMarkup, thumbnail, messageThreadId, captionEntities, disableContentTypeDetection, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<Message> SendVideo(
+        ChatId chatId,
+        InputFile video,
+        string? caption = default,
+        ParseMode parseMode = default,
+        ReplyParameters? replyParameters = default,
+        ReplyMarkup? replyMarkup = default,
+        int? duration = default,
+        int? width = default,
+        int? height = default,
+        InputFile? thumbnail = default,
+        int? messageThreadId = default,
+        IEnumerable<MessageEntity>? captionEntities = default,
+        bool showCaptionAboveMedia = default,
+        bool hasSpoiler = default,
+        bool supportsStreaming = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        string? messageEffectId = default,
+        string? businessConnectionId = default,
+        bool allowPaidBroadcast = default,
+        InputFile? cover = default,
+        int? startTimestamp = default,
+        long? directMessagesTopicId = default,
+        SuggestedPostParameters? suggestedPostParameters = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.SendVideo(chatId, video, caption, parseMode, replyParameters, replyMarkup, duration, width, height, thumbnail, messageThreadId, captionEntities, showCaptionAboveMedia, hasSpoiler, supportsStreaming, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, cover, startTimestamp, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<Message> SendVideoM(
+        ChatId chatId,
+        InputFile video,
+        string? caption = default,
+        ParseMode parseMode = default,
+        Message? replyMessage = default,
+        ReplyMarkup? replyMarkup = default,
+        int? duration = default,
+        int? width = default,
+        int? height = default,
+        InputFile? thumbnail = default,
+        int? messageThreadId = default,
+        IEnumerable<MessageEntity>? captionEntities = default,
+        bool showCaptionAboveMedia = default,
+        bool hasSpoiler = default,
+        bool supportsStreaming = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        string? messageEffectId = default,
+        string? businessConnectionId = default,
+        bool allowPaidBroadcast = default,
+        InputFile? cover = default,
+        int? startTimestamp = default,
+        long? directMessagesTopicId = default,
+        SuggestedPostParameters? suggestedPostParameters = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var replyParameters = CreateReplyParameters(replyMessage);
+
+        return _botClient.SendVideo(chatId, video, caption, parseMode, replyParameters, replyMarkup, duration, width, height, thumbnail, messageThreadId, captionEntities, showCaptionAboveMedia, hasSpoiler, supportsStreaming, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, cover, startTimestamp, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<Message[]> SendMediaGroup(
+        ChatId chatId,
+        IEnumerable<IAlbumInputMedia> media,
+        ReplyParameters? replyParameters = default,
+        int? messageThreadId = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        string? messageEffectId = default,
+        string? businessConnectionId = default,
+        bool allowPaidBroadcast = default,
+        long? directMessagesTopicId = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.SendMediaGroup(chatId, media, replyParameters, messageThreadId, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<Message[]> SendMediaGroupM(
+    ChatId chatId,
+    IEnumerable<IAlbumInputMedia> media,
+    Message? replyMessage = default,
+    int? messageThreadId = default,
+    bool disableNotification = default,
+    bool protectContent = default,
+    string? messageEffectId = default,
+    string? businessConnectionId = default,
+    bool allowPaidBroadcast = default,
+    long? directMessagesTopicId = default,
+    CancellationToken cancellationToken = default
+)
+    {
+        var replyParameters = CreateReplyParameters(replyMessage);
+
+        return _botClient.SendMediaGroup(chatId, media, replyParameters, messageThreadId, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<Message> SendVoice(
+        ChatId chatId,
+        InputFile voice,
+        string? caption = default,
+        ParseMode parseMode = default,
+        ReplyParameters? replyParameters = default,
+        ReplyMarkup? replyMarkup = default,
+        int? duration = default,
+        int? messageThreadId = default,
+        IEnumerable<MessageEntity>? captionEntities = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        string? messageEffectId = default,
+        string? businessConnectionId = default,
+        bool allowPaidBroadcast = default,
+        long? directMessagesTopicId = default,
+        SuggestedPostParameters? suggestedPostParameters = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.SendVoice(chatId, voice, caption, parseMode, replyParameters, replyMarkup, duration, messageThreadId, captionEntities, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+    }
+
+
+    /// <inheritdoc />
+    public Task<Message> SendVoiceM(
+        ChatId chatId,
+        InputFile voice,
+        string? caption = default,
+        ParseMode parseMode = default,
+        Message? replyMessage = default,
+        ReplyMarkup? replyMarkup = default,
+        int? duration = default,
+        int? messageThreadId = default,
+        IEnumerable<MessageEntity>? captionEntities = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        string? messageEffectId = default,
+        string? businessConnectionId = default,
+        bool allowPaidBroadcast = default,
+        long? directMessagesTopicId = default,
+        SuggestedPostParameters? suggestedPostParameters = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var replyParameters = CreateReplyParameters(replyMessage);
+
+        return _botClient.SendVoice(chatId, voice, caption, parseMode, replyParameters, replyMarkup, duration, messageThreadId, captionEntities, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<Message> SendAnimation(
+        ChatId chatId,
+        InputFile animation,
+        string? caption = default,
+        ParseMode parseMode = default,
+        ReplyParameters? replyParameters = default,
+        ReplyMarkup? replyMarkup = default,
+        int? duration = default,
+        int? width = default,
+        int? height = default,
+        InputFile? thumbnail = default,
+        int? messageThreadId = default,
+        IEnumerable<MessageEntity>? captionEntities = default,
+        bool showCaptionAboveMedia = default,
+        bool hasSpoiler = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        string? messageEffectId = default,
+        string? businessConnectionId = default,
+        bool allowPaidBroadcast = default,
+        long? directMessagesTopicId = default,
+        SuggestedPostParameters? suggestedPostParameters = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.SendAnimation(chatId, animation, caption, parseMode, replyParameters, replyMarkup, duration, width, height, thumbnail, messageThreadId, captionEntities, showCaptionAboveMedia, hasSpoiler, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<Message> SendAnimationM(
+        ChatId chatId,
+        InputFile animation,
+        string? caption = default,
+        ParseMode parseMode = default,
+        Message? replyMessage = default,
+        ReplyMarkup? replyMarkup = default,
+        int? duration = default,
+        int? width = default,
+        int? height = default,
+        InputFile? thumbnail = default,
+        int? messageThreadId = default,
+        IEnumerable<MessageEntity>? captionEntities = default,
+        bool showCaptionAboveMedia = default,
+        bool hasSpoiler = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        string? messageEffectId = default,
+        string? businessConnectionId = default,
+        bool allowPaidBroadcast = default,
+        long? directMessagesTopicId = default,
+        SuggestedPostParameters? suggestedPostParameters = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var replyParameters = CreateReplyParameters(replyMessage);
+
+        return _botClient.SendAnimation(chatId, animation, caption, parseMode, replyParameters, replyMarkup, duration, width, height, thumbnail, messageThreadId, captionEntities, showCaptionAboveMedia, hasSpoiler, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<MessageId> CopyMessage(
+        ChatId chatId,
+        ChatId fromChatId,
+        int messageId,
+        string? caption = default,
+        ParseMode parseMode = default,
+        ReplyParameters? replyParameters = default,
+        ReplyMarkup? replyMarkup = default,
+        int? messageThreadId = default,
+        IEnumerable<MessageEntity>? captionEntities = default,
+        bool showCaptionAboveMedia = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        bool allowPaidBroadcast = default,
+        int? videoStartTimestamp = default,
+        long? directMessagesTopicId = default,
+        SuggestedPostParameters? suggestedPostParameters = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.CopyMessage(chatId, fromChatId, messageId, caption, parseMode, replyParameters, replyMarkup, messageThreadId, captionEntities, showCaptionAboveMedia, disableNotification, protectContent, allowPaidBroadcast, videoStartTimestamp, directMessagesTopicId, suggestedPostParameters, null, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<MessageId[]> CopyMessages(
+        ChatId chatId,
+        ChatId fromChatId,
+        IEnumerable<int> messageIds,
+        bool removeCaption = default,
+        int? messageThreadId = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        long? directMessagesTopicId = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.CopyMessages(chatId, fromChatId, messageIds, removeCaption, messageThreadId, disableNotification, protectContent, directMessagesTopicId, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task RestrictChatMember(
+        ChatId chatId,
+        long userId,
+        ChatPermissions permissions,
+        bool useIndependentChatPermissions = default,
+        DateTime? untilDate = default,
+        CancellationToken cancellationToken = default)
+    {
+        return _botClient.RestrictChatMember(chatId, userId, permissions, useIndependentChatPermissions, untilDate, cancellationToken);
+    }
+
+
+    /// <inheritdoc />
+    public Task BanChatMember(
+       ChatId chatId,
+       long userId,
+       DateTime? untilDate = default,
+       bool revokeMessages = default,
+       CancellationToken cancellationToken = default)
+    {
+        return _botClient.BanChatMember(chatId, userId, untilDate, revokeMessages, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task UnbanChatMember(
+        ChatId chatId,
+        long userId,
+        bool onlyIfBanned = default,
+        CancellationToken cancellationToken = default)
+    {
+        return _botClient.UnbanChatMember(chatId, userId, onlyIfBanned, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<ChatInviteLink> CreateChatInviteLink(
+        ChatId chatId,
+        string? name = default,
+        DateTime? expireDate = default,
+        int? memberLimit = default,
+        bool createsJoinRequest = default,
+        CancellationToken cancellationToken = default)
+    {
+        return _botClient.CreateChatInviteLink(chatId, name, expireDate, memberLimit, createsJoinRequest, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task PinChatMessage(
+       ChatId chatId,
+       int messageId,
+       bool disableNotification = default,
+       string? businessConnectionId = default,
+       CancellationToken cancellationToken = default
+   )
+    {
+        return _botClient.PinChatMessage(chatId, messageId, disableNotification, businessConnectionId, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task UnpinChatMessage(
+        ChatId chatId,
+        int? messageId = default,
+        string? businessConnectionId = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.UnpinChatMessage(chatId, messageId, businessConnectionId, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task UnpinAllChatMessages(
+       ChatId chatId,
+       CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.UnpinAllChatMessages(chatId, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task LeaveChat(
+       ChatId chatId,
+       CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.LeaveChat(chatId, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<ChatMember[]> GetChatAdministrators(
+        ChatId chatId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.GetChatAdministrators(chatId, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task SetMyCommands(
+        IEnumerable<BotCommand> commands,
+        BotCommandScope? scope = default,
+        string? languageCode = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.SetMyCommands(commands, scope, languageCode, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task DeleteMyCommands(
+        BotCommandScope? scope = default,
+        string? languageCode = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.DeleteMyCommands(scope, languageCode, cancellationToken);
+    }
+
+
+    /// <inheritdoc />
+    public Task<BotCommand[]> GetMyCommands(
+
+        BotCommandScope? scope = default,
+        string? languageCode = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.GetMyCommands(scope, languageCode, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task SetMyName(
+
+        string? name = default,
+        string? languageCode = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.SetMyName(name, languageCode, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<BotName> GetMyName(
+
+        string? languageCode = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.GetMyName(languageCode, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<Message> ForwardMessage(
+        ChatId chatId,
+        ChatId fromChatId,
+        int messageId,
+        int? messageThreadId = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        int? videoStartTimestamp = default,
+        long? directMessagesTopicId = default,
+        SuggestedPostParameters? suggestedPostParameters = default,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.ForwardMessage(chatId, fromChatId, messageId, messageThreadId, disableNotification, protectContent, videoStartTimestamp, directMessagesTopicId, suggestedPostParameters, null, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<MessageId[]> ForwardMessages(
+        ChatId chatId,
+        ChatId fromChatId,
+        IEnumerable<int> messageIds,
+        int? messageThreadId = default,
+        bool disableNotification = default,
+        bool protectContent = default,
+        long? directMessagesTopicId = default,
+        CancellationToken cancellationToken = default)
+    {
+        return _botClient.ForwardMessages(chatId, fromChatId, messageIds, messageThreadId, disableNotification, protectContent, directMessagesTopicId, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<User> GetMe(
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.GetMe(cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<ChatFullInfo> GetChat(
+        ChatId chatId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return _botClient.GetChat(chatId, cancellationToken);
+    }
+
+}
+

@@ -76,7 +76,7 @@ public static class WebApiExtension
         // 支持CORS
         app.UseCors();
 
-        var config = app.Services.GetRequiredService<IOptions<OptionSettings>>().Value.System;
+        var config = app.Services.GetRequiredService<IOptions<AppSettings>>().Value.System;
 
         // 调试模式输出错误信息
         if (config.Debug)

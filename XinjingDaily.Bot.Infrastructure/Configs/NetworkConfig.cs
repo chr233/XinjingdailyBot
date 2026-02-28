@@ -1,10 +1,29 @@
-namespace XinjingDaily.Bot.Infrastructure.Options;
+namespace XinjingDaily.Bot.Infrastructure.Configs;
 
+/// <summary>
+/// GitHub选项
+/// </summary>
 public sealed record NetworkConfig
 {
-    public string? TelegramProxy { get; init; }
+    public string? WebProxy { get; init; }
 
-    public string? TelegramEndpoint { get; init; }
+    /// <summary>
+    /// GitHub Api地址
+    /// </summary>
+    public string GitHubApi { get; init; } = "https://api.github.com/";
 
-    public string? HttpProxy { get; init; }
+    /// <summary>
+    /// IpInfo Api地址
+    /// </summary>
+    public string IpInfoApi { get; init; } = "https://ipinfo.io/";
+
+    /// <summary>
+    /// IpInfo Token
+    /// </summary>
+    public string? IpInfoToken { get; init; }
+
+    /// <summary>
+    /// Telegram Api地址
+    /// </summary>
+    public string TelegramApi { get; init; } = "https://api.telegram.org/";
 }

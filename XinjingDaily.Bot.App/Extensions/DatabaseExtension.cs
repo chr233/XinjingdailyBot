@@ -9,7 +9,7 @@ using XinjingDaily.Bot.Entry.Columns;
 using XinjingDaily.Bot.Infrastructure;
 using XinjingDaily.Bot.Infrastructure.Convertor;
 using XinjingDaily.Bot.Infrastructure.Options;
-using XinjingDaily.Bot.Service.HostedService;
+using XinjingDaily.Bot.Service.HostedService.Init;
 
 namespace XinjingDaily.Bot.WebAPI.Extensions;
 
@@ -48,7 +48,7 @@ public static class DatabaseExtension
         public void AddSqlSugarSetup()
         {
             services.AddScoped<ISqlSugarClient>(s => {
-                var config = s.GetRequiredService<IOptions<OptionSettings>>().Value.Database;
+                var config = s.GetRequiredService<IOptions<AppSettings>>().Value.Database;
 
                 var dbType = config.Type?.ToUpperInvariant() switch {
                     "SQLITE" => DbType.Sqlite,
@@ -155,7 +155,7 @@ public static class DatabaseExtension
                 return db;
             });
 
-            services.AddHostedService<DbInitializationService>();
+            services.AddHostedService<DbInitHostedService>();
         }
     }
 }

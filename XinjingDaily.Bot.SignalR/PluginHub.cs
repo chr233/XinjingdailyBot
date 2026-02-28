@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
-namespace XhhControlSystem.SignalR.Hubs;
+namespace XinjingDaily.Bot.SignalR;
 
 /// <summary>
 /// Plugin Hub

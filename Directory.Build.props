@@ -19,7 +19,7 @@
 		<Nullable>enable</Nullable>
 		<PackageIcon>$(ApplicationIcon)</PackageIcon>
 		<PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/chr233/XinjingDaily.Bot</PackageProjectUrl>
+		<PackageProjectUrl>https://github.com/chr233/XinjingDailyBot</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageReleaseNotes>$(PackageProjectUrl)/releases</PackageReleaseNotes>
 		<RepositoryBranch>main</RepositoryBranch>

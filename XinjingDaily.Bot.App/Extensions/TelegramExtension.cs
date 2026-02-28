@@ -1,4 +1,8 @@
+using Microsoft.Extensions.Options;
+using System.Net.Http.Headers;
+using Telegram.Bot;
 using XinjingDaily.Bot.Infrastructure;
+using XinjingDaily.Bot.Service.HostedService;
 
 namespace XinjingDaily.Bot.WebAPI.Extensions;
 
@@ -9,6 +13,8 @@ public static class TelegramExtension
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
+    private const string TelegramClient = "telegram_bot_client";
+
     extension(IServiceCollection services)
     {
         /// <summary>
@@ -17,48 +23,34 @@ public static class TelegramExtension
         /// <param name="services"></param>
         public void AddTelegramBotClient()
         {
-            string publicIdentifier = $"{nameof(XinjingDaily.Bot)}-{BuildInfo.Variant}";
+            string publicIdentifier = $"{BuildInfo.AppName}-{BuildInfo.Variant}";
 
-            //services.AddScoped<ITelegramBotClient>(sp => {
-            //    var config = sp.GetRequiredService<IOptions<BotConfig>>().Value;
-            //    ArgumentNullException.ThrowIfNull(config);
+            services.AddHttpClient(TelegramClient, (serviceProvider, httpClient) => {
+                var config = serviceProvider.GetRequiredService<IOptions<AppSettings>>().Value.Network;
+                httpClient.BaseAddress = HttpClientExtension.GetBaseAddress(TelegramClient, config.TelegramApi);
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(publicIdentifier, BuildInfo.Version));
+            }).ConfigurePrimaryHttpMessageHandler(serviceProvider => {
+                var config = serviceProvider.GetRequiredService<IOptions<AppSettings>>().Value.Bot;
+                string? proxy = config.BotProxy;
+                return HttpClientExtension.CreateHttpClientHandler(TelegramClient, proxy);
+            }).AddTypedClient<ITelegramBotClient>((httpClient, sp) => {
+                var config = sp.GetRequiredService<IOptions<AppSettings>>().Value.Bot;
 
-            //    var httpClient = sp.GetRequiredService<IHttpClientFactory>().CreateClient("Telegram");
+                if (string.IsNullOrEmpty(config.BotToken))
+                {
+                    _logger.Error("BotToken 不能为空, 请检查 Bot 节");
+                    _logger.Error("按任意键退出...");
+                    Console.ReadKey();
+                    Environment.Exit(1);
+                }
 
+                TelegramBotClientOptions options = new(config.BotToken);
+                return new TelegramBotClient(options, httpClient);
+            }).RemoveAllLoggers();
 
-            //    return new TelegramBotClient(config.BotToken, httpClient);
-            //});
+            services.AddHostedService<PollingService>();
 
-            //services.AddSingleton<ITelegramBotClient>(serviceProvider => {
-            //    var httpHelperService = serviceProvider.GetRequiredService<IHttpHelperService>();
-            //    var httpClient = httpHelperService.CreateClient("Telegram");
-
-            //    var config = serviceProvider.GetRequiredService<IOptions<OptionsSetting>>().Value;
-            //    string? token = config.Bot.BotToken;
-
-            //    if (string.IsNullOrEmpty(token))
-            //    {
-            //        _logger.Error("Telegram bot token 不能为空");
-            //        _logger.Error("按任意键退出...");
-            //        Console.ReadKey();
-            //        Environment.Exit(1);
-            //    }
-
-            //    string? baseUrl = config.Bot.BaseUrl;
-
-            //    var options = new TelegramBotClientOptions(token, baseUrl, false);
-            //    return new TelegramBotClient(options, httpClient);
-            //});
-
-            //services.AddHttpClient("telegram_bot_client").RemoveAllLoggers()
-            //.AddTypedClient<ITelegramBotClient>((httpClient, sp) => {
-            //    BotConfiguration? botConfiguration = sp.GetService<IOptions<BotConfiguration>>()?.Value;
-            //    ArgumentNullException.ThrowIfNull(botConfiguration);
-            //    TelegramBotClientOptions options = new(botConfiguration.BotToken);
-            //    return new TelegramBotClient(options, httpClient);
-            //});
-
-            //services.AddHostedService<PollingService>();
             //services.AddHostedService<StatisticService>();
 
             //services.AddHostedService<BotInitializationServices>();

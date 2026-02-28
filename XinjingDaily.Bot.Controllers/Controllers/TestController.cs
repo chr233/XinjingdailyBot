@@ -1,14 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using XinjingDaily.Bot.Controllers.Controllers.Base;
 using XinjingDaily.Bot.IRepository.Redis;
-using XinjingDaily.Bot.Service.Common;
 
 namespace XinjingDaily.Bot.Controllers.Controllers;
 
 [ApiController]
 public class TestController(
-    IRedisCacheRepository _redisCache,
-    BotManagerService _botFactoryServices) : AbstractController
+    IRedisCacheRepository _redisCache) : AbstractController
 {
     [HttpGet]
     public async Task<ActionResult> Set(string key = "test", string value = "123")

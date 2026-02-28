@@ -42,5 +42,5 @@ public sealed record DatabaseConfig
     /// </summary>
     public string? Password { get; init; }
 
-    public string? TablePrefix { get; set; }
+    public string? TablePrefix { get; init; }
 }

@@ -9,7 +9,7 @@ namespace XinjingDaily.Bot.Repository.Ads;
 /// 广告统计仓储实现
 /// </summary>
 [RegisterScoped]
-public class AdvertiseStatisticsRepository : RepositoryInt<AdvertiseStatistics>, IAdvertiseStatisticsRepository
+public class AdvertiseStatisticsRepository : RepositoryInt<AdvertiseStatistic>, IAdvertiseStatisticsRepository
 {
     /// <summary>
     /// 构造函数

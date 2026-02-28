@@ -1,13 +1,14 @@
 using SqlSugar;
+using Telegram.Bot.Types.Enums;
 using XinjingDaily.Bot.Entry.Columns;
 
-namespace XinjingDaily.Bot.Entry.Entries.Channel;
+namespace XinjingDaily.Bot.Entry.Entries.Chat;
 
 /// <summary>
-/// 来源频道设定
+/// 发布频道表
 /// </summary>
-[SugarTable("source_channel_setting", TableDescription = "来源频道设定")]
-public sealed record SourceChannelSettings : ICreateAt, IModifyAt
+[SugarTable("chat_info", TableDescription = "会话信息")]
+public sealed record ChatInfo : ICreateAt, IModifyAt
 {
     /// <summary>
     /// 主键
@@ -26,7 +27,7 @@ public sealed record SourceChannelSettings : ICreateAt, IModifyAt
     /// <summary>
     /// 频道名称
     /// </summary>
-    [SugarColumn(IsNullable = true, Length = 512)]
+    [SugarColumn(IsNullable = true)]
     public string? Title { get; set; }
 
     /// <summary>
@@ -34,15 +35,8 @@ public sealed record SourceChannelSettings : ICreateAt, IModifyAt
     /// </summary>
     public bool IsPublish { get; set; }
 
-    /// <summary>
-    /// 是否自动拒绝频道投稿
-    /// </summary>
-    public bool IsAutoReject { get; set; }
+    public ChatType Type { get; set; }
 
-    /// <summary>
-    /// 允许投稿携带来源
-    /// </summary>
-    public bool IsKeepFrom { get; set; } = true;
 
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;

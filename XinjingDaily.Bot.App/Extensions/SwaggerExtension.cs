@@ -30,7 +30,7 @@ public static class SwaggerExtension
     /// <param name="app"></param>
     public static void UseSwaggerEx(this WebApplication app)
     {
-        var optionsAccessor = app.Services.GetService<IOptions<OptionSettings>>();
+        var optionsAccessor = app.Services.GetService<IOptions<AppSettings>>();
         if (optionsAccessor == null || !optionsAccessor.Value.System.Swagger)
         {
             return;

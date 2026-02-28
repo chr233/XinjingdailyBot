@@ -7,7 +7,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Ads;
 /// 广告消息表
 /// </summary>
 [SugarTable("advertise_history", TableDescription = "广告消息")]
-public sealed record AdvertiseHistorys : IModifyAt, ICreateAt
+public sealed record AdvertiseHistory : IModifyAt, ICreateAt
 {
     /// <summary>
     /// 主键

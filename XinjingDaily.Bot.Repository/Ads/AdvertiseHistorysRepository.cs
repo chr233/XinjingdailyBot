@@ -13,6 +13,6 @@ namespace XinjingDaily.Bot.Repository.Ads;
 /// </remarks>
 /// <param name="db"></param>
 [RegisterScoped]
-public class AdvertiseHistorysRepository(ISqlSugarClient db) : RepositoryInt<AdvertiseHistorys>(db), IAdvertiseHistorysRepository
+public class AdvertiseHistorysRepository(ISqlSugarClient db) : RepositoryInt<AdvertiseHistory>(db), IAdvertiseHistorysRepository
 {
 }

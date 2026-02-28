@@ -9,7 +9,7 @@ namespace XinjingDaily.Bot.Repository.Redis;
 [RegisterScoped]
 public sealed class RedisCacheRepository(
     IConnectionMultiplexer multiplexer,
-    IOptions<OptionSettings> options,
+    IOptions<AppSettings> options,
     ILogger<RedisCacheRepository> logger) : IRedisCacheRepository
 {
     private readonly ILogger<RedisCacheRepository> _logger = logger;

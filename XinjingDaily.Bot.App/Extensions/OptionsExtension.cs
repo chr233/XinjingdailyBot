@@ -21,7 +21,7 @@ public static class OptionsExtension
                 .AddUserSecrets<Program>()
                 .Build();
 
-            builder.Services.Configure<OptionSettings>(config);
+            builder.Services.Configure<AppSettings>(config);
         }
     }
 }

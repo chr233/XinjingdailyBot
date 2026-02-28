@@ -1,6 +1,6 @@
-using XhhControlSystem.SignalR.Hubs;
+using XinjingDaily.Bot.SignalR;
 
-namespace XhhControlSystem.Server.Extensions;
+namespace XinjingDaily.Bot.App.Extensions;
 
 /// <summary>
 /// SignalR扩展

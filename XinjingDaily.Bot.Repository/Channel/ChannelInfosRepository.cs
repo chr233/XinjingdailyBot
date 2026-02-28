@@ -1,5 +1,5 @@
 using SqlSugar;
-using XinjingDaily.Bot.Entry.Entries.Posts;
+using XinjingDaily.Bot.Entry.Entries.Chat;
 using XinjingDaily.Bot.IRepository.Channel;
 using XinjingDaily.Bot.Repository.Base;
 
@@ -8,7 +8,7 @@ namespace XinjingDaily.Bot.Repository.Channel;
 /// <summary>
 /// 频道信息仓储实现
 /// </summary>
-public class ChannelInfosRepository : RepositoryInt<ChannelInfos>, IChannelInfoRepository
+public class ChannelInfosRepository : RepositoryInt<ChatInfo>, IChannelInfoRepository
 {
     /// <summary>
     /// 构造函数

@@ -5,9 +5,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Injectio" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
 		<PackageReference Include="Microsoft.Extensions.Http" />
+		<PackageReference Include="Injectio" PrivateAssets="all" />
 		<PackageReference Include="SkiaSharp" />
 		<PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" />
 		<PackageReference Include="SkiaSharp.NativeAssets.macOS" />
@@ -24,6 +24,10 @@
 		<ProjectReference Include="..\XinjingDaily.Bot.Infrastructure\XinjingDaily.Bot.Infrastructure.csproj" />
 		<ProjectReference Include="..\XinjingDaily.Bot.Interface\XinjingDaily.Bot.Interface.csproj" />
 		<ProjectReference Include="..\XinjingDaily.Bot.Repository\XinjingDaily.Bot.Repository.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Common\" />
 	</ItemGroup>
 
 </Project>

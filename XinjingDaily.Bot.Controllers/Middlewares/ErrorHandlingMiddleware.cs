@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Text.Json;
 using XinjingDaily.Bot.Controllers.Responses;
-using XinjingDaily.Bot.WebAPI.IPC.Responses;
 
 namespace XinjingDaily.Bot.Controllers.Middleware;
 

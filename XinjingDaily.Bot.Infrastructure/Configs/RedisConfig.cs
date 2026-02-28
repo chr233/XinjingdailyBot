@@ -21,17 +21,17 @@ public sealed record RedisConfig
     /// <summary>
     /// 默认数据库, 默认为3, 0-15
     /// </summary>
-    public int DefaultDatabase { get; set; } = 3;
+    public int DefaultDatabase { get; init; } = 3;
 
-    public bool Ssl { get; set; }
-    public string? SslHost { get; set; }
+    public bool Ssl { get; init; }
+    public string? SslHost { get; init; }
 
     public string? KeyPrefix { get; init; } = "xjb";
 
-    public int ConnectTimeout { get; set; } = 5000;
-    public int SyncTimeout { get; set; } = 5000;
-    public int AsyncTimeout { get; set; } = 5000;
-    public int ConnectRetry { get; set; } = 5;
+    public int ConnectTimeout { get; init; } = 5000;
+    public int SyncTimeout { get; init; } = 5000;
+    public int AsyncTimeout { get; init; } = 5000;
+    public int ConnectRetry { get; init; } = 5;
 
-    public int KeepAlive { get; set; } = 60;
+    public int KeepAlive { get; init; } = 60;
 }

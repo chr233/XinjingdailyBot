@@ -5,6 +5,7 @@ using System.Text.Json;
 using XinjingDaily.Bot.Infrastructure;
 using XinjingDaily.Bot.Infrastructure.Convertor;
 using XinjingDaily.Bot.Infrastructure.Options;
+using XinjingDaily.Bot.Service.HostedService.Init;
 
 namespace XinjingDaily.Bot.WebAPI.Extensions;
 
@@ -92,7 +93,7 @@ public static class RedisExtension
         public void AddRedis()
         {
             services.AddSingleton<IConnectionMultiplexer>(sp => {
-                var config = sp.GetRequiredService<IOptions<OptionSettings>>().Value.Redis;
+                var config = sp.GetRequiredService<IOptions<AppSettings>>().Value.Redis;
 
                 if (!TryConvertToEndPoint(config.Host, config.Port, out var endPoint) || endPoint == null)
                 {
@@ -127,10 +128,10 @@ public static class RedisExtension
 
                 options.EndPoints.Add(endPoint);
 
-                _logger.Info("[Redis] 正在连接: {msg}", options.EndPoints.FirstOrDefault());
-
                 return ConnectionMultiplexer.Connect(options);
             });
+
+            services.AddHostedService<RedisInitHostedService>();
         }
     }
 }

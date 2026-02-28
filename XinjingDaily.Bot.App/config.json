@@ -6,46 +6,55 @@
     // Swagger
     "Swagger": true,
     "Statistic": true,
-    "HttpPort": 8235
+
+    "HttpPort": 8235,
+
+    "SuperAdmins": []
   },
+
   // 机器人设置
   "Bot": {
-    "BotToken": "5149880601:AAFIcbMcFnZ9WWGzcGM72PpOZ21rL8FdjIg",
-    "Proxy": null,
+    "BotToken": "",
+    "BotProxy": null,
     "ThrowPendingUpdates": false,
     "AutoLeaveOtherGroup": false,
-    "SuperAdmins": [],
     "EnablePlanPost": false,
     "PostSecondMenu": false,
     "EnableWebPagePreview": false
   },
-  // 频道设置
-  "Channel": {
-    "ReviewGroup": "",
-    "CommentGroup": "",
-    "SubGroup": "",
-    "AcceptChannel": "",
-    "RejectChannel": "",
-    "SecondChannel": "",
-    "SecondCommentGroup": ""
+
+  //网络设置
+  "Network": {
+    "WebProxy": null,
+    "IpInfoToken": null
   },
-  // 消息设置
-  "Message": {
-    "Start": "欢迎使用 心惊报 @XinjingDaily 专用投稿机器人",
-    "Help": "发送图片/视频或者文字内容即可投稿"
-  },
+
   // 数据库设置
   "Database": {
     "Generate": true,
     "LogSQL": false,
+    "TablePrefix": "xjb",
+
+    //mysql
     "Type": "mysql",
     "Host": "localhost",
     "Port": 3306,
     "Database": "xinjingdaily_db",
+
+    //pgsql
+    //"Type": "postgresql",
+    //"Host": "localhost",
+    //"Port": 5432,
+    //"Database": "xinjingdaily_db",
+
+    //sqlite
+    //"Type": "sqlite",
+    //"Database": "xinjingdaily_db",
+
     "User": "root",
-    "Password": "root",
-    "TablePrefix": "xjb"
+    "Password": "root"
   },
+
   // Redis设置
   "Redis": {
     "Host": "127.0.0.1",
@@ -74,35 +83,5 @@
     "PureHashTag": true,
     "PureWords": "",
     "PostExpiredTime": 3
-  },
-  // IpInfo设置
-  "IpInfo": {
-    "Token": ""
-  },
-  // 计划任务
-  "Schedule": {
-    "Cron": {
-      // 处理过期稿件
-      "ExpiredPostTask": "0 0 0 * * ?",
-      // 定时发布广告
-      "PostAdvertiseTask": "0 0 9 * * ?",
-      // 拒绝频道定时置顶
-      "RejectChannelTask": "0 0 0 * * ?",
-      // 已排期稿件定时发布
-      "PlanedPostsTask": "0 0 0 * * ?",
-      // 定时更新审核群审核状态
-      "ReviewStatusTask": "*/30 * * * * ?"
-    }
-  },
-  // 等级设置
-  "Level": {
-    // 每个通过稿件获得的经验
-    "ExpPerAccept": 0.1,
-    // 每个拒绝稿件获得的经验
-    "ExpPerReject": 0.01,
-    // 每个审核稿件获得的经验
-    "ExpPerReview": 0.05,
-    // 每个过期稿件获得的经验
-    "ExpPerExpire": 0.01
   }
 }

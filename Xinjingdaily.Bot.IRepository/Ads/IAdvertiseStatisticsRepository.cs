@@ -6,6 +6,6 @@ namespace XinjingDaily.Bot.IRepository.Ads;
 /// <summary>
 /// 广告统计仓储接口
 /// </summary>
-public interface IAdvertiseStatisticsRepository : IRepositoryInt<AdvertiseStatistics>
+public interface IAdvertiseStatisticsRepository : IRepositoryInt<AdvertiseStatistic>
 {
 }

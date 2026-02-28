@@ -5,6 +5,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Injectio" PrivateAssets="all" />
 		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
 	</ItemGroup>
 
@@ -17,6 +18,11 @@
 
 	<ItemGroup>
 		<None Include="..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Test\" />
+	  <Folder Include="Common\" />
 	</ItemGroup>
 
 </Project>
