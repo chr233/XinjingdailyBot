@@ -8,7 +8,7 @@ namespace XinjingDaily.Bot.Entry.Entries.User.Shop;
 /// </summary>
 [SugarTable("shop_items", TableDescription = "商店物品表")]
 [SugarIndex("i_shop_items_badgeid", nameof(BadgeId), OrderByType.Asc, true)]
-public sealed record ShopItems : ICreateAt, IModifyAt
+public sealed record ShopItem : ICreateAt, IModifyAt
 {
     [SugarColumn(IsIdentity = true, IsPrimaryKey = true)]
     public int Id { get; set; }

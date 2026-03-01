@@ -9,7 +9,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Historys;
 [SugarTable("ban_history", TableDescription = "用户封禁记录户表")]
 [SugarIndex("index_userid", nameof(UserId), OrderByType.Asc)]
 [SugarIndex("index_operatorid", nameof(OperatorUserId), OrderByType.Asc)]
-public sealed record BanHistorys
+public sealed record BanHistory
 {
     /// <summary>
     /// 主键

@@ -9,7 +9,7 @@ namespace XinjingDaily.Bot.Repository.Post;
 /// 帖子附件仓储实现
 /// </summary>
 [RegisterScoped]
-public class PostAttachmentsRepository : RepositoryInt<PostAttachments>, IPostAttachmentsRepository
+public class PostAttachmentsRepository : RepositoryInt<PostAttachment>, IPostAttachmentsRepository
 {
     /// <summary>
     /// 构造函数

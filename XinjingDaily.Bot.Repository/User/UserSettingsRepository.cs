@@ -13,7 +13,7 @@ namespace XinjingDaily.Bot.Repository.User;
 /// </remarks>
 /// <param name="db"></param>
 [RegisterScoped]
-public class UserSettingsRepository(ISqlSugarClient db) : RepositoryInt<UserSettings>(db), IUserSettingRepository
+public class UserSettingsRepository(ISqlSugarClient db) : RepositoryInt<UserSetting>(db), IUserSettingRepository
 {
 }
  

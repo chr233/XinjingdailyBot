@@ -32,7 +32,7 @@ public class DispatcherService(
     }
 
     /// <inheritdoc/>
-    public async Task OnMessageReceived(UserInfos dbUser, Message message)
+    public async Task OnMessageReceived(UserInfo dbUser, Message message)
     {
         //await _dialogueService.RecordMessage(message).ConfigureAwait(false);
 
@@ -65,7 +65,7 @@ public class DispatcherService(
     }
 
     /// <inheritdoc/>
-    public async Task OnChannalPostReceived(UserInfos dbUser, Message message)
+    public async Task OnChannalPostReceived(UserInfo dbUser, Message message)
     {
         //仅监听发布频道的消息
         //var chatId = message.Chat.Id;
@@ -90,13 +90,13 @@ public class DispatcherService(
     }
 
     /// <inheritdoc/>
-    public async Task OnCallbackQueryReceived(UserInfos dbUser, CallbackQuery query)
+    public async Task OnCallbackQueryReceived(UserInfo dbUser, CallbackQuery query)
     {
         //await _commandHandler.OnQueryCommandReceived(dbUser, query).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task OnJoinRequestReceived(UserInfos dbUser, ChatJoinRequest request)
+    public async Task OnJoinRequestReceived(UserInfo dbUser, ChatJoinRequest request)
     {
         //if (_channelService.IsGroupMessage(request.Chat.Id))
         //{
@@ -105,13 +105,13 @@ public class DispatcherService(
     }
 
     /// <inheritdoc/>
-    public async Task OnInlineQueryReceived(UserInfos dbUser, InlineQuery query)
+    public async Task OnInlineQueryReceived(UserInfo dbUser, InlineQuery query)
     {
         //await _inlineQueryHandler.OnInlineQueryReceived(dbUser, query).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public Task OnOtherUpdateReceived(UserInfos dbUser, Update update)
+    public Task OnOtherUpdateReceived(UserInfo dbUser, Update update)
     {
         _logger.LogInformation("收到未知消息类型的消息, [{type}]", update.Type);
         return Task.CompletedTask;

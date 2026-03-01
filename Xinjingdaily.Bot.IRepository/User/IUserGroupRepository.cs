@@ -6,6 +6,6 @@ namespace XinjingDaily.Bot.IRepository.User;
 /// <summary>
 /// 用户组仓储接口
 /// </summary>
-public interface IUserGroupRepository : IRepositoryInt<UserGroups>
+public interface IUserGroupRepository : IRepositoryInt<UserGroup>
 {
 }

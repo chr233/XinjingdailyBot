@@ -4,7 +4,7 @@ using XinjingDaily.Bot.Entry.Columns;
 namespace XinjingDaily.Bot.Entry.Entries.Chats;
 
 [SugarTable("group_info", TableDescription = "群聊信息")]
-public sealed record GroupInfos :ICreateAt, IModifyAt
+public sealed record GroupInfo :ICreateAt, IModifyAt
 {
     [SugarColumn(IsIdentity = true, IsPrimaryKey = true)]
     public int Id { get; set; }

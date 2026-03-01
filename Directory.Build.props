@@ -34,8 +34,6 @@
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<DebugType>portable</DebugType>
-		
-		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">

@@ -26,7 +26,7 @@ public class UpdateService(
             //_channelService.OnChatTitleChanged(update.Message.Chat, update.Message.NewChatTitle);
         }
 
-        var dbUser = new UserInfos();
+        var dbUser = new UserInfo();
 
         if (dbUser == null)
         {

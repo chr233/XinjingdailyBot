@@ -9,7 +9,7 @@ namespace XinjingDaily.Bot.Repository.User.Rbac;
 /// 权限仓储实现
 /// </summary>
 [RegisterScoped]
-public class ClaimsRepository : RepositoryInt<Claims>, IClaimsRepository
+public class ClaimsRepository : RepositoryInt<Claim>, IClaimsRepository
 {
     /// <summary>
     /// 构造函数

@@ -1,19 +1,25 @@
 using SqlSugar;
 using XinjingDaily.Bot.Entry.Columns;
 
-namespace XinjingDaily.Bot.Entry.Entries.Channel;
+namespace XinjingDaily.Bot.Entry.Entries.Posts;
 
 /// <summary>
-/// 来源频道设定
+/// 发布频道表
 /// </summary>
-[SugarTable("source_channel_setting", TableDescription = "来源频道设定")]
-public sealed record SourceChannelSettings : ICreateAt, IModifyAt
+[SugarTable("post_channel", TableDescription = "发布频道")]
+public sealed record PostChannel : ICreateAt, IModifyAt
 {
     /// <summary>
     /// 主键
     /// </summary>
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
+
+    /// <summary>
+    /// 优先级, 数字越小越靠前
+    /// </summary>
+    public int Order { get; set; }
+
     /// <summary>
     /// 频道ID
     /// </summary>
@@ -23,6 +29,7 @@ public sealed record SourceChannelSettings : ICreateAt, IModifyAt
     /// </summary>
     [SugarColumn(IsNullable = true)]
     public string? TelegramName { get; set; }
+
     /// <summary>
     /// 频道名称
     /// </summary>
@@ -34,15 +41,7 @@ public sealed record SourceChannelSettings : ICreateAt, IModifyAt
     /// </summary>
     public bool IsPublish { get; set; }
 
-    /// <summary>
-    /// 是否自动拒绝频道投稿
-    /// </summary>
-    public bool IsAutoReject { get; set; }
-
-    /// <summary>
-    /// 允许投稿携带来源
-    /// </summary>
-    public bool IsKeepFrom { get; set; } = true;
+    public bool IsEnable { get; set; }
 
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;

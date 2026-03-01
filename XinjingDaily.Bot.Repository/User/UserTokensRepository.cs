@@ -9,7 +9,7 @@ namespace XinjingDaily.Bot.Repository.User;
 /// 用户令牌仓储实现
 /// </summary>
 [RegisterScoped]
-public class UserTokensRepository : RepositoryInt<UserTokens>, IUserTokenRepository
+public class UserTokensRepository : RepositoryInt<UserToken>, IUserTokenRepository
 {
     /// <summary>
     /// 构造函数

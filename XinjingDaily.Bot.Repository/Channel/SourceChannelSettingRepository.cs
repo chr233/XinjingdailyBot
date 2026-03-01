@@ -9,7 +9,7 @@ namespace XinjingDaily.Bot.Repository.Channel;
 /// 机器人频道仓储实现
 /// </summary>
 [RegisterScoped]
-public class SourceChannelSettingRepository(ISqlSugarClient db) : RepositoryInt<SourceChannelSettings>(db), ISourceChannelSettingRepository
+public class SourceChannelSettingRepository(ISqlSugarClient db) : RepositoryInt<SourceChannelSetting>(db), ISourceChannelSettingRepository
 {
 
 }

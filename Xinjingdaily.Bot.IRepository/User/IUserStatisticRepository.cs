@@ -6,6 +6,6 @@ namespace XinjingDaily.Bot.IRepository.User;
 /// <summary>
 /// 用户统计仓储接口
 /// </summary>
-public interface IUserStatisticRepository : IRepositoryInt<UserStatistics>
+public interface IUserStatisticRepository : IRepositoryInt<UserStatistic>
 {
 }

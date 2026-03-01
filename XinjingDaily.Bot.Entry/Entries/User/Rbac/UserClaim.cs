@@ -2,14 +2,14 @@ using SqlSugar;
 
 namespace XinjingDaily.Bot.Entry.Entries.Users.Rbac;
 
-[SugarTable("role_claim", TableDescription = "角色权限表")]
-public sealed record RoleClaims
+[SugarTable("user_claim", TableDescription = "用户权限表")]
+public sealed record class UserClaim
 {
     /// <summary>
-    /// Role主键
+    /// User主键
     /// </summary>
     [SugarColumn(IsPrimaryKey = true)]
-    public int RoleId { get; set; }
+    public int UserId { get; set; }
 
     /// <summary>
     /// Claim主键

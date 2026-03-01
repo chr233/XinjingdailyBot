@@ -5,7 +5,7 @@ using XinjingDaily.Bot.Entry.Columns;
 namespace XinjingDaily.Bot.Entry.Entries.Chats;
 
 [SugarTable("message_attachment", TableDescription = "聊天附件")]
-public sealed record MessageAttachments : ICreateAt
+public sealed record MessageAttachment : ICreateAt
 {
     /// <summary>
     /// 主键

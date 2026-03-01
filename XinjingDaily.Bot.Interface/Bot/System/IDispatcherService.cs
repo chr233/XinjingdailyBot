@@ -5,10 +5,10 @@ namespace XinjingDaily.Bot.Interface.Bot.System;
 
 public interface IDispatcherService
 {
-    Task OnCallbackQueryReceived(UserInfos dbUser, CallbackQuery query);
-    Task OnChannalPostReceived(UserInfos dbUser, Message message);
-    Task OnInlineQueryReceived(UserInfos dbUser, InlineQuery query);
-    Task OnJoinRequestReceived(UserInfos dbUser, ChatJoinRequest request);
-    Task OnMessageReceived(UserInfos dbUser, Message message);
-    Task OnOtherUpdateReceived(UserInfos dbUser, Update update);
+    Task OnCallbackQueryReceived(UserInfo dbUser, CallbackQuery query);
+    Task OnChannalPostReceived(UserInfo dbUser, Message message);
+    Task OnInlineQueryReceived(UserInfo dbUser, InlineQuery query);
+    Task OnJoinRequestReceived(UserInfo dbUser, ChatJoinRequest request);
+    Task OnMessageReceived(UserInfo dbUser, Message message);
+    Task OnOtherUpdateReceived(UserInfo dbUser, Update update);
 }

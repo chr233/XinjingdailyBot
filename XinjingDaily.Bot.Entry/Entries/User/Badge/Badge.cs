@@ -10,7 +10,7 @@ namespace XinjingDaily.Bot.Entry.Entries.User.Badge;
 /// 徽章信息表
 /// </summary>
 [SugarTable("badge", TableDescription = "徽章信息")]
-public sealed record Badges : ICreateAt, IModifyAt
+public sealed record Badge : ICreateAt, IModifyAt
 {
     /// <summary>
     /// 主键

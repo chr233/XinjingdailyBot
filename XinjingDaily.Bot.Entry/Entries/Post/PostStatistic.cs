@@ -7,7 +7,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Posts;
 /// 投稿统计信息表
 /// </summary>
 [SugarTable("post_statistic", TableDescription = "投稿统计信息")]
-public sealed record PostStatistics : IModifyAt, ICreateAt
+public sealed record PostStatistic : IModifyAt, ICreateAt
 {
     /// <summary>
     /// 主键

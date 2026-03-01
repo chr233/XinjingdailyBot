@@ -10,7 +10,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Policys;
 [SugarTable("channel_option", TableDescription = "投稿来源频道设定")]
 [SugarIndex("co_channel_id", nameof(ChatId), OrderByType.Asc, true)]
 [SugarIndex("index_channel_name", nameof(ChatName), OrderByType.Asc, false)]
-public sealed record SourceChannelPolicys : ICreateAt, IModifyAt
+public sealed record SourceChannelPolicy : ICreateAt, IModifyAt
 {
     /// <summary>
     /// 主键

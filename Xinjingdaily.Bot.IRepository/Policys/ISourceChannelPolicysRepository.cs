@@ -6,6 +6,6 @@ namespace XinjingDaily.Bot.IRepository.Policys;
 /// <summary>
 /// 来源频道策略仓储接口
 /// </summary>
-public interface ISourceChannelPolicysRepository : IRepositoryInt<SourceChannelPolicys>
+public interface ISourceChannelPolicysRepository : IRepositoryInt<SourceChannelPolicy>
 {
 }

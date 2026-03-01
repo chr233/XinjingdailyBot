@@ -7,7 +7,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Posts;
 /// 多图投稿记录表
 /// </summary>
 [SugarTable("media_group_info", TableDescription = "多图投稿记录")]
-public sealed record MediaGroupInfos : ICreateAt
+public sealed record MediaGroupInfo : ICreateAt
 {
     /// <summary>
     /// 主键

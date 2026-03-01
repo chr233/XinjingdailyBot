@@ -4,7 +4,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Users.Rbac;
 
 
 [SugarTable("claim", TableDescription = "权限表")]
-public sealed record Claims
+public sealed record Claim
 {
     /// <summary>
     /// 主键

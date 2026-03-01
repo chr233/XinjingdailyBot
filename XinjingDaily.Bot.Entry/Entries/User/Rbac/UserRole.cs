@@ -6,7 +6,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Users.Rbac;
 /// 用户设置表
 /// </summary>
 [SugarTable("user_role", TableDescription = "用户角色表")]
-public sealed record UserRoles
+public sealed record UserRole
 {
     /// <summary>
     /// User主键

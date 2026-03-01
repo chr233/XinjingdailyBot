@@ -12,7 +12,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Posts;
 [SugarIndex("i_post_info_posteruid", nameof(PosterUId), OrderByType.Asc)]
 [SugarIndex("i_post_info_status", nameof(Status), OrderByType.Asc)]
 [SugarIndex("i_post_info_createtime", nameof(CreateAt), OrderByType.Desc)]
-public sealed record PostInfos : IModifyAt, ICreateAt
+public sealed record PostInfo : IModifyAt, ICreateAt
 {
     /// <summary>
     /// 主键

@@ -23,7 +23,7 @@ public sealed record ChannelInfo : ICreateAt, IModifyAt
     /// 频道ID @
     /// </summary>
     [SugarColumn(IsNullable = true)]
-    public string? TelegramName { get; set; }
+    public string? TelegramName { get; set; } 
     /// <summary>
     /// 频道名称
     /// </summary>

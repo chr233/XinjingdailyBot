@@ -9,7 +9,7 @@ namespace XinjingDaily.Bot.Repository.Post;
 /// 媒体组信息仓储实现
 /// </summary>
 [RegisterScoped]
-public class MediaGroupInfosRepository : RepositoryInt<MediaGroupInfos>, IMediaGroupInfosRepository
+public class MediaGroupInfosRepository : RepositoryInt<MediaGroupInfo>, IMediaGroupInfosRepository
 {
     /// <summary>
     /// 构造函数

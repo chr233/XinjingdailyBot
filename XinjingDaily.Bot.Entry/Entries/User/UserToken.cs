@@ -8,7 +8,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Users;
 /// </summary>
 [SugarTable("user_token", TableDescription = "用户密钥表")]
 [SugarIndex("i_usertoken_apitoken", nameof(ApiToken), OrderByType.Asc, false)]
-public sealed record UserTokens : ICreateAt, IExpiredAt
+public sealed record UserToken : ICreateAt, IExpiredAt
 {
     /// <summary>
     /// 用户表主键

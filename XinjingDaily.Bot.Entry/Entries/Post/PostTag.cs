@@ -7,8 +7,8 @@ namespace XinjingDaily.Bot.Entry.Entries.Posts;
 /// 投稿标签表
 /// </summary>
 [SugarTable("post_tag", TableDescription = "投稿标签")]
-[SugarIndex("payload", nameof(Payload), OrderByType.Asc, true)]
-public sealed record PostTags : ICreateAt, IModifyAt
+[SugarIndex("i_post_tag_payload", nameof(Payload), OrderByType.Asc, true)]
+public sealed record PostTag : ICreateAt, IModifyAt
 {
     /// <summary>
     /// 主键

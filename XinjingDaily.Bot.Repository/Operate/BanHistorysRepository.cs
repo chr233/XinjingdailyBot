@@ -9,7 +9,7 @@ namespace XinjingDaily.Bot.Repository.Operate;
 /// 封禁历史仓储实现
 /// </summary>
 [RegisterScoped]
-public class BanHistorysRepository : RepositoryInt<BanHistorys>, IBanHistorysRepository
+public class BanHistorysRepository : RepositoryInt<BanHistory>, IBanHistorysRepository
 {
     /// <summary>
     /// 构造函数

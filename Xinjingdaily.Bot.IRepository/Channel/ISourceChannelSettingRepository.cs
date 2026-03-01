@@ -6,6 +6,6 @@ namespace XinjingDaily.Bot.IRepository.Channel;
 /// <summary>
 /// 机器人频道仓储接口
 /// </summary>
-public interface ISourceChannelSettingRepository : IRepositoryInt<SourceChannelSettings>
+public interface ISourceChannelSettingRepository : IRepositoryInt<SourceChannelSetting>
 {
 }

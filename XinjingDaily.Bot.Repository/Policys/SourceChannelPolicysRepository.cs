@@ -9,7 +9,7 @@ namespace XinjingDaily.Bot.Repository.Policys;
 /// 来源频道策略仓储实现
 /// </summary>
 [RegisterScoped]
-public class SourceChannelPolicysRepository : RepositoryInt<SourceChannelPolicys>, ISourceChannelPolicysRepository
+public class SourceChannelPolicysRepository : RepositoryInt<SourceChannelPolicy>, ISourceChannelPolicysRepository
 {
     /// <summary>
     /// 构造函数

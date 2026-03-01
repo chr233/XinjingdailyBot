@@ -9,7 +9,7 @@ namespace XinjingDaily.Bot.Repository.User;
 /// 用户统计仓储实现
 /// </summary>
 [RegisterScoped]
-public class UserStatisticsRepository : RepositoryInt<UserStatistics>, IUserStatisticRepository
+public class UserStatisticsRepository : RepositoryInt<UserStatistic>, IUserStatisticRepository
 {
     /// <summary>
     /// 构造函数

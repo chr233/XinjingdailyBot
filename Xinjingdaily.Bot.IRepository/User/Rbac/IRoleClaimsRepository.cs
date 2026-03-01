@@ -6,6 +6,6 @@ namespace XinjingDaily.Bot.IRepository.User.Rbac;
 /// <summary>
 /// 角色权限仓储接口
 /// </summary>
-public interface IRoleClaimsRepository : IRepositoryInt<RoleClaims>
+public interface IRoleClaimsRepository : IRepositoryInt<RoleClaim>
 {
 }

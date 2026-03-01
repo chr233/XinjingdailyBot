@@ -10,7 +10,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Users;
 [SugarTable("user_info", TableDescription = "用户基础信息表")]
 [SugarIndex("i_user_username", nameof(TelegramName), OrderByType.Asc)]
 [SugarIndex("i_user_telegramid", nameof(TelegramId), OrderByType.Asc, true)]
-public sealed record UserInfos : IModifyAt, ICreateAt
+public sealed record UserInfo : IModifyAt, ICreateAt
 {
     /// <summary>
     /// 主键

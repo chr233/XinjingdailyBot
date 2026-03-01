@@ -66,7 +66,7 @@ public class PluginHub(
     /// <returns></returns>
     public Task<string> Echo(string message)
     {
-        var user = Context.Items["user"] as UserInfos;
+        var user = Context.Items["user"] as UserInfo;
 
         _logger.LogInformation("Plugin {info} Echo: {msg}", user, message);
         return Task.FromResult(message);

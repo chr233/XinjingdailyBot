@@ -6,6 +6,6 @@ namespace XinjingDaily.Bot.IRepository.Post;
 /// <summary>
 /// 帖子附件仓储接口
 /// </summary>
-public interface IPostAttachmentsRepository : IRepositoryInt<PostAttachments>
+public interface IPostAttachmentsRepository : IRepositoryInt<PostAttachment>
 {
 }

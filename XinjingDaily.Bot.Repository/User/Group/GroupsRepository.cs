@@ -9,7 +9,7 @@ namespace XinjingDaily.Bot.Repository.User.Group;
 /// 群组仓储实现
 /// </summary>
 [RegisterScoped]
-public class GroupsRepository : RepositoryInt<Groups>, IGroupsRepository
+public class GroupsRepository : RepositoryInt<Entry.Entries.User.Group.Group>, IGroupsRepository
 {
     /// <summary>
     /// 构造函数

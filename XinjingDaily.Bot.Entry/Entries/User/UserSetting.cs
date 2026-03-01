@@ -8,7 +8,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Users;
 /// </summary>
 [SugarTable("user_setting", TableDescription = "用户设置表")]
 [SugarIndex("i_usersetting_userid", nameof(UserId), OrderByType.Asc, true)]
-public sealed record UserSettings : IModifyAt, ICreateAt
+public sealed record UserSetting : IModifyAt, ICreateAt
 {
     /// <summary>
     /// 主键

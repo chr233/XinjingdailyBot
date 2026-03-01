@@ -9,7 +9,7 @@ namespace XinjingDaily.Bot.Repository.Post;
 /// 帖子标签仓储实现
 /// </summary>
 [RegisterScoped]
-public class PostTagsRepository : RepositoryInt<PostTags>, IPostTagsRepository
+public class PostTagsRepository : RepositoryInt<PostTag>, IPostTagsRepository
 {
     /// <summary>
     /// 构造函数

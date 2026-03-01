@@ -6,7 +6,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Users;
 /// 用户等级表
 /// </summary>
 [SugarTable("user_statistic", TableDescription = "用户统计信息表")]
-public sealed record UserStatistics
+public sealed record UserStatistic
 {
     /// <summary>
     /// 主键

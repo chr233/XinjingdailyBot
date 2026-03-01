@@ -3,7 +3,7 @@ using SqlSugar;
 namespace XinjingDaily.Bot.Entry.Entries.Users.Rbac;
 
 [SugarTable("role", TableDescription = "角色表")]
-public sealed record Roles
+public sealed record Role
 {
 
     /// <summary>

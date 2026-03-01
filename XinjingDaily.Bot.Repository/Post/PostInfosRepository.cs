@@ -9,7 +9,7 @@ namespace XinjingDaily.Bot.Repository.Post;
 /// 帖子信息仓储实现
 /// </summary>
 [RegisterScoped]
-public class PostInfosRepository : RepositoryInt<PostInfos>, IPostInfosRepository
+public class PostInfosRepository : RepositoryInt<PostInfo>, IPostInfosRepository
 {
     /// <summary>
     /// 构造函数

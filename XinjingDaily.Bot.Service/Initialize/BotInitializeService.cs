@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using XinjingDaily.Bot.Infrastructure;
+using XinjingDaily.Bot.Infrastructure.Extensions;
 using XinjingDaily.Bot.Interface.Bot;
 using XinjingDaily.Bot.Interface.Common;
 using XinjingDaily.Bot.Interface.InitService;
@@ -28,10 +29,20 @@ public class BotInitializeService(
     /// <inheritdoc/>
     public async Task InitializeAsync()
     {
-        // 获取机器人本身的数据
-        var me = await _botClient.GetMe();
-        _globalInfo.BotUser = me;
-        _logger.LogInformation("机器人信息获取成功: {BotName} (@{BotUsername})");
+        try
+        {
+            var me = await _botClient.GetMe().ConfigureAwait(false);
+            _globalInfo.BotUser = me;
+            _logger.LogInformation("机器人信息获取成功: {BotName} (@{BotUsername})", me.FullName(), me.Username);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取机器人信息失败, 请检查 Bot.BotToken 和 Bot.BotProxy");
+            throw;
+        }
+
+
+
 
         // 从数据库获取每个Channel的信息
         var channelInfos = await _channelInfoRepository.GetAllAsync();

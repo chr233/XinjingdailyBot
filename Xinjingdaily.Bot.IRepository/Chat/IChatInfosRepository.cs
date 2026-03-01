@@ -6,6 +6,6 @@ namespace XinjingDaily.Bot.IRepository.Chat;
 /// <summary>
 /// 聊天信息仓储接口
 /// </summary>
-public interface IChatInfosRepository : IRepositoryInt<GroupInfos>
+public interface IChatInfosRepository : IRepositoryInt<GroupInfo>
 {
 }
