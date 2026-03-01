@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 using XinjingDaily.Bot.Infrastructure;
+using XinjingDaily.Bot.Infrastructure.Exceptions;
 using XinjingDaily.Bot.Interface.InitService;
 
 namespace XinjingDaily.Bot.Service.InitService;
@@ -15,28 +16,21 @@ public class RedisInitializeService(
     IOptions<AppSettings> _options,
     IConnectionMultiplexer _multiplexer) : IInitializeService
 {
+    /// <inheritdoc/>
     public int Order => 2;
+    /// <inheritdoc/>
+    public string Name => "Redis初始化";
 
-    /// <summary>
-    /// 执行
-    /// </summary>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public async Task<bool> InitializeAsync(CancellationToken cancellationToken)
+    /// <inheritdoc/>
+    public async Task InitializeAsync()
     {
         var config = _options.Value.Redis;
 
         const int maxAttempts = 3;
-        const int delayMs = 1000; // 1 second delay between attempts
+        const int delayMs = 1000;
 
         for (int attempt = 1; attempt <= maxAttempts; attempt++)
         {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                _logger.LogInformation("Redis 初始化取消");
-                return false;
-            }
-
             try
             {
                 if (!_multiplexer.IsConnected)
@@ -49,33 +43,18 @@ public class RedisInitializeService(
                     var ping = await db.PingAsync().ConfigureAwait(false);
 
                     _logger.LogInformation("Redis 连接成功, Ping: {Ping} ms", ping.TotalMilliseconds);
-                    return true;
+                    return;
                 }
-            }
-            catch (Exception ex) when (attempt < maxAttempts)
-            {
-                _logger.LogWarning(ex, "Redis 连接在第 {Attempt} 次尝试时出错，稍后重试", attempt);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Redis 连接出错");
-                return false;
+                _logger.LogWarning(ex, "Redis 连接在第 {Attempt} 次尝试时出错", attempt);
+                await Task.Delay(delayMs).ConfigureAwait(false);
             }
 
-            if (attempt < maxAttempts)
-            {
-                try
-                {
-                    await Task.Delay(delayMs, cancellationToken).ConfigureAwait(false);
-                }
-                catch (OperationCanceledException)
-                {
-                    return false;
-                }
-            }
         }
 
         _logger.LogError("Redis 连接在 {MaxAttempts} 次尝试后失败", maxAttempts);
-        return false;
+        throw new InitializeException("Redis 初始化失败, 请检查配置");
     }
 }

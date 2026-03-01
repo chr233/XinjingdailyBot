@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using XinjingDaily.Bot.Entry.Entries.Users;
 
 namespace XinjingDaily.Bot.SignalR;
 
@@ -58,15 +59,16 @@ public class PluginHub(
     //}
     #endregion
 
-    ///// <summary>
-    ///// Echo
-    ///// </summary>
-    ///// <param name="message"></param>
-    ///// <returns></returns>
-    //public Task<string> Echo(string message)
-    //{
-    //    var info = GetPluginInfo();
-    //    _logger.LogInformation("Plugin {info} Echo: {msg}", info, message);
-    //    return Task.FromResult(message);
-    //}
+    /// <summary>
+    /// Echo
+    /// </summary>
+    /// <param name="message"></param>
+    /// <returns></returns>
+    public Task<string> Echo(string message)
+    {
+        var user = Context.Items["user"] as UserInfos;
+
+        _logger.LogInformation("Plugin {info} Echo: {msg}", user, message);
+        return Task.FromResult(message);
+    }
 }

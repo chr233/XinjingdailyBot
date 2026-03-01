@@ -121,7 +121,7 @@ public static class RedisExtension
                     SslHost = config.SslHost,
 
                     // 5. 高可用与心跳
-                    AbortOnConnectFail = true, // 关键：生产环境建议设为 false，即使初始连接失败也会继续重试
+                    AbortOnConnectFail = false, // 关键：生产环境建议设为 false，即使初始连接失败也会继续重试
                     KeepAlive = config.KeepAlive,
                 };
 

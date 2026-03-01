@@ -18,15 +18,16 @@ public class DbInitializeService(
     IOptions<AppSettings> _options,
     IServiceProvider _serviceProvider) : IInitializeService
 {
+    /// <inheritdoc/>
     public int Order => 1;
 
-    /// <summary>
-    /// 执行
-    /// </summary>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <inheritdoc/>
+    public string Name => "数据库初始化";
+
+    /// <inheritdoc/>
+
     [RequiresUnreferencedCode("不兼容剪裁")]
-    public Task<bool> InitializeAsync(CancellationToken cancellationToken)
+    public Task InitializeAsync( )
     {
         var config = _options.Value.Database;
 
@@ -55,7 +56,7 @@ public class DbInitializeService(
             _logger.LogWarning("数据库结构生成完毕, 建议禁用 Database.Generate 来加快启动速度");
         }
 
-        return Task.FromResult(true);
+        return Task.CompletedTask;
     }
 
     private void SafeCreateDatabase(ISqlSugarClient db)

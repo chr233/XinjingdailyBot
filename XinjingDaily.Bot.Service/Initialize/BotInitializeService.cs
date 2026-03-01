@@ -2,7 +2,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using XinjingDaily.Bot.Infrastructure;
 using XinjingDaily.Bot.Interface.Bot;
+using XinjingDaily.Bot.Interface.Common;
 using XinjingDaily.Bot.Interface.InitService;
+using XinjingDaily.Bot.IRepository.Channel;
 
 namespace XinjingDaily.Bot.Service.InitService;
 
@@ -13,48 +15,40 @@ namespace XinjingDaily.Bot.Service.InitService;
 public class BotInitializeService(
     ILogger<BotInitializeService> _logger,
     IOptions<AppSettings> _options,
-    ITelegramBotService _botClient) : IInitializeService, IDisposable
+    ITelegramBotService _botClient,
+    IChannelInfoRepository _channelInfoRepository,
+    IGlobalInfoService _globalInfo) : IInitializeService
 {
+    /// <inheritdoc/>
     public int Order => 10;
 
-    public void Dispose()
-    {
-        _logger.LogError("BotInitializeService 已释放");
-    }
+    /// <inheritdoc/>
+    public string Name => "Bot初始化";
 
-    /// <summary>
-    /// 执行
-    /// </summary>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public async Task<bool> InitializeAsync(CancellationToken cancellationToken)
+    /// <inheritdoc/>
+    public async Task InitializeAsync()
     {
-        var config = _options.Value.Redis;
-
+        // 获取机器人本身的数据
         var me = await _botClient.GetMe();
+        _globalInfo.BotUser = me;
+        _logger.LogInformation("机器人信息获取成功: {BotName} (@{BotUsername})");
 
-        _logger.LogWarning(me.ToString());
+        // 从数据库获取每个Channel的信息
+        var channelInfos = await _channelInfoRepository.GetAllAsync();
+        _logger.LogInformation("获取到 {Count} 个频道信息", channelInfos.Count);
 
-        //try
+        //// 遍历每个频道信息，获取详细的chatInfo
+        //foreach (var channelInfo in channelInfos)
         //{
-        //    if (!_multiplexer.IsConnected)
+        //    try
         //    {
-        //        _logger.LogError("Redis 连接失败");
-        //        return false;
+        //        var chat = await _botClient.GetChatAsync(channelInfo.TelegramId);
+        //        _logger.LogInformation("获取频道详细信息: {Title} (@{Username})", chat.Title, chat.Username);
         //    }
-
-        //    var db = _multiplexer.GetDatabase(config.DefaultDatabase);
-        //    var ping = await db.PingAsync().ConfigureAwait(false);
-
-        //    _logger.LogInformation("Redis 连接成功, Ping: {Ping} ms", ping.TotalMilliseconds);
-        //    return true;
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "获取频道 {TelegramId} 信息失败", channelInfo.TelegramId);
+        //    }
         //}
-        //catch (Exception ex)
-        //{
-        //    _logger.LogError(ex, "Redis 连接出错");
-        //    return false;
-        //}
-
-        return true;
     }
 }
