@@ -43,17 +43,11 @@ services.AddSqlSugarSetup();
 // Redis
 services.AddRedis();
 
-#if DEBUG
 // 添加服务
 services.AddAppService();
+
 // 添加定时任务
 services.AddQuartzSetup(builder.Configuration);
-#else
-// 添加服务
-services.AddAppServiceGenerated();
-// 添加定时任务
-services.AddQuartzSetupGenerated(builder.Configuration);
-#endif
 
 // 注册HttpClient
 services.AddHttpClients();

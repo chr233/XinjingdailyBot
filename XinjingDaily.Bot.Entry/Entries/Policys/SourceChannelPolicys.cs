@@ -24,6 +24,7 @@ public sealed record SourceChannelPolicys : ICreateAt, IModifyAt
     /// <summary>
     /// 频道ID @
     /// </summary>
+    [SugarColumn(Length = 100)]
     public string ChatName { get; set; } = "";
     /// <summary>
     /// 频道名称

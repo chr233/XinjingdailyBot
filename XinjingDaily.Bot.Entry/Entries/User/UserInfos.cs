@@ -26,7 +26,7 @@ public sealed record UserInfos : IModifyAt, ICreateAt
     /// <summary>
     /// 用户名@
     /// </summary>
-    [SugarColumn(IsNullable = true)]
+    [SugarColumn(IsNullable = true, Length = 100)]
     public string? TelegramName { get; set; }
     /// <summary>
     /// 用户昵称 姓

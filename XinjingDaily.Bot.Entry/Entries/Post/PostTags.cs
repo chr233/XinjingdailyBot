@@ -27,6 +27,7 @@ public sealed record PostTags : ICreateAt, IModifyAt
     /// <summary>
     /// CallbackData
     /// </summary>
+    [SugarColumn(Length = 50)]
     public string Payload { get; set; } = "";
     /// <summary>
     /// 启用文本

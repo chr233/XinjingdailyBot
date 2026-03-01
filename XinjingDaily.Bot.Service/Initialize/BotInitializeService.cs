@@ -13,9 +13,14 @@ namespace XinjingDaily.Bot.Service.InitService;
 public class BotInitializeService(
     ILogger<BotInitializeService> _logger,
     IOptions<AppSettings> _options,
-    ITelegramBotService _botClient) : IInitializeService
+    ITelegramBotService _botClient) : IInitializeService, IDisposable
 {
     public int Order => 10;
+
+    public void Dispose()
+    {
+        _logger.LogError("BotInitializeService 已释放");
+    }
 
     /// <summary>
     /// 执行
