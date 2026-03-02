@@ -1,9 +1,6 @@
 using SqlSugar;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace XinjingDaily.Bot.Entry.Entries.Context;
+namespace XinjingDaily.Bot.Entry.Entries.Command;
 
 [SugarTable("command_context", TableDescription = "命令上下文")]
 public sealed record CommandContext
@@ -14,5 +11,5 @@ public sealed record CommandContext
 
     public int UserId { get; set; }
 
-    
+
 }

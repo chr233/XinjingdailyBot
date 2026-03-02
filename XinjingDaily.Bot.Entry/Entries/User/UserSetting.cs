@@ -7,7 +7,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Users;
 /// 用户设置表
 /// </summary>
 [SugarTable("user_setting", TableDescription = "用户设置表")]
-[SugarIndex("i_usersetting_userid", nameof(UserId), OrderByType.Asc, true)]
+[SugarIndex("i_user_setting_user_id", nameof(UserId), OrderByType.Asc, true)]
 public sealed record UserSetting : IModifyAt, ICreateAt
 {
     /// <summary>

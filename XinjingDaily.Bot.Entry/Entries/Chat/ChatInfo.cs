@@ -7,7 +7,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Chat;
 /// <summary>
 /// 发布频道表
 /// </summary>
-[SugarTable("chat_info", TableDescription = "会话信息")]
+[SugarTable("chat_info", TableDescription = "群聊/频道信息")]
 public sealed record ChatInfo : ICreateAt, IModifyAt
 {
     /// <summary>
@@ -35,8 +35,10 @@ public sealed record ChatInfo : ICreateAt, IModifyAt
     /// </summary>
     public bool IsPublish { get; set; }
 
+    /// <summary>
+    /// 会话类型
+    /// </summary>
     public ChatType Type { get; set; }
-
 
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.Now;

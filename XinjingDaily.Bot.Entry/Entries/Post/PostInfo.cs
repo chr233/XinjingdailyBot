@@ -75,11 +75,6 @@ public sealed record PostInfo : IModifyAt, ICreateAt
     public bool IsDirectPost { get; set; }
 
     /// <summary>
-    /// 匿名投稿
-    /// </summary>
-    public EAnonymousType Anonymous { get; set; }
-
-    /// <summary>
     /// 投稿描述(过滤#标签和链接)
     /// </summary>
     [SugarColumn(Length = 2000)]

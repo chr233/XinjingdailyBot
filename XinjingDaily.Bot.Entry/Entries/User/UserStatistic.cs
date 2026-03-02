@@ -6,6 +6,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Users;
 /// 用户等级表
 /// </summary>
 [SugarTable("user_statistic", TableDescription = "用户统计信息表")]
+[SugarIndex("i_user_statistic_user_id", nameof(UserId), OrderByType.Asc, true)]
 public sealed record UserStatistic
 {
     /// <summary>

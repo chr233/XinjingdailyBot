@@ -7,7 +7,8 @@ namespace XinjingDaily.Bot.Entry.Entries.Users;
 /// 用户密钥表, 储存WebAPI的Token
 /// </summary>
 [SugarTable("user_token", TableDescription = "用户密钥表")]
-[SugarIndex("i_usertoken_apitoken", nameof(ApiToken), OrderByType.Asc, false)]
+[SugarIndex("i_user_token_api_token", nameof(ApiToken), OrderByType.Asc, false)]
+[SugarIndex("i_user_token_user_id", nameof(UserId), OrderByType.Asc, true)]
 public sealed record UserToken : ICreateAt, IExpiredAt
 {
     /// <summary>
@@ -19,7 +20,7 @@ public sealed record UserToken : ICreateAt, IExpiredAt
     /// <summary>
     /// UserInfo 主键
     /// </summary>
-    public long UserId { get; set; }
+    public int UserId { get; set; }
 
     /// <summary>
     /// API Token

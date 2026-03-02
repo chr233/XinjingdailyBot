@@ -7,7 +7,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Posts;
 /// 投稿附件表
 /// </summary>
 [SugarTable("post_attachment", TableDescription = "投稿附件")]
-[SugarIndex("i_post_attachment_postid", nameof(PostId), OrderByType.Asc)]
+[SugarIndex("i_post_attachment_post_id", nameof(PostId), OrderByType.Asc)]
 public sealed record PostAttachment
 {
     /// <summary>
