@@ -1,4 +1,5 @@
 using SqlSugar;
+using XinjingDaily.Bot.Entry.Columns;
 
 namespace XinjingDaily.Bot.Entry.Entries.Users;
 
@@ -7,7 +8,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Users;
 /// </summary>
 [SugarTable("user_statistic", TableDescription = "用户统计信息表")]
 [SugarIndex("i_user_statistic_user_id", nameof(UserId), OrderByType.Asc, true)]
-public sealed record UserStatistic
+public sealed record UserStatistic : ICreateAt, IModifyAt
 {
     /// <summary>
     /// 主键
@@ -45,4 +46,9 @@ public sealed record UserStatistic
     /// </summary>
     public ulong Experience { get; set; }
 
+    /// <inheritdoc cref="ICreateAt"/>
+    public DateTime CreateAt { get; set; } = DateTime.Now;
+
+    /// <inheritdoc cref="IModifyAt"/>
+    public DateTime ModifyAt { get; set; } = DateTime.Now;
 }

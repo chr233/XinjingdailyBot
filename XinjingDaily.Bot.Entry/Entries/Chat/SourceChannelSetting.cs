@@ -40,5 +40,5 @@ public sealed record SourceChannelSetting : ICreateAt, IModifyAt
     public DateTime CreateAt { get; set; } = DateTime.Now;
 
     /// <inheritdoc cref="IModifyAt"/>
-    public DateTime ModifyAt { get; set; } = DateTime.Now;
+    public DateTime ModifyAt { get; set; } = DateTime.MinValue;
 }
