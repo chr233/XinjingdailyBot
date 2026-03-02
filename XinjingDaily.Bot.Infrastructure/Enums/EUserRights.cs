@@ -3,7 +3,6 @@ namespace XinjingDaily.Bot.Infrastructure.Enums;
 /// <summary>
 /// 用户权限
 /// </summary>
-[Flags]
 public enum EUserRights : byte
 {
     /// <summary>
@@ -45,39 +44,4 @@ public enum EUserRights : byte
     /// 火星
     /// </summary>
     Mars = 1 << 7,
-
-    /// <summary>
-    /// 普通用户
-    /// </summary>
-    NormalUser = SendPost | NormalCmd,
-
-    /// <summary>
-    /// 审核员
-    /// </summary>
-    Reviewer = NormalUser | ReviewPost,
-
-    /// <summary>
-    /// 发布员
-    /// </summary>
-    Poster = NormalUser | DirectPost,
-
-    /// <summary>
-    /// 火星救员
-    /// </summary>
-    TheMartian = NormalUser | Mars,
-
-    /// <summary>
-    /// 普通管理
-    /// </summary>
-    Admin = SendPost | ReviewPost | DirectPost | NormalCmd | AdminCmd | Mars,
-
-    /// <summary>
-    /// 超级管理
-    /// </summary>
-    SuperAdmin = Admin | SuperCmd,
-
-    /// <summary>
-    /// 全部权限
-    /// </summary>
-    ALL = SendPost | ReviewPost | DirectPost | NormalCmd | AdminCmd | SuperCmd | Mars
 }

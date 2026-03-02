@@ -1,6 +1,6 @@
 namespace XinjingDaily.Bot.Interface.InitService;
 
-public interface IInitializer
+public interface IServiceInitializer
 {
     /// <summary>
     /// 服务名称
@@ -13,7 +13,5 @@ public interface IInitializer
     /// <summary>
     /// 初始化方法, 如果抛出异常则停止运行
     /// </summary>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
     Task InitializeAsync();
 }

@@ -38,7 +38,7 @@ public sealed record AdvertisesLegacy : ICreateAt, IExpiredAt
     /// <summary>
     /// 广告发布位置
     /// </summary>
-    public EAdMode Mode { get; set; } = EAdMode.None;
+    //public EAdMode Mode { get; set; } = EAdMode.None;
 
     /// <summary>
     /// 展示权重, 数值越大概率越高, 0为不展示

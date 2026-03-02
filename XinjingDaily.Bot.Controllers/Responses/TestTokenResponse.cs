@@ -23,8 +23,6 @@ public sealed record TestTokenResponse
     /// 用户昵称
     /// </summary>
     public string? NickName { get; set; }
-    /// <inheritdoc cref="EUserRights"/>
-    public EUserRights UserRight { get; set; }
     /// <summary>
     /// 权限组ID
     /// </summary>

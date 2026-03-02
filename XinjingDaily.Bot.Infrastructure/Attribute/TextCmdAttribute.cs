@@ -6,13 +6,13 @@ namespace XinjingDaily.Bot.Infrastructure.Attribute;
 /// <summary>
 /// 用于标记文本命令
 /// </summary>
-[AttributeUsage(AttributeTargets.Method, Inherited = false)]
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
 public sealed class TextCmdAttribute : System.Attribute
 {
     /// <summary>
     /// 指令名称
     /// </summary>
-    public string Command { get; set; } = "";
+    public string Command { get; set; }
     /// <summary>
     /// 指令别名
     /// </summary>
@@ -21,10 +21,18 @@ public sealed class TextCmdAttribute : System.Attribute
     /// 指令描述
     /// </summary>
     public string? Description { get; set; }
+
     /// <summary>
-    /// 需求的权限
+    /// 命令可用范围
     /// </summary>
-    public EUserRights Rights { get; set; } = EUserRights.None;
+    public ECommandScope Scope { get; set; }
+
+    /// <summary>
+    /// 需要的权限
+    /// </summary>
+    public string? Permission { get; set; }
+
+    public bool IsShareContext { get; set; }
 
     /// <summary>
     /// 创建特性
@@ -33,16 +41,40 @@ public sealed class TextCmdAttribute : System.Attribute
     public TextCmdAttribute(string command)
     {
         Command = command;
-        Rights = EUserRights.None;
+        Scope = ECommandScope.All;
     }
     /// <summary>
     /// 创建特性
     /// </summary>
     /// <param name="command"></param>
-    /// <param name="rights"></param>
-    public TextCmdAttribute(string command, EUserRights rights)
+    /// <param name="scope"></param>
+    public TextCmdAttribute(string command, ECommandScope scope)
     {
         Command = command;
-        Rights = rights;
+        Scope = scope;
+    }
+    /// <summary>
+    /// 创建特性
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="scope"></param>
+    /// <param name="permission"></param>
+    public TextCmdAttribute(string command, ECommandScope scope, string? permission)
+    {
+        Command = command;
+        Scope = scope;
+        Permission = permission;
+    }
+
+    /// <summary>
+    /// 创建特性
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="permission"></param>
+    public TextCmdAttribute(string command, string? permission)
+    {
+        Command = command;
+        Scope = ECommandScope.All;
+        Permission = permission;
     }
 }

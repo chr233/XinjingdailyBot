@@ -12,26 +12,6 @@ public class DispatcherService(
         ITelegramBotService _botClient) : IDispatcherService
 {
     /// <inheritdoc/>
-    private async Task UnPinMessage(Message message)
-    {
-        //try
-        //{
-        //    if (_tagRepository.IsWarnText(message.Text))
-        //    {
-        //        await _botClient.DeleteMessage(message.Chat.Id, message.MessageId).ConfigureAwait(false);
-        //    }
-        //    else
-        //    {
-        //        await _botClient.UnpinChatMessage(message.Chat.Id, message.MessageId).ConfigureAwait(false);
-        //    }
-        //}
-        //catch (Exception ex)
-        //{
-        //    _logger.LogError(ex, "取消置顶出错");
-        //}
-    }
-
-    /// <inheritdoc/>
     public async Task OnMessageReceived(UserInfo dbUser, Message message)
     {
         //await _dialogueService.RecordMessage(message).ConfigureAwait(false);

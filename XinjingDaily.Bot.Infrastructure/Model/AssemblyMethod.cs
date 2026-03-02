@@ -4,33 +4,15 @@ using XinjingDaily.Bot.Infrastructure.Enums;
 namespace XinjingDaily.Bot.Infrastructure.Model;
 
 /// <summary>
-/// 反射方法
+/// 程序集方法信息
 /// </summary>
-public sealed record AssemblyMethod
-{
-    /// <summary>
-    /// 反射方法
-    /// </summary>
-    public MethodInfo Method { get; set; }
-    /// <summary>
-    /// 命令说明
-    /// </summary>
-    public string? Description { get; set; }
-    /// <summary>
-    /// 命令权限
-    /// </summary>
-    public EUserRights Rights { get; set; }
+/// <param name="Method">方法信息</param>
+/// <param name="Description">方法描述</param>
+/// <param name="Rights">需要的权限</param>
+/// <param name="Scope">适用的聊天场景</param>
+public sealed record AssemblyMethod(
+    MethodInfo Method,
+    string? Description,
+    EUserRights Rights,
+    ECommandScope Scope = ECommandScope.All);
 
-    /// <summary>
-    /// 反射方法
-    /// </summary>
-    /// <param name="method"></param>
-    /// <param name="description"></param>
-    /// <param name="rights"></param>
-    public AssemblyMethod(MethodInfo method, string? description, EUserRights rights)
-    {
-        Method = method;
-        Description = description;
-        Rights = rights;
-    }
-}

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
@@ -20,10 +20,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\XinjingDaily.Bot.Command\XinjingDaily.Bot.Command.csproj" />
 		<ProjectReference Include="..\XinjingDaily.Bot.Data\XinjingDaily.Bot.Data.csproj" />
 		<ProjectReference Include="..\XinjingDaily.Bot.Infrastructure\XinjingDaily.Bot.Infrastructure.csproj" />
 		<ProjectReference Include="..\XinjingDaily.Bot.Interface\XinjingDaily.Bot.Interface.csproj" />
 		<ProjectReference Include="..\XinjingDaily.Bot.Repository\XinjingDaily.Bot.Repository.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Storage\" />
 	</ItemGroup>
 
 </Project>
