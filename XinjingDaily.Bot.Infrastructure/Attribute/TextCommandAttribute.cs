@@ -7,7 +7,7 @@ namespace XinjingDaily.Bot.Infrastructure.Attribute;
 /// 用于标记文本命令
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
-public sealed class TextCmdAttribute : System.Attribute
+public sealed class TextCommandAttribute : System.Attribute
 {
     /// <summary>
     /// 指令名称
@@ -38,7 +38,7 @@ public sealed class TextCmdAttribute : System.Attribute
     /// 创建特性
     /// </summary>
     /// <param name="command"></param>
-    public TextCmdAttribute(string command)
+    public TextCommandAttribute(string command)
     {
         Command = command;
         Scope = ECommandScope.All;
@@ -48,7 +48,7 @@ public sealed class TextCmdAttribute : System.Attribute
     /// </summary>
     /// <param name="command"></param>
     /// <param name="scope"></param>
-    public TextCmdAttribute(string command, ECommandScope scope)
+    public TextCommandAttribute(string command, ECommandScope scope)
     {
         Command = command;
         Scope = scope;
@@ -59,7 +59,7 @@ public sealed class TextCmdAttribute : System.Attribute
     /// <param name="command"></param>
     /// <param name="scope"></param>
     /// <param name="permission"></param>
-    public TextCmdAttribute(string command, ECommandScope scope, string? permission)
+    public TextCommandAttribute(string command, ECommandScope scope, string? permission)
     {
         Command = command;
         Scope = scope;
@@ -71,7 +71,7 @@ public sealed class TextCmdAttribute : System.Attribute
     /// </summary>
     /// <param name="command"></param>
     /// <param name="permission"></param>
-    public TextCmdAttribute(string command, string? permission)
+    public TextCommandAttribute(string command, string? permission)
     {
         Command = command;
         Scope = ECommandScope.All;

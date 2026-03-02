@@ -10,7 +10,6 @@ using XinjingDaily.Bot.Entry.Entries.Users;
 using XinjingDaily.Bot.Infrastructure;
 using XinjingDaily.Bot.Infrastructure.Attribute;
 using XinjingDaily.Bot.Infrastructure.Enums;
-using XinjingDaily.Bot.Infrastructure.Model;
 using XinjingDaily.Bot.Interface.Bot;
 using XinjingDaily.Bot.Interface.Bot.Handler;
 using XinjingDaily.Bot.Interface.Common;
@@ -30,23 +29,23 @@ public class CommandHandler(
 
     private readonly Dictionary<(ECommandScope scope, string command), string?> _textCommandPermission = [];
 
-    private readonly Dictionary<string, CommandDefinition<TextCmdAttribute>> _textCommandDefinitions = [];
+    private readonly Dictionary<string, CommandDefinition<TextCommandAttribute>> _textCommandDefinitions = [];
 
     private readonly Dictionary<(ECommandScope scope, string command), string?> _queryCommandPermission = [];
 
-    private readonly Dictionary<string, CommandDefinition<QueryCmdAttribute>> _queryCommandDefinitions = [];
+    private readonly Dictionary<string, CommandDefinition<QueryCommandAttribute>> _queryCommandDefinitions = [];
 
     private string[] SplitAlias(string alias)
     {
         return alias.ToUpperInvariant().Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }
 
-    public void RegisterTextCommand(Type classType, MethodInfo methodInfo, TextCmdAttribute attribute)
+    public void RegisterTextCommand(Type classType, MethodInfo methodInfo, TextCommandAttribute attribute)
     {
         var scope = attribute.Scope;
         var command = attribute.Command.ToUpperInvariant();
         var permission = attribute.Permission?.ToUpperInvariant();
-        var definition = new CommandDefinition<TextCmdAttribute>(classType, methodInfo, attribute);
+        var definition = new CommandDefinition<TextCommandAttribute>(classType, methodInfo, attribute);
 
         if (!_textCommandDefinitions.TryAdd(command, definition))
         {
@@ -68,12 +67,12 @@ public class CommandHandler(
         }
     }
 
-    public void RegisterQueryCommand(Type classType, MethodInfo methodInfo, QueryCmdAttribute attribute)
+    public void RegisterQueryCommand(Type classType, MethodInfo methodInfo, QueryCommandAttribute attribute)
     {
         var scope = attribute.Scope;
         var command = attribute.Command.ToUpperInvariant();
         var permission = attribute.Permission?.ToUpperInvariant();
-        var definition = new CommandDefinition<QueryCmdAttribute>(classType, methodInfo, attribute);
+        var definition = new CommandDefinition<QueryCommandAttribute>(classType, methodInfo, attribute);
 
         if (!_queryCommandDefinitions.TryAdd(command, definition))
         {
@@ -125,6 +124,7 @@ public class CommandHandler(
             }
         }
 
+        // 根据调用环境获取需要的权限
         var chatType = message.Chat.Type;
         string? permission;
         if (chatType == ChatType.Group || chatType == ChatType.Supergroup)
@@ -145,36 +145,26 @@ public class CommandHandler(
 
         //todo 权限验证
 
+
         bool handled = false;
         string? errorMsg = null;
 
         //寻找注册的命令处理器
-        foreach (var type in _commandClass.Keys)
+        if (_textCommandDefinitions.TryGetValue(cmd, out var definition))
         {
-            var allAlias = _commandAlias[type];
-            if (allAlias.TryGetValue(cmd, out var alias))
+            try
             {
-                cmd = alias;
-            }
+                await _botClient.SendChatAction(message, ChatAction.Typing).ConfigureAwait(false);
 
-            var allMethods = _commandClass[type];
-            if (allMethods.TryGetValue(cmd, out var method))
+                await CallCommandAsync(userInfo, message, definition.ClassType, definition.Method).ConfigureAwait(false);
+            }
+            catch (Exception ex)
             {
-                try
-                {
-                    await _botClient.SendChatAction(message, ChatAction.Typing).ConfigureAwait(false);
-
-                    await CallCommandAsync(userInfo, message, type, method).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    errorMsg = $"{ex.GetType} {ex.Message}";
-                    _logger.LogError(ex, "命令 {cmd} 执行出错", cmd);
-                    await _botClient.SendCommandReply(_optionsSetting.System.Debug ? errorMsg : "遇到内部错误", message).ConfigureAwait(false);
-                }
-                handled = true;
-                break;
+                errorMsg = $"{ex.GetType} {ex.Message}";
+                _logger.LogError(ex, "命令 {cmd} 执行出错", cmd);
+                await _botClient.SendCommandReply(_optionsSetting.System.Debug ? errorMsg : "遇到内部错误", message).ConfigureAwait(false);
             }
+            handled = true;
         }
 
         //await _cmdRecordService.AddCmdRecord(message, userInfo, handled, false, errorMsg).ConfigureAwait(false);
@@ -193,7 +183,7 @@ public class CommandHandler(
     /// <param name="type"></param>
     /// <param name="assemblyMethod"></param>
     /// <returns></returns>
-    private async Task CallCommandAsync(UserInfo userInfo, Message message, Type type, AssemblyMethod assemblyMethod)
+    private async Task CallCommandAsync(UserInfo userInfo, Message message, Type type, MethodInfo method)
     {
         //权限检查
         //if (!userInfo.Right.HasFlag(assemblyMethod.Rights))
@@ -204,7 +194,6 @@ public class CommandHandler(
 
         //获取服务
         var service = _serviceScope.ServiceProvider.GetRequiredService(type);
-        var method = assemblyMethod.Method;
         var methodParameters = new List<object>();
         //组装函数的入参
         foreach (var parameter in method.GetParameters())
@@ -274,33 +263,44 @@ public class CommandHandler(
             cmd = args.First().ToUpperInvariant();
         }
 
+        // 根据调用环境获取需要的权限
+        var chatType = message.Chat.Type;
+        string? permission;
+        if (chatType == ChatType.Group || chatType == ChatType.Supergroup)
+        {
+            permission = _textCommandPermission.GetValueOrDefault((ECommandScope.Group, cmd), null)
+                ?? _textCommandPermission.GetValueOrDefault((ECommandScope.All, cmd), null);
+        }
+        else if (chatType == ChatType.Private)
+        {
+            permission = _textCommandPermission.GetValueOrDefault((ECommandScope.Private, cmd), null)
+                ?? _textCommandPermission.GetValueOrDefault((ECommandScope.All, cmd), null);
+        }
+        else
+        {
+            _logger.LogWarning("不支持在 ChatType = {type} 中调用命令", chatType);
+            return;
+        }
+
+        //todo 权限验证
+
+
         bool handled = false;
         string? errorMsg = null;
         //寻找注册的命令处理器
-        foreach (var type in _queryCommandClass.Keys)
+        if (_queryCommandDefinitions.TryGetValue(cmd, out var definition))
         {
-            var allAlias = _queryCommandAlias[type];
-            if (allAlias.TryGetValue(cmd, out var alias))
+            try
             {
-                cmd = alias;
+                await CallQueryCommandAsync(dbUser, query, definition.ClassType, definition.Method, args).ConfigureAwait(false);
             }
-
-            var allMethods = _queryCommandClass[type];
-            if (allMethods.TryGetValue(cmd, out var method))
+            catch (Exception ex)
             {
-                try
-                {
-                    await CallQueryCommandAsync(dbUser, query, type, method, args).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    errorMsg = $"{ex.GetType} {ex.Message}";
-                    _logger.LogError(ex, "回调命令 {cmd} 执行出错", cmd);
-                    await _botClient.AutoReply(_optionsSetting.System.Debug ? errorMsg : "遇到内部错误", query, true).ConfigureAwait(false);
-                }
-                handled = true;
-                break;
+                errorMsg = $"{ex.GetType} {ex.Message}";
+                _logger.LogError(ex, "回调命令 {cmd} 执行出错", cmd);
+                await _botClient.AutoReply(_optionsSetting.System.Debug ? errorMsg : "遇到内部错误", query, true).ConfigureAwait(false);
             }
+            handled = true;
         }
 
         //await _cmdRecordService.AddCmdRecord(query, dbUser, handled, true, errorMsg).ConfigureAwait(false);
@@ -327,7 +327,7 @@ public class CommandHandler(
     /// <param name="assemblyMethod"></param>
     /// <param name="args"></param>
     /// <returns></returns>
-    private async Task CallQueryCommandAsync(UserInfo userInfo, CallbackQuery query, Type type, AssemblyMethod assemblyMethod, string[] args)
+    private async Task CallQueryCommandAsync(UserInfo userInfo, CallbackQuery query, Type type, MethodInfo method, string[] args)
     {
         //权限检查
         //if (!userInfo.Right.HasFlag(assemblyMethod.Rights))
@@ -338,7 +338,6 @@ public class CommandHandler(
 
         //获取服务
         var service = _serviceScope.ServiceProvider.GetRequiredService(type);
-        var method = assemblyMethod.Method;
         var methodParameters = new List<object>();
         //组装函数的入参
         foreach (var parameter in method.GetParameters())
@@ -372,25 +371,25 @@ public class CommandHandler(
     {
         var cmds = new Dictionary<string, string>();
 
-        foreach (var type in _commandClass.Keys)
-        {
-            var allMethods = _commandClass[type];
-            foreach (var cmd in allMethods.Keys)
-            {
-                var method = allMethods[cmd];
+        //foreach (var type in _commandClass.Keys)
+        //{
+        //    var allMethods = _commandClass[type];
+        //    foreach (var cmd in allMethods.Keys)
+        //    {
+        //        var method = allMethods[cmd];
 
-                //if (dbUser.Right.HasFlag(method.Rights))
-                //{
-                //    if (!string.IsNullOrEmpty(method.Description))
-                //    {
-                //        if (!cmds.TryAdd(cmd.ToLowerInvariant(), method.Description))
-                //        {
-                //            _logger.LogWarning("命令 {cmd} 重复, 请检查代码逻辑", cmd);
-                //        }
-                //    }
-                //}
-            }
-        }
+        //        //if (dbUser.Right.HasFlag(method.Rights))
+        //        //{
+        //        //    if (!string.IsNullOrEmpty(method.Description))
+        //        //    {
+        //        //        if (!cmds.TryAdd(cmd.ToLowerInvariant(), method.Description))
+        //        //        {
+        //        //            _logger.LogWarning("命令 {cmd} 重复, 请检查代码逻辑", cmd);
+        //        //        }
+        //        //    }
+        //        //}
+        //    }
+        //}
 
         if (cmds.Count > 0)
         {
@@ -414,21 +413,21 @@ public class CommandHandler(
 
         void AddCommands(EUserRights right)
         {
-            foreach (var type in _commandClass.Keys)
-            {
-                var allMethods = _commandClass[type];
-                foreach (var cmd in allMethods.Keys)
-                {
-                    var method = allMethods[cmd];
-                    if (method.Rights == right)
-                    {
-                        if (!string.IsNullOrEmpty(method.Description))
-                        {
-                            cmds.Add(new BotCommand { Command = cmd.ToLowerInvariant(), Description = method.Description });
-                        }
-                    }
-                }
-            }
+            //foreach (var type in _commandClass.Keys)
+            //{
+            //    var allMethods = _commandClass[type];
+            //    foreach (var cmd in allMethods.Keys)
+            //    {
+            //        var method = allMethods[cmd];
+            //        if (method.Rights == right)
+            //        {
+            //            if (!string.IsNullOrEmpty(method.Description))
+            //            {
+            //                cmds.Add(new BotCommand { Command = cmd.ToLowerInvariant(), Description = method.Description });
+            //            }
+            //        }
+            //    }
+            //}
         }
 
         AddCommands(EUserRights.None);

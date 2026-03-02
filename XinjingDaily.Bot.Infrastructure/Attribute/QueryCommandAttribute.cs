@@ -7,7 +7,7 @@ namespace XinjingDaily.Bot.Infrastructure.Attribute;
 /// 用于标记Query命令
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
-public sealed class QueryCmdAttribute : System.Attribute
+public sealed class QueryCommandAttribute : System.Attribute
 {
     /// <summary>
     /// 指令名称
@@ -34,7 +34,7 @@ public sealed class QueryCmdAttribute : System.Attribute
     /// 创建特性
     /// </summary>
     /// <param name="command"></param>
-    public QueryCmdAttribute(string command)
+    public QueryCommandAttribute(string command)
     {
         Command = command;
         Scope = ECommandScope.All;
@@ -44,7 +44,7 @@ public sealed class QueryCmdAttribute : System.Attribute
     /// </summary>
     /// <param name="command"></param>
     /// <param name="scope"></param>
-    public QueryCmdAttribute(string command, ECommandScope scope)
+    public QueryCommandAttribute(string command, ECommandScope scope)
     {
         Command = command;
         Scope = scope;
@@ -55,7 +55,7 @@ public sealed class QueryCmdAttribute : System.Attribute
     /// </summary>
     /// <param name="command"></param>
     /// <param name="scope"></param>
-    public QueryCmdAttribute(string command, string? permission)
+    public QueryCommandAttribute(string command, string? permission)
     {
         Command = command;
         Scope = ECommandScope.All;

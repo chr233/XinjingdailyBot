@@ -24,7 +24,7 @@ public class CommandInitializer(
     /// <inheritdoc/>
     public Task InitializeAsync()
     {
-        ScanExistCommands("XinjingDaily.Bot.Entry");
+        ScanExistCommands("XinjingDaily.Bot.Command");
         return Task.CompletedTask;
     }
 
@@ -45,10 +45,18 @@ public class CommandInitializer(
             // 遍历类型中的所有方法
             foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance))
             {
-                var textAttribute = method.GetCustomAttributes<TextCmdAttribute>(inherit: false);
+                var textAttribute = method.GetCustomAttributes<TextCommandAttribute>(inherit: false);
                 foreach (var attr in textAttribute)
                 {
                     _commandHandler.RegisterTextCommand(type, method, attr);
+                    _logger.LogDebug("注册命令 {cmd}", attr.Command.ToUpperInvariant());
+                }
+
+                var queryAttribute = method.GetCustomAttributes<QueryCommandAttribute>(inherit: false);
+                foreach (var attr in queryAttribute)
+                {
+                    _commandHandler.RegisterQueryCommand(type, method, attr);
+                    _logger.LogDebug("注册Q命令 {cmd}", attr.Command.ToUpperInvariant());
                 }
             }
         }
