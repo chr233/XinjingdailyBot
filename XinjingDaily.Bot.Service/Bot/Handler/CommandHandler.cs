@@ -1,14 +1,18 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Reflection;
 using System.Text;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using XinjingDaily.Bot.Data.Bot;
 using XinjingDaily.Bot.Entry.Entries.Users;
 using XinjingDaily.Bot.Infrastructure;
+using XinjingDaily.Bot.Infrastructure.Attribute;
 using XinjingDaily.Bot.Infrastructure.Enums;
 using XinjingDaily.Bot.Infrastructure.Model;
 using XinjingDaily.Bot.Interface.Bot;
+using XinjingDaily.Bot.Interface.Bot.Handler;
 using XinjingDaily.Bot.Interface.Common;
 
 namespace XinjingDaily.Bot.Service.Bot.Handler;
@@ -19,38 +23,76 @@ public class CommandHandler(
     IServiceProvider _serviceProvider,
     ITelegramBotService _botClient,
     IGlobalInfoService _globalInfo,
-    IOptions<AppSettings> _options)
+    IOptions<AppSettings> _options) : ICommandHandler
 {
     private readonly AppSettings _optionsSetting = _options.Value;
     private readonly IServiceScope _serviceScope = _serviceProvider.CreateScope();
 
-    /// <summary>
-    /// 指令方法名映射
-    /// </summary>
-    private readonly Dictionary<Type, Dictionary<string, AssemblyMethod>> _commandClass = [];
-    /// <summary>
-    /// 指令别名
-    /// </summary>
-    private readonly Dictionary<Type, Dictionary<string, string>> _commandAlias = [];
+    private readonly Dictionary<(ECommandScope scope, string command), string?> _textCommandPermission = [];
 
-    /// <summary>
-    /// Query指令方法名映射
-    /// </summary>
-    private readonly Dictionary<Type, Dictionary<string, AssemblyMethod>> _queryCommandClass = [];
-    /// <summary>
-    /// Query指令别名
-    /// </summary>
-    private readonly Dictionary<Type, Dictionary<string, string>> _queryCommandAlias = [];
+    private readonly Dictionary<string, CommandDefinition<TextCmdAttribute>> _textCommandDefinitions = [];
 
+    private readonly Dictionary<(ECommandScope scope, string command), string?> _queryCommandPermission = [];
 
-    public void RegisterTextCommand()
+    private readonly Dictionary<string, CommandDefinition<QueryCmdAttribute>> _queryCommandDefinitions = [];
+
+    private string[] SplitAlias(string alias)
     {
-
+        return alias.ToUpperInvariant().Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }
 
-    public void RegisterQueryCommand()
+    public void RegisterTextCommand(Type classType, MethodInfo methodInfo, TextCmdAttribute attribute)
     {
+        var scope = attribute.Scope;
+        var command = attribute.Command.ToUpperInvariant();
+        var permission = attribute.Permission?.ToUpperInvariant();
+        var definition = new CommandDefinition<TextCmdAttribute>(classType, methodInfo, attribute);
 
+        if (!_textCommandDefinitions.TryAdd(command, definition))
+        {
+            _logger.LogWarning("命令 {scope} - {command} - {permission} 已经存在, 请检查代码逻辑", scope, command, permission);
+        }
+        _textCommandPermission.TryAdd((scope, command), permission);
+
+        if (!string.IsNullOrEmpty(attribute.Alias))
+        {
+            var entries = SplitAlias(attribute.Alias);
+            foreach (var entry in entries)
+            {
+                if (!_textCommandDefinitions.TryAdd(entry, definition))
+                {
+                    _logger.LogWarning("命令 {command} 的别名 {alias} 已经存在, 请检查代码逻辑", command, entry);
+                }
+                _textCommandPermission.TryAdd((scope, entry), permission);
+            }
+        }
+    }
+
+    public void RegisterQueryCommand(Type classType, MethodInfo methodInfo, QueryCmdAttribute attribute)
+    {
+        var scope = attribute.Scope;
+        var command = attribute.Command.ToUpperInvariant();
+        var permission = attribute.Permission?.ToUpperInvariant();
+        var definition = new CommandDefinition<QueryCmdAttribute>(classType, methodInfo, attribute);
+
+        if (!_queryCommandDefinitions.TryAdd(command, definition))
+        {
+            _logger.LogWarning("命令 {scope} - {command} - {permission} 已经存在, 请检查代码逻辑", scope, command, permission);
+        }
+        _queryCommandPermission.TryAdd((scope, command), permission);
+
+        if (!string.IsNullOrEmpty(attribute.Alias))
+        {
+            var entries = SplitAlias(attribute.Alias);
+            foreach (var entry in entries)
+            {
+                if (!_queryCommandDefinitions.TryAdd(command, definition))
+                {
+                    _logger.LogWarning("命令 {command} 的别名 {alias} 已经存在, 请检查代码逻辑", command, entry);
+                }
+                _queryCommandPermission.TryAdd((scope, entry), permission);
+            }
+        }
     }
 
     /// <inheritdoc />
@@ -83,8 +125,29 @@ public class CommandHandler(
             }
         }
 
+        var chatType = message.Chat.Type;
+        string? permission;
+        if (chatType == ChatType.Group || chatType == ChatType.Supergroup)
+        {
+            permission = _textCommandPermission.GetValueOrDefault((ECommandScope.Group, cmd), null)
+                ?? _textCommandPermission.GetValueOrDefault((ECommandScope.All, cmd), null);
+        }
+        else if (chatType == ChatType.Private)
+        {
+            permission = _textCommandPermission.GetValueOrDefault((ECommandScope.Private, cmd), null)
+                ?? _textCommandPermission.GetValueOrDefault((ECommandScope.All, cmd), null);
+        }
+        else
+        {
+            _logger.LogWarning("不支持在 ChatType = {type} 中调用命令", chatType);
+            return;
+        }
+
+        //todo 权限验证
+
         bool handled = false;
         string? errorMsg = null;
+
         //寻找注册的命令处理器
         foreach (var type in _commandClass.Keys)
         {

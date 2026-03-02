@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using XinjingDaily.Bot.Infrastructure.Attribute;
+using XinjingDaily.Bot.Interface.Bot.Handler;
 using XinjingDaily.Bot.Interface.InitService;
 
 namespace XinjingDaily.Bot.Service.InitService;
@@ -11,7 +12,8 @@ namespace XinjingDaily.Bot.Service.InitService;
 /// </summary>
 [RegisterScoped<IServiceInitializer>(Duplicate = DuplicateStrategy.Append)]
 public class CommandInitializer(
-    ILogger<CommandInitializer> _logger) : IServiceInitializer
+    ILogger<CommandInitializer> _logger,
+    ICommandHandler _commandHandler) : IServiceInitializer
 {
     /// <inheritdoc/>
     public int Order => 3;
@@ -22,7 +24,6 @@ public class CommandInitializer(
     /// <inheritdoc/>
     public Task InitializeAsync()
     {
-
         ScanExistCommands("XinjingDaily.Bot.Entry");
         return Task.CompletedTask;
     }
@@ -31,46 +32,26 @@ public class CommandInitializer(
     /// 扫描程序集中的所有命令
     /// </summary>
     [RequiresUnreferencedCode("不兼容剪裁")]
-    private List<object> ScanExistCommands(string packageName)
+    private void ScanExistCommands(string packageName)
     {
-        List<CommandDescriptor>? commandList = new List<CommandDescriptor>();
+        var assembly = Assembly.Load(packageName);
 
-        if (assemblies == null || assemblies.Length == 0)
+        // 遍历所有类型
+        foreach (var type in assembly.GetTypes())
         {
-            // 默认扫描当前程序集
-            assemblies = new[] { Assembly.GetExecutingAssembly() };
-        }
+            // 跳过抽象类和接口
+            if (type.IsAbstract || type.IsInterface) continue;
 
-        // 遍历所有程序集
-        foreach (var assembly in assemblies)
-        {
-            // 遍历所有类型
-            foreach (var type in assembly.GetTypes())
+            // 遍历类型中的所有方法
+            foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance))
             {
-                // 跳过抽象类和接口
-                if (type.IsAbstract || type.IsInterface) continue;
-
-                // 遍历类型中的所有方法
-                foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance))
+                var textAttribute = method.GetCustomAttributes<TextCmdAttribute>(inherit: false);
+                foreach (var attr in textAttribute)
                 {
-                    // 获取方法上的所有TextCmdAttribute
-                    var cmdAttributes = method.GetCustomAttributes<TextCmdAttribute>(inherit: false);
-                    foreach (var attr in cmdAttributes)
-                    {
-                        // 构建命令描述符
-                        commandList.Add(new CommandDescriptor {
-                            Keyword = attr.Keyword,
-                            ChatType = attr.ChatType,
-                            RequiredRight = attr.RequiredRight,
-                            HandlerMethod = method,
-                            HandlerType = type
-                        });
-                    }
+                    _commandHandler.RegisterTextCommand(type, method, attr);
                 }
             }
         }
-
-        return commandList;
     }
 
 }

@@ -14,7 +14,7 @@ public sealed class TextCmdAttribute : System.Attribute
     /// </summary>
     public string Command { get; set; }
     /// <summary>
-    /// 指令别名
+    /// 指令别名, 用 | 分隔
     /// </summary>
     public string? Alias { get; set; }
     /// <summary>

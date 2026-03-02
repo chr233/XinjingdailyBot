@@ -18,8 +18,4 @@
 		<None Include="..\.editorconfig" Link=".editorconfig" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Bot\Handler\" />
-	</ItemGroup>
-
 </Project>
