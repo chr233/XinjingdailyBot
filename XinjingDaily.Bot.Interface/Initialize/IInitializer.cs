@@ -1,6 +1,6 @@
 namespace XinjingDaily.Bot.Interface.InitService;
 
-public interface IInitializeService
+public interface IInitializer
 {
     /// <summary>
     /// 服务名称

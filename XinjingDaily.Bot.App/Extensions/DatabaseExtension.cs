@@ -46,6 +46,8 @@ public static class DatabaseExtension
         /// <param name="services"></param>
         public void AddSqlSugarSetup()
         {
+            bool firstInit = true;
+
             services.AddScoped<ISqlSugarClient>(s => {
                 var config = s.GetRequiredService<IOptions<AppSettings>>().Value.Database;
 
@@ -93,15 +95,22 @@ public static class DatabaseExtension
                     Environment.Exit(1);
                 }
 
-                _logger.Info("数据库驱动: {0}", dbType);
+                if (firstInit)
+                {
+                    firstInit = false;
 
-                if (string.IsNullOrEmpty(config.Password))
-                {
-                    _logger.Info("数据库连接: {0}", connStr);
-                }
-                else
-                {
-                    _logger.Info("数据库连接: {0}", connStr.Replace(config.Password, "***"));
+                    _logger.Info("数据库驱动: {0}", dbType);
+
+#if DEBUG
+                    if (string.IsNullOrEmpty(config.Password))
+                    {
+                        _logger.Info("数据库连接: {0}", connStr);
+                    }
+                    else
+                    {
+                        _logger.Info("数据库连接: {0}", connStr.Replace(config.Password, "***"));
+                    }
+#endif
                 }
 
                 var sqlSugarConfig = new ConnectionConfig {

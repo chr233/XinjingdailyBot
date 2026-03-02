@@ -13,18 +13,18 @@ namespace XinjingDaily.Bot.Service.InitService;
 /// 机器人初始化服务
 /// </summary>
 /// <param name="_logger"></param>
-public class BotInitializeService(
-    ILogger<BotInitializeService> _logger,
+public class BotInitializer(
+    ILogger<BotInitializer> _logger,
     IOptions<AppSettings> _options,
     ITelegramBotService _botClient,
     IChannelInfoRepository _channelInfoRepository,
-    IGlobalInfoService _globalInfo) : IInitializeService
+    IGlobalInfoService _globalInfo) : IInitializer
 {
     /// <inheritdoc/>
     public int Order => 10;
 
     /// <inheritdoc/>
-    public string Name => "Bot初始化";
+    public string Name => nameof(BotInitializer);
 
     /// <inheritdoc/>
     public async Task InitializeAsync()

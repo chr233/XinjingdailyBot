@@ -22,9 +22,10 @@ public static class AppServiceExtensions
             services.AddXinjingDailyBotService();
             services.AddXinjingDailyBotCommand();
 
-            services.AddTransient<IInitializeService, DbInitializeService>();
-            services.AddTransient<IInitializeService, RedisInitializeService>();
-            services.AddTransient<IInitializeService, BotInitializeService>();
+            services.AddTransient<IInitializer, DatabaseInitializer>();
+            services.AddTransient<IInitializer, RedisInitializer>();
+            services.AddTransient<IInitializer, CommandInitializer>();
+            services.AddTransient<IInitializer, BotInitializer>();
         }
     }
 
@@ -37,7 +38,7 @@ public static class AppServiceExtensions
 
             try
             {
-                var initServices = services.GetServices<IInitializeService>()
+                var initServices = services.GetServices<IInitializer>()
                     .OrderBy(static service => service.Order)
                     .ToList();
 
@@ -53,15 +54,13 @@ public static class AppServiceExtensions
                 {
                     var serviceName = initService.Name;
 
-                    _logger.Info("开始初始化服务：{ServiceName}", serviceName);
+                    _logger.Info("准备初始化【{ServiceName}】", serviceName);
 
                     await initService.InitializeAsync().ConfigureAwait(false);
 
-                    _logger.Info("初始化服务 {ServiceName} 成功", serviceName);
+                    _logger.Info("初始化成功");
+                    _logger.Info(Langs.Line);
                 }
-
-                _logger.Info(Langs.Line);
-                _logger.Info("初始化完成");
             }
             catch (Exception ex)
             {

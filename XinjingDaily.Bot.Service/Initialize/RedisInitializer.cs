@@ -11,15 +11,15 @@ namespace XinjingDaily.Bot.Service.InitService;
 /// Redis初始化服务
 /// </summary>
 /// <param name="_logger"></param>
-public class RedisInitializeService(
-    ILogger<RedisInitializeService> _logger,
+public class RedisInitializer(
+    ILogger<RedisInitializer> _logger,
     IOptions<AppSettings> _options,
-    IConnectionMultiplexer _multiplexer) : IInitializeService
+    IConnectionMultiplexer _multiplexer) : IInitializer
 {
     /// <inheritdoc/>
     public int Order => 2;
     /// <inheritdoc/>
-    public string Name => "Redis初始化";
+    public string Name => nameof(RedisInitializer);
 
     /// <inheritdoc/>
     public async Task InitializeAsync()
