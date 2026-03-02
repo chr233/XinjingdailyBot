@@ -1,5 +1,4 @@
 using XinjingDaily.Bot.Interface.InitService;
-using XinjingDaily.Bot.Service.InitService;
 
 namespace XinjingDaily.Bot.App.Extensions;
 
@@ -21,11 +20,6 @@ public static class AppServiceExtensions
             services.AddXinjingDailyBotRepository();
             services.AddXinjingDailyBotService();
             services.AddXinjingDailyBotCommand();
-
-            services.AddTransient<IInitializer, DatabaseInitializer>();
-            services.AddTransient<IInitializer, RedisInitializer>();
-            services.AddTransient<IInitializer, CommandInitializer>();
-            services.AddTransient<IInitializer, BotInitializer>();
         }
     }
 
@@ -38,7 +32,7 @@ public static class AppServiceExtensions
 
             try
             {
-                var initServices = services.GetServices<IInitializer>()
+                var initServices = services.GetServices<IServiceInitializer>()
                     .OrderBy(static service => service.Order)
                     .ToList();
 

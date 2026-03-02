@@ -13,12 +13,13 @@ namespace XinjingDaily.Bot.Service.InitService;
 /// 机器人初始化服务
 /// </summary>
 /// <param name="_logger"></param>
+[RegisterScoped<IServiceInitializer>(Duplicate = DuplicateStrategy.Append)]
 public class BotInitializer(
     ILogger<BotInitializer> _logger,
     IOptions<AppSettings> _options,
     ITelegramBotService _botClient,
     IChannelInfoRepository _channelInfoRepository,
-    IGlobalInfoService _globalInfo) : IInitializer
+    IGlobalInfoService _globalInfo) : IServiceInitializer
 {
     /// <inheritdoc/>
     public int Order => 10;

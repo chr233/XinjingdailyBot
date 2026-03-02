@@ -11,10 +11,11 @@ namespace XinjingDaily.Bot.Service.InitService;
 /// Redis初始化服务
 /// </summary>
 /// <param name="_logger"></param>
+[RegisterScoped<IServiceInitializer>(Duplicate = DuplicateStrategy.Append)]
 public class RedisInitializer(
     ILogger<RedisInitializer> _logger,
     IOptions<AppSettings> _options,
-    IConnectionMultiplexer _multiplexer) : IInitializer
+    IConnectionMultiplexer _multiplexer) : IServiceInitializer
 {
     /// <inheritdoc/>
     public int Order => 2;

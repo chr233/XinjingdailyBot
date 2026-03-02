@@ -14,10 +14,11 @@ namespace XinjingDaily.Bot.Service.InitService;
 /// 数据库初始化服务
 /// </remarks>
 /// <param name="_logger"></param>
+[RegisterScoped<IServiceInitializer>(Duplicate = DuplicateStrategy.Append)]
 public class DatabaseInitializer(
     ILogger<DatabaseInitializer> _logger,
     IOptions<AppSettings> _options,
-    IServiceProvider _serviceProvider) : IInitializer
+    IServiceProvider _serviceProvider) : IServiceInitializer
 {
     /// <inheritdoc/>
     public int Order => 1;
@@ -96,11 +97,10 @@ public class DatabaseInitializer(
         SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Chats.GroupMessageHistory>(db);
         SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Chats.MessageAttachment>(db);
         SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Chats.PrivateMessageHistory>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Context.CommandContext>(db);
+        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Command.CommandContext>(db);
         SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Chat.ChatInfo>(db);
         SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Channel.SourceChannelSetting>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Posts.ChannelInfo>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Posts.PostChannel>(db);
+        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Posts.PostChannelSetting>(db);
         SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Posts.MediaGroupInfo>(db);
         SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Posts.PostAttachment>(db);
         SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Posts.PostInfo>(db);

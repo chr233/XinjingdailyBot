@@ -1,27 +1,17 @@
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using XinjingDaily.Bot.Infrastructure;
 using XinjingDaily.Bot.Infrastructure.Attribute;
-using XinjingDaily.Bot.Infrastructure.Model;
-using XinjingDaily.Bot.Interface.Bot;
-using XinjingDaily.Bot.Interface.Common;
 using XinjingDaily.Bot.Interface.InitService;
-using XinjingDaily.Bot.IRepository.Channel;
 
 namespace XinjingDaily.Bot.Service.InitService;
 
 /// <summary>
-/// 机器人初始化服务
+/// 命令初始化服务
 /// </summary>
-/// <param name="_logger"></param>
+[RegisterScoped<IServiceInitializer>(Duplicate = DuplicateStrategy.Append)]
 public class CommandInitializer(
-    ILogger<BotInitializer> _logger,
-    IOptions<AppSettings> _options,
-    ITelegramBotService _botClient,
-    IChannelInfoRepository _channelInfoRepository,
-    IGlobalInfoService _globalInfo) : IInitializer
+    ILogger<CommandInitializer> _logger) : IServiceInitializer
 {
     /// <inheritdoc/>
     public int Order => 3;
@@ -29,123 +19,66 @@ public class CommandInitializer(
     /// <inheritdoc/>
     public string Name => nameof(CommandInitializer);
 
-    private static readonly char[] separator = [','];
-
     /// <inheritdoc/>
-    public async Task InitializeAsync()
+    public Task InitializeAsync()
     {
-
-
-        // 从数据库获取每个Channel的信息
-        var channelInfos = await _channelInfoRepository.GetAllAsync();
-        _logger.LogInformation("获取到 {Count} 个频道信息", channelInfos.Count);
-
-        //// 遍历每个频道信息，获取详细的chatInfo
-        //foreach (var channelInfo in channelInfos)
-        //{
-        //    try
-        //    {
-        //        var chat = await _botClient.GetChatAsync(channelInfo.TelegramId);
-        //        _logger.LogInformation("获取频道详细信息: {Title} (@{Username})", chat.Title, chat.Username);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "获取频道 {TelegramId} 信息失败", channelInfo.TelegramId);
-        //    }
-        //}
+        ScanExistCommands();
+        return Task.CompletedTask;
     }
 
-
-    /// <inheritdoc />
+    /// <summary>
+    /// 安装命令
+    /// </summary>
     [RequiresUnreferencedCode("不兼容剪裁")]
-    public void InstallCommands()
+    private void ScanExistCommands()
     {
-        //获取所有服务方法
-        var assembly = Assembly.Load("XinjingdailyBot.Command");
-        foreach (var type in assembly.GetTypes())
+        _logger.LogInformation("开始扫描并注册命令...");
+
+        /// <summary>
+        /// 扫描程序集中的所有命令
+        /// </summary>
+        /// <param name="assemblies">要扫描的程序集</param>
+        /// <returns>扫描到的命令列表</returns>
+    public static List<object> DiscoverCommands()
+    {
+        List<CommandDescriptor>? commandList = new List<CommandDescriptor>();
+
+        if (assemblies == null || assemblies.Length == 0)
         {
-            RegisterCommands(type);
+            // 默认扫描当前程序集
+            assemblies = new[] { Assembly.GetExecutingAssembly() };
         }
-    }
 
-    /// <inheritdoc />
-    [RequiresUnreferencedCode("不兼容剪裁")]
-    private void RegisterCommands([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type type)
-    {
-        var commands = new Dictionary<string, AssemblyMethod>();
-        var commandAlias = new Dictionary<string, string>();
-        var queryCommands = new Dictionary<string, AssemblyMethod>();
-        var queryAlias = new Dictionary<string, string>();
-
-        foreach (var method in type.GetMethods())
+        // 遍历所有程序集
+        foreach (var assembly in assemblies)
         {
-            var textAttribute = method.GetCustomAttribute<TextCmdAttribute>();
-
-            //注册文字命令
-            if (textAttribute != null)
+            // 遍历所有类型
+            foreach (var type in assembly.GetTypes())
             {
-                var command = textAttribute.Command.ToUpperInvariant();
-                var alias = textAttribute.Alias?.ToUpperInvariant();
-                var description = textAttribute.Description;
-                var rights = textAttribute.Rights;
-                if (!commands.TryAdd(command, new AssemblyMethod(method, description, rights)))
-                {
-                    _logger.LogWarning("注册命令 {cmd} 失败, 命令名称重复", command);
-                }
+                // 跳过抽象类和接口
+                if (type.IsAbstract || type.IsInterface) continue;
 
-                //添加别名
-                if (!string.IsNullOrEmpty(alias))
+                // 遍历类型中的所有方法
+                foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance))
                 {
-                    var splitedAlias = alias.Split(separator, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var split in splitedAlias)
+                    // 获取方法上的所有TextCmdAttribute
+                    var cmdAttributes = method.GetCustomAttributes<TextCmdAttribute>(inherit: false);
+                    foreach (var attr in cmdAttributes)
                     {
-                        if (!commandAlias.TryAdd(split, command))
-                        {
-                            _logger.LogWarning("注册命令 {cmd} 别名 {alias} 失败, 命令别名重复", command, split);
-                        }
-                    }
-                }
-            }
-
-            var queryAttribute = method.GetCustomAttribute<QueryCmdAttribute>();
-
-            //注册Query命令
-            if (queryAttribute != null)
-            {
-                var command = queryAttribute.Command.ToUpperInvariant();
-                var alias = queryAttribute.Alias?.ToUpperInvariant();
-                var description = queryAttribute.Description;
-                var rights = queryAttribute.Rights;
-                if (!queryCommands.TryAdd(command, new AssemblyMethod(method, description, rights)))
-                {
-                    _logger.LogWarning("注册Query命令 {cmd} 失败, 命令名称重复", command);
-                }
-
-                //添加别名
-                if (!string.IsNullOrEmpty(alias))
-                {
-                    var splitedAlias = alias.Split(separator, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var split in splitedAlias)
-                    {
-                        if (!queryAlias.TryAdd(split, command))
-                        {
-                            _logger.LogWarning("注册Query命令 {cmd} 别名 {split} 失败, 命令别名重复", command, split);
-                        }
+                        // 构建命令描述符
+                        commandList.Add(new CommandDescriptor {
+                            Keyword = attr.Keyword,
+                            ChatType = attr.ChatType,
+                            RequiredRight = attr.RequiredRight,
+                            HandlerMethod = method,
+                            HandlerType = type
+                        });
                     }
                 }
             }
         }
 
-        if (commands.Count > 0)
-        {
-            _commandClass.Add(type, commands);
-            _commandAlias.Add(type, commandAlias);
-        }
-
-        if (queryCommands.Count > 0)
-        {
-            _queryCommandClass.Add(type, queryCommands);
-            _queryCommandAlias.Add(type, queryAlias);
-        }
+        return commandList;
     }
+
 }
