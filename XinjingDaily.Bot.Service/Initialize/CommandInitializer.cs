@@ -22,24 +22,16 @@ public class CommandInitializer(
     /// <inheritdoc/>
     public Task InitializeAsync()
     {
-        ScanExistCommands();
+
+        ScanExistCommands("XinjingDaily.Bot.Entry");
         return Task.CompletedTask;
     }
 
     /// <summary>
-    /// 安装命令
+    /// 扫描程序集中的所有命令
     /// </summary>
     [RequiresUnreferencedCode("不兼容剪裁")]
-    private void ScanExistCommands()
-    {
-        _logger.LogInformation("开始扫描并注册命令...");
-
-        /// <summary>
-        /// 扫描程序集中的所有命令
-        /// </summary>
-        /// <param name="assemblies">要扫描的程序集</param>
-        /// <returns>扫描到的命令列表</returns>
-    public static List<object> DiscoverCommands()
+    private List<object> ScanExistCommands(string packageName)
     {
         List<CommandDescriptor>? commandList = new List<CommandDescriptor>();
 
