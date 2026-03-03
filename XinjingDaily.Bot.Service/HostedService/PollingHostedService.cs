@@ -17,7 +17,6 @@ namespace XinjingDaily.Bot.Service.HostedService;
 public class PollingService(
         IServiceProvider _serviceProvider,
         ILogger<PollingService> _logger,
-        ITelegramBotClient _botClient,
         IOptions<AppSettings> options) : BackgroundService
 {
 
@@ -30,18 +29,6 @@ public class PollingService(
     /// <returns></returns>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogDebug("注册可用命令");
-        //_commandHandler.InstallCommands();
-
-        _logger.LogInformation("读取基础信息");
-        //await _channelService.InitChannelInfo().ConfigureAwait(false);
-
-        _logger.LogInformation("读取群组和等级设定");
-        //await _groupRepository.InitGroupCache().ConfigureAwait(false);
-        //await _levelRepository.InitLevelCache().ConfigureAwait(false);
-        //await _tagRepository.InitPostTagCache().ConfigureAwait(false);
-        //await _rejectReasonRepository.InitRejectReasonCache().ConfigureAwait(false);
-
         _logger.LogInformation("开始运行 Bot");
         await DoPolling(stoppingToken).ConfigureAwait(false);
     }
@@ -55,6 +42,8 @@ public class PollingService(
         {
             try
             {
+                var botClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
+
                 var receiverOptions = new ReceiverOptions {
                     AllowedUpdates = [],
                     DropPendingUpdates = _throwPendingUpdates,
@@ -63,7 +52,7 @@ public class PollingService(
 
                 _logger.LogInformation("接收服务运行中...");
 
-                await _botClient.ReceiveAsync(
+                await botClient.ReceiveAsync(
                     updateHandler: updateService.HandleUpdateAsync,
                     errorHandler: updateService.HandlePollingErrorAsync,
                     receiverOptions: receiverOptions,

@@ -6,7 +6,7 @@ using XinjingDaily.Bot.Interface.Bot.System;
 
 namespace XinjingDaily.Bot.Service.Bot.System;
 
-[RegisterScoped]
+[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
 public class DispatcherService(
         ILogger<DispatcherService> _logger,
         ITelegramBotService _botClient) : IDispatcherService
@@ -44,8 +44,23 @@ public class DispatcherService(
         await _botClient.AutoReply("test", message).ConfigureAwait(false);
     }
 
+    private async Task OnPrivateMessageReceived(UserInfo dbUser, Message message)
+    {
+        //处理私聊消息
+        //var handler = message.Type == MessageType.Text ? _messageHandler.OnTextMessageReceived(dbUser, message) : _messageHandler.OnMediaMessageReceived(dbUser, message);
+        //if (handler != null)
+        //{
+        //    await handler.ConfigureAwait(false);
+        //}
+    }
+
+    private async Task OnGroupMessageReceived(UserInfo userInfo, Message message)
+    {
+
+    }
+
     /// <inheritdoc/>
-    public async Task OnChannalPostReceived(UserInfo dbUser, Message message)
+    public async Task OnChannelPostReceived(UserInfo dbUser, Message message)
     {
         //仅监听发布频道的消息
         //var chatId = message.Chat.Id;

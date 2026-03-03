@@ -117,39 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AppServiceContent1" xml:space="preserve">
-    <value>services.Add{0}&lt;{1}&gt;();</value>
-    <comment>服务注册文件内容</comment>
-  </data>
-  <data name="AppServiceContent2" xml:space="preserve">
-    <value>services.Add{0}&lt;{1}, {2}&gt;();</value>
-    <comment>服务注册文件内容</comment>
-  </data>
-  <data name="AppServiceFooter" xml:space="preserve">
-    <value>}
-}</value>
-    <comment>服务注册文件尾</comment>
-  </data>
-  <data name="AppServiceHeader" xml:space="preserve">
-    <value>using Microsoft.Extensions.DependencyInjection;
-
-namespace XinjingDaily.Bot.WebAPI.Extensions;
-
-/// &lt;summary&gt;
-/// 动态注册服务扩展
-/// &lt;/summary&gt;
-public static class GeneratedAppServiceExtensions
-{
-    private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-
-    /// &lt;summary&gt;
-    /// 注册引用程序域中所有有AppService标记的类的服务
-    /// &lt;/summary&gt;
-    /// &lt;param name="services"&gt;&lt;/param&gt;
-    public static void AddAppServiceGenerated(this IServiceCollection services)
-    {</value>
-    <comment>服务注册文件头</comment>
-  </data>
   <data name="DbTableContent" xml:space="preserve">
     <value>_logger.LogInformation("开始创建 {0} 表");
 _dbClient.CodeFirst.InitTables&lt;{1}&gt;();</value>

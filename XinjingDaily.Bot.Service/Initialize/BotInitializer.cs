@@ -13,19 +13,16 @@ namespace XinjingDaily.Bot.Service.InitService;
 /// 机器人初始化服务
 /// </summary>
 /// <param name="_logger"></param>
-[RegisterScoped<IServiceInitializer>(Duplicate = DuplicateStrategy.Append)]
+[RegisterScoped<IServiceInitializer>(Duplicate = DuplicateStrategy.Append, Registration = RegistrationStrategy.ImplementedInterfaces)]
 public class BotInitializer(
     ILogger<BotInitializer> _logger,
     IOptions<AppSettings> _options,
     ITelegramBotService _botClient,
-    IChannelInfoRepository _channelInfoRepository,
+    IChatInfoRepository _channelInfoRepository,
     IGlobalInfoService _globalInfo) : IServiceInitializer
 {
     /// <inheritdoc/>
     public int Order => 10;
-
-    /// <inheritdoc/>
-    public string Name => nameof(BotInitializer);
 
     /// <inheritdoc/>
     public async Task InitializeAsync()
@@ -46,7 +43,7 @@ public class BotInitializer(
 
 
         // 从数据库获取每个Channel的信息
-        var channelInfos = await _channelInfoRepository.GetAllAsync();
+        var channelInfos = await _channelInfoRepository.QueryAllAsync();
         _logger.LogInformation("获取到 {Count} 个频道信息", channelInfos.Count);
 
         //// 遍历每个频道信息，获取详细的chatInfo

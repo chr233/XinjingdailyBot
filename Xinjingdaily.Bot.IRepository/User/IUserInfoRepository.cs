@@ -8,4 +8,6 @@ namespace XinjingDaily.Bot.IRepository.User;
 /// </summary>
 public interface IUserInfoRepository : IRepositoryInt<UserInfo>
 {
+    Task<UserInfo?> QueryByTelegramIdAsync(long telegramId);
+    Task<UserInfo?> QueryByTelegramNameAsync(string telegramName);
 }

@@ -46,7 +46,7 @@ public static class AppServiceExtensions
 
                 foreach (var initService in initServices)
                 {
-                    var serviceName = initService.Name;
+                    var serviceName = initService.GetType().Name;
 
                     _logger.Info("初始化【{ServiceName}】", serviceName);
 

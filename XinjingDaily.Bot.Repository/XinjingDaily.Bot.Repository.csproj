@@ -21,6 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\XinjingDaily.Bot.Data\XinjingDaily.Bot.Data.csproj" />
 		<ProjectReference Include="..\XinjingDaily.Bot.Entry\XinjingDaily.Bot.Entry.csproj" />
 		<ProjectReference Include="..\XinjingDaily.Bot.Infrastructure\XinjingDaily.Bot.Infrastructure.csproj" />
 		<ProjectReference Include="..\XinjingDaily.Bot.IRepository\XinjingDaily.Bot.IRepository.csproj" />

@@ -11,7 +11,7 @@ namespace XinjingDaily.Bot.Service.InitService;
 /// Redis初始化服务
 /// </summary>
 /// <param name="_logger"></param>
-[RegisterScoped<IServiceInitializer>(Duplicate = DuplicateStrategy.Append)]
+[RegisterScoped<IServiceInitializer>(Duplicate = DuplicateStrategy.Append, Registration = RegistrationStrategy.ImplementedInterfaces)]
 public class RedisInitializer(
     ILogger<RedisInitializer> _logger,
     IOptions<AppSettings> _options,
@@ -19,8 +19,6 @@ public class RedisInitializer(
 {
     /// <inheritdoc/>
     public int Order => 2;
-    /// <inheritdoc/>
-    public string Name => nameof(RedisInitializer);
 
     /// <inheritdoc/>
     public async Task InitializeAsync()

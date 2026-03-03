@@ -6,20 +6,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Content Remove="Properties\appService.json" />
-		<Content Remove="Properties\dbtable.json" />
-		<Content Remove="Properties\schedule.json" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<None Remove="Properties\launchSettings.json" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<AdditionalFiles Include="Properties\appService.json" />
-		<AdditionalFiles Include="Properties\dbtable.json" />
 		<AdditionalFiles Include="Properties\launchSettings.json" />
-		<AdditionalFiles Include="Properties\schedule.json" />
 	</ItemGroup>
 
 	<ItemGroup>

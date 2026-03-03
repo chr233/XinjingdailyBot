@@ -1,6 +1,6 @@
 namespace XinjingDaily.Bot.Command.Common;
 
-[RegisterScoped]
+[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
 public class NormalCommands
 {
 }

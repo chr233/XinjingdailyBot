@@ -14,7 +14,7 @@ namespace XinjingDaily.Bot.Service.InitService;
 /// 数据库初始化服务
 /// </remarks>
 /// <param name="_logger"></param>
-[RegisterScoped<IServiceInitializer>(Duplicate = DuplicateStrategy.Append)]
+[RegisterScoped<IServiceInitializer>(Duplicate = DuplicateStrategy.Append, Registration = RegistrationStrategy.ImplementedInterfaces)]
 public class DatabaseInitializer(
     ILogger<DatabaseInitializer> _logger,
     IOptions<AppSettings> _options,
@@ -22,9 +22,6 @@ public class DatabaseInitializer(
 {
     /// <inheritdoc/>
     public int Order => 1;
-
-    /// <inheritdoc/>
-    public string Name => nameof(DatabaseInitializer);
 
     /// <inheritdoc/>
 
@@ -77,39 +74,7 @@ public class DatabaseInitializer(
 
     private void CreateTableByTypes(ISqlSugarClient db)
     {
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Users.UserSetting>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Users.UserStatistic>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Users.UserToken>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Users.Rbac.Claim>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Users.Rbac.Role>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Users.Rbac.RoleClaim>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Users.Rbac.UserClaim>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Users.Rbac.UserRole>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.User.Shop.ShopItem>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.User.Shop.UserCoin>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.User.Group.Group>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.User.Group.UserGroup>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.User.Badge.Badge>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.User.Badge.UserBadge>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Policys.SourceChannelPolicy>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Historys.BanHistory>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Chats.GroupInfo>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Chats.GroupMessageHistory>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Chats.MessageAttachment>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Chats.PrivateMessageHistory>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Command.CommandContext>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Chat.ChatInfo>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Channel.SourceChannelSetting>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Posts.PostChannelSetting>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Posts.MediaGroupInfo>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Posts.PostAttachment>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Posts.PostInfo>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Posts.PostStatistic>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Posts.PostTag>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Ads.Advertise>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Ads.AdvertiseChat>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Ads.AdvertiseHistory>(db);
-        SafeCreateTable<XinjingDaily.Bot.Entry.Entries.Ads.AdvertiseStatistic>(db);
+
     }
 
     private void SafeCreateDatabase(ISqlSugarClient db)

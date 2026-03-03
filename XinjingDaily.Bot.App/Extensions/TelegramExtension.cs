@@ -50,10 +50,6 @@ public static class TelegramExtension
             }).RemoveAllLoggers();
 
             services.AddHostedService<PollingService>();
-
-            //services.AddHostedService<StatisticService>();
-
-            //services.AddHostedService<BotInitializationServices>();
         }
     }
 }

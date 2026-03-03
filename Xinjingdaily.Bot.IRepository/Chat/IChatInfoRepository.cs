@@ -8,4 +8,6 @@ namespace XinjingDaily.Bot.IRepository.Channel;
 /// </summary>
 public interface IChatInfoRepository : IRepositoryInt<ChatInfo>
 {
+    Task<ChatInfo?> QueryByTelegramIdAsync(long telegramId);
+    Task<ChatInfo?> QueryByTelegramNameAsync(string telegramName);
 }

@@ -1,6 +1,5 @@
 using XinjingDaily.Bot.App.Extensions;
 using XinjingDaily.Bot.Infrastructure;
-using XinjingDaily.Bot.Infrastructure.Utils;
 
 
 Console.WriteLine(Langs.Line);
@@ -20,8 +19,6 @@ Console.WriteLine(Langs.Line);
 #if !DEBUG
 Thread.Sleep(2000);
 #endif
-
-Utils.CleanOldFiles();
 
 var builder = WebApplication.CreateBuilder(args);
 

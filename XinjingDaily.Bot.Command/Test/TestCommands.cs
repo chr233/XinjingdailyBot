@@ -3,7 +3,7 @@ using XinjingDaily.Bot.Infrastructure.Enums;
 
 namespace XinjingDaily.Bot.Command.Test;
 
-[RegisterScoped]
+[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
 public class TestCommands
 {
     [Permission(ECommandScope.Group, "test")]

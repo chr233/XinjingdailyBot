@@ -8,7 +8,7 @@ using XinjingDaily.Bot.Interface.Bot;
 
 namespace XinjingDaily.Bot.Service.Bot;
 
-[RegisterSingleton]
+[RegisterTransient(Registration = RegistrationStrategy.ImplementedInterfaces)]
 public class TelegramBotService(
     ITelegramBotClient _botClient,
     ILogger<TelegramBotService> _logger) : ITelegramBotService

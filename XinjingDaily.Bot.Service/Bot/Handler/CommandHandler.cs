@@ -16,7 +16,7 @@ using XinjingDaily.Bot.Interface.Common;
 
 namespace XinjingDaily.Bot.Service.Bot.Handler;
 
-[RegisterSingleton]
+[RegisterSingleton( Registration = RegistrationStrategy.ImplementedInterfaces)]
 public class CommandHandler(
     ILogger<CommandHandler> _logger,
     IServiceProvider _serviceProvider,
