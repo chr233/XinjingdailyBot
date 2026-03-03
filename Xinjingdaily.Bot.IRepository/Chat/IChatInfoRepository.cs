@@ -1,11 +1,11 @@
-using XinjingDaily.Bot.Entry.Entries.Chats;
+using XinjingDaily.Bot.Entry.Entries.Chat;
 using XinjingDaily.Bot.IRepository.Base;
 
-namespace XinjingDaily.Bot.IRepository.Chat;
+namespace XinjingDaily.Bot.IRepository.Channel;
 
 /// <summary>
-/// 聊天信息仓储接口
+/// 频道信息仓储接口
 /// </summary>
-public interface IChatInfoRepository : IRepositoryInt<GroupInfo>
+public interface IChatInfoRepository : IRepositoryInt<ChatInfo>
 {
 }
