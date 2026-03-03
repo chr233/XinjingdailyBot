@@ -1,5 +1,3 @@
-using XinjingDaily.Bot.Infrastructure.Enums;
-
 namespace XinjingDaily.Bot.Infrastructure.Attribute;
 
 
@@ -22,16 +20,6 @@ public sealed class TextCommandAttribute : System.Attribute
     /// </summary>
     public string? Description { get; set; }
 
-    /// <summary>
-    /// 命令可用范围
-    /// </summary>
-    public ECommandScope Scope { get; set; }
-
-    /// <summary>
-    /// 需要的权限
-    /// </summary>
-    public string? Permission { get; set; }
-
     public bool IsShareContext { get; set; }
 
     /// <summary>
@@ -41,40 +29,28 @@ public sealed class TextCommandAttribute : System.Attribute
     public TextCommandAttribute(string command)
     {
         Command = command;
-        Scope = ECommandScope.All;
-    }
-    /// <summary>
-    /// 创建特性
-    /// </summary>
-    /// <param name="command"></param>
-    /// <param name="scope"></param>
-    public TextCommandAttribute(string command, ECommandScope scope)
-    {
-        Command = command;
-        Scope = scope;
-    }
-    /// <summary>
-    /// 创建特性
-    /// </summary>
-    /// <param name="command"></param>
-    /// <param name="scope"></param>
-    /// <param name="permission"></param>
-    public TextCommandAttribute(string command, ECommandScope scope, string? permission)
-    {
-        Command = command;
-        Scope = scope;
-        Permission = permission;
     }
 
-    /// <summary>
-    /// 创建特性
-    /// </summary>
-    /// <param name="command"></param>
-    /// <param name="permission"></param>
-    public TextCommandAttribute(string command, string? permission)
+    public TextCommandAttribute(string command, bool isShareContext) : this(command)
     {
-        Command = command;
-        Scope = ECommandScope.All;
-        Permission = permission;
+        IsShareContext = isShareContext;
+    }
+
+    public TextCommandAttribute(string command, string? description) : this(command)
+    {
+        Description = description;
+    }
+
+    public TextCommandAttribute(string command, string? description, bool isShareContext) : this(command)
+    {
+        Description = description;
+        IsShareContext = isShareContext;
+    }
+
+    public TextCommandAttribute(string command, string? alias, string? description, bool isShareContext) : this(command)
+    {
+        Alias = alias;
+        Description = description;
+        IsShareContext = isShareContext;
     }
 }

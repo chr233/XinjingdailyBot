@@ -42,9 +42,18 @@ public class CommandHandler(
 
     public void RegisterTextCommand(Type classType, MethodInfo methodInfo, TextCommandAttribute attribute)
     {
-        var scope = attribute.Scope;
+        RegisterTextCommand(classType, methodInfo, ECommandScope.All, null, attribute);
+    }
+
+    public void RegisterTextCommand(Type classType, MethodInfo methodInfo, PermissionAttribute permission, TextCommandAttribute attribute)
+    {
+        RegisterTextCommand(classType, methodInfo, permission.Scope, permission.Permission, attribute);
+    }
+
+    public void RegisterTextCommand(Type classType, MethodInfo methodInfo, ECommandScope scope, string? permission, TextCommandAttribute attribute)
+    {
         var command = attribute.Command.ToUpperInvariant();
-        var permission = attribute.Permission?.ToUpperInvariant();
+        permission = permission?.ToUpperInvariant();
         var definition = new CommandDefinition<TextCommandAttribute>(classType, methodInfo, attribute);
 
         if (!_textCommandDefinitions.TryAdd(command, definition))
@@ -69,9 +78,18 @@ public class CommandHandler(
 
     public void RegisterQueryCommand(Type classType, MethodInfo methodInfo, QueryCommandAttribute attribute)
     {
-        var scope = attribute.Scope;
+        RegisterQueryCommand(classType, methodInfo, ECommandScope.All, null, attribute);
+    }
+
+    public void RegisterQueryCommand(Type classType, MethodInfo methodInfo, PermissionAttribute permission, QueryCommandAttribute attribute)
+    {
+        RegisterQueryCommand(classType, methodInfo, permission.Scope, permission.Permission, attribute);
+    }
+
+    public void RegisterQueryCommand(Type classType, MethodInfo methodInfo, ECommandScope scope, string? permission, QueryCommandAttribute attribute)
+    {
         var command = attribute.Command.ToUpperInvariant();
-        var permission = attribute.Permission?.ToUpperInvariant();
+        permission = permission?.ToUpperInvariant();
         var definition = new CommandDefinition<QueryCommandAttribute>(classType, methodInfo, attribute);
 
         if (!_queryCommandDefinitions.TryAdd(command, definition))

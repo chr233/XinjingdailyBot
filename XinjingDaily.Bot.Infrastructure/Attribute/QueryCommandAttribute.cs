@@ -1,5 +1,3 @@
-using XinjingDaily.Bot.Infrastructure.Enums;
-
 namespace XinjingDaily.Bot.Infrastructure.Attribute;
 
 
@@ -18,16 +16,6 @@ public sealed class QueryCommandAttribute : System.Attribute
     /// </summary>
     public string? Alias { get; set; }
 
-    /// <summary>
-    /// 命令可用范围
-    /// </summary>
-    public ECommandScope Scope { get; set; }
-
-    /// <summary>
-    /// 需要的权限
-    /// </summary>
-    public string? Permission { get; set; }
-
     public bool IsShareContext { get; set; }
 
     /// <summary>
@@ -37,28 +25,21 @@ public sealed class QueryCommandAttribute : System.Attribute
     public QueryCommandAttribute(string command)
     {
         Command = command;
-        Scope = ECommandScope.All;
-    }
-    /// <summary>
-    /// 创建特性
-    /// </summary>
-    /// <param name="command"></param>
-    /// <param name="scope"></param>
-    public QueryCommandAttribute(string command, ECommandScope scope)
-    {
-        Command = command;
-        Scope = scope;
     }
 
-    /// <summary>
-    /// 创建特性
-    /// </summary>
-    /// <param name="command"></param>
-    /// <param name="scope"></param>
-    public QueryCommandAttribute(string command, string? permission)
+    public QueryCommandAttribute(string command, bool isShareContext) : this(command)
     {
-        Command = command;
-        Scope = ECommandScope.All;
-        Permission = permission;
+        IsShareContext = isShareContext;
+    }
+
+    public QueryCommandAttribute(string command, string? alias) : this(command)
+    {
+        Alias = alias;
+    }
+
+    public QueryCommandAttribute(string command, string? alias, bool isShareContext) : this(command)
+    {
+        Alias = alias;
+        IsShareContext = isShareContext;
     }
 }
