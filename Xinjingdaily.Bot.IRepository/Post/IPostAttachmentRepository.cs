@@ -4,8 +4,8 @@ using XinjingDaily.Bot.IRepository.Base;
 namespace XinjingDaily.Bot.IRepository.Post;
 
 /// <summary>
-/// 帖子标签仓储接口
+/// 帖子附件仓储接口
 /// </summary>
-public interface IPostTagsRepository : IRepositoryInt<PostTag>
+public interface IPostAttachmentRepository : IRepositoryInt<PostAttachment>
 {
 }

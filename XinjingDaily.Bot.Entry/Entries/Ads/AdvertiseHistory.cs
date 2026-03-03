@@ -7,6 +7,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Ads;
 /// 广告消息表
 /// </summary>
 [SugarTable("advertise_history", TableDescription = "广告消息")]
+[SugarIndex("i_advertise_history_ad_id", nameof(ChatId), OrderByType.Asc, nameof(AdId), OrderByType.Asc, true)]
 public sealed record AdvertiseHistory : IModifyAt, ICreateAt
 {
     /// <summary>

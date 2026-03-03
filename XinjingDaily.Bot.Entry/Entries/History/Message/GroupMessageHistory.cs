@@ -2,10 +2,10 @@ using SqlSugar;
 using Telegram.Bot.Types.Enums;
 using XinjingDaily.Bot.Entry.Columns;
 
-namespace XinjingDaily.Bot.Entry.Entries.Chats;
+namespace XinjingDaily.Bot.Entry.Entries.History.Message;
 
-[SugarTable("private_message_history", TableDescription = "私聊消息记录")]
-public sealed record PrivateMessageHistory : ICreateAt
+[SugarTable("group_message_history", TableDescription = "群聊消息记录")]
+public sealed record GroupMessageHistory : ICreateAt
 {
     /// <summary>
     /// 主键

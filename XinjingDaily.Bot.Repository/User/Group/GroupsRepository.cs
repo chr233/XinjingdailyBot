@@ -8,8 +8,8 @@ namespace XinjingDaily.Bot.Repository.User.Group;
 /// <summary>
 /// 群组仓储实现
 /// </summary>
-[RegisterScoped]
-public class GroupsRepository : RepositoryInt<Entry.Entries.User.Group.Group>, IGroupsRepository
+[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
+public class GroupsRepository : RepositoryInt<Entry.Entries.User.Group.GroupInfo>, IGroupRepository
 {
     /// <summary>
     /// 构造函数

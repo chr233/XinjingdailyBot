@@ -4,8 +4,8 @@ using XinjingDaily.Bot.IRepository.Base;
 namespace XinjingDaily.Bot.IRepository.Chat;
 
 /// <summary>
-/// 消息附件仓储接口
+/// 聊天信息仓储接口
 /// </summary>
-public interface IMessageAttachmentsRepository : IRepositoryInt<MessageAttachment>
+public interface IChatInfoRepository : IRepositoryInt<GroupInfo>
 {
 }

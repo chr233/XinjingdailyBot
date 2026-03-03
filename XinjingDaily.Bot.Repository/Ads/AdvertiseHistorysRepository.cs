@@ -12,7 +12,7 @@ namespace XinjingDaily.Bot.Repository.Ads;
 /// 构造函数
 /// </remarks>
 /// <param name="db"></param>
-[RegisterScoped]
-public class AdvertiseHistorysRepository(ISqlSugarClient db) : RepositoryInt<AdvertiseHistory>(db), IAdvertiseHistorysRepository
+[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
+public class AdvertiseHistorysRepository(ISqlSugarClient db) : RepositoryInt<AdvertiseHistory>(db), IAdvertiseHistoryRepository
 {
 }

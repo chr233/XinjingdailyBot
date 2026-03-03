@@ -8,8 +8,8 @@ namespace XinjingDaily.Bot.Repository.Post;
 /// <summary>
 /// 帖子统计仓储实现
 /// </summary>
-[RegisterScoped]
-public class PostStatisticsRepository : RepositoryInt<PostStatistic>, IPostStatisticsRepository
+[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
+public class PostStatisticsRepository : RepositoryInt<PostStatistic>, IPostStatisticRepository
 {
     /// <summary>
     /// 构造函数

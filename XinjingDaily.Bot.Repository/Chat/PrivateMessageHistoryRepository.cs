@@ -1,5 +1,5 @@
 using SqlSugar;
-using XinjingDaily.Bot.Entry.Entries.Chats;
+using XinjingDaily.Bot.Entry.Entries.History.Message;
 using XinjingDaily.Bot.IRepository.Chat;
 using XinjingDaily.Bot.Repository.Base;
 
@@ -8,7 +8,7 @@ namespace XinjingDaily.Bot.Repository.Chat;
 /// <summary>
 /// 私聊消息历史仓储实现
 /// </summary>
-[RegisterScoped]
+[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
 public class PrivateMessageHistoryRepository : RepositoryInt<PrivateMessageHistory>, IPrivateMessageHistoryRepository
 {
     /// <summary>

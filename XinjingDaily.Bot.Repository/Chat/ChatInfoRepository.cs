@@ -8,14 +8,14 @@ namespace XinjingDaily.Bot.Repository.Chat;
 /// <summary>
 /// 聊天信息仓储实现
 /// </summary>
-[RegisterScoped]
-public class ChatInfosRepository : RepositoryInt<GroupInfo>, IChatInfosRepository
+[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
+public class ChatInfoRepository : RepositoryInt<GroupInfo>, IChatInfoRepository
 {
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="db"></param>
-    public ChatInfosRepository(ISqlSugarClient db) : base(db)
+    public ChatInfoRepository(ISqlSugarClient db) : base(db)
     {
     }
 }

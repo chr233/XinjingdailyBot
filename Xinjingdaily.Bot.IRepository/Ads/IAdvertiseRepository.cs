@@ -4,8 +4,8 @@ using XinjingDaily.Bot.IRepository.Base;
 namespace XinjingDaily.Bot.IRepository.Ads;
 
 /// <summary>
-/// 广告统计仓储接口
+/// 广告仓储接口
 /// </summary>
-public interface IAdvertiseStatisticsRepository : IRepositoryInt<AdvertiseStatistic>
+public interface IAdvertiseRepository : IRepositoryInt<Advertise>
 {
 }

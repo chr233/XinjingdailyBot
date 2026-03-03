@@ -12,7 +12,7 @@ namespace XinjingDaily.Bot.Repository.User;
 /// 构造函数
 /// </remarks>
 /// <param name="db"></param>
-[RegisterScoped]
+[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
 public class UserSettingsRepository(ISqlSugarClient db) : RepositoryInt<UserSetting>(db), IUserSettingRepository
 {
 }

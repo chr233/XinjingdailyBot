@@ -7,7 +7,7 @@ namespace XinjingDaily.Bot.Entry.Entries.Ads;
 /// 广告投放
 /// </summary>
 [SugarTable("advertise_statistic", TableDescription = "广告统计")]
-[SugarIndex("i_advertise_statistic_adid", nameof(AdId), OrderByType.Asc, true)]
+[SugarIndex("i_advertise_statistic_ad_id", nameof(AdId), OrderByType.Asc, true)]
 public sealed record AdvertiseStatistic : ICreateAt, IModifyAt
 {
     /// <summary>

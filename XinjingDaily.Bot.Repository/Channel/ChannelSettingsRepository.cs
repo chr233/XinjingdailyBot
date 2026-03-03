@@ -8,8 +8,8 @@ namespace XinjingDaily.Bot.Repository.Channel;
 /// <summary>
 /// 频道设置仓储实现
 /// </summary>
-[RegisterScoped]
-public class ChannelSettingsRepository : RepositoryInt<SourceChannelSetting>, IChannelSettingsRepository
+[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
+public class ChannelSettingsRepository : RepositoryInt<SourceChannelSetting>, IChannelSettingRepository
 {
     /// <summary>
     /// 构造函数

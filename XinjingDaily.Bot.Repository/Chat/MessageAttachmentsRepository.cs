@@ -8,8 +8,8 @@ namespace XinjingDaily.Bot.Repository.Chat;
 /// <summary>
 /// 消息附件仓储实现
 /// </summary>
-[RegisterScoped]
-public class MessageAttachmentsRepository : RepositoryInt<MessageAttachment>, IMessageAttachmentsRepository
+[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
+public class MessageAttachmentsRepository : RepositoryInt<MessageAttachment>, IMessageAttachmentRepository
 {
     /// <summary>
     /// 构造函数

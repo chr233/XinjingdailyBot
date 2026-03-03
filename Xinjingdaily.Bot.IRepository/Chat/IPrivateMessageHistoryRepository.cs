@@ -1,4 +1,4 @@
-using XinjingDaily.Bot.Entry.Entries.Chats;
+using XinjingDaily.Bot.Entry.Entries.History.Message;
 using XinjingDaily.Bot.IRepository.Base;
 
 namespace XinjingDaily.Bot.IRepository.Chat;

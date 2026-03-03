@@ -1,7 +1,7 @@
 using SqlSugar;
 using XinjingDaily.Bot.Infrastructure.Enums;
 
-namespace XinjingDaily.Bot.Entry.Entries.Historys;
+namespace XinjingDaily.Bot.Entry.Entries.History.Operate;
 
 /// <summary>
 /// 用户封禁记录

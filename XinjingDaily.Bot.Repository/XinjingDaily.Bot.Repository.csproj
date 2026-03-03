@@ -5,6 +5,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="LocalLow\**" />
+	  <Compile Remove="Services\**" />
+	  <EmbeddedResource Remove="LocalLow\**" />
+	  <EmbeddedResource Remove="Services\**" />
+	  <None Remove="LocalLow\**" />
+	  <None Remove="Services\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="ConfigureAwaitChecker.Analyzer" PrivateAssets="all" />
 		<PackageReference Include="Injectio" PrivateAssets="all" />
 		<PackageReference Include="NRedisStack" />
@@ -22,8 +31,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="LocalLow\" />
-	  <Folder Include="Services\" />
 	  <Folder Include="User\Shop\" />
 	</ItemGroup>
 

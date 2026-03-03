@@ -1,4 +1,4 @@
-using XinjingDaily.Bot.Entry.Entries.Historys;
+using XinjingDaily.Bot.Entry.Entries.History.Operate;
 using XinjingDaily.Bot.IRepository.Base;
 
 namespace XinjingDaily.Bot.IRepository.Operate;
@@ -6,6 +6,6 @@ namespace XinjingDaily.Bot.IRepository.Operate;
 /// <summary>
 /// 封禁历史仓储接口
 /// </summary>
-public interface IBanHistorysRepository : IRepositoryInt<BanHistory>
+public interface IBanHistoryRepository : IRepositoryInt<BanHistory>
 {
 }

@@ -8,8 +8,8 @@ namespace XinjingDaily.Bot.Repository.User.Rbac;
 /// <summary>
 /// 角色权限仓储实现
 /// </summary>
-[RegisterScoped]
-public class RoleClaimsRepository : RepositoryInt<RoleClaim>, IRoleClaimsRepository
+[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
+public class RoleClaimsRepository : RepositoryInt<RoleClaim>, IRoleClaimRepository
 {
     /// <summary>
     /// 构造函数

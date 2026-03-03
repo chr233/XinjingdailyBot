@@ -8,8 +8,8 @@ namespace XinjingDaily.Bot.Repository.Policys;
 /// <summary>
 /// 来源频道策略仓储实现
 /// </summary>
-[RegisterScoped]
-public class SourceChannelPolicysRepository : RepositoryInt<SourceChannelPolicy>, ISourceChannelPolicysRepository
+[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
+public class SourceChannelPolicysRepository : RepositoryInt<SourceChannelPolicy>, ISourceChannelPolicyRepository
 {
     /// <summary>
     /// 构造函数

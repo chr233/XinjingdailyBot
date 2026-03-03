@@ -8,7 +8,7 @@ namespace XinjingDaily.Bot.Repository.User;
 /// <summary>
 /// 用户组仓储实现
 /// </summary>
-[RegisterScoped]
+[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
 public class UserGroupsRepository : RepositoryInt<UserGroup>, IUserGroupRepository
 {
     /// <summary>

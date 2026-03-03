@@ -4,8 +4,8 @@ using XinjingDaily.Bot.IRepository.Base;
 namespace XinjingDaily.Bot.IRepository.Post;
 
 /// <summary>
-/// 帖子附件仓储接口
+/// 媒体组信息仓储接口
 /// </summary>
-public interface IPostAttachmentsRepository : IRepositoryInt<PostAttachment>
+public interface IMediaGroupInfoRepository : IRepositoryInt<MediaGroupInfo>
 {
 }

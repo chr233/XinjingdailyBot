@@ -6,7 +6,7 @@ using XinjingDaily.Bot.IRepository.Redis;
 
 namespace XinjingDaily.Bot.Repository.Redis;
 
-[RegisterScoped]
+[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
 public sealed class RedisCacheRepository(
     IConnectionMultiplexer multiplexer,
     IOptions<AppSettings> options,

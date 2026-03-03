@@ -8,8 +8,8 @@ namespace XinjingDaily.Bot.Repository.Post;
 /// <summary>
 /// 帖子标签仓储实现
 /// </summary>
-[RegisterScoped]
-public class PostTagsRepository : RepositoryInt<PostTag>, IPostTagsRepository
+[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
+public class PostTagsRepository : RepositoryInt<PostTag>, IPostTagRepository
 {
     /// <summary>
     /// 构造函数

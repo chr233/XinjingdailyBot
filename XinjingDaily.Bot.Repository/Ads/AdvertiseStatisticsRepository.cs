@@ -8,8 +8,8 @@ namespace XinjingDaily.Bot.Repository.Ads;
 /// <summary>
 /// 广告统计仓储实现
 /// </summary>
-[RegisterScoped]
-public class AdvertiseStatisticsRepository : RepositoryInt<AdvertiseStatistic>, IAdvertiseStatisticsRepository
+[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
+public class AdvertiseStatisticsRepository : RepositoryInt<AdvertiseStatistic>, IAdvertiseStatisticRepository
 {
     /// <summary>
     /// 构造函数

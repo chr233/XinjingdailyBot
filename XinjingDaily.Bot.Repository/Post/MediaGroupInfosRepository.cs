@@ -8,8 +8,8 @@ namespace XinjingDaily.Bot.Repository.Post;
 /// <summary>
 /// 媒体组信息仓储实现
 /// </summary>
-[RegisterScoped]
-public class MediaGroupInfosRepository : RepositoryInt<MediaGroupInfo>, IMediaGroupInfosRepository
+[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
+public class MediaGroupInfosRepository : RepositoryInt<MediaGroupInfo>, IMediaGroupInfoRepository
 {
     /// <summary>
     /// 构造函数

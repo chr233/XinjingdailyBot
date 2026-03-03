@@ -4,8 +4,8 @@ using XinjingDaily.Bot.IRepository.Base;
 namespace XinjingDaily.Bot.IRepository.User.Rbac;
 
 /// <summary>
-/// 权限仓储接口
+/// 角色仓储接口
 /// </summary>
-public interface IClaimsRepository : IRepositoryInt<Claim>
+public interface IRoleRepository : IRepositoryInt<Role>
 {
 }
