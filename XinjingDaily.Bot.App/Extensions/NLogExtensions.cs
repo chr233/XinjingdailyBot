@@ -11,6 +11,15 @@ namespace XinjingDaily.Bot.App.Extensions;
 /// </summary>
 public static class NLogExtensions
 {
+#if DEBUG
+    private const Microsoft.Extensions.Logging.LogLevel MinimumLogLevel = Microsoft.Extensions.Logging. LogLevel.Trace;
+    private static NLog.LogLevel MinimumNLogLevel = NLog.LogLevel.Trace;
+#else
+    private const Microsoft.Extensions.Logging.LogLevel MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Information;
+    private static NLog.LogLevel MinimumNLogLevel = NLog.LogLevel.Info;
+
+#endif
+
     extension(IServiceCollection services)
     {
         /// <summary>
@@ -23,9 +32,7 @@ public static class NLogExtensions
             if (File.Exists(path))
                 services.AddLogging(loggingBuilder => {
                     loggingBuilder.ClearProviders();
-#if !DEBUG
-                    loggingBuilder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Debug);
-#endif
+                    loggingBuilder.SetMinimumLevel(MinimumLogLevel);
                     loggingBuilder.AddNLog(path);
                 });
             else
@@ -128,15 +135,14 @@ public static class NLogExtensions
                     Final = true
                 });
 
-                config.AddRuleForAllLevels(consoleTarget);
+                config.AddRule(MinimumNLogLevel, NLog.LogLevel.Fatal, consoleTarget);
 
+                LogManager.GlobalThreshold = MinimumNLogLevel;
                 LogManager.Configuration = config;
 
                 services.AddLogging(loggingBuilder => {
                     loggingBuilder.ClearProviders();
-#if !DEBUG
-                    loggingBuilder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Debug);
-#endif
+                    loggingBuilder.SetMinimumLevel(MinimumLogLevel);
                     loggingBuilder.AddNLog(config);
                 });
             }

@@ -117,11 +117,14 @@ Dev";
 #elif XJB_WIN_X64
 	public const bool CanUpdate = true;
 	public const string Variant = "win-x64";
+#elif XJB_DOCKER
+	public const bool CanUpdate = false;
+	public const string Variant = "docker";
 #else
     public const bool CanUpdate = false;
     public const string Variant = "source";
 #endif
     public const string Author = "@chr233";
-    public const string Repo = "https://github.com/chr233/XinjingDaily.Bot/";
+    public const string Repo = "https://github.com/chr233/XinjingdailyBot/";
 }
 
