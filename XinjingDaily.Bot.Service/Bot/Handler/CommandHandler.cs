@@ -16,7 +16,7 @@ using XinjingDaily.Bot.Interface.Common;
 
 namespace XinjingDaily.Bot.Service.Bot.Handler;
 
-[RegisterSingleton( Registration = RegistrationStrategy.ImplementedInterfaces)]
+[RegisterSingleton(Registration = RegistrationStrategy.ImplementedInterfaces)]
 public class CommandHandler(
     ILogger<CommandHandler> _logger,
     IServiceProvider _serviceProvider,
@@ -142,6 +142,8 @@ public class CommandHandler(
             }
         }
 
+        //todo 权限验证
+
         // 根据调用环境获取需要的权限
         var chatType = message.Chat.Type;
         string? permission;
@@ -160,9 +162,6 @@ public class CommandHandler(
             _logger.LogWarning("不支持在 ChatType = {type} 中调用命令", chatType);
             return;
         }
-
-        //todo 权限验证
-
 
         bool handled = false;
         string? errorMsg = null;

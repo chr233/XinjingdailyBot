@@ -13,17 +13,55 @@ public class UserInfoRepository(ISqlSugarClient _db) : RepositoryInt<UserInfo>(_
 {
     public async Task<UserInfo?> QueryByTelegramIdAsync(long telegramId)
     {
-        return await _db
-            .Queryable<UserInfo>()
+        return await Queryable()
             .FirstAsync(u => u.TelegramId == telegramId)
             .ConfigureAwait(false);
     }
 
     public async Task<UserInfo?> QueryByTelegramNameAsync(string telegramName)
     {
-        return await _db
-            .Queryable<UserInfo>()
+        return await Queryable()
             .FirstAsync(u => u.TelegramName != null && u.TelegramName == telegramName)
             .ConfigureAwait(false);
+    }
+
+    private async Task UpdateUserInfoNameField(UserInfo userInfo)
+    {
+        if (userInfo.TelegramName?.Length >= 150)
+        {
+            userInfo.TelegramName = userInfo.TelegramName[..150];
+        }
+
+        if (userInfo.FirstName?.Length >= 150)
+        {
+            userInfo.FirstName = userInfo.FirstName[..150];
+        }
+
+        if (userInfo.LastName?.Length >= 150)
+        {
+            userInfo.LastName = userInfo.LastName[..150];
+        }
+
+        userInfo.ModifyAt = DateTime.Now;
+        await Updateable(userInfo)
+            .UpdateColumns(static u => new { u.TelegramName, u.FirstName, u.LastName, u.ModifyAt })
+            .ExecuteCommandAsync()
+            .ConfigureAwait(false);
+    }
+
+    public async Task UpdateTelegramNameAndNickNameAsync(UserInfo userInfo)
+    {
+        if (!string.IsNullOrEmpty(userInfo.TelegramName))
+        {
+            // 如果有有重名的用户, 去掉重名用户的 TelegramName
+            var existUser = await Queryable()
+               .FirstAsync(u => u.TelegramName == userInfo.TelegramName)
+               .ConfigureAwait(false);
+
+            existUser.TelegramName = null;
+            await UpdateUserInfoNameField(existUser).ConfigureAwait(false);
+        }
+
+        await UpdateUserInfoNameField(userInfo).ConfigureAwait(false);
     }
 }

@@ -26,17 +26,17 @@ public sealed record UserInfo : IModifyAt, ICreateAt
     /// <summary>
     /// 用户名@
     /// </summary>
-    [SugarColumn(IsNullable = true, Length = 100)]
+    [SugarColumn(IsNullable = true, Length = 150)]
     public string? TelegramName { get; set; }
     /// <summary>
     /// 用户昵称 姓
     /// </summary>
-    [SugarColumn(IsNullable = true)]
+    [SugarColumn(IsNullable = true, Length = 150)]
     public string? FirstName { get; set; }
     /// <summary>
     /// 用户昵称 名
     /// </summary>
-    [SugarColumn(IsNullable = true)]
+    [SugarColumn(IsNullable = true, Length = 150)]
     public string? LastName { get; set; }
 
     /// <summary>
