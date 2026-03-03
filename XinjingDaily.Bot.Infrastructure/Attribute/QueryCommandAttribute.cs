@@ -10,13 +10,13 @@ public sealed class QueryCommandAttribute : System.Attribute
     /// <summary>
     /// 指令名称
     /// </summary>
-    public string Command { get; set; }
+    public string Command { get; init; }
     /// <summary>
     /// 指令别名
     /// </summary>
-    public string? Alias { get; set; }
+    public string? Alias { get; init; }
 
-    public bool IsShareContext { get; set; }
+    public bool IsShareContext { get; init; }
 
     /// <summary>
     /// 创建特性

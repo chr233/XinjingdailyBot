@@ -8,10 +8,15 @@ namespace XinjingDaily.Bot.Infrastructure.Attribute;
 /// </remarks>
 /// <param name="schedule">Cron表达式</param>
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-public sealed class ScheduleAttribute(string schedule) : System.Attribute
+public sealed class ScheduleAttribute : System.Attribute
 {
     /// <summary>
     /// Cron表达式
     /// </summary>
-    public string Schedule { get; set; } = schedule;
+    public string Schedule { get; init; }
+
+    public ScheduleAttribute(string schedule)
+    {
+        Schedule = schedule;
+    }
 }

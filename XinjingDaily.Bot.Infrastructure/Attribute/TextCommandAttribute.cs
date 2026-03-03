@@ -10,17 +10,17 @@ public sealed class TextCommandAttribute : System.Attribute
     /// <summary>
     /// 指令名称
     /// </summary>
-    public string Command { get; set; }
+    public string Command { get; init; }
     /// <summary>
     /// 指令别名, 用 | 分隔
     /// </summary>
-    public string? Alias { get; set; }
+    public string? Alias { get; init; }
     /// <summary>
     /// 指令描述
     /// </summary>
-    public string? Description { get; set; }
+    public string? Description { get; init; }
 
-    public bool IsShareContext { get; set; }
+    public bool IsShareContext { get; init; }
 
     /// <summary>
     /// 创建特性

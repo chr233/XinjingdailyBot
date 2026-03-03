@@ -12,12 +12,12 @@ public sealed class PermissionAttribute : System.Attribute
     /// <summary>
     /// 命令可用范围
     /// </summary>
-    public ECommandScope Scope { get; set; }
+    public ECommandScope Scope { get; init; }
 
     /// <summary>
     /// 需要的权限
     /// </summary>
-    public string? Permission { get; set; }
+    public string? Permission { get; init; }
 
     /// <summary>
     /// 创建特性
