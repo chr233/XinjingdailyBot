@@ -17,19 +17,19 @@ public interface IRepository<TEntity, TKey>
     /// </summary>
     /// <param name="entity"></param>
     /// <returns></returns>
-    Task<bool> InsertAsync(TEntity entity);
+    Task<int> InsertAsync(TEntity entity);
     /// <summary>
     /// 批量添加
     /// </summary>
     /// <param name="entities"></param>
     /// <returns></returns>
-    Task<bool> InsertAsync(List<TEntity> entities);
+    Task<int> InsertAsync(List<TEntity> entities);
     /// <summary>
     /// 批量添加
     /// </summary>
     /// <param name="entities"></param>
     /// <returns></returns>
-    Task<bool> InsertAsync(TEntity[] entities);
+    Task<int> InsertAsync(TEntity[] entities);
     #endregion
 
     #region Update

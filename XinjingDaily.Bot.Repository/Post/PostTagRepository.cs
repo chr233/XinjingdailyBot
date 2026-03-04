@@ -8,14 +8,11 @@ namespace XinjingDaily.Bot.Repository.Post;
 /// <summary>
 /// 帖子标签仓储实现
 /// </summary>
+/// <remarks>
+/// 构造函数
+/// </remarks>
+/// <param name="db"></param>
 [RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
-public class PostTagRepository : RepositoryInt<PostTag>, IPostTagRepository
+public class PostTagRepository(ISqlSugarClient db) : RepositoryInt<PostTag>(db), IPostTagRepository
 {
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    /// <param name="db"></param>
-    public PostTagRepository(ISqlSugarClient db) : base(db)
-    {
-    }
 }

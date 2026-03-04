@@ -1,5 +1,6 @@
 using SqlSugar;
 using XinjingDaily.Bot.Entry.Columns;
+using XinjingDaily.Bot.Entry.Entries.Users.Rbac;
 using XinjingDaily.Bot.Infrastructure.Extensions;
 
 namespace XinjingDaily.Bot.Entry.Entries.Users;
@@ -58,6 +59,14 @@ public sealed record UserInfo : IModifyAt, ICreateAt
     public DateTime CreateAt { get; set; } = DateTime.Now;
     /// <inheritdoc cref="IModifyAt"/>
     public DateTime ModifyAt { get; set; } = DateTime.Now;
+
+    // 新增导航：用户关联的角色列表
+    [Navigate(NavigateType.OneToMany, nameof(UserRole.UserId))]
+    public List<UserRole>? UserRoles { get; set; }
+
+    // 新增导航：用户直接关联的权限列表
+    [Navigate(NavigateType.OneToMany, nameof(UserClaim.UserId))]
+    public List<UserClaim>? UserClaims { get; set; }
 
     /// <summary>
     /// 文本显示

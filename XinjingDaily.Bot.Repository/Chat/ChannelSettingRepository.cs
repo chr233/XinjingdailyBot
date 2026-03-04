@@ -8,14 +8,11 @@ namespace XinjingDaily.Bot.Repository.Channel;
 /// <summary>
 /// 频道设置仓储实现
 /// </summary>
+/// <remarks>
+/// 构造函数
+/// </remarks>
+/// <param name="db"></param>
 [RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
-public class ChannelSettingRepository : RepositoryInt<SourceChannelSetting>, ISourceChannelSettingRepository
+public class ChannelSettingRepository(ISqlSugarClient db) : RepositoryInt<SourceChannelSetting>(db), ISourceChannelSettingRepository
 {
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    /// <param name="db"></param>
-    public ChannelSettingRepository(ISqlSugarClient db) : base(db)
-    {
-    }
 }

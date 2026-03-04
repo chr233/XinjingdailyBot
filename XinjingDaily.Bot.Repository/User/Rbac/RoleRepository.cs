@@ -8,14 +8,26 @@ namespace XinjingDaily.Bot.Repository.User.Rbac;
 /// <summary>
 /// 权限仓储实现
 /// </summary>
+/// <remarks>
+/// 构造函数
+/// </remarks>
+/// <param name="db"></param>
 [RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
-public class RoleRepository : RepositoryInt<Role>, IRoleRepository
+public class RoleRepository(ISqlSugarClient db) : RepositoryInt<Role>(db), IRoleRepository
 {
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    /// <param name="db"></param>
-    public RoleRepository(ISqlSugarClient db) : base(db)
+    public async Task<List<Role>> QueryDefaultUserRolesAsync()
     {
+        return await Queryable()
+            .Where(r => r.IsDefaultUserRole)
+            .ToListAsync()
+            .ConfigureAwait(false);
+    }
+
+    public async Task<List<Role>> QueryDefaultAdminRolesAsync()
+    {
+        return await Queryable()
+            .Where(r => r.IsDefaultAdminRole)
+            .ToListAsync()
+            .ConfigureAwait(false);
     }
 }

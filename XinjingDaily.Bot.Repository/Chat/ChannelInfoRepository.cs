@@ -13,7 +13,7 @@ public class ChannelInfoRepository(ISqlSugarClient _db) : RepositoryInt<ChatInfo
 {
     public async Task<ChatInfo?> QueryByTelegramIdAsync(long telegramId)
     {
-        return await _db.Queryable<ChatInfo>()
+        return await Queryable()
             .Where(c => c.TelegramId == telegramId)
             .FirstAsync()
             .ConfigureAwait(false);
@@ -21,7 +21,7 @@ public class ChannelInfoRepository(ISqlSugarClient _db) : RepositoryInt<ChatInfo
 
     public async Task<ChatInfo?> QueryByTelegramNameAsync(string telegramName)
     {
-        return await _db.Queryable<ChatInfo>()
+        return await Queryable()
             .Where(c => c.TelegramName != null && c.TelegramName == telegramName)
             .FirstAsync()
             .ConfigureAwait(false);

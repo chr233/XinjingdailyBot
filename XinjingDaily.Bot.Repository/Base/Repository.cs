@@ -141,27 +141,27 @@ public abstract class Repository<TEntity, TKey>(
 
     #region Create
     /// <inheritdoc />
-    public virtual async Task<bool> InsertAsync(TEntity entity)
+    public virtual async Task<int> InsertAsync(TEntity entity)
     {
         return await Insertable(entity)
-            .ExecuteCommandAsync()
-            .ConfigureAwait(false) > 0;
+            .ExecuteReturnIdentityAsync()
+            .ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public virtual async Task<bool> InsertAsync(List<TEntity> entities)
+    public virtual async Task<int> InsertAsync(List<TEntity> entities)
     {
         return await Insertable(entities)
-            .ExecuteCommandAsync()
-            .ConfigureAwait(false) > 0;
+            .ExecuteReturnIdentityAsync()
+            .ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public virtual async Task<bool> InsertAsync(TEntity[] entities)
+    public virtual async Task<int> InsertAsync(TEntity[] entities)
     {
         return await Insertable(entities)
-            .ExecuteCommandAsync()
-            .ConfigureAwait(false) > 0;
+            .ExecuteReturnIdentityAsync()
+            .ConfigureAwait(false);
     }
     #endregion
 

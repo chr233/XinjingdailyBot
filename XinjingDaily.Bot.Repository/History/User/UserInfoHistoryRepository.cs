@@ -24,8 +24,7 @@ public class UserInfoHistoryRepository(ISqlSugarClient _db) : RepositoryInt<User
             CreateAt = DateTime.Now
         };
 
-        await _db
-            .Insertable(history)
+        await Insertable(history)
             .ExecuteCommandAsync()
             .ConfigureAwait(false);
     }

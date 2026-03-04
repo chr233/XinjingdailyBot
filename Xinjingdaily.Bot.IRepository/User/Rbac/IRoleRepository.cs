@@ -8,4 +8,6 @@ namespace XinjingDaily.Bot.IRepository.User.Rbac;
 /// </summary>
 public interface IRoleRepository : IRepositoryInt<Role>
 {
+    Task<List<Role>> QueryDefaultAdminRolesAsync();
+    Task<List<Role>> QueryDefaultUserRolesAsync();
 }

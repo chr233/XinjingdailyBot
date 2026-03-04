@@ -8,14 +8,11 @@ namespace XinjingDaily.Bot.Repository.User.Shop;
 /// <summary>
 /// 角色权限仓储实现
 /// </summary>
+/// <remarks>
+/// 构造函数
+/// </remarks>
+/// <param name="db"></param>
 [RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
-public class ShopItemRepository : RepositoryInt<ShopItem>, IShopItemRepository
+public class ShopItemRepository(ISqlSugarClient db) : RepositoryInt<ShopItem>(db), IShopItemRepository
 {
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    /// <param name="db"></param>
-    public ShopItemRepository(ISqlSugarClient db) : base(db)
-    {
-    }
 }

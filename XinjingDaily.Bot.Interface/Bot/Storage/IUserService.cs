@@ -5,5 +5,6 @@ namespace XinjingDaily.Bot.Interface.Bot.Storage;
 
 public interface IUserService
 {
+    Task LoadUserSetting();
     Task<UserInfo?> QueryUserFromUpdate(Update update);
 }

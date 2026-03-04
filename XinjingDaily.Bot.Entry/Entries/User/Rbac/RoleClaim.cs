@@ -16,4 +16,12 @@ public sealed record RoleClaim
     /// </summary>
     [SugarColumn(IsPrimaryKey = true)]
     public int ClaimId { get; set; }
+
+    // 导航：关联角色表
+    [Navigate(NavigateType.OneToOne, nameof(RoleId))]
+    public Role? Role { get; set; }
+
+    // 导航：关联权限表
+    [Navigate(NavigateType.OneToOne, nameof(ClaimId))]
+    public Claim? Claim { get; set; }
 }

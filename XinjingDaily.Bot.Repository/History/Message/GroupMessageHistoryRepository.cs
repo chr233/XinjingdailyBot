@@ -8,14 +8,11 @@ namespace XinjingDaily.Bot.Repository.History.Message;
 /// <summary>
 /// 群消息历史仓储实现
 /// </summary>
+/// <remarks>
+/// 构造函数
+/// </remarks>
+/// <param name="db"></param>
 [RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
-public class GroupMessageHistoryRepository : RepositoryInt<GroupMessageHistory>, IGroupMessageHistoryRepository
+public class GroupMessageHistoryRepository(ISqlSugarClient db) : RepositoryInt<GroupMessageHistory>(db), IGroupMessageHistoryRepository
 {
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    /// <param name="db"></param>
-    public GroupMessageHistoryRepository(ISqlSugarClient db) : base(db)
-    {
-    }
 }

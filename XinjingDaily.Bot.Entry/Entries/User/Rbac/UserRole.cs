@@ -19,4 +19,12 @@ public sealed record UserRole
     /// </summary>
     [SugarColumn(IsPrimaryKey = true)]
     public int RoleId { get; set; }
+
+    // 导航：关联用户表
+    [Navigate(NavigateType.OneToOne, nameof(UserId))]
+    public UserInfo? User { get; set; }
+
+    // 导航：关联角色表
+    [Navigate(NavigateType.OneToOne, nameof(RoleId))]
+    public Role? Role { get; set; }
 }

@@ -8,14 +8,11 @@ namespace XinjingDaily.Bot.Repository.Ads;
 /// <summary>
 /// 广告统计仓储实现
 /// </summary>
+/// <remarks>
+/// 构造函数
+/// </remarks>
+/// <param name="db"></param>
 [RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
-public class AdvertiseStatisticsRepository : RepositoryInt<AdvertiseStatistic>, IAdvertiseStatisticRepository
+public class AdvertiseStatisticsRepository(ISqlSugarClient db) : RepositoryInt<AdvertiseStatistic>(db), IAdvertiseStatisticRepository
 {
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    /// <param name="db"></param>
-    public AdvertiseStatisticsRepository(ISqlSugarClient db) : base(db)
-    {
-    }
 }

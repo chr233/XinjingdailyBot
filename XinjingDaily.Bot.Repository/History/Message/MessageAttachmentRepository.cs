@@ -8,14 +8,11 @@ namespace XinjingDaily.Bot.Repository.History.Message;
 /// <summary>
 /// 消息附件仓储实现
 /// </summary>
+/// <remarks>
+/// 构造函数
+/// </remarks>
+/// <param name="db"></param>
 [RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
-public class MessageAttachmentRepository : RepositoryInt<MessageAttachment>, IMessageAttachmentRepository
+public class MessageAttachmentRepository(ISqlSugarClient db) : RepositoryInt<MessageAttachment>(db), IMessageAttachmentRepository
 {
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    /// <param name="db"></param>
-    public MessageAttachmentRepository(ISqlSugarClient db) : base(db)
-    {
-    }
 }

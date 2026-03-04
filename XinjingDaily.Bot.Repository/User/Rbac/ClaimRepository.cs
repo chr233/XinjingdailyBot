@@ -8,14 +8,11 @@ namespace XinjingDaily.Bot.Repository.User.Rbac;
 /// <summary>
 /// 权限仓储实现
 /// </summary>
+/// <remarks>
+/// 构造函数
+/// </remarks>
+/// <param name="db"></param>
 [RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
-public class ClaimRepository : RepositoryInt<Claim>, IClaimRepository
+public class ClaimRepository(ISqlSugarClient db) : RepositoryInt<Claim>(db), IClaimRepository
 {
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    /// <param name="db"></param>
-    public ClaimRepository(ISqlSugarClient db) : base(db)
-    {
-    }
 }

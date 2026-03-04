@@ -8,14 +8,11 @@ namespace XinjingDaily.Bot.Repository.Post;
 /// <summary>
 /// 帖子附件仓储实现
 /// </summary>
+/// <remarks>
+/// 构造函数
+/// </remarks>
+/// <param name="db"></param>
 [RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
-public class PostAttachmentRepository : RepositoryInt<PostAttachment>, IPostAttachmentRepository
+public class PostAttachmentRepository(ISqlSugarClient db) : RepositoryInt<PostAttachment>(db), IPostAttachmentRepository
 {
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    /// <param name="db"></param>
-    public PostAttachmentRepository(ISqlSugarClient db) : base(db)
-    {
-    }
 }

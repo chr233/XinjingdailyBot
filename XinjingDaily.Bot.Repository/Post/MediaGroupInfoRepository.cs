@@ -8,14 +8,11 @@ namespace XinjingDaily.Bot.Repository.Post;
 /// <summary>
 /// 媒体组信息仓储实现
 /// </summary>
+/// <remarks>
+/// 构造函数
+/// </remarks>
+/// <param name="db"></param>
 [RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
-public class MediaGroupInfoRepository : RepositoryInt<MediaGroupInfo>, IMediaGroupInfoRepository
+public class MediaGroupInfoRepository(ISqlSugarClient db) : RepositoryInt<MediaGroupInfo>(db), IMediaGroupInfoRepository
 {
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    /// <param name="db"></param>
-    public MediaGroupInfoRepository(ISqlSugarClient db) : base(db)
-    {
-    }
 }

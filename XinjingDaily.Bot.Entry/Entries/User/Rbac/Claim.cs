@@ -1,10 +1,11 @@
 using SqlSugar;
+using XinjingDaily.Bot.Entry.Columns;
 
 namespace XinjingDaily.Bot.Entry.Entries.Users.Rbac;
 
 
 [SugarTable("claim", TableDescription = "权限表")]
-public sealed record Claim
+public sealed record Claim : ICreateAt, IModifyAt
 {
     /// <summary>
     /// 主键
@@ -23,4 +24,9 @@ public sealed record Claim
     /// </summary>
     [SugarColumn(IsNullable = true)]
     public string? Key { get; set; }
+
+    /// <inheritdoc cref="ICreateAt"/>
+    public DateTime CreateAt { get; set; } = DateTime.Now;
+    /// <inheritdoc cref="IModifyAt"/>
+    public DateTime ModifyAt { get; set; } = DateTime.Now;
 }
