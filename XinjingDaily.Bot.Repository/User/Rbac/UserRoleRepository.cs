@@ -1,4 +1,5 @@
 using SqlSugar;
+using XinjingDaily.Bot.Entry.Entries.Users;
 using XinjingDaily.Bot.Entry.Entries.Users.Rbac;
 using XinjingDaily.Bot.IRepository.User.Rbac;
 using XinjingDaily.Bot.Repository.Base;
@@ -22,5 +23,19 @@ public class UserRoleRepository(ISqlSugarClient db) : RepositoryInt<UserRole>(db
         // 添加新的角色关联
         var userRoles = roleIds.Select(roleId => new UserRole { UserId = userId, RoleId = roleId }).ToList();
         await Insertable(userRoles).ExecuteCommandAsync().ConfigureAwait(false);
+    }
+
+    public async Task<List<string?>> QueryUserRoleClaimsAsync(UserInfo userInfo)
+    {
+        return await Queryable()
+            .Where(ur => ur.UserId == userInfo.Id)
+            .LeftJoin<Role>((ur, r) => ur.RoleId == r.Id)
+            .LeftJoin<RoleClaim>((ur, r, rc) => r.Id == rc.RoleId)
+            .LeftJoin<Claim>((ur, r, rc, c) => rc.ClaimId == c.Id)
+            .Select((ur, r, rc, c) => c.Key)
+            .Where(ur => !string.IsNullOrEmpty(ur))
+            .Distinct()
+            .ToListAsync()
+            .ConfigureAwait(false);
     }
 }

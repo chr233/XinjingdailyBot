@@ -35,7 +35,7 @@ public class CommandHandler(
 
     private readonly Dictionary<string, CommandDefinition<QueryCommandAttribute>> _queryCommandDefinitions = [];
 
-    private string[] SplitAlias(string alias)
+    private static string[] SplitAlias(string alias)
     {
         return alias.ToUpperInvariant().Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }
@@ -112,6 +112,38 @@ public class CommandHandler(
         }
     }
 
+    private bool VerifyTextCommandPermission(HashSet<string>? claims, ECommandScope scope, string command)
+    {
+        if (_textCommandPermission.TryGetValue((scope, command), out var permission))
+        {
+            return permission == null || (claims != null && claims.Contains(permission));
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private bool VerifyTextCommandPermission(HashSet<string>? claims, ChatType chatType, string command)
+    {
+        if (chatType is ChatType.Private)
+        {
+            if (VerifyTextCommandPermission(claims, ECommandScope.Private, command))
+            {
+                return true;
+            }
+        }
+        else if (chatType is ChatType.Group or ChatType.Supergroup)
+        {
+            if (VerifyTextCommandPermission(claims, ECommandScope.Group, command))
+            {
+                return true;
+            }
+        }
+
+        return VerifyTextCommandPermission(claims, ECommandScope.All, command);
+    }
+
     /// <inheritdoc />
     public async Task OnCommandReceived(UserInfo userInfo, Message message)
     {
@@ -142,46 +174,29 @@ public class CommandHandler(
             }
         }
 
-        //todo 权限验证
-
-        // 根据调用环境获取需要的权限
-        var chatType = message.Chat.Type;
-        string? permission;
-        if (chatType == ChatType.Group || chatType == ChatType.Supergroup)
-        {
-            permission = _textCommandPermission.GetValueOrDefault((ECommandScope.Group, cmd), null)
-                ?? _textCommandPermission.GetValueOrDefault((ECommandScope.All, cmd), null);
-        }
-        else if (chatType == ChatType.Private)
-        {
-            permission = _textCommandPermission.GetValueOrDefault((ECommandScope.Private, cmd), null)
-                ?? _textCommandPermission.GetValueOrDefault((ECommandScope.All, cmd), null);
-        }
-        else
-        {
-            _logger.LogWarning("不支持在 ChatType = {type} 中调用命令", chatType);
-            return;
-        }
-
         bool handled = false;
         string? errorMsg = null;
 
         //寻找注册的命令处理器
         if (_textCommandDefinitions.TryGetValue(cmd, out var definition))
         {
-            try
+            // 根据调用环境获取需要的权限
+            if (VerifyTextCommandPermission(userInfo.Claims, message.Chat.Type, cmd))
             {
-                await _botClient.SendChatAction(message, ChatAction.Typing).ConfigureAwait(false);
+                try
+                {
+                    await _botClient.SendChatAction(message, ChatAction.Typing).ConfigureAwait(false);
 
-                await CallCommandAsync(userInfo, message, definition.ClassType, definition.Method).ConfigureAwait(false);
+                    await CallCommandAsync(userInfo, message, definition.ClassType, definition.Method).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    errorMsg = $"{ex.GetType} {ex.Message}";
+                    _logger.LogError(ex, "命令 {cmd} 执行出错", cmd);
+                    await _botClient.SendCommandReply(_optionsSetting.System.Debug ? errorMsg : "遇到内部错误", message).ConfigureAwait(false);
+                }
+                handled = true;
             }
-            catch (Exception ex)
-            {
-                errorMsg = $"{ex.GetType} {ex.Message}";
-                _logger.LogError(ex, "命令 {cmd} 执行出错", cmd);
-                await _botClient.SendCommandReply(_optionsSetting.System.Debug ? errorMsg : "遇到内部错误", message).ConfigureAwait(false);
-            }
-            handled = true;
         }
 
         //await _cmdRecordService.AddCmdRecord(message, userInfo, handled, false, errorMsg).ConfigureAwait(false);

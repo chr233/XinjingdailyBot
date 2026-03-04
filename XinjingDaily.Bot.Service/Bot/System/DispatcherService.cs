@@ -41,7 +41,6 @@ public class DispatcherService(
         //    }
         //}
 
-        await _botClient.AutoReply("test", message).ConfigureAwait(false);
     }
 
     private async Task OnPrivateMessageReceived(UserInfo dbUser, Message message)

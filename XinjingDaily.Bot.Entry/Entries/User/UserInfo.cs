@@ -68,6 +68,9 @@ public sealed record UserInfo : IModifyAt, ICreateAt
     [Navigate(NavigateType.OneToMany, nameof(UserClaim.UserId))]
     public List<UserClaim>? UserClaims { get; set; }
 
+    [SugarColumn(IsIgnore = true)]
+    public HashSet<string>? Claims { get; set; }
+
     /// <summary>
     /// 文本显示
     /// </summary>
@@ -76,11 +79,11 @@ public sealed record UserInfo : IModifyAt, ICreateAt
     {
         if (string.IsNullOrEmpty(TelegramName))
         {
-            return $"{FullName}(#{Id})".EscapeHtml();
+            return $"{Id}-{FullName}(#{TelegramId})".EscapeHtml();
         }
         else
         {
-            return $"{FullName}(@{TelegramName})".EscapeHtml();
+            return $"{Id}-{FullName}(@{TelegramName})".EscapeHtml();
         }
     }
 

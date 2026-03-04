@@ -1,6 +1,5 @@
 using SqlSugar;
 using XinjingDaily.Bot.Entry.Entries.Users;
-using XinjingDaily.Bot.Entry.Entries.Users.Rbac;
 using XinjingDaily.Bot.IRepository.User;
 using XinjingDaily.Bot.Repository.Base;
 
@@ -82,17 +81,5 @@ public class UserInfoRepository(ISqlSugarClient _db) : RepositoryInt<UserInfo>(_
             .UpdateColumns(static u => new { u.ModifyAt })
             .ExecuteCommandAsync()
             .ConfigureAwait(false);
-    }
-
-    public async Task<HashSet<string?>> QueryUserClaimsAsync(UserInfo userInfo)
-    {
-        var user = await Queryable()
-            .Includes(u => u.UserClaims)
-            .ToListAsync();
-
-        
-
-        // 合并去重
-        return [];
     }
 }

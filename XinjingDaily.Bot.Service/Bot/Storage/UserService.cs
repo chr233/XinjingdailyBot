@@ -8,6 +8,7 @@ using XinjingDaily.Bot.Infrastructure.Extensions;
 using XinjingDaily.Bot.Interface.Bot.Storage;
 using XinjingDaily.Bot.IRepository.History.User;
 using XinjingDaily.Bot.IRepository.User;
+using XinjingDaily.Bot.IRepository.User.Rbac;
 
 namespace XinjingDaily.Bot.Service.Storage;
 
@@ -16,8 +17,51 @@ public sealed class UserService(
     ILogger<UserService> _logger,
     IOptions<AppSettings> _options,
     IUserInfoRepository _userInfoRepository,
-    IUserInfoHistoryRepository _userInfoHistoryRepository) : IUserService
+    IUserInfoHistoryRepository _userInfoHistoryRepository,
+    IUserRoleRepository _userRoleRepository,
+    IRoleClaimRepository _roleClaimRepository,
+    IUserClaimRepository _userClaimRepository,
+    IClaimRepository _claimRepository) : IUserService
 {
+    private readonly TimeSpan UpdatePeriod = TimeSpan.FromDays(14);
+
+    private readonly HashSet<long> SuperAdminUserIds = [];
+    private readonly HashSet<string> SuperAdminUserNames = [];
+
+    public async Task LoadUserSetting()
+    {
+        var admins = _options.Value.System.SuperAdmins;
+        if (admins != null && admins.Count > 0)
+        {
+            foreach (var admin in admins)
+            {
+                if (string.IsNullOrEmpty(admin))
+                {
+                    continue;
+                }
+
+                if (long.TryParse(admin, out var userId))
+                {
+                    SuperAdminUserIds.Add(userId);
+                }
+                else if (!string.IsNullOrEmpty(admin))
+                {
+                    if (admin.StartsWith('@'))
+                    {
+                        SuperAdminUserNames.Add(admin.TrimStart('@'));
+                    }
+                    else
+                    {
+                        SuperAdminUserNames.Add(admin);
+                    }
+                }
+            }
+        }
+
+        _logger.LogInformation("读取了 {count} 个潮剧管理员", SuperAdminUserIds.Count + SuperAdminUserNames.Count);
+
+    }
+
     public async Task<UserInfo?> QueryUserFromUpdate(Update update)
     {
         var msgChat = update.Type switch {
@@ -103,6 +147,88 @@ public sealed class UserService(
     }
 
     /// <summary>
+    /// 创建新用户
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    private async Task<UserInfo?> CreateNewUser(User user)
+    {
+        var userInfo = new UserInfo {
+            TelegramId = user.Id,
+            TelegramName = user.Username,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            IsBot = user.IsBot,
+            IsBan = false,
+            CreateAt = DateTime.Now,
+            ModifyAt = DateTime.MinValue,
+        };
+
+        try
+        {
+            userInfo.Id = await _userInfoRepository.InsertAsync(userInfo).ConfigureAwait(false);
+
+            if (_options.Value.System.Debug)
+            {
+                _logger.LogDebug("创建用户 {user} 成功", userInfo);
+            }
+
+            return userInfo;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "创建用户 {user} 失败", userInfo);
+            return null;
+        }
+    }
+
+    public async Task<HashSet<string>> QueryUserClaims(UserInfo userInfo)
+    {
+        HashSet<string> claims = [];
+        if (userInfo.IsBan)
+        {
+            return claims;
+        }
+
+        if (SuperAdminUserIds.Contains(userInfo.TelegramId) || (!string.IsNullOrEmpty(userInfo.TelegramName) && SuperAdminUserNames.Contains(userInfo.TelegramName)))
+        {
+            claims.Add("SuperAdmin");
+        }
+
+
+        if (userInfo == null || userInfo.Id <= 0)
+        {
+            return [];
+        }
+
+        // 1. 定义直接权限子查询：UserClaim -> Claim
+        var directKeys = await _userClaimRepository
+            .QueryUserClaimsAsync(userInfo)
+            .ConfigureAwait(false);
+
+        // 2. 定义间接权限子查询：UserRole -> Role -> RoleClaim -> Claim
+        var indirectKeys = await _userRoleRepository
+            .QueryUserRoleClaimsAsync(userInfo)
+            .ConfigureAwait(false);
+
+        foreach (var key in directKeys)
+        {
+            claims.Add(key ?? "");
+        }
+        foreach (var key in indirectKeys)
+        {
+            claims.Add(key ?? "");
+        }
+
+        foreach (var key in claims)
+        {
+            _logger.LogWarning(key);
+        }
+
+        return claims;
+    }
+
+    /// <summary>
     /// 根据MessageUser获取用户
     /// </summary>
     /// <param name="user"></param>
@@ -132,39 +258,19 @@ public sealed class UserService(
         var userInfo = await _userInfoRepository.QueryByTelegramIdAsync(user.Id).ConfigureAwait(false);
         if (userInfo == null)
         {
-            userInfo = new UserInfo {
-                TelegramId = user.Id,
-                TelegramName = user.Username,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                IsBot = user.IsBot,
-                IsBan = false,
-                CreateAt = DateTime.Now,
-                ModifyAt = DateTime.MinValue,
-            };
+            userInfo = await CreateNewUser(user).ConfigureAwait(false);
 
-            try
+            if (userInfo == null)
             {
-                await _userInfoRepository.InsertAsync(userInfo).ConfigureAwait(false);
-                if (isDebug)
-                {
-                    _logger.LogDebug("创建用户 {user} 成功", userInfo);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "创建用户 {user} 失败", userInfo);
                 return null;
             }
         }
         else
         {
-            var needUpdate = false;
-
             var nickChanged = userInfo.FirstName != user.FirstName || userInfo.LastName != user.LastName;
             var userNameChanged = userInfo.TelegramName != user.Username;
 
-            //用户名不一致时更新
+            //用户名不一致时
             if (nickChanged || userNameChanged)
             {
                 userInfo.TelegramName = user.Username;
@@ -172,80 +278,31 @@ public sealed class UserService(
                 userInfo.LastName = user.LastName;
 
                 await _userInfoHistoryRepository.CreateHistoryAsync(userInfo, nickChanged, userNameChanged).ConfigureAwait(false);
-
-                needUpdate = true;
+                await _userInfoRepository.UpdateTelegramNameAndNickNameAsync(userInfo).ConfigureAwait(false);
             }
 
             if (userInfo.IsBot != user.IsBot)
             {
                 userInfo.IsBot = user.IsBot;
-                needUpdate = true;
+                await _userInfoRepository.UpdateIsBotAsync(userInfo).ConfigureAwait(false);
             }
 
-            //    //超过设定时间也触发更新
-            //    if (DateTime.Now > userInfo.ModifyAt + UpdatePeriod)
-            //    {
-            //        needUpdate = true;
-            //    }
+            //超过设定时间也触发更新
+            if (DateTime.Now > userInfo.ModifyAt + UpdatePeriod)
+            {
+                await _userInfoRepository.UpdateModifyAsync(userInfo).ConfigureAwait(false);
+            }
+        }
 
-            //    if (!_groupRepository.HasGroupId(userInfo.GroupID))
-            //    {
-            //        var defaultGroup = _groupRepository.GetDefaultGroup();
-            //        if (defaultGroup == null)
-            //        {
-            //            _logger.LogError("未设置默认群组");
-            //            return null;
-            //        }
-            //        userInfo.GroupID = defaultGroup.Id;
-            //        needUpdate = true;
-            //    }
+        userInfo.Claims = await QueryUserClaims(userInfo).ConfigureAwait(false);
 
-            //    //需要更新用户数据
-            //    if (needUpdate)
-            //    {
-            //        try
-            //        {
-            //            userInfo.ModifyAt = DateTime.Now;
-            //            await Updateable(userInfo).UpdateColumns(static x => new {
-            //                x.UserName,
-            //                x.FirstName,
-            //                x.LastName,
-            //                x.IsBot,
-            //                x.GroupID,
-            //                x.PrivateChatID,
-            //                x.ModifyAt
-            //            }).ExecuteCommandAsync().ConfigureAwait(false);
-            //            if (isDebug)
-            //            {
-            //                _logger.LogDebug("更新用户 {dbUser} 成功", userInfo);
-            //            }
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            _logger.LogError(ex, "更新用户 {dbUser} 失败", userInfo);
-            //            return null;
-            //        }
-            //    }
-            //}
 
-            ////如果是配置文件中指定的管理员就覆盖用户组权限
-            //if (_optionsSetting.Bot.SuperAdmins?.Contains(userInfo.UserID) ?? false)
-            //{
-            //    userInfo.GroupID = _groupRepository.GetMaxGroupId();
-            //}
 
-            ////根据GroupID设置用户权限信息 (封禁用户区别对待)
-            //var group = _groupRepository.GetGroupById(!userInfo.IsBan ? userInfo.GroupID : 0);
 
-            //if (group != null)
-            //{
-            //    userInfo.Right = group.DefaultRight;
-            //}
-            //else
-            //{
-            //    _logger.LogError("读取用户 {dbUser} 权限组 {GroupID} 失败", userInfo, userInfo.GroupID);
-            //    return null;
-            //}
+        //如果是配置文件中指定的管理员就覆盖用户组权限
+        if (SuperAdminUserIds.Contains(userInfo.TelegramId) || (!string.IsNullOrEmpty(userInfo.TelegramName) && SuperAdminUserNames.Contains(userInfo.TelegramName)))
+        {
+
         }
 
         return userInfo;

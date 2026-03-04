@@ -23,11 +23,10 @@ public class RepositoryInitializer(
     /// <inheritdoc/>
     public async Task InitializeAsync()
     {
-        var tagCount = await _postService.LoadTagCache().ConfigureAwait(false);
-        _logger.LogInformation("读取了 {count} 个投稿标签", tagCount);
+        await _userService.LoadUserSetting().ConfigureAwait(false);
 
-        var channelCount = await _chatService.LoadChannelCache().ConfigureAwait(false);
-        _logger.LogInformation("读取了 {count} 个投稿频道", channelCount);
+        await _postService.LoadTagCache().ConfigureAwait(false);
 
+        await _chatService.LoadChannelCache().ConfigureAwait(false);
     }
 }

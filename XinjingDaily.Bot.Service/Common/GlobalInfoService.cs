@@ -6,7 +6,7 @@ namespace XinjingDaily.Bot.Service.Common;
 [RegisterSingleton(Registration = RegistrationStrategy.ImplementedInterfaces)]
 public sealed class GlobalInfoService : IGlobalInfoService
 {
-    public User BotUser { get; set; }
+    public User BotUser { get; set; } = new();
 
 
 }

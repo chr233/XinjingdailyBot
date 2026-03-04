@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Telegram.Bot.Types;
 using XinjingDaily.Bot.Entry.Entries.Chat;
@@ -9,19 +10,21 @@ namespace XinjingDaily.Bot.Service.Bot.Storage;
 
 [RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
 public sealed class ChatService(
+    ILogger<ChatService> _logger,
     IOptions<AppSettings> _options,
     IChatInfoRepository _chatInfoRepository) : IChatService
 {
     private readonly Dictionary<long, Chat> _channelCache = [];
 
-    public async Task<int> LoadChannelCache()
+    public async Task LoadChannelCache()
     {
         //var channels = await _channelRepository.QueryAllChannels().ConfigureAwait(false);
         //foreach (var channel in channels)
         //{
         //    _channelCache[channel.ChatId] = channel;
         //}
-        return _channelCache.Count;
+        _logger.LogInformation("读取了 {count} 个投稿频道", _channelCache.Count);
+
     }
 
     public async Task AutoLeaveChat(Chat chat)

@@ -67,6 +67,7 @@ public static class DatabaseExtension
                         Password = config.Password,
                         CharacterSet = "utf8mb4",
                         AllowZeroDateTime = true,
+                        AllowUserVariables = true,
                     }.ToString(),
 
                     DbType.Sqlite => new SqliteConnectionStringBuilder {

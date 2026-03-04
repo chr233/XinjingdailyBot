@@ -1,3 +1,4 @@
+using XinjingDaily.Bot.Entry.Entries.Users;
 using XinjingDaily.Bot.Entry.Entries.Users.Rbac;
 using XinjingDaily.Bot.IRepository.Base;
 
@@ -8,4 +9,5 @@ namespace XinjingDaily.Bot.IRepository.User.Rbac;
 /// </summary>
 public interface IUserRoleRepository : IRepositoryInt<UserRole>
 {
+    Task<List<string?>> QueryUserRoleClaimsAsync(UserInfo userInfo);
 }
