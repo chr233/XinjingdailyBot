@@ -1,7 +1,9 @@
 using Microsoft.Extensions.Logging;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using XinjingDaily.Bot.Entry.Entries.Users;
 using XinjingDaily.Bot.Interface.Bot;
+using XinjingDaily.Bot.Interface.Bot.Handler;
 using XinjingDaily.Bot.Interface.Bot.System;
 
 namespace XinjingDaily.Bot.Service.Bot.System;
@@ -9,6 +11,7 @@ namespace XinjingDaily.Bot.Service.Bot.System;
 [RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
 public class DispatcherService(
         ILogger<DispatcherService> _logger,
+        ICommandHandler _commandHandler,
         ITelegramBotService _botClient) : IDispatcherService
 {
     /// <inheritdoc/>
@@ -25,21 +28,21 @@ public class DispatcherService(
         //    }
         //}
 
-        //if (message.Type == MessageType.Text && message.Text!.StartsWith('/'))
-        //{
-        //    //处理命令
-        //    await _commandHandler.OnCommandReceived(dbUser, message).ConfigureAwait(false);
-        //}
-        //else
-        //{
-        //    //处理私聊投稿以及群聊消息
-        //    var handler = message.Type == MessageType.Text ? _messageHandler.OnTextMessageReceived(dbUser, message) : _messageHandler.OnMediaMessageReceived(dbUser, message);
+        if (message.Type == MessageType.Text && message.Text!.StartsWith('/'))
+        {
+            //处理命令
+            await _commandHandler.OnCommandReceived(dbUser, message).ConfigureAwait(false);
+        }
+        else
+        {
+            //处理私聊投稿以及群聊消息
+            //var handler = message.Type == MessageType.Text ? _messageHandler.OnTextMessageReceived(dbUser, message) : _messageHandler.OnMediaMessageReceived(dbUser, message);
 
-        //    if (handler != null)
-        //    {
-        //        await handler.ConfigureAwait(false);
-        //    }
-        //}
+            //if (handler != null)
+            //{
+            //    await handler.ConfigureAwait(false);
+            //}
+        }
 
     }
 
@@ -86,7 +89,7 @@ public class DispatcherService(
     /// <inheritdoc/>
     public async Task OnCallbackQueryReceived(UserInfo dbUser, CallbackQuery query)
     {
-        //await _commandHandler.OnQueryCommandReceived(dbUser, query).ConfigureAwait(false);
+        await _commandHandler.OnQueryCommandReceived(dbUser, query).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>

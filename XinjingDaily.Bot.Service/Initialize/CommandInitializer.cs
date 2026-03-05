@@ -47,7 +47,7 @@ public class CommandInitializer(
                 var textAttributes = method.GetCustomAttributes<TextCommandAttribute>(inherit: false);
                 foreach (var attr in textAttributes)
                 {
-                    if (permissionAttributes == null)
+                    if (permissionAttributes == null || !permissionAttributes.Any())
                     {
                         _commandHandler.RegisterTextCommand(type, method, attr);
                     }
@@ -65,7 +65,7 @@ public class CommandInitializer(
                 var queryAttributes = method.GetCustomAttributes<QueryCommandAttribute>(inherit: false);
                 foreach (var attr in queryAttributes)
                 {
-                    if (permissionAttributes == null)
+                    if (permissionAttributes == null || !permissionAttributes.Any())
                     {
                         _commandHandler.RegisterQueryCommand(type, method, attr);
                     }

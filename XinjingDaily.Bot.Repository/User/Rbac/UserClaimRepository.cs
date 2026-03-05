@@ -16,14 +16,13 @@ namespace XinjingDaily.Bot.Repository.User.Rbac;
 [RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
 public class UserClaimRepository(ISqlSugarClient _db) : RepositoryInt<UserClaim>(_db), IUserClaimRepository
 {
-    public async Task<List<string?>> QueryUserClaimsAsync(UserInfo userInfo)
+    public async Task<List<string>> QueryUserClaimsAsync(UserInfo userInfo)
     {
         // 1. 定义直接权限子查询：UserClaim -> Claim
         return await Queryable()
             .Where(uc => uc.UserId == userInfo.Id)
             .LeftJoin<Claim>((uc, c) => uc.ClaimId == c.Id)
-            .Select((uc, c) => c.Key)
-            .Where(uc => !string.IsNullOrEmpty(uc))
+            .Select((uc, c) => SqlFunc.ToUpper(c.Key ?? ""))
             .Distinct()
             .ToListAsync()
             .ConfigureAwait(false);

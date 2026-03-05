@@ -25,15 +25,14 @@ public class UserRoleRepository(ISqlSugarClient db) : RepositoryInt<UserRole>(db
         await Insertable(userRoles).ExecuteCommandAsync().ConfigureAwait(false);
     }
 
-    public async Task<List<string?>> QueryUserRoleClaimsAsync(UserInfo userInfo)
+    public async Task<List<string>> QueryUserRoleClaimsAsync(UserInfo userInfo)
     {
         return await Queryable()
             .Where(ur => ur.UserId == userInfo.Id)
             .LeftJoin<Role>((ur, r) => ur.RoleId == r.Id)
             .LeftJoin<RoleClaim>((ur, r, rc) => r.Id == rc.RoleId)
             .LeftJoin<Claim>((ur, r, rc, c) => rc.ClaimId == c.Id)
-            .Select((ur, r, rc, c) => c.Key)
-            .Where(ur => !string.IsNullOrEmpty(ur))
+            .Select((ur, r, rc, c) => SqlFunc.ToUpper(c.Key ?? ""))
             .Distinct()
             .ToListAsync()
             .ConfigureAwait(false);

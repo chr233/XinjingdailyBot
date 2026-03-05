@@ -9,5 +9,5 @@ namespace XinjingDaily.Bot.IRepository.User.Rbac;
 /// </summary>
 public interface IUserRoleRepository : IRepositoryInt<UserRole>
 {
-    Task<List<string?>> QueryUserRoleClaimsAsync(UserInfo userInfo);
+    Task<List<string>> QueryUserRoleClaimsAsync(UserInfo userInfo);
 }

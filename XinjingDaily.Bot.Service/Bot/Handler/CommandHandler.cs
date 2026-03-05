@@ -56,11 +56,17 @@ public class CommandHandler(
         permission = permission?.ToUpperInvariant();
         var definition = new CommandDefinition<TextCommandAttribute>(classType, methodInfo, attribute);
 
-        if (!_textCommandDefinitions.TryAdd(command, definition))
+        bool isDefinitionAdded = _textCommandDefinitions.TryAdd(command, definition);
+        bool isPermissionAdded = _textCommandPermission.TryAdd((scope, command), permission);
+
+        if (!isDefinitionAdded || !isPermissionAdded)
         {
             _logger.LogWarning("命令 {scope} - {command} - {permission} 已经存在, 请检查代码逻辑", scope, command, permission);
         }
-        _textCommandPermission.TryAdd((scope, command), permission);
+        else
+        {
+            _logger.LogTrace("注册 {scope} - {command} - {permission}", scope, command, permission);
+        }
 
         if (!string.IsNullOrEmpty(attribute.Alias))
         {
