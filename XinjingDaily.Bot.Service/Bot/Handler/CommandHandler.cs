@@ -40,6 +40,7 @@ public class CommandHandler(
         return alias.ToUpperInvariant().Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }
 
+    #region 注册命令
     public void RegisterTextCommand(Type classType, MethodInfo methodInfo, TextCommandAttribute attribute)
     {
         RegisterTextCommand(classType, methodInfo, ECommandScope.All, null, attribute);
@@ -117,7 +118,16 @@ public class CommandHandler(
             }
         }
     }
+    #endregion
 
+    #region 验证权限
+    /// <summary>
+    /// 验证Text命令权限
+    /// </summary>
+    /// <param name="claims"></param>
+    /// <param name="scope"></param>
+    /// <param name="command"></param>
+    /// <returns></returns>
     private bool VerifyTextCommandPermission(HashSet<string>? claims, ECommandScope scope, string command)
     {
         if (_textCommandPermission.TryGetValue((scope, command), out var permission))
@@ -130,6 +140,13 @@ public class CommandHandler(
         }
     }
 
+    /// <summary>
+    /// 验证Text命令权限
+    /// </summary>
+    /// <param name="claims"></param>
+    /// <param name="chatType"></param>
+    /// <param name="command"></param>
+    /// <returns></returns>
     private bool VerifyTextCommandPermission(HashSet<string>? claims, ChatType chatType, string command)
     {
         if (chatType is ChatType.Private)
@@ -150,6 +167,53 @@ public class CommandHandler(
         return VerifyTextCommandPermission(claims, ECommandScope.All, command);
     }
 
+    /// <summary>
+    /// 验证Query命令权限
+    /// </summary>
+    /// <param name="claims"></param>
+    /// <param name="scope"></param>
+    /// <param name="command"></param>
+    /// <returns></returns>
+    private bool VerifyQueryCommandPermission(HashSet<string>? claims, ECommandScope scope, string command)
+    {
+        if (_queryCommandPermission.TryGetValue((scope, command), out var permission))
+        {
+            return permission == null || (claims != null && claims.Contains(permission));
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 验证Query命令权限
+    /// </summary>
+    /// <param name="claims"></param>
+    /// <param name="chatType"></param>
+    /// <param name="command"></param>
+    /// <returns></returns>
+    private bool VerifyQueryCommandPermission(HashSet<string>? claims, ChatType chatType, string command)
+    {
+        if (chatType is ChatType.Private)
+        {
+            if (VerifyQueryCommandPermission(claims, ECommandScope.Private, command))
+            {
+                return true;
+            }
+        }
+        else if (chatType is ChatType.Group or ChatType.Supergroup)
+        {
+            if (VerifyQueryCommandPermission(claims, ECommandScope.Group, command))
+            {
+                return true;
+            }
+        }
+
+        return VerifyQueryCommandPermission(claims, ECommandScope.All, command);
+    }
+    #endregion
+
     /// <inheritdoc />
     public async Task OnCommandReceived(UserInfo userInfo, Message message)
     {
@@ -159,20 +223,20 @@ public class CommandHandler(
         }
 
         //切分命令参数
-        string[] args = message.Text!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
-        string cmd = args.First()[1..].ToUpperInvariant();
-        bool inGroup = message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup;
+        var args = message.Text!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
+        var cmd = args.First()[1..].ToUpperInvariant();
+        bool isInGroup = message.Chat.Type is ChatType.Group or ChatType.Supergroup;
 
         //判断是不是艾特机器人的命令
-        bool IsAtMe = false;
+        bool isAtMe = false;
         int index = cmd.IndexOf('@');
-        if (inGroup && index > -1)
+        if (isInGroup && index > -1)
         {
             string botName = cmd[(index + 1)..];
             if (botName.Equals(_globalInfo.BotUser.Username, StringComparison.OrdinalIgnoreCase))
             {
                 cmd = cmd[..index];
-                IsAtMe = true;
+                isAtMe = true;
             }
             else
             {
@@ -203,14 +267,24 @@ public class CommandHandler(
                 }
                 handled = true;
             }
+            else
+            {
+                if (isAtMe || !isInGroup)
+                {
+                    await _botClient.SendCommandReply("没有权限这么做", message).ConfigureAwait(false);
+                }
+
+            }
+        }
+        else
+        {
+            if (isAtMe || !isInGroup)
+            {
+                await _botClient.SendCommandReply("未知的命令", message).ConfigureAwait(false);
+            }
         }
 
         //await _cmdRecordService.AddCmdRecord(message, userInfo, handled, false, errorMsg).ConfigureAwait(false);
-
-        if (!handled && ((inGroup && IsAtMe) || (!inGroup)))
-        {
-            await _botClient.SendCommandReply("未知的命令", message).ConfigureAwait(false);
-        }
     }
 
     /// <summary>
@@ -278,50 +352,9 @@ public class CommandHandler(
         }
 
         //切分命令参数
-        string[] args = query.Data!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
-        string cmd = args.First().ToUpperInvariant();
-
-        if (cmd == "CMD")
-        {
-            if (args.Length < 2 || !long.TryParse(args[1], out long userID))
-            {
-                await _botClient.AutoReply("Payload 非法", query, true).ConfigureAwait(false);
-                await _botClient.RemoveMessageReplyMarkup(message).ConfigureAwait(false);
-                return;
-            }
-
-            //判断消息发起人是不是同一个, userID 为 -1 时所有人均可用
-            if (dbUser.TelegramId != userID && userID != -1)
-            {
-                await _botClient.AutoReply("这不是你的消息, 请不要瞎点", query, true).ConfigureAwait(false);
-                return;
-            }
-
-            args = args[2..];
-            cmd = args.First().ToUpperInvariant();
-        }
-
-        // 根据调用环境获取需要的权限
-        var chatType = message.Chat.Type;
-        string? permission;
-        if (chatType == ChatType.Group || chatType == ChatType.Supergroup)
-        {
-            permission = _textCommandPermission.GetValueOrDefault((ECommandScope.Group, cmd), null)
-                ?? _textCommandPermission.GetValueOrDefault((ECommandScope.All, cmd), null);
-        }
-        else if (chatType == ChatType.Private)
-        {
-            permission = _textCommandPermission.GetValueOrDefault((ECommandScope.Private, cmd), null)
-                ?? _textCommandPermission.GetValueOrDefault((ECommandScope.All, cmd), null);
-        }
-        else
-        {
-            _logger.LogWarning("不支持在 ChatType = {type} 中调用命令", chatType);
-            return;
-        }
-
-        //todo 权限验证
-
+        var args = query.Data!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
+        var cmd = args.First().ToUpperInvariant();
+        bool isInGroup = message.Chat.Type is ChatType.Group or ChatType.Supergroup;
 
         bool handled = false;
         string? errorMsg = null;

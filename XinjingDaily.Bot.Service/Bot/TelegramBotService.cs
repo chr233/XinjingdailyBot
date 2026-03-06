@@ -38,7 +38,7 @@ public class TelegramBotService(
     }
 
     /// <inheritdoc />
-    public Task<Message> AutoReply(
+    public async Task<Message> AutoReply(
         string text,
         Message message,
         ParseMode parsemode = ParseMode.None,
@@ -48,49 +48,49 @@ public class TelegramBotService(
             AllowSendingWithoutReply = true,
             MessageId = message.MessageId,
         };
-        return _botClient.SendMessage(message.Chat, text, parseMode: parsemode, replyParameters: replyParameters, cancellationToken: cancellationToken);
+        return await _botClient.SendMessage(message.Chat, text, parseMode: parsemode, replyParameters: replyParameters, cancellationToken: cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task AutoReply(
+    public async Task AutoReply(
         string text,
         CallbackQuery query,
         bool showAlert = false,
         CancellationToken cancellationToken = default)
     {
-        return _botClient.AnswerCallbackQuery(query.Id, text, showAlert: showAlert, cancellationToken: cancellationToken);
+        await _botClient.AnswerCallbackQuery(query.Id, text, showAlert: showAlert, cancellationToken: cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<Message> EditMessageReplyMarkup(
+    public async Task<Message> EditMessageReplyMarkup(
         ChatId chatId,
         int messageId,
         InlineKeyboardMarkup? replyMarkup = default,
         string? businessConnectionId = default,
         CancellationToken cancellationToken = default)
     {
-        return _botClient.EditMessageReplyMarkup(chatId, messageId, replyMarkup, businessConnectionId, cancellationToken);
+        return await _botClient.EditMessageReplyMarkup(chatId, messageId, replyMarkup, businessConnectionId, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public Task<Message> EditMessageReplyMarkup(
+    public async Task<Message> EditMessageReplyMarkup(
         Message message,
         InlineKeyboardMarkup? replyMarkup = default,
         string? businessConnectionId = default,
         CancellationToken cancellationToken = default)
     {
-        return _botClient.EditMessageReplyMarkup(message.Chat, message.Id, replyMarkup, businessConnectionId, cancellationToken);
+        return await _botClient.EditMessageReplyMarkup(message.Chat, message.Id, replyMarkup, businessConnectionId, cancellationToken);
     }
 
     /// <inheritdoc/>
-    public Task EditMessageReplyMarkup(
+    public async Task EditMessageReplyMarkup(
         string inlineMessageId,
         InlineKeyboardMarkup? replyMarkup = default,
         string? businessConnectionId = default,
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.EditMessageReplyMarkup(inlineMessageId, replyMarkup, businessConnectionId, cancellationToken);
+        await _botClient.EditMessageReplyMarkup(inlineMessageId, replyMarkup, businessConnectionId, cancellationToken);
     }
 
     /// <summary>
@@ -99,11 +99,11 @@ public class TelegramBotService(
     /// <param name="message"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<Message> RemoveMessageReplyMarkup(
+    public async Task<Message> RemoveMessageReplyMarkup(
         Message message,
         CancellationToken cancellationToken = default)
     {
-        return _botClient.EditMessageReplyMarkup(message.Chat, message.MessageId, null, cancellationToken: cancellationToken);
+        return await _botClient.EditMessageReplyMarkup(message.Chat, message.MessageId, null, cancellationToken: cancellationToken);
     }
 
     /// <summary>
@@ -116,7 +116,7 @@ public class TelegramBotService(
     /// <param name="disableWebPagePreview"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<Message> EditMessageText(
+    public async Task<Message> EditMessageText(
         Message message,
         string text,
         ParseMode parseMode = ParseMode.None,
@@ -128,7 +128,7 @@ public class TelegramBotService(
             IsDisabled = disableWebPagePreview,
         };
 
-        return _botClient.EditMessageText(message.Chat, message.MessageId, text, parseMode: parseMode, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken);
+        return await _botClient.EditMessageText(message.Chat, message.MessageId, text, parseMode: parseMode, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken);
     }
 
     /// <summary>
@@ -142,7 +142,7 @@ public class TelegramBotService(
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<Message> EditMessageText(
+    public async Task<Message> EditMessageText(
         ChatId chatId,
         int messageId,
         string text,
@@ -155,7 +155,7 @@ public class TelegramBotService(
             IsDisabled = disableWebPagePreview,
         };
 
-        return _botClient.EditMessageText(chatId, messageId, text, parseMode: parseMode, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken);
+        return await _botClient.EditMessageText(chatId, messageId, text, parseMode: parseMode, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, cancellationToken: cancellationToken);
     }
 
     /// <summary>
@@ -171,7 +171,7 @@ public class TelegramBotService(
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<Message> SendMessage(
+    public async Task<Message> SendMessage(
         long chatId,
         string text,
         int? messageThreadId = null,
@@ -191,7 +191,7 @@ public class TelegramBotService(
             MessageId = replyToMessageId.Value,
         } : null;
 
-        return _botClient.SendMessage(chatId, text, parseMode: parseMode, messageThreadId: messageThreadId, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, replyParameters: replyParameters, disableNotification: disableNotification, cancellationToken: cancellationToken);
+        return await _botClient.SendMessage(chatId, text, parseMode: parseMode, messageThreadId: messageThreadId, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, replyParameters: replyParameters, disableNotification: disableNotification, cancellationToken: cancellationToken);
     }
 
     /// <summary>
@@ -207,7 +207,7 @@ public class TelegramBotService(
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<Message> SendMessage(
+    public async Task<Message> SendMessage(
         ChatId chatId,
         string text,
         int? messageThreadId,
@@ -227,11 +227,11 @@ public class TelegramBotService(
             MessageId = replyToMessageId.Value,
         } : null;
 
-        return _botClient.SendMessage(chatId, text, parseMode: parseMode, messageThreadId: messageThreadId, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, replyParameters: replyParameters, disableNotification: disableNotification, cancellationToken: cancellationToken);
+        return await _botClient.SendMessage(chatId, text, parseMode: parseMode, messageThreadId: messageThreadId, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, replyParameters: replyParameters, disableNotification: disableNotification, cancellationToken: cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<Message> SendMessage(
+    public async Task<Message> SendMessage(
         Chat chat,
         string text,
         int? messageThreadId = null,
@@ -251,7 +251,7 @@ public class TelegramBotService(
             MessageId = replyToMessageId.Value,
         } : null;
 
-        return _botClient.SendMessage(chat, text, parseMode: parseMode, messageThreadId: messageThreadId, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, replyParameters: replyParameters, disableNotification: disableNotification, cancellationToken: cancellationToken);
+        return await _botClient.SendMessage(chat, text, parseMode: parseMode, messageThreadId: messageThreadId, replyMarkup: replyMarkup, linkPreviewOptions: linkPreviewOptions, replyParameters: replyParameters, disableNotification: disableNotification, cancellationToken: cancellationToken);
     }
 
     /// <summary>
@@ -266,7 +266,7 @@ public class TelegramBotService(
     /// <param name="replyMarkup"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<Message> SendMessage(
+    public async Task<Message> SendMessage(
 
         Message message,
         string text,
@@ -286,27 +286,27 @@ public class TelegramBotService(
             MessageId = message.MessageId,
         } : null;
 
-        return _botClient.SendMessage(message.Chat, text, parseMode: parseMode, messageThreadId: message.Chat.IsForum ? message.MessageThreadId : null, replyMarkup: replyMarkup, replyParameters: replyParameters, linkPreviewOptions: linkPreviewOptions, disableNotification: disableNotification, cancellationToken: cancellationToken);
+        return await _botClient.SendMessage(message.Chat, text, parseMode: parseMode, messageThreadId: message.Chat.IsForum ? message.MessageThreadId : null, replyMarkup: replyMarkup, replyParameters: replyParameters, linkPreviewOptions: linkPreviewOptions, disableNotification: disableNotification, cancellationToken: cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task DeleteMessage(
+    public async Task DeleteMessage(
       ChatId chatId,
       int messageId,
       CancellationToken cancellationToken = default
   )
     {
-        return _botClient.DeleteMessage(chatId, messageId, cancellationToken);
+        await _botClient.DeleteMessage(chatId, messageId, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task DeleteMessages(
+    public async Task DeleteMessages(
         ChatId chatId,
         IEnumerable<int> messageIds,
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.DeleteMessages(chatId, messageIds, cancellationToken);
+        await _botClient.DeleteMessages(chatId, messageIds, cancellationToken);
     }
 
     /// <summary>
@@ -320,7 +320,6 @@ public class TelegramBotService(
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     public async Task<Message> SendCommandReply(
-
         string text,
         Message message,
         bool? autoDelete = null,
@@ -370,7 +369,7 @@ public class TelegramBotService(
     /// <param name="threadId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task SendChatAction(
+    public async Task SendChatAction(
 
         Message message,
         ChatAction chatAction,
@@ -378,12 +377,11 @@ public class TelegramBotService(
     {
         try
         {
-            return _botClient.SendChatAction(message.Chat, chatAction, message.Chat.IsForum ? message.MessageThreadId : null, null, cancellationToken);
+            await _botClient.SendChatAction(message.Chat, chatAction, message.Chat.IsForum ? message.MessageThreadId : null, null, cancellationToken);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "SendChatAction出错");
-            return Task.CompletedTask;
         }
     }
 
@@ -430,13 +428,13 @@ public class TelegramBotService(
     }
 
     /// <inheritdoc />
-    public Task<TGFile> GetFile(string fileId, CancellationToken cancellationToken = default)
+    public async Task<TGFile> GetFile(string fileId, CancellationToken cancellationToken = default)
     {
-        return _botClient.GetFile(fileId, cancellationToken);
+        return await _botClient.GetFile(fileId, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<Message> SendPhoto(
+    public async Task<Message> SendPhoto(
         ChatId chatId,
         InputFile photo,
         string? caption = default,
@@ -456,11 +454,11 @@ public class TelegramBotService(
         SuggestedPostParameters? suggestedPostParameters = default,
         CancellationToken cancellationToken = default)
     {
-        return _botClient.SendPhoto(chatId, photo, caption, parseMode, replyParameters, replyMarkup, messageThreadId, captionEntities, showCaptionAboveMedia, hasSpoiler, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+        return await _botClient.SendPhoto(chatId, photo, caption, parseMode, replyParameters, replyMarkup, messageThreadId, captionEntities, showCaptionAboveMedia, hasSpoiler, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<Message> SendPhotoM(
+    public async Task<Message> SendPhotoM(
         ChatId chatId,
         InputFile photo,
         string? caption = default,
@@ -482,11 +480,11 @@ public class TelegramBotService(
     {
         var replyParameters = CreateReplyParameters(replyMessage);
 
-        return _botClient.SendPhoto(chatId, photo, caption, parseMode, replyParameters, replyMarkup, messageThreadId, captionEntities, showCaptionAboveMedia, hasSpoiler, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+        return await _botClient.SendPhoto(chatId, photo, caption, parseMode, replyParameters, replyMarkup, messageThreadId, captionEntities, showCaptionAboveMedia, hasSpoiler, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<Message> SendAudio(
+    public async Task<Message> SendAudio(
         ChatId chatId,
         InputFile audio,
         string? caption = default,
@@ -509,11 +507,11 @@ public class TelegramBotService(
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.SendAudio(chatId, audio, caption, parseMode, replyParameters, replyMarkup, duration, performer, title, thumbnail, messageThreadId, captionEntities, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+        return await _botClient.SendAudio(chatId, audio, caption, parseMode, replyParameters, replyMarkup, duration, performer, title, thumbnail, messageThreadId, captionEntities, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<Message> SendAudioM(
+    public async Task<Message> SendAudioM(
         ChatId chatId,
         InputFile audio,
         string? caption = default,
@@ -538,11 +536,11 @@ public class TelegramBotService(
     {
         var replyParameters = CreateReplyParameters(replyMessage);
 
-        return _botClient.SendAudio(chatId, audio, caption, parseMode, replyParameters, replyMarkup, duration, performer, title, thumbnail, messageThreadId, captionEntities, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+        return await _botClient.SendAudio(chatId, audio, caption, parseMode, replyParameters, replyMarkup, duration, performer, title, thumbnail, messageThreadId, captionEntities, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<Message> SendDocument(
+    public async Task<Message> SendDocument(
         ChatId chatId,
         InputFile document,
         string? caption = default,
@@ -563,11 +561,11 @@ public class TelegramBotService(
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.SendDocument(chatId, document, caption, parseMode, replyParameters, replyMarkup, thumbnail, messageThreadId, captionEntities, disableContentTypeDetection, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+        return await _botClient.SendDocument(chatId, document, caption, parseMode, replyParameters, replyMarkup, thumbnail, messageThreadId, captionEntities, disableContentTypeDetection, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<Message> SendDocumentM(
+    public async Task<Message> SendDocumentM(
         ChatId chatId,
         InputFile document,
         string? caption = default,
@@ -590,11 +588,11 @@ public class TelegramBotService(
     {
         var replyParameters = CreateReplyParameters(replyMessage);
 
-        return _botClient.SendDocument(chatId, document, caption, parseMode, replyParameters, replyMarkup, thumbnail, messageThreadId, captionEntities, disableContentTypeDetection, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+        return await _botClient.SendDocument(chatId, document, caption, parseMode, replyParameters, replyMarkup, thumbnail, messageThreadId, captionEntities, disableContentTypeDetection, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<Message> SendVideo(
+    public async Task<Message> SendVideo(
         ChatId chatId,
         InputFile video,
         string? caption = default,
@@ -622,11 +620,11 @@ public class TelegramBotService(
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.SendVideo(chatId, video, caption, parseMode, replyParameters, replyMarkup, duration, width, height, thumbnail, messageThreadId, captionEntities, showCaptionAboveMedia, hasSpoiler, supportsStreaming, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, cover, startTimestamp, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+        return await _botClient.SendVideo(chatId, video, caption, parseMode, replyParameters, replyMarkup, duration, width, height, thumbnail, messageThreadId, captionEntities, showCaptionAboveMedia, hasSpoiler, supportsStreaming, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, cover, startTimestamp, directMessagesTopicId, suggestedPostParameters, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<Message> SendVideoM(
+    public async Task<Message> SendVideoM(
         ChatId chatId,
         InputFile video,
         string? caption = default,
@@ -656,11 +654,11 @@ public class TelegramBotService(
     {
         var replyParameters = CreateReplyParameters(replyMessage);
 
-        return _botClient.SendVideo(chatId, video, caption, parseMode, replyParameters, replyMarkup, duration, width, height, thumbnail, messageThreadId, captionEntities, showCaptionAboveMedia, hasSpoiler, supportsStreaming, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, cover, startTimestamp, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+        return await _botClient.SendVideo(chatId, video, caption, parseMode, replyParameters, replyMarkup, duration, width, height, thumbnail, messageThreadId, captionEntities, showCaptionAboveMedia, hasSpoiler, supportsStreaming, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, cover, startTimestamp, directMessagesTopicId, suggestedPostParameters, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<Message[]> SendMediaGroup(
+    public async Task<Message[]> SendMediaGroup(
         ChatId chatId,
         IEnumerable<IAlbumInputMedia> media,
         ReplyParameters? replyParameters = default,
@@ -671,14 +669,13 @@ public class TelegramBotService(
         string? businessConnectionId = default,
         bool allowPaidBroadcast = default,
         long? directMessagesTopicId = default,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
-        return _botClient.SendMediaGroup(chatId, media, replyParameters, messageThreadId, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, cancellationToken);
+        return await _botClient.SendMediaGroup(chatId, media, replyParameters, messageThreadId, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<Message[]> SendMediaGroupM(
+    public async Task<Message[]> SendMediaGroupM(
     ChatId chatId,
     IEnumerable<IAlbumInputMedia> media,
     Message? replyMessage = default,
@@ -689,16 +686,15 @@ public class TelegramBotService(
     string? businessConnectionId = default,
     bool allowPaidBroadcast = default,
     long? directMessagesTopicId = default,
-    CancellationToken cancellationToken = default
-)
+    CancellationToken cancellationToken = default)
     {
         var replyParameters = CreateReplyParameters(replyMessage);
 
-        return _botClient.SendMediaGroup(chatId, media, replyParameters, messageThreadId, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, cancellationToken);
+        return await _botClient.SendMediaGroup(chatId, media, replyParameters, messageThreadId, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<Message> SendVoice(
+    public async Task<Message> SendVoice(
         ChatId chatId,
         InputFile voice,
         string? caption = default,
@@ -718,12 +714,12 @@ public class TelegramBotService(
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.SendVoice(chatId, voice, caption, parseMode, replyParameters, replyMarkup, duration, messageThreadId, captionEntities, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+        return await _botClient.SendVoice(chatId, voice, caption, parseMode, replyParameters, replyMarkup, duration, messageThreadId, captionEntities, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
     }
 
 
     /// <inheritdoc />
-    public Task<Message> SendVoiceM(
+    public async Task<Message> SendVoiceM(
         ChatId chatId,
         InputFile voice,
         string? caption = default,
@@ -745,11 +741,11 @@ public class TelegramBotService(
     {
         var replyParameters = CreateReplyParameters(replyMessage);
 
-        return _botClient.SendVoice(chatId, voice, caption, parseMode, replyParameters, replyMarkup, duration, messageThreadId, captionEntities, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+        return await _botClient.SendVoice(chatId, voice, caption, parseMode, replyParameters, replyMarkup, duration, messageThreadId, captionEntities, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<Message> SendAnimation(
+    public async Task<Message> SendAnimation(
         ChatId chatId,
         InputFile animation,
         string? caption = default,
@@ -774,11 +770,11 @@ public class TelegramBotService(
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.SendAnimation(chatId, animation, caption, parseMode, replyParameters, replyMarkup, duration, width, height, thumbnail, messageThreadId, captionEntities, showCaptionAboveMedia, hasSpoiler, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+        return await _botClient.SendAnimation(chatId, animation, caption, parseMode, replyParameters, replyMarkup, duration, width, height, thumbnail, messageThreadId, captionEntities, showCaptionAboveMedia, hasSpoiler, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<Message> SendAnimationM(
+    public async Task<Message> SendAnimationM(
         ChatId chatId,
         InputFile animation,
         string? caption = default,
@@ -805,11 +801,11 @@ public class TelegramBotService(
     {
         var replyParameters = CreateReplyParameters(replyMessage);
 
-        return _botClient.SendAnimation(chatId, animation, caption, parseMode, replyParameters, replyMarkup, duration, width, height, thumbnail, messageThreadId, captionEntities, showCaptionAboveMedia, hasSpoiler, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
+        return await _botClient.SendAnimation(chatId, animation, caption, parseMode, replyParameters, replyMarkup, duration, width, height, thumbnail, messageThreadId, captionEntities, showCaptionAboveMedia, hasSpoiler, disableNotification, protectContent, messageEffectId, businessConnectionId, allowPaidBroadcast, directMessagesTopicId, suggestedPostParameters, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<MessageId> CopyMessage(
+    public async Task<MessageId> CopyMessage(
         ChatId chatId,
         ChatId fromChatId,
         int messageId,
@@ -829,11 +825,11 @@ public class TelegramBotService(
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.CopyMessage(chatId, fromChatId, messageId, caption, parseMode, replyParameters, replyMarkup, messageThreadId, captionEntities, showCaptionAboveMedia, disableNotification, protectContent, allowPaidBroadcast, videoStartTimestamp, directMessagesTopicId, suggestedPostParameters, null, cancellationToken);
+        return await _botClient.CopyMessage(chatId, fromChatId, messageId, caption, parseMode, replyParameters, replyMarkup, messageThreadId, captionEntities, showCaptionAboveMedia, disableNotification, protectContent, allowPaidBroadcast, videoStartTimestamp, directMessagesTopicId, suggestedPostParameters, null, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<MessageId[]> CopyMessages(
+    public async Task<MessageId[]> CopyMessages(
         ChatId chatId,
         ChatId fromChatId,
         IEnumerable<int> messageIds,
@@ -845,11 +841,11 @@ public class TelegramBotService(
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.CopyMessages(chatId, fromChatId, messageIds, removeCaption, messageThreadId, disableNotification, protectContent, directMessagesTopicId, cancellationToken);
+        return await _botClient.CopyMessages(chatId, fromChatId, messageIds, removeCaption, messageThreadId, disableNotification, protectContent, directMessagesTopicId, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task RestrictChatMember(
+    public async Task RestrictChatMember(
         ChatId chatId,
         long userId,
         ChatPermissions permissions,
@@ -857,33 +853,33 @@ public class TelegramBotService(
         DateTime? untilDate = default,
         CancellationToken cancellationToken = default)
     {
-        return _botClient.RestrictChatMember(chatId, userId, permissions, useIndependentChatPermissions, untilDate, cancellationToken);
+        await _botClient.RestrictChatMember(chatId, userId, permissions, useIndependentChatPermissions, untilDate, cancellationToken);
     }
 
 
     /// <inheritdoc />
-    public Task BanChatMember(
+    public async Task BanChatMember(
        ChatId chatId,
        long userId,
        DateTime? untilDate = default,
        bool revokeMessages = default,
        CancellationToken cancellationToken = default)
     {
-        return _botClient.BanChatMember(chatId, userId, untilDate, revokeMessages, cancellationToken);
+        await _botClient.BanChatMember(chatId, userId, untilDate, revokeMessages, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task UnbanChatMember(
+    public async Task UnbanChatMember(
         ChatId chatId,
         long userId,
         bool onlyIfBanned = default,
         CancellationToken cancellationToken = default)
     {
-        return _botClient.UnbanChatMember(chatId, userId, onlyIfBanned, cancellationToken);
+        await _botClient.UnbanChatMember(chatId, userId, onlyIfBanned, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<ChatInviteLink> CreateChatInviteLink(
+    public async Task<ChatInviteLink> CreateChatInviteLink(
         ChatId chatId,
         string? name = default,
         DateTime? expireDate = default,
@@ -891,11 +887,11 @@ public class TelegramBotService(
         bool createsJoinRequest = default,
         CancellationToken cancellationToken = default)
     {
-        return _botClient.CreateChatInviteLink(chatId, name, expireDate, memberLimit, createsJoinRequest, cancellationToken);
+        return await _botClient.CreateChatInviteLink(chatId, name, expireDate, memberLimit, createsJoinRequest, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task PinChatMessage(
+    public async Task PinChatMessage(
        ChatId chatId,
        int messageId,
        bool disableNotification = default,
@@ -903,103 +899,103 @@ public class TelegramBotService(
        CancellationToken cancellationToken = default
    )
     {
-        return _botClient.PinChatMessage(chatId, messageId, disableNotification, businessConnectionId, cancellationToken);
+        await _botClient.PinChatMessage(chatId, messageId, disableNotification, businessConnectionId, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task UnpinChatMessage(
+    public async Task UnpinChatMessage(
         ChatId chatId,
         int? messageId = default,
         string? businessConnectionId = default,
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.UnpinChatMessage(chatId, messageId, businessConnectionId, cancellationToken);
+        await _botClient.UnpinChatMessage(chatId, messageId, businessConnectionId, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task UnpinAllChatMessages(
+    public async Task UnpinAllChatMessages(
        ChatId chatId,
        CancellationToken cancellationToken = default
     )
     {
-        return _botClient.UnpinAllChatMessages(chatId, cancellationToken);
+        await _botClient.UnpinAllChatMessages(chatId, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task LeaveChat(
+    public async Task LeaveChat(
        ChatId chatId,
        CancellationToken cancellationToken = default
     )
     {
-        return _botClient.LeaveChat(chatId, cancellationToken);
+        await _botClient.LeaveChat(chatId, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<ChatMember[]> GetChatAdministrators(
+    public async Task<ChatMember[]> GetChatAdministrators(
         ChatId chatId,
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.GetChatAdministrators(chatId, cancellationToken);
+        return await _botClient.GetChatAdministrators(chatId, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task SetMyCommands(
+    public async Task SetMyCommands(
         IEnumerable<BotCommand> commands,
         BotCommandScope? scope = default,
         string? languageCode = default,
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.SetMyCommands(commands, scope, languageCode, cancellationToken);
+        await _botClient.SetMyCommands(commands, scope, languageCode, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task DeleteMyCommands(
+    public async Task DeleteMyCommands(
         BotCommandScope? scope = default,
         string? languageCode = default,
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.DeleteMyCommands(scope, languageCode, cancellationToken);
+        await _botClient.DeleteMyCommands(scope, languageCode, cancellationToken);
     }
 
 
     /// <inheritdoc />
-    public Task<BotCommand[]> GetMyCommands(
+    public async Task<BotCommand[]> GetMyCommands(
 
         BotCommandScope? scope = default,
         string? languageCode = default,
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.GetMyCommands(scope, languageCode, cancellationToken);
+        return await _botClient.GetMyCommands(scope, languageCode, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task SetMyName(
+    public async Task SetMyName(
 
         string? name = default,
         string? languageCode = default,
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.SetMyName(name, languageCode, cancellationToken);
+        await _botClient.SetMyName(name, languageCode, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<BotName> GetMyName(
+    public async Task<BotName> GetMyName(
 
         string? languageCode = default,
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.GetMyName(languageCode, cancellationToken);
+        return await _botClient.GetMyName(languageCode, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<Message> ForwardMessage(
+    public async Task<Message> ForwardMessage(
         ChatId chatId,
         ChatId fromChatId,
         int messageId,
@@ -1012,11 +1008,11 @@ public class TelegramBotService(
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.ForwardMessage(chatId, fromChatId, messageId, messageThreadId, disableNotification, protectContent, videoStartTimestamp, directMessagesTopicId, suggestedPostParameters, null, cancellationToken);
+        return await _botClient.ForwardMessage(chatId, fromChatId, messageId, messageThreadId, disableNotification, protectContent, videoStartTimestamp, directMessagesTopicId, suggestedPostParameters, null, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<MessageId[]> ForwardMessages(
+    public async Task<MessageId[]> ForwardMessages(
         ChatId chatId,
         ChatId fromChatId,
         IEnumerable<int> messageIds,
@@ -1026,25 +1022,24 @@ public class TelegramBotService(
         long? directMessagesTopicId = default,
         CancellationToken cancellationToken = default)
     {
-        return _botClient.ForwardMessages(chatId, fromChatId, messageIds, messageThreadId, disableNotification, protectContent, directMessagesTopicId, cancellationToken);
+        return await _botClient.ForwardMessages(chatId, fromChatId, messageIds, messageThreadId, disableNotification, protectContent, directMessagesTopicId, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<User> GetMe(
+    public async Task<User> GetMe(
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.GetMe(cancellationToken);
+        return await _botClient.GetMe(cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<ChatFullInfo> GetChat(
+    public async Task<ChatFullInfo> GetChat(
         ChatId chatId,
         CancellationToken cancellationToken = default
     )
     {
-        return _botClient.GetChat(chatId, cancellationToken);
+        return await _botClient.GetChat(chatId, cancellationToken);
     }
-
 }
 

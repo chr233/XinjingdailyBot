@@ -115,11 +115,13 @@ public sealed class UserService(
         //    return null;
         //}
 
-        //string? author = message.AuthorSignature;
-        //if (string.IsNullOrEmpty(author))
-        //{
-        //    return null;
-        //}
+        string? author = message.AuthorSignature;
+        if (string.IsNullOrEmpty(author))
+        {
+            return null;
+        }
+
+        _logger.LogWarning(author);
 
         //if (_channelUserIdCache.TryGetValue(author, out long userId))
         //{

@@ -1,7 +1,7 @@
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using XinjingDaily.Bot.Entry.Entries.Command;
 using XinjingDaily.Bot.Infrastructure.Attribute;
-using XinjingDaily.Bot.Infrastructure.Enums;
 using XinjingDaily.Bot.Interface.Bot;
 
 namespace XinjingDaily.Bot.Command.Common;
@@ -10,11 +10,9 @@ namespace XinjingDaily.Bot.Command.Common;
 public class NormalCommands(
     ITelegramBotService _botClient, ITelegramBotClient _bc)
 {
-
-    [Permission(ECommandScope.Group, "test:1")]
-    [QueryCommand("CLEARCOMMAND")]
-    public async Task TestQCommand()
+    [TextCommand("CANCEL", "取消当前操作")]
+    public async Task CancelCommand(CommandContext? context)
     {
-        await _bc.DeleteMyCommands(BotCommandScope.AllGroupChats());
+       
     }
 }
