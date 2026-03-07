@@ -55,5 +55,5 @@ public sealed record CommadRecordsLegacy : IExecuteAt
 
     /// <inheritdoc cref="IExecuteAt"/>
 
-    public DateTime ExecuteAt { get; set; } = DateTime.Now;
+    public DateTime ExecuteAt { get; set; } = DateTime.UtcNow;
 }

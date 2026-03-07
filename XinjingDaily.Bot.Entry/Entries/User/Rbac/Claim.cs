@@ -20,10 +20,16 @@ public sealed record Claim : ICreateAt, IModifyAt
     public string? Name { get; set; }
 
     /// <summary>
-    /// 权限Key
+    /// 权限字段
     /// </summary>
     [SugarColumn(IsNullable = true)]
-    public string? Key { get; set; }
+    public string? Value { get; set; }
+
+    /// <summary>
+    /// 描述
+    /// </summary>
+    [SugarColumn(IsNullable = true)]
+    public string? Description { get; set; }
 
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.UtcNow;

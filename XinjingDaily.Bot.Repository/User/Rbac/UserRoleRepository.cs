@@ -32,7 +32,7 @@ public class UserRoleRepository(ISqlSugarClient db) : RepositoryInt<UserRole>(db
             .LeftJoin<Role>((ur, r) => ur.RoleId == r.Id)
             .LeftJoin<RoleClaim>((ur, r, rc) => r.Id == rc.RoleId)
             .LeftJoin<Claim>((ur, r, rc, c) => rc.ClaimId == c.Id)
-            .Select((ur, r, rc, c) => SqlFunc.ToUpper(c.Key ?? ""))
+            .Select((ur, r, rc, c) => SqlFunc.ToUpper(c.Value ?? ""))
             .Distinct()
             .ToListAsync()
             .ConfigureAwait(false);

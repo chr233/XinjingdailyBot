@@ -2,7 +2,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Reflection;
-using System.Text;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingDaily.Bot.Data.Bot;
@@ -12,55 +11,88 @@ using XinjingDaily.Bot.Infrastructure.Attribute;
 using XinjingDaily.Bot.Infrastructure.Enums;
 using XinjingDaily.Bot.Interface.Bot;
 using XinjingDaily.Bot.Interface.Bot.Handler;
+using XinjingDaily.Bot.Interface.Bot.Storage;
 using XinjingDaily.Bot.Interface.Common;
 
 namespace XinjingDaily.Bot.Service.Bot.Handler;
 
 [RegisterSingleton(Registration = RegistrationStrategy.ImplementedInterfaces)]
-public class CommandHandler(
-    ILogger<CommandHandler> _logger,
-    IServiceProvider _serviceProvider,
-    ITelegramBotService _botClient,
-    IGlobalInfoService _globalInfo,
-    IOptions<AppSettings> _options) : ICommandHandler
+public class CommandHandler : ICommandHandler
 {
-    private readonly AppSettings _optionsSetting = _options.Value;
-    private readonly IServiceScope _serviceScope = _serviceProvider.CreateScope();
+    private readonly ILogger<CommandHandler> _logger;
+    private readonly ITelegramBotService _botClient;
+    private readonly IGlobalInfoService _globalInfo;
 
+    private readonly AppSettings _optionsSetting;
+    private readonly IServiceScope _serviceScope;
+    private readonly IUserService _userService;
+
+    /// <summary>
+    /// 命令权限字典, key: (scope, command), value: permission
+    /// </summary>
     private readonly Dictionary<(ECommandScope scope, string command), string?> _textCommandPermission = [];
-
+    /// <summary>
+    /// 命令定义字典, key: command, value: (classType, methodInfo, attribute)
+    /// </summary>
     private readonly Dictionary<string, CommandDefinition<TextCommandAttribute>> _textCommandDefinitions = [];
-
+    /// <summary>
+    /// 命令权限字典, key: (scope, command), value: permission
+    /// </summary>
     private readonly Dictionary<(ECommandScope scope, string command), string?> _queryCommandPermission = [];
-
+    /// <summary>
+    /// 命令定义字典, key: command, value: (classType, methodInfo, attribute)
+    /// </summary>
     private readonly Dictionary<string, CommandDefinition<QueryCommandAttribute>> _queryCommandDefinitions = [];
+
+    public CommandHandler(
+        ILogger<CommandHandler> logger,
+        IServiceProvider serviceProvider,
+        ITelegramBotService botClient,
+        IGlobalInfoService globalInfo,
+        IOptions<AppSettings> options)
+    {
+        _logger = logger;
+        _botClient = botClient;
+        _globalInfo = globalInfo;
+        _optionsSetting = options.Value;
+
+        var scope = serviceProvider.CreateScope();
+        _serviceScope = scope;
+        _userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+    }
 
     private static string[] SplitAlias(string alias)
     {
         return alias.ToUpperInvariant().Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }
 
+    private static string[] SplitArgs(string args)
+    {
+        return args.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    }
+
     #region 注册命令
+    /// <inheritdoc />
     public void RegisterTextCommand(Type classType, MethodInfo methodInfo, TextCommandAttribute attribute)
     {
         RegisterTextCommand(classType, methodInfo, ECommandScope.All, null, attribute);
     }
 
+    /// <inheritdoc />
     public void RegisterTextCommand(Type classType, MethodInfo methodInfo, PermissionAttribute permission, TextCommandAttribute attribute)
     {
         RegisterTextCommand(classType, methodInfo, permission.Scope, permission.Permission, attribute);
     }
 
+    /// <inheritdoc />
     public void RegisterTextCommand(Type classType, MethodInfo methodInfo, ECommandScope scope, string? permission, TextCommandAttribute attribute)
     {
         var command = attribute.Command.ToUpperInvariant();
         permission = permission?.ToUpperInvariant();
         var definition = new CommandDefinition<TextCommandAttribute>(classType, methodInfo, attribute);
 
-        bool isDefinitionAdded = _textCommandDefinitions.TryAdd(command, definition);
-        bool isPermissionAdded = _textCommandPermission.TryAdd((scope, command), permission);
-
-        if (!isDefinitionAdded || !isPermissionAdded)
+        _textCommandDefinitions.TryAdd(command, definition);
+        if (!_textCommandPermission.TryAdd((scope, command), permission))
         {
             _logger.LogWarning("命令 {scope} - {command} - {permission} 已经存在, 请检查代码逻辑", scope, command, permission);
         }
@@ -223,8 +255,8 @@ public class CommandHandler(
         }
 
         //切分命令参数
-        var args = message.Text!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
-        var cmd = args.First()[1..].ToUpperInvariant();
+        var args = SplitArgs(message.Text);
+        var cmd = args.First().TrimStart('/').ToUpperInvariant();
         bool isInGroup = message.Chat.Type is ChatType.Group or ChatType.Supergroup;
 
         //判断是不是艾特机器人的命令
@@ -250,14 +282,16 @@ public class CommandHandler(
         //寻找注册的命令处理器
         if (_textCommandDefinitions.TryGetValue(cmd, out var definition))
         {
+            var claims = await _userService.QueryUserClaims(userInfo).ConfigureAwait(false);
+
             // 根据调用环境获取需要的权限
-            if (VerifyTextCommandPermission(userInfo.Claims, message.Chat.Type, cmd))
+            if (VerifyTextCommandPermission(claims, message.Chat.Type, cmd))
             {
                 try
                 {
                     await _botClient.SendChatAction(message, ChatAction.Typing).ConfigureAwait(false);
 
-                    await CallCommandAsync(userInfo, message, definition.ClassType, definition.Method).ConfigureAwait(false);
+                    await CallCommandAsync(userInfo, message, definition.ClassType, definition.Method, args).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -273,7 +307,6 @@ public class CommandHandler(
                 {
                     await _botClient.SendCommandReply("没有权限这么做", message).ConfigureAwait(false);
                 }
-
             }
         }
         else
@@ -293,39 +326,42 @@ public class CommandHandler(
     /// <param name="userInfo"></param>
     /// <param name="message"></param>
     /// <param name="type"></param>
-    /// <param name="assemblyMethod"></param>
+    /// <param name="method"></param>
+    /// <param name="args"></param>
     /// <returns></returns>
-    private async Task CallCommandAsync(UserInfo userInfo, Message message, Type type, MethodInfo method)
+    private async Task CallCommandAsync(UserInfo userInfo, Message message, Type type, MethodInfo method, string[] args)
     {
-        //权限检查
-        //if (!userInfo.Right.HasFlag(assemblyMethod.Rights))
-        //{
-        //    await _botClient.SendCommandReply("没有权限这么做", message).ConfigureAwait(false);
-        //    return;
-        //}
+        List<object> methodParameters = [];
 
         //获取服务
         var service = _serviceScope.ServiceProvider.GetRequiredService(type);
-        var methodParameters = new List<object>();
+
         //组装函数的入参
         foreach (var parameter in method.GetParameters())
         {
-            switch (parameter.ParameterType.Name)
-            {
-                case nameof(UserInfo):
-                    methodParameters.Add(userInfo);
-                    break;
-                case nameof(Message):
-                    methodParameters.Add(message);
-                    break;
-                case "String[]":
-                    string[] args = message.Text!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
-                    methodParameters.Add(args[1..]);
-                    break;
+            var paramType = parameter.ParameterType;
 
-                default:
-                    _logger.LogDebug("{paramName}", parameter.ParameterType.Name);
-                    break;
+            if (paramType == typeof(UserInfo))
+            {
+                methodParameters.Add(userInfo);
+            }
+            else if (paramType == typeof(Message))
+            {
+                methodParameters.Add(message);
+            }
+            else if (paramType == typeof(string[]))
+            {
+                var methodArgs = args.Length > 0 ? args[1..] : [];
+                methodParameters.Add(methodArgs);
+            }
+            else if (paramType == typeof(List<string>))
+            {
+                var methodArgs = args.Length > 0 ? args[1..] : [];
+                methodParameters.Add(methodArgs.ToList());
+            }
+            else
+            {
+                _logger.LogError("无效的参数类型 {paramName}", paramType.FullName);
             }
         }
         //调用方法
@@ -336,7 +372,7 @@ public class CommandHandler(
     }
 
     /// <inheritdoc />
-    public async Task OnQueryCommandReceived(UserInfo dbUser, CallbackQuery query)
+    public async Task OnQueryCommandReceived(UserInfo userInfo, CallbackQuery query)
     {
         var message = query.Message;
         if (message == null)
@@ -352,41 +388,44 @@ public class CommandHandler(
         }
 
         //切分命令参数
-        var args = query.Data!.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
+        var args = SplitArgs(query.Data);
         var cmd = args.First().ToUpperInvariant();
         bool isInGroup = message.Chat.Type is ChatType.Group or ChatType.Supergroup;
 
         bool handled = false;
         string? errorMsg = null;
+
         //寻找注册的命令处理器
         if (_queryCommandDefinitions.TryGetValue(cmd, out var definition))
         {
-            try
-            {
-                await CallQueryCommandAsync(dbUser, query, definition.ClassType, definition.Method, args).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                errorMsg = $"{ex.GetType} {ex.Message}";
-                _logger.LogError(ex, "回调命令 {cmd} 执行出错", cmd);
-                await _botClient.AutoReply(_optionsSetting.System.Debug ? errorMsg : "遇到内部错误", query, true).ConfigureAwait(false);
-            }
-            handled = true;
-        }
+            var claims = await _userService.QueryUserClaims(userInfo).ConfigureAwait(false);
 
-        //await _cmdRecordService.AddCmdRecord(query, dbUser, handled, true, errorMsg).ConfigureAwait(false);
-
-        if (!handled)
-        {
-            if (_optionsSetting.System.Debug)
+            // 根据调用环境获取需要的权限
+            if (VerifyTextCommandPermission(claims, message.Chat.Type, cmd))
             {
-                await _botClient.AutoReply($"未知的命令 [{query.Data}]", query, true).ConfigureAwait(false);
+                try
+                {
+                    await CallQueryCommandAsync(userInfo, query, message, definition.ClassType, definition.Method, args).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    errorMsg = $"{ex.GetType} {ex.Message}";
+                    _logger.LogError(ex, "回调命令 {cmd} 执行出错", cmd);
+                    await _botClient.AutoReply(_optionsSetting.System.Debug ? errorMsg : "遇到内部错误", query, true).ConfigureAwait(false);
+                }
+                handled = true;
             }
             else
             {
-                await _botClient.AutoReply("未知的命令", query, true).ConfigureAwait(false);
+                await _botClient.SendCommandReply("没有权限这么做", message).ConfigureAwait(false);
             }
         }
+        else
+        {
+            await _botClient.SendCommandReply("未知的命令", message).ConfigureAwait(false);
+        }
+
+        //await _cmdRecordService.AddCmdRecord(query, dbUser, handled, true, errorMsg).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -394,42 +433,49 @@ public class CommandHandler(
     /// </summary>
     /// <param name="userInfo"></param>
     /// <param name="query"></param>
+    /// <param name="message"></param>
     /// <param name="type"></param>
-    /// <param name="assemblyMethod"></param>
+    /// <param name="method"></param>
     /// <param name="args"></param>
     /// <returns></returns>
-    private async Task CallQueryCommandAsync(UserInfo userInfo, CallbackQuery query, Type type, MethodInfo method, string[] args)
+    private async Task CallQueryCommandAsync(UserInfo userInfo, CallbackQuery query, Message message, Type type, MethodInfo method, string[] args)
     {
-        //权限检查
-        //if (!userInfo.Right.HasFlag(assemblyMethod.Rights))
-        //{
-        //    await _botClient.AutoReply("没有权限这么做", query, true).ConfigureAwait(false);
-        //    return;
-        //}
-
         //获取服务
         var service = _serviceScope.ServiceProvider.GetRequiredService(type);
         var methodParameters = new List<object>();
         //组装函数的入参
         foreach (var parameter in method.GetParameters())
         {
-            switch (parameter.ParameterType.Name)
-            {
-                case nameof(UserInfo):
-                    methodParameters.Add(userInfo);
-                    break;
-                case nameof(CallbackQuery):
-                    methodParameters.Add(query);
-                    break;
-                case "String[]":
-                    methodParameters.Add(args);
-                    break;
+            var paramType = parameter.ParameterType;
 
-                default:
-                    _logger.LogDebug("{paramName}", parameter.ParameterType.Name);
-                    break;
+            if (paramType == typeof(UserInfo))
+            {
+                methodParameters.Add(userInfo);
+            }
+            else if (paramType == typeof(CallbackQuery))
+            {
+                methodParameters.Add(query);
+            }
+            else if (paramType == typeof(Message))
+            {
+                methodParameters.Add(message);
+            }
+            else if (paramType == typeof(string[]))
+            {
+                var methodArgs = args.Length > 0 ? args[1..] : [];
+                methodParameters.Add(methodArgs);
+            }
+            else if (paramType == typeof(List<string>))
+            {
+                var methodArgs = args.Length > 0 ? args[1..] : [];
+                methodParameters.Add(methodArgs.ToList());
+            }
+            else
+            {
+                _logger.LogError("无效的参数类型 {paramName}", paramType.FullName);
             }
         }
+
         //调用方法
         if (method.Invoke(service, [.. methodParameters]) is Task task)
         {
@@ -438,79 +484,45 @@ public class CommandHandler(
     }
 
     /// <inheritdoc />
-    public string GetAvailabeCommands(UserInfo dbUser)
+    public async Task<List<BotCommand>> GetAvailabeCommands(UserInfo userInfo, ChatType chatType)
     {
-        var cmds = new Dictionary<string, string>();
+        var claims = await _userService.QueryUserClaims(userInfo).ConfigureAwait(false);
 
-        //foreach (var type in _commandClass.Keys)
-        //{
-        //    var allMethods = _commandClass[type];
-        //    foreach (var cmd in allMethods.Keys)
-        //    {
-        //        var method = allMethods[cmd];
+        List<BotCommand> commands = [];
 
-        //        //if (dbUser.Right.HasFlag(method.Rights))
-        //        //{
-        //        //    if (!string.IsNullOrEmpty(method.Description))
-        //        //    {
-        //        //        if (!cmds.TryAdd(cmd.ToLowerInvariant(), method.Description))
-        //        //        {
-        //        //            _logger.LogWarning("命令 {cmd} 重复, 请检查代码逻辑", cmd);
-        //        //        }
-        //        //    }
-        //        //}
-        //    }
-        //}
-
-        if (cmds.Count > 0)
+        foreach (var (command, definition) in _textCommandDefinitions)
         {
-            var sb = new StringBuilder();
-            foreach (var cmd in cmds.OrderBy(static x => x.Key))
+            if (VerifyTextCommandPermission(claims, chatType, command))
             {
-                sb.AppendLine($"/{cmd.Key} - {cmd.Value}");
+                var botCommand = new BotCommand {
+                    Command = command,
+                    Description = definition.Attribute?.Description ?? "",
+                };
+
+                commands.Add(botCommand);
             }
-            return sb.ToString();
         }
-        else
-        {
-            return "没有可用命令";
-        }
+
+        return commands;
     }
 
     /// <inheritdoc />
     public async Task<bool> SetCommandsMenu()
     {
-        var cmds = new List<BotCommand>();
+        //var privateCommands = GetAvailabeCommands(;
+        //var privateCommands = new List<BotCommand>();
+        //var privateCommands = new List<BotCommand>();
 
-        void AddCommands(EUserRights right)
-        {
-            //foreach (var type in _commandClass.Keys)
-            //{
-            //    var allMethods = _commandClass[type];
-            //    foreach (var cmd in allMethods.Keys)
-            //    {
-            //        var method = allMethods[cmd];
-            //        if (method.Rights == right)
-            //        {
-            //            if (!string.IsNullOrEmpty(method.Description))
-            //            {
-            //                cmds.Add(new BotCommand { Command = cmd.ToLowerInvariant(), Description = method.Description });
-            //            }
-            //        }
-            //    }
-            //}
-        }
+        //AddCommands(EUserRights.None);
+        //AddCommands(EUserRights.NormalCmd);
+        //await _botClient.SetMyCommands(commands, null).ConfigureAwait(false);
+        //await _botClient.SetMyCommands(commands, new BotCommandScopeAllPrivateChats()).ConfigureAwait(false);
+        //await _botClient.SetMyCommands(commands, new BotCommandScopeAllGroupChats()).ConfigureAwait(false);
 
-        AddCommands(EUserRights.None);
-        AddCommands(EUserRights.NormalCmd);
-        await _botClient.SetMyCommands(cmds, null).ConfigureAwait(false);
-        await _botClient.SetMyCommands(cmds, new BotCommandScopeAllPrivateChats()).ConfigureAwait(false);
-        await _botClient.SetMyCommands(cmds, new BotCommandScopeAllGroupChats()).ConfigureAwait(false);
+        //AddCommands(EUserRights.AdminCmd);
+        //await _botClient.SetMyCommands(commands, new BotCommandScopeAllChatAdministrators()).ConfigureAwait(false);
 
-        AddCommands(EUserRights.AdminCmd);
-        await _botClient.SetMyCommands(cmds, new BotCommandScopeAllChatAdministrators()).ConfigureAwait(false);
-
-        AddCommands(EUserRights.ReviewPost);
+        //AddCommands(EUserRights.ReviewPost);
         //await _botClient.SetMyCommands(cmds, new BotCommandScopeChatAdministrators { ChatId = _channelService.ReviewGroup.Id }).ConfigureAwait(false);
         return true;
     }
@@ -518,13 +530,13 @@ public class CommandHandler(
     /// <inheritdoc />
     public async Task<bool> ClearCommandsMenu()
     {
-        var cmds = new List<BotCommand>();
+        List<BotCommand> commands = [];
+        string? languageCode = null;
 
-        await _botClient.SetMyCommands(cmds).ConfigureAwait(false);
-        await _botClient.SetMyCommands(cmds, new BotCommandScopeAllPrivateChats()).ConfigureAwait(false);
-        await _botClient.SetMyCommands(cmds, new BotCommandScopeAllGroupChats()).ConfigureAwait(false);
-        await _botClient.SetMyCommands(cmds, new BotCommandScopeAllChatAdministrators()).ConfigureAwait(false);
-        //await _botClient.SetMyCommands(cmds, new BotCommandScopeChatAdministrators { ChatId = _channelService.ReviewGroup.Id }).ConfigureAwait(false);
+        await _botClient.SetMyCommands(commands, null, languageCode).ConfigureAwait(false);
+        await _botClient.SetMyCommands(commands, new BotCommandScopeAllPrivateChats(), languageCode).ConfigureAwait(false);
+        await _botClient.SetMyCommands(commands, new BotCommandScopeAllGroupChats(), languageCode).ConfigureAwait(false);
+        await _botClient.SetMyCommands(commands, new BotCommandScopeAllChatAdministrators(), languageCode).ConfigureAwait(false);
         return true;
     }
 }

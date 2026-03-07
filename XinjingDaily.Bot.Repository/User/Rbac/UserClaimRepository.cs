@@ -22,7 +22,7 @@ public class UserClaimRepository(ISqlSugarClient _db) : RepositoryInt<UserClaim>
         return await Queryable()
             .Where(uc => uc.UserId == userInfo.Id)
             .LeftJoin<Claim>((uc, c) => uc.ClaimId == c.Id)
-            .Select((uc, c) => SqlFunc.ToUpper(c.Key ?? ""))
+            .Select((uc, c) => SqlFunc.ToUpper(c.Value ?? ""))
             .Distinct()
             .ToListAsync()
             .ConfigureAwait(false);

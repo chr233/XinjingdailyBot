@@ -10,7 +10,7 @@ namespace XinjingDaily.Bot.Service.InitService;
 /// <summary>
 /// 命令初始化服务
 /// </summary>
-[RegisterScoped<IServiceInitializer>(Duplicate = DuplicateStrategy.Append, Registration = RegistrationStrategy.ImplementedInterfaces)]
+[RegisterTransient<IServiceInitializer>(Duplicate = DuplicateStrategy.Append, Registration = RegistrationStrategy.ImplementedInterfaces)]
 public class CommandInitializer(
     ILogger<CommandInitializer> _logger,
     ICommandHandler _commandHandler) : IServiceInitializer

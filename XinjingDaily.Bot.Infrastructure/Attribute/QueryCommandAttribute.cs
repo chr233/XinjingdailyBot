@@ -16,10 +16,13 @@ public sealed class QueryCommandAttribute : System.Attribute
     /// </summary>
     public string? Alias { get; init; }
 
+    /// <summary>
+    /// 是否共享上下文, 在群组中不同的人使用同一个上下文, 不影响私聊
+    /// </summary>
     public bool IsShareContext { get; init; }
 
     /// <summary>
-    /// 创建特性
+    /// Query命令
     /// </summary>
     /// <param name="command"></param>
     public QueryCommandAttribute(string command)
@@ -27,16 +30,32 @@ public sealed class QueryCommandAttribute : System.Attribute
         Command = command;
     }
 
+    /// <summary>
+    /// Query命令
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="isShareContext"></param>
     public QueryCommandAttribute(string command, bool isShareContext) : this(command)
     {
         IsShareContext = isShareContext;
     }
 
+    /// <summary>
+    /// Query命令
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="alias"></param>
     public QueryCommandAttribute(string command, string? alias) : this(command)
     {
         Alias = alias;
     }
 
+    /// <summary>
+    /// Query命令
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="alias"></param>
+    /// <param name="isShareContext"></param>
     public QueryCommandAttribute(string command, string? alias, bool isShareContext) : this(command)
     {
         Alias = alias;

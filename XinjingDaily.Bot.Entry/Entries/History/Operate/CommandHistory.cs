@@ -1,10 +1,10 @@
 using SqlSugar;
 using XinjingDaily.Bot.Entry.Columns;
 
-namespace XinjingDaily.Bot.Entry.Entries.Command;
+namespace XinjingDaily.Bot.Entry.Entries.History.Operate;
 
-[SugarTable("command_record", TableDescription = "命令调用记录")]
-public sealed record CommandRecord : ICreateAt
+[SugarTable("command_history", TableDescription = "命令调用记录")]
+public sealed record CommandHistory : ICreateAt
 {
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }

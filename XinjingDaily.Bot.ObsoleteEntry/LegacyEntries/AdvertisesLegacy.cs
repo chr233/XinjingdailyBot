@@ -1,6 +1,5 @@
 using SqlSugar;
 using XinjingDaily.Bot.Entry.Columns;
-using XinjingDaily.Bot.Infrastructure.Enums;
 
 namespace XinjingDaily.Bot.Model.Legacy;
 
@@ -71,7 +70,7 @@ public sealed record AdvertisesLegacy : ICreateAt, IExpiredAt
     public string? ExternalLinkName { get; set; }
 
     /// <inheritdoc cref="ICreateAt"/>
-    public DateTime CreateAt { get; set; } = DateTime.Now;
+    public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 
     /// <inheritdoc cref="IExpiredAt"/>
     [SugarColumn(OldColumnName = "ExpireAt")]

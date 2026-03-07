@@ -40,7 +40,7 @@ public static class WebApiExtension
 
             option.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             option.WriteIndented = false;
-            option.NumberHandling = JsonNumberHandling.AllowReadingFromString;
+            option.NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.WriteAsString;
             option.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             option.PropertyNameCaseInsensitive = false;
             option.ReadCommentHandling = JsonCommentHandling.Skip;

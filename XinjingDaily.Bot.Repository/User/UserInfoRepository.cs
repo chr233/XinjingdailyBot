@@ -42,7 +42,7 @@ public class UserInfoRepository(ISqlSugarClient _db) : RepositoryInt<UserInfo>(_
             userInfo.LastName = userInfo.LastName[..150];
         }
 
-        userInfo.ModifyAt = DateTime.Now;
+        userInfo.ModifyAt = DateTime.UtcNow;
         await Updateable(userInfo)
             .UpdateColumns(static u => new { u.TelegramName, u.FirstName, u.LastName, u.ModifyAt })
             .ExecuteCommandAsync()
@@ -58,7 +58,7 @@ public class UserInfoRepository(ISqlSugarClient _db) : RepositoryInt<UserInfo>(_
                .FirstAsync(u => u.TelegramName == userInfo.TelegramName)
                .ConfigureAwait(false);
 
-            existUser.TelegramName = $"{existUser.TelegramName} [Dup {DateTime.Now}]";
+            existUser.TelegramName = $"{existUser.TelegramName} [Dup {DateTime.UtcNow}]";
             await UpdateNameAsync(existUser).ConfigureAwait(false);
         }
 
@@ -67,7 +67,7 @@ public class UserInfoRepository(ISqlSugarClient _db) : RepositoryInt<UserInfo>(_
 
     public async Task UpdateIsBotAsync(UserInfo userInfo)
     {
-        userInfo.ModifyAt = DateTime.Now;
+        userInfo.ModifyAt = DateTime.UtcNow;
         await Updateable(userInfo)
             .UpdateColumns(static u => new { u.IsBot, u.ModifyAt })
             .ExecuteCommandAsync()
@@ -76,7 +76,7 @@ public class UserInfoRepository(ISqlSugarClient _db) : RepositoryInt<UserInfo>(_
 
     public async Task UpdateModifyAsync(UserInfo userInfo)
     {
-        userInfo.ModifyAt = DateTime.Now;
+        userInfo.ModifyAt = DateTime.UtcNow;
         await Updateable(userInfo)
             .UpdateColumns(static u => new { u.ModifyAt })
             .ExecuteCommandAsync()

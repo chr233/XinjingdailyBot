@@ -34,7 +34,7 @@ public sealed record UserTokensLegacy : ICreateAt, IExpiredAt
     public UsersLegacy? User { get; set; }
 
     /// <inheritdoc cref=" ICreateAt"/>
-    public DateTime CreateAt { get; set; } = DateTime.Now;
+    public DateTime CreateAt { get; set; } = DateTime.UtcNow;
     /// <inheritdoc cref=" IExpiredAt"/>
     public DateTime ExpiredAt { get; set; } = DateTime.MaxValue;
 }

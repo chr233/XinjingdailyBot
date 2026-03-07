@@ -21,7 +21,7 @@ public class UserInfoHistoryRepository(ISqlSugarClient _db) : RepositoryInt<User
             IsNickChanged = nickChanged,
             TelegramName = telegramNameChanged ? user.TelegramName : null,
             IsTelegramNameChanged = telegramNameChanged,
-            CreateAt = DateTime.Now
+            CreateAt = DateTime.UtcNow
         };
 
         await Insertable(history)

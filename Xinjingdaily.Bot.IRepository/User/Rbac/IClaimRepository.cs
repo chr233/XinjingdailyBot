@@ -8,4 +8,5 @@ namespace XinjingDaily.Bot.IRepository.User.Rbac;
 /// </summary>
 public interface IClaimRepository : IRepositoryInt<Claim>
 {
+    Task<List<string>?> QueryAllClaimsAsync();
 }

@@ -20,7 +20,7 @@ public sealed class PermissionAttribute : System.Attribute
     public string? Permission { get; init; }
 
     /// <summary>
-    /// 创建特性
+    /// 命令权限设定
     /// </summary>
     /// <param name="scope"></param>
     public PermissionAttribute(ECommandScope scope)
@@ -29,7 +29,7 @@ public sealed class PermissionAttribute : System.Attribute
     }
 
     /// <summary>
-    /// 创建特性
+    /// 命令权限设定
     /// </summary>
     /// <param name="permission"></param>
     public PermissionAttribute(string? permission) : this(ECommandScope.All)
@@ -38,7 +38,7 @@ public sealed class PermissionAttribute : System.Attribute
     }
 
     /// <summary>
-    /// 创建特性
+    /// 命令权限设定
     /// </summary>
     /// <param name="scope"></param>
     /// <param name="permission"></param>

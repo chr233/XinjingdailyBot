@@ -18,7 +18,7 @@ namespace XinjingDaily.Bot.Service.InitService;
 public class DatabaseInitializer(
     ILogger<DatabaseInitializer> _logger,
     IOptions<AppSettings> _options,
-    IServiceProvider _serviceProvider) : IServiceInitializer
+    IServiceScopeFactory _serviceScopeFactory) : IServiceInitializer
 {
     /// <inheritdoc/>
     public int Order => 1;
@@ -33,7 +33,7 @@ public class DatabaseInitializer(
         {
             _logger.LogInformation("开始生成数据库结构");
 
-            using var scope = _serviceProvider.CreateScope();
+            using var scope = _serviceScopeFactory.CreateScope();
             var dbClient = scope.ServiceProvider.GetRequiredService<ISqlSugarClient>();
 
             //创建数据库
@@ -97,7 +97,7 @@ public class DatabaseInitializer(
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "创建表失败, 可能没有权限");
+            _logger.LogWarning(ex, "创建表 {type} 失败, 可能没有权限", typeof(T).Name);
         }
     }
 
@@ -109,7 +109,7 @@ public class DatabaseInitializer(
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "创建表失败, 可能没有权限");
+            _logger.LogWarning(ex, "创建表 {type} 失败, 可能没有权限", type.Name);
         }
     }
 
@@ -123,6 +123,6 @@ public class DatabaseInitializer(
         }
 
         _logger.LogTrace("反射扫描到以下需要创建的表");
-        _logger.LogTrace(sb.ToString());
+        _logger.LogTrace("{msg}", sb.ToString());
     }
 }

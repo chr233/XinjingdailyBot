@@ -21,7 +21,6 @@
     </Project>
   </Folder>
   <Folder Name="/4. 服务/">
-    <Project Path="XinjingDaily.Bot.Command/XinjingDaily.Bot.Command.csproj" />
     <Project Path="XinjingDaily.Bot.Interface/XinjingDaily.Bot.Interface.csproj">
       <BuildDependency Project="XinjingDaily.Bot.Infrastructure/XinjingDaily.Bot.Infrastructure.csproj" />
       <BuildDependency Project="XinjingDaily.Bot.Repository/XinjingDaily.Bot.Repository.csproj" />
@@ -31,13 +30,16 @@
       <BuildDependency Project="XinjingDaily.Bot.Interface/XinjingDaily.Bot.Interface.csproj" />
       <BuildDependency Project="XinjingDaily.Bot.Repository/XinjingDaily.Bot.Repository.csproj" />
     </Project>
+  </Folder>
+  <Folder Name="/5. 命令/">
+    <Project Path="XinjingDaily.Bot.Command/XinjingDaily.Bot.Command.csproj" />
     <Project Path="XinjingDaily.Bot.Tasks/XinjingDaily.Bot.Tasks.csproj" />
   </Folder>
-  <Folder Name="/5. 控制器/">
+  <Folder Name="/6. 控制器/">
     <Project Path="XinjingDaily.Bot.Controllers/XinjingDaily.Bot.Controllers.csproj" />
     <Project Path="XinjingDaily.Bot.SignalR/XinjingDaily.Bot.SignalR.csproj" />
   </Folder>
-  <Folder Name="/6. 启动/">
+  <Folder Name="/7. 应用/">
     <Project Path="XinjingDaily.Bot.App/XinjingDaily.Bot.App.csproj" />
     <Project Path="XinjingDaily.Bot.Setup/XinjingDaily.Bot.Setup.csproj" />
   </Folder>

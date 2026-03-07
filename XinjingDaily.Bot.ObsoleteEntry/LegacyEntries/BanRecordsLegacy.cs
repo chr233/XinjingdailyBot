@@ -34,7 +34,7 @@ public sealed record BanRecordsLegacy
     /// <summary>
     /// 封禁时间
     /// </summary>
-    public DateTime BanTime { get; set; } = DateTime.Now;
+    public DateTime BanTime { get; set; } = DateTime.UtcNow;
     /// <summary>
     /// 封禁理由
     /// </summary>

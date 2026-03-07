@@ -1,36 +1,60 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using StackExchange.Redis;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using XinjingDaily.Bot.Entry.Entries.Users;
 using XinjingDaily.Bot.Infrastructure;
 using XinjingDaily.Bot.Infrastructure.Extensions;
+using XinjingDaily.Bot.Infrastructure.Strings;
 using XinjingDaily.Bot.Interface.Bot.Storage;
 using XinjingDaily.Bot.IRepository.History.User;
+using XinjingDaily.Bot.IRepository.Redis;
 using XinjingDaily.Bot.IRepository.User;
 using XinjingDaily.Bot.IRepository.User.Rbac;
 
 namespace XinjingDaily.Bot.Service.Storage;
 
-[RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
-public sealed class UserService(
-    ILogger<UserService> _logger,
-    IOptions<AppSettings> _options,
-    IUserInfoRepository _userInfoRepository,
-    IUserInfoHistoryRepository _userInfoHistoryRepository,
-    IUserRoleRepository _userRoleRepository,
-    IRoleClaimRepository _roleClaimRepository,
-    IUserClaimRepository _userClaimRepository,
-    IClaimRepository _claimRepository) : IUserService
+[RegisterSingleton(Registration = RegistrationStrategy.ImplementedInterfaces)]
+public sealed class UserService : IUserService
 {
+    private readonly ILogger<UserService> _logger;
+    private readonly AppSettings _options;
+    private readonly IUserInfoRepository _userInfoRepository;
+    private readonly IUserInfoHistoryRepository _userInfoHistoryRepository;
+    private readonly IUserRoleRepository _userRoleRepository;
+    private readonly IRoleClaimRepository _roleClaimRepository;
+    private readonly IUserClaimRepository _userClaimRepository;
+    private readonly IClaimRepository _claimRepository;
+    private readonly IRedisRepository _redisRepository;
+
     private readonly TimeSpan UpdatePeriod = TimeSpan.FromDays(14);
 
     private readonly HashSet<long> SuperAdminUserIds = [];
     private readonly HashSet<string> SuperAdminUserNames = [];
 
+    public UserService(
+        ILogger<UserService> logger,
+        IOptions<AppSettings> options,
+        IServiceScopeFactory _serviceScopeFactory)
+    {
+        _logger = logger;
+        _options = options.Value;
+
+        var scope = _serviceScopeFactory.CreateScope();
+        _userInfoRepository = scope.ServiceProvider.GetRequiredService<IUserInfoRepository>();
+        _userInfoHistoryRepository = scope.ServiceProvider.GetRequiredService<IUserInfoHistoryRepository>();
+        _userRoleRepository = scope.ServiceProvider.GetRequiredService<IUserRoleRepository>();
+        _roleClaimRepository = scope.ServiceProvider.GetRequiredService<IRoleClaimRepository>();
+        _userClaimRepository = scope.ServiceProvider.GetRequiredService<IUserClaimRepository>();
+        _claimRepository = scope.ServiceProvider.GetRequiredService<IClaimRepository>();
+        _redisRepository = scope.ServiceProvider.GetRequiredService<IRedisRepository>();
+    }
+
     public async Task LoadUserSetting()
     {
-        var admins = _options.Value.System.SuperAdmins;
+        var admins = _options.System.SuperAdmins;
         if (admins != null && admins.Count > 0)
         {
             foreach (var admin in admins)
@@ -58,7 +82,7 @@ public sealed class UserService(
             }
         }
 
-        _logger.LogInformation("读取了 {count} 个潮剧管理员", SuperAdminUserIds.Count + SuperAdminUserNames.Count);
+        _logger.LogInformation("读取了 {count} 个超级管理员", SuperAdminUserIds.Count + SuperAdminUserNames.Count);
 
     }
 
@@ -162,7 +186,7 @@ public sealed class UserService(
             LastName = user.LastName,
             IsBot = user.IsBot,
             IsBan = false,
-            CreateAt = DateTime.Now,
+            CreateAt = DateTime.UtcNow,
             ModifyAt = DateTime.MinValue,
         };
 
@@ -170,7 +194,7 @@ public sealed class UserService(
         {
             userInfo.Id = await _userInfoRepository.InsertAsync(userInfo).ConfigureAwait(false);
 
-            if (_options.Value.System.Debug)
+            if (_options.System.Debug)
             {
                 _logger.LogDebug("创建用户 {user} 成功", userInfo);
             }
@@ -184,48 +208,94 @@ public sealed class UserService(
         }
     }
 
+    /// <summary>
+    /// 从缓存获取用户权限列表
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    private async Task<HashSet<string>?> GetUserClaimsFromCache(int userId)
+    {
+        var cacheKey = $"{CacheKeys.UserPermission}:{userId}";
+        return await _redisRepository.GetAsync<HashSet<string>>(cacheKey).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// 从缓存设置用户权限列表
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="claims"></param>
+    /// <returns></returns>
+    private async Task SetUserClaimsToCache(int userId, HashSet<string> claims)
+    {
+        var cacheKey = $"{CacheKeys.UserPermission}:{userId}";
+        if (claims != null)
+        {
+            var expirySeconds = _options.Cache.UserPermissionTtl;
+            await _redisRepository.SetAsync(cacheKey, claims, expirySeconds, When.Always).ConfigureAwait(false);
+        }
+        else
+        {
+            await _redisRepository.DeleteAsync(cacheKey).ConfigureAwait(false);
+        }
+    }
+
+    private bool IsSuperAdmin(UserInfo userInfo)
+    {
+        return SuperAdminUserIds.Contains(userInfo.Id) ||
+            (!string.IsNullOrEmpty(userInfo.TelegramName) && SuperAdminUserNames.Contains(userInfo.TelegramName));
+    }
+
     public async Task<HashSet<string>> QueryUserClaims(UserInfo userInfo)
     {
+        // 验证用户是否有效
         HashSet<string> claims = [];
-        if (userInfo.IsBan)
+        if (userInfo == null || userInfo.Id <= 0 || userInfo.IsBan)
         {
             return claims;
         }
 
-        if (SuperAdminUserIds.Contains(userInfo.TelegramId) || (!string.IsNullOrEmpty(userInfo.TelegramName) && SuperAdminUserNames.Contains(userInfo.TelegramName)))
+        // 尝试从缓存加载权限
+        var cachedClaims = await GetUserClaimsFromCache(userInfo.Id).ConfigureAwait(false);
+        if (cachedClaims != null)
         {
-            claims.Add("SuperAdmin");
+            return cachedClaims;
         }
 
-
-        if (userInfo == null || userInfo.Id <= 0)
+        if (IsSuperAdmin(userInfo))
         {
-            return [];
+            var allClaims = await _claimRepository.QueryAllClaimsAsync().ConfigureAwait(false);
+
+            if (allClaims != null)
+            {
+                foreach (var claim in allClaims)
+                {
+                    claims.Add(claim);
+                }
+            }
+        }
+        else
+        {
+            // 直接权限子查询：UserClaim -> Claim
+            var directKeys = await _userClaimRepository
+                    .QueryUserClaimsAsync(userInfo)
+                    .ConfigureAwait(false);
+
+            // 间接权限子查询：UserRole -> Role -> RoleClaim -> Claim
+            var indirectKeys = await _userRoleRepository
+                .QueryUserRoleClaimsAsync(userInfo)
+                .ConfigureAwait(false);
+
+            foreach (var key in directKeys)
+            {
+                claims.Add(key ?? "");
+            }
+            foreach (var key in indirectKeys)
+            {
+                claims.Add(key ?? "");
+            }
         }
 
-        // 1. 定义直接权限子查询：UserClaim -> Claim
-        var directKeys = await _userClaimRepository
-            .QueryUserClaimsAsync(userInfo)
-            .ConfigureAwait(false);
-
-        // 2. 定义间接权限子查询：UserRole -> Role -> RoleClaim -> Claim
-        var indirectKeys = await _userRoleRepository
-            .QueryUserRoleClaimsAsync(userInfo)
-            .ConfigureAwait(false);
-
-        foreach (var key in directKeys)
-        {
-            claims.Add(key ?? "");
-        }
-        foreach (var key in indirectKeys)
-        {
-            claims.Add(key ?? "");
-        }
-
-        foreach (var key in claims)
-        {
-            _logger.LogWarning(key);
-        }
+        await SetUserClaimsToCache(userInfo, claims).ConfigureAwait(false);
 
         return claims;
     }
@@ -243,7 +313,7 @@ public sealed class UserService(
             return null;
         }
 
-        bool isDebug = _options.Value.System.Debug;
+        bool isDebug = _options.System.Debug;
 
         if (user.Username == "GroupAnonymousBot")
         {
@@ -290,21 +360,10 @@ public sealed class UserService(
             }
 
             //超过设定时间也触发更新
-            if (DateTime.Now > userInfo.ModifyAt + UpdatePeriod)
+            if (DateTime.UtcNow > userInfo.ModifyAt + UpdatePeriod)
             {
                 await _userInfoRepository.UpdateModifyAsync(userInfo).ConfigureAwait(false);
             }
-        }
-
-        userInfo.Claims = await QueryUserClaims(userInfo).ConfigureAwait(false);
-
-
-
-
-        //如果是配置文件中指定的管理员就覆盖用户组权限
-        if (SuperAdminUserIds.Contains(userInfo.TelegramId) || (!string.IsNullOrEmpty(userInfo.TelegramName) && SuperAdminUserNames.Contains(userInfo.TelegramName)))
-        {
-
         }
 
         return userInfo;

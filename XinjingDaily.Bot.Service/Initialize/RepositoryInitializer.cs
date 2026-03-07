@@ -9,7 +9,7 @@ namespace XinjingDaily.Bot.Service.InitService;
 /// 机器人初始化服务
 /// </summary>
 /// <param name="_logger"></param>
-[RegisterScoped<IServiceInitializer>(Duplicate = DuplicateStrategy.Append, Registration = RegistrationStrategy.ImplementedInterfaces)]
+[RegisterTransient<IServiceInitializer>(Duplicate = DuplicateStrategy.Append, Registration = RegistrationStrategy.ImplementedInterfaces)]
 public class RepositoryInitializer(
     ILogger<RepositoryInitializer> _logger,
     IGlobalInfoService _globalInfo,

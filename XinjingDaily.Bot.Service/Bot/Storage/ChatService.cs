@@ -51,7 +51,7 @@ public sealed class ChatService(
                 TelegramName = chat.Username,
                 Title = newTitle,
                 Type = chat.Type,
-                CreateAt = DateTime.Now,
+                CreateAt = DateTime.UtcNow,
                 ModifyAt = DateTime.MinValue
             };
 

@@ -23,6 +23,8 @@ public sealed record RedisConfig
     /// </summary>
     public int DefaultDatabase { get; init; } = 3;
 
+    public bool LogRedis { get; init; }
+
     public bool Ssl { get; init; }
     public string? SslHost { get; init; }
 

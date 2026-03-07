@@ -48,7 +48,7 @@ public static class AppServiceExtensions
                 {
                     var serviceName = initService.GetType().Name;
 
-                    _logger.Info("初始化【{ServiceName}】", serviceName);
+                    _logger.Info("初始化【{ServiceName} - {order}】", serviceName,initService.Order);
 
                     await initService.InitializeAsync().ConfigureAwait(false);
 

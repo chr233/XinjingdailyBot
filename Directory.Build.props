@@ -34,6 +34,9 @@
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<DebugType>portable</DebugType>
+
+		<DefineConstants>$(DefineConstants);REDIS_LOG</DefineConstants>
+		<DefineConstants>$(DefineConstants);DB_LOG</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">

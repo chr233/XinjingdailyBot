@@ -15,4 +15,13 @@ namespace XinjingDaily.Bot.Repository.User.Rbac;
 [RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
 public class ClaimRepository(ISqlSugarClient db) : RepositoryInt<Claim>(db), IClaimRepository
 {
+    public async Task<List<string>?> QueryAllClaimsAsync()
+    {
+        return await Queryable()
+            .Where(c => !string.IsNullOrEmpty(c.Value))
+            .Select(c => SqlFunc.ToUpper(c.Value ?? ""))
+            .Distinct()
+            .ToListAsync()
+            .ConfigureAwait(false);
+    }
 }

@@ -12,7 +12,7 @@ namespace XinjingDaily.Bot.App.Extensions;
 public static class NLogExtensions
 {
 #if DEBUG
-    private const Microsoft.Extensions.Logging.LogLevel MinimumLogLevel = Microsoft.Extensions.Logging. LogLevel.Trace;
+    private const Microsoft.Extensions.Logging.LogLevel MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Trace;
     private static NLog.LogLevel MinimumNLogLevel = NLog.LogLevel.Trace;
 #else
     private const Microsoft.Extensions.Logging.LogLevel MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Information;
@@ -39,7 +39,7 @@ public static class NLogExtensions
             {
                 var config = new LoggingConfiguration();
 
-                const string loggerLayout = "${longdate} [${level:uppercase=true}] ${logger:shortName=true} - ${message} ${exception:format=toString,Data}";
+                const string loggerLayout = "${longdate}|${level:uppercase=true}|${logger:shortName=false}|${message} ${exception:format=toString,Data}";
 
                 // ========== 1. 原有彩色控制台目标（通用日志） ==========
                 var consoleTarget = new ColoredConsoleTarget("coloredConsole") {

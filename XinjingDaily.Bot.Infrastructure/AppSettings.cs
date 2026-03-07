@@ -25,4 +25,6 @@ public sealed record AppSettings
 
     /// <inheritdoc cref="IpInfoConfig"/>
     public IpInfoConfig IpInfo { get; init; } = new();
+
+    public CacheConfig Cache { get; init; } = new();
 }

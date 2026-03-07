@@ -3,9 +3,6 @@ namespace XinjingDaily.Bot.Infrastructure.Attribute;
 /// <summary>
 /// 标记定时任务
 /// </summary>
-/// <remarks>
-/// 标记定时任务
-/// </remarks>
 /// <param name="schedule">Cron表达式</param>
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public sealed class ScheduleAttribute : System.Attribute
@@ -15,6 +12,9 @@ public sealed class ScheduleAttribute : System.Attribute
     /// </summary>
     public string Schedule { get; init; }
 
+    /// <remarks>
+    /// 标记定时任务
+    /// </remarks>
     public ScheduleAttribute(string schedule)
     {
         Schedule = schedule;
