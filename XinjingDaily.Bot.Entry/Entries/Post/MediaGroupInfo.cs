@@ -28,5 +28,5 @@ public sealed record MediaGroupInfo : ICreateAt
     public string MediaGroupId { get; set; } = "";
 
     /// <inheritdoc cref="ICreateAt"/>
-    public DateTime CreateAt { get; set; } = DateTime.Now;
+    public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 }

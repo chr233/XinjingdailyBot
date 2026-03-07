@@ -56,9 +56,9 @@ public sealed record UserInfo : IModifyAt, ICreateAt
     public bool IsBot { get; set; }
 
     /// <inheritdoc cref="ICreateAt"/>
-    public DateTime CreateAt { get; set; } = DateTime.Now;
+    public DateTime CreateAt { get; set; } = DateTime.UtcNow;
     /// <inheritdoc cref="IModifyAt"/>
-    public DateTime ModifyAt { get; set; } = DateTime.Now;
+    public DateTime ModifyAt { get; set; } = DateTime.MinValue;
 
     // 新增导航：用户关联的角色列表
     [Navigate(NavigateType.OneToMany, nameof(UserRole.UserId))]
@@ -67,9 +67,6 @@ public sealed record UserInfo : IModifyAt, ICreateAt
     // 新增导航：用户直接关联的权限列表
     [Navigate(NavigateType.OneToMany, nameof(UserClaim.UserId))]
     public List<UserClaim>? UserClaims { get; set; }
-
-    [SugarColumn(IsIgnore = true)]
-    public HashSet<string>? Claims { get; set; }
 
     /// <summary>
     /// 文本显示
@@ -113,4 +110,6 @@ public sealed record UserInfo : IModifyAt, ICreateAt
     {
         return FullName.EscapeHtml();
     }
+
+    public static implicit operator int(UserInfo value) => value.Id;
 }

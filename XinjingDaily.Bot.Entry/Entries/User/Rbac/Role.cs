@@ -29,9 +29,9 @@ public sealed record Role : ICreateAt, IModifyAt
     public bool IsDefaultAdminRole { get; set; }
 
     /// <inheritdoc cref="ICreateAt"/>
-    public DateTime CreateAt { get; set; } = DateTime.Now;
+    public DateTime CreateAt { get; set; } = DateTime.UtcNow;
     /// <inheritdoc cref="IModifyAt"/>
-    public DateTime ModifyAt { get; set; } = DateTime.Now;
+    public DateTime ModifyAt { get; set; } = DateTime.MinValue;
 
     // 导航：角色关联的权限列表
     [Navigate(NavigateType.OneToMany, nameof(RoleClaim.RoleId))]

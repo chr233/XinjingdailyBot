@@ -35,5 +35,5 @@ public sealed record CommandRecord : ICreateAt
     public bool IsHandled { get; set; }
 
     /// <inheritdoc cref="ICreateAt"/>
-    public DateTime CreateAt { get; set; } = DateTime.Now;
+    public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 }

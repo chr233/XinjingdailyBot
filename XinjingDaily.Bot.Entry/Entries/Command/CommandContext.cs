@@ -27,7 +27,7 @@ public sealed record CommandContext : ICreateAt, IModifyAt
     public string? Payload { get; set; }
 
     /// <inheritdoc cref="ICreateAt"/>
-    public DateTime CreateAt { get; set; } = DateTime.Now;
+    public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 
     /// <inheritdoc cref="IModifyAt"/>
     public DateTime ModifyAt { get; set; } = DateTime.MinValue;

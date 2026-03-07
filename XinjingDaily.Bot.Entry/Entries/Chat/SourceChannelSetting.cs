@@ -37,7 +37,7 @@ public sealed record SourceChannelSetting : ICreateAt, IModifyAt
     public bool IsSpoiler { get; set; }
 
     /// <inheritdoc cref="ICreateAt"/>
-    public DateTime CreateAt { get; set; } = DateTime.Now;
+    public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 
     /// <inheritdoc cref="IModifyAt"/>
     public DateTime ModifyAt { get; set; } = DateTime.MinValue;

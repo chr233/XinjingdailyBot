@@ -24,7 +24,7 @@ public sealed record ChatInfo : ICreateAt, IModifyAt
     /// <summary>
     /// 频道ID @
     /// </summary>
-    [SugarColumn(IsNullable = true)]
+    [SugarColumn(IsNullable = true, Length = 100)]
     public string? TelegramName { get; set; }
     /// <summary>
     /// 频道名称
@@ -48,8 +48,8 @@ public sealed record ChatInfo : ICreateAt, IModifyAt
     public bool IsChannel => Type is ChatType.Channel;
 
     /// <inheritdoc cref="ICreateAt"/>
-    public DateTime CreateAt { get; set; } = DateTime.Now;
+    public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 
     /// <inheritdoc cref="IModifyAt"/>
-    public DateTime ModifyAt { get; set; } = DateTime.Now;
+    public DateTime ModifyAt { get; set; } = DateTime.MinValue;
 }

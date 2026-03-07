@@ -50,7 +50,7 @@ public sealed record PostTag : ICreateAt, IModifyAt
     public string? WarnText { get; set; }
 
     /// <inheritdoc cref="ICreateAt"/>
-    public DateTime CreateAt { get; set; } = DateTime.Now;
+    public DateTime CreateAt { get; set; } = DateTime.UtcNow;
     /// <inheritdoc cref="IModifyAt"/>
-    public DateTime ModifyAt { get; set; } = DateTime.Now;
+    public DateTime ModifyAt { get; set; } = DateTime.MinValue;
 }
