@@ -1,8 +1,8 @@
 namespace XinjingDaily.Bot.Infrastructure.Enums;
 
-public enum EPermission 
+public enum EPermission
 {
-    BotAdmin =1,
-    Reviewer =2,
+    PostCreate = 1,
+    PostDeleteOwn = 2,
 
 }

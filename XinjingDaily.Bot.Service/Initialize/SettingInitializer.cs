@@ -123,10 +123,10 @@ public class SettingInitializer(
 
         List<Claim> claims =
         [
-            new Claim { Id = 1, Name = "机器人管理命令", Value = "bot:admin:command"  },
-            new Claim { Id = 1, Name = "执行审核命令", Value = "review:command"  },
-            new Claim { Id = 1, Name = "执行审核命令", Value = "review:command"  },
-            new Claim { Id = 1, Name = "执行审核命令", Value = "review:command"  },
+            new Claim { Id = 1, Name = "机器人管理命令", Value = "bot:admin:command" },
+            new Claim { Id = 1, Name = "执行审核命令", Value = "review:command" },
+            new Claim { Id = 1, Name = "执行审核命令", Value = "review:command" },
+            new Claim { Id = 1, Name = "执行审核命令", Value = "review:command" },
             new Claim { Id = 2, Name = "用户管理", Value = "UserManagement" },
             new Claim { Id = 3, Name = "角色管理", Value = "RoleManagement" },
         ];
