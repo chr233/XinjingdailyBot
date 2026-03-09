@@ -275,15 +275,15 @@ public sealed class UserService : IUserService
         }
         else
         {
-            // 直接权限子查询：UserClaim -> Claim
-            var directKeys = await _userClaimRepository
-                    .QueryUserClaimsAsync(userInfo)
-                    .ConfigureAwait(false);
-
             // 间接权限子查询：UserRole -> Role -> RoleClaim -> Claim
             var indirectKeys = await _userRoleRepository
                 .QueryUserRoleClaimsAsync(userInfo)
                 .ConfigureAwait(false);
+
+            // 直接权限子查询：UserClaim -> Claim
+            var directKeys = await _userClaimRepository
+                    .QueryUserClaimsAsync(userInfo)
+                    .ConfigureAwait(false);
 
             foreach (var key in directKeys)
             {

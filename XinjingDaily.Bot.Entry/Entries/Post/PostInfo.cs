@@ -129,10 +129,7 @@ public sealed record PostInfo : IModifyAt, ICreateAt
     /// 发布频道或者拒绝频道的媒体组ID
     /// </summary>
     public string PublishMediaGroupId { get; set; } = "";
-    /// <summary>
-    /// 稿件标签
-    /// </summary>
-    public int Tags { get; set; }
+
     /// <summary>
     /// 是否启用遮罩
     /// </summary>

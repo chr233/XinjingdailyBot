@@ -24,9 +24,11 @@ public sealed record Role : ICreateAt, IModifyAt
     [SugarColumn(IsNullable = true)]
     public string? Description { get; set; }
 
+    /// <summary>
+    /// 新用户默认权限组
+    /// </summary>
     public bool IsDefaultUserRole { get; set; }
 
-    public bool IsDefaultAdminRole { get; set; }
 
     /// <inheritdoc cref="ICreateAt"/>
     public DateTime CreateAt { get; set; } = DateTime.UtcNow;

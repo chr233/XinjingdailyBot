@@ -19,10 +19,19 @@ public class UserRoleRepository(ISqlSugarClient db) : RepositoryInt<UserRole>(db
     public async Task UpdateUserRolesAsync(int userId, List<int> roleIds)
     {
         // 删除用户现有的角色关联
-        await Deleteable().Where(ur => ur.UserId == userId).ExecuteCommandAsync().ConfigureAwait(false);
+        await Deleteable()
+            .Where(ur => ur.UserId == userId)
+            .ExecuteCommandAsync()
+            .ConfigureAwait(false);
+
         // 添加新的角色关联
-        var userRoles = roleIds.Select(roleId => new UserRole { UserId = userId, RoleId = roleId }).ToList();
-        await Insertable(userRoles).ExecuteCommandAsync().ConfigureAwait(false);
+        var userRoles = roleIds
+            .Select(roleId => new UserRole { UserId = userId, RoleId = roleId })
+            .ToList();
+
+        await Insertable(userRoles)
+            .ExecuteCommandAsync()
+            .ConfigureAwait(false);
     }
 
     public async Task<List<string>> QueryUserRoleClaimsAsync(UserInfo userInfo)
@@ -35,6 +44,21 @@ public class UserRoleRepository(ISqlSugarClient db) : RepositoryInt<UserRole>(db
             .Select((ur, r, rc, c) => SqlFunc.ToUpper(c.Value ?? ""))
             .Distinct()
             .ToListAsync()
+            .ConfigureAwait(false);
+    }
+
+    public async Task<Claim?> QueryUserRoleClaimAsync(UserInfo userInfo, string claimValue)
+    {
+        string normalizedValue = claimValue.ToUpper();
+
+        return await Queryable()
+            .Where(ur => ur.UserId == userInfo.Id)
+            .LeftJoin<Role>((ur, r) => ur.RoleId == r.Id)
+            .LeftJoin<RoleClaim>((ur, r, rc) => r.Id == rc.RoleId)
+            .LeftJoin<Claim>((ur, r, rc, c) => rc.ClaimId == c.Id)
+            .Where((ur, r, rc, c) => SqlFunc.ToUpper(c.Value ?? "") == normalizedValue)
+            .Select((ur, r, rc, c) => c)
+            .FirstAsync()
             .ConfigureAwait(false);
     }
 }

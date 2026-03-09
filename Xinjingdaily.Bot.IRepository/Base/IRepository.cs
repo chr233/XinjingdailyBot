@@ -127,5 +127,7 @@ public interface IRepository<TEntity, TKey>
     /// <param name="predicate"></param>
     /// <returns></returns>
     Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate);
+    Task<int> InsertOrUpdateAsync(List<TEntity> entities);
+    Task<int> InsertOrIgnoreAsync(List<TEntity> entities);
     #endregion
 }

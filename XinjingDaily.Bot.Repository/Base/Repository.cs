@@ -163,6 +163,38 @@ public abstract class Repository<TEntity, TKey>(
             .ExecuteReturnIdentityAsync()
             .ConfigureAwait(false);
     }
+
+    /// <summary>
+    /// 批量插入或更新（存在则更新，不存在则插入）
+    /// </summary>
+    public virtual async Task<int> InsertOrUpdateAsync(List<TEntity> entities)
+    {
+        var storage = await Storageable(entities)
+            .ToStorageAsync()
+            .ConfigureAwait(false);
+
+        // 执行插入
+        await storage.AsInsertable.ExecuteCommandAsync().ConfigureAwait(false);
+        // 执行更新
+        await storage.AsUpdateable.ExecuteCommandAsync().ConfigureAwait(false);
+
+        return entities.Count;
+    }
+
+    /// <summary>
+    /// 批量插入（忽略已存在的记录）
+    /// </summary>
+    public virtual async Task<int> InsertOrIgnoreAsync(List<TEntity> entities)
+    {
+        var storage = await Storageable(entities)
+            .SplitInsert(it => !it.Any()) // 数据库不存在则插入
+            .SplitIgnore(it => it.Any())  // 数据库存在则忽略
+            .ToStorageAsync()
+            .ConfigureAwait(false);
+
+        return await storage.AsInsertable.ExecuteCommandAsync().ConfigureAwait(false);
+    }
+
     #endregion
 
     #region Update

@@ -22,12 +22,4 @@ public class RoleRepository(ISqlSugarClient db) : RepositoryInt<Role>(db), IRole
             .ToListAsync()
             .ConfigureAwait(false);
     }
-
-    public async Task<List<Role>> QueryDefaultAdminRolesAsync()
-    {
-        return await Queryable()
-            .Where(r => r.IsDefaultAdminRole)
-            .ToListAsync()
-            .ConfigureAwait(false);
-    }
 }
