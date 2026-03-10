@@ -10,7 +10,7 @@ public sealed record Claim : ICreateAt, IModifyAt
     /// <summary>
     /// 主键
     /// </summary>
-    [SugarColumn(IsIdentity = true, IsPrimaryKey = true)]
+    [SugarColumn(IsIdentity = false, IsPrimaryKey = true)]
     public int Id { get; set; }
 
     /// <summary>

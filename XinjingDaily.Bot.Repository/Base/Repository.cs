@@ -170,15 +170,22 @@ public abstract class Repository<TEntity, TKey>(
     public virtual async Task<int> InsertOrUpdateAsync(List<TEntity> entities)
     {
         var storage = await Storageable(entities)
-            .ToStorageAsync()
-            .ConfigureAwait(false);
+              .SplitInsert(it => !it.Any()) // 不存在则插入
+              .SplitUpdate(it => it.Any())  // 已存在则更新
+              .ToStorageAsync()
+              .ConfigureAwait(false);
 
-        // 执行插入
-        await storage.AsInsertable.ExecuteCommandAsync().ConfigureAwait(false);
-        // 执行更新
-        await storage.AsUpdateable.ExecuteCommandAsync().ConfigureAwait(false);
+        if (storage.InsertList.Count > 0)
+        {
+            await storage.AsInsertable.ExecuteCommandAsync().ConfigureAwait(false);
+        }
 
-        return entities.Count;
+        if (storage.UpdateList.Count > 0)
+        {
+            await storage.AsUpdateable.ExecuteCommandAsync().ConfigureAwait(false);
+        }
+
+        return storage.InsertList.Count + storage.UpdateList.Count;
     }
 
     /// <summary>

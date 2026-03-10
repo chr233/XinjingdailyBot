@@ -33,18 +33,23 @@ public class SettingInitializer(
     public async Task InitializeAsync()
     {
         List<Claim> claims = [
-            new Claim { Id = 1, Name = "查询自己的信息", Description = "", Value = "query:self:command" },
-            new Claim { Id = 2, Name = "查询所有人的信息", Description = "", Value = "query:all:command" },
-            new Claim { Id = 1, Name = "一般功能命令", Description = "", Value = "common:command" },
-            new Claim { Id = 1, Name = "群管功能命令", Description = "", Value = "group-admin:command" },
-            new Claim { Id = 1, Name = "投稿功能命令", Description = "", Value = "group-admin:command" },
-            new Claim { Id = 2, Name = "功能命令", Description = "", Value = "function:command" },
-            new Claim { Id = 3, Name = "创建投稿", Description = "", Value = "post:create" },
-            new Claim { Id = 4, Name = "执行审核命令", Description = "", Value = "review:command" },
-            new Claim { Id = 5, Name = "执行审核命令", Description = "", Value = "review:command" },
-            new Claim { Id = 6, Name = "执行审核命令", Description = "", Value = "review:command" },
-            new Claim { Id = 7, Name = "用户管理", Description = "", Value = "UserManagement" },
-            new Claim { Id = 8, Name = "角色管理", Description = "", Value = "RoleManagement" },
+            new Claim { Id = 1, Name = "查询自己的信息", Description = "", Value = "query:self" },
+            new Claim { Id = 2, Name = "查询所有人的信息", Description = "", Value = "query:all" },
+            //new Claim { Id = 3, Name = "所有人命令", Description = "", Value = "everyone:cmd" },
+            //new Claim { Id = 3, Name = "2级命令", Description = "", Value = "user:cmd" },
+            //new Claim { Id = 3, Name = "3级命令", Description = "", Value = "adv-user:cmd" },
+            //new Claim { Id = 3, Name = "4级命令", Description = "", Value = "l4:command" },
+            //new Claim { Id = 3, Name = "5级命令", Description = "", Value = "l5:command" },
+            new Claim { Id = 3, Name = "一般功能命令", Description = "", Value = "l2:command" },
+            new Claim { Id = 4, Name = "群管功能命令", Description = "", Value = "group-admin:command" },
+            new Claim { Id = 5, Name = "投稿功能命令", Description = "", Value = "group-admin:command" },
+            new Claim { Id = 6, Name = "功能命令", Description = "", Value = "function:command" },
+            new Claim { Id = 7, Name = "创建投稿", Description = "", Value = "post:create" },
+            new Claim { Id = 8, Name = "执行审核命令", Description = "", Value = "review:command" },
+            new Claim { Id = 9, Name = "执行审核命令", Description = "", Value = "review:command" },
+            new Claim { Id = 10, Name = "执行审核命令", Description = "", Value = "review:command" },
+            new Claim { Id = 11, Name = "用户管理", Description = "", Value = "UserManagement" },
+            new Claim { Id = 12, Name = "角色管理", Description = "", Value = "RoleManagement" },
         ];
 
         claims.ForEach(static x => x.Value = x.Value?.ToUpperInvariant());
@@ -132,20 +137,22 @@ public class SettingInitializer(
         await repo.InsertOrUpdateAsync(entities).ConfigureAwait(false);
     }
 
-    private async Task ClearTableInt<TRepository, TEntity>(TRepository repo)
+#if DEBUG
+    private static async Task ClearTableInt<TRepository, TEntity>(TRepository repo)
         where TRepository : IRepository.Base.IRepositoryInt<TEntity>
         where TEntity : class, new()
     {
         await ClearTable<TRepository, TEntity, int>(repo).ConfigureAwait(false);
     }
 
-    private async Task ClearTable<TRepository, TEntity, TKey>(TRepository repo)
+    private static async Task ClearTable<TRepository, TEntity, TKey>(TRepository repo)
         where TRepository : IRepository.Base.IRepository<TEntity, TKey>
         where TEntity : class, new()
     {
         var entries = await repo.QueryAllAsync().ConfigureAwait(false);
         await repo.DeleteAsync(entries).ConfigureAwait(false);
     }
+#endif
     #endregion
 
     /// <summary>
@@ -154,13 +161,13 @@ public class SettingInitializer(
     /// <returns></returns>
     private async Task InitDefaultClaims(List<Claim> claims)
     {
-        ClearTableInt<IClaimRepository, Claim>(_claimRepository).ConfigureAwait(false).GetAwaiter().GetResult();
-
         if (await _claimRepository.CountAsync().ConfigureAwait(false) > 0)
         {
             _logger.LogDebug("已存在权限数据, 跳过初始化");
 #if RELEASE
             return;
+#else
+            ClearTableInt<IClaimRepository, Claim>(_claimRepository).ConfigureAwait(false).GetAwaiter().GetResult();
 #endif
         }
 
@@ -173,13 +180,14 @@ public class SettingInitializer(
     /// <returns></returns>
     private async Task InitDefaultRoles(List<Role> roles)
     {
-        ClearTableInt<IRoleRepository, Role>(_roleRepository).ConfigureAwait(false).GetAwaiter().GetResult();
 
         if (await _roleRepository.CountAsync().ConfigureAwait(false) > 0)
         {
             _logger.LogDebug("已存在权限数据, 跳过初始化");
 #if RELEASE
             return;
+#else
+            ClearTableInt<IRoleRepository, Role>(_roleRepository).ConfigureAwait(false).GetAwaiter().GetResult();
 #endif
         }
 
@@ -193,13 +201,14 @@ public class SettingInitializer(
     /// <returns></returns>
     private async Task InitDefaultRoleClaims(List<RoleClaim> roleClaims)
     {
-        ClearTableInt<IRoleClaimRepository, RoleClaim>(_roleClaimRepository).ConfigureAwait(false).GetAwaiter().GetResult();
 
         if (await _roleClaimRepository.CountAsync().ConfigureAwait(false) > 0)
         {
             _logger.LogDebug("已存在权限数据, 跳过初始化");
 #if RELEASE
             return;
+#else
+            ClearTableInt<IRoleClaimRepository, RoleClaim>(_roleClaimRepository).ConfigureAwait(false).GetAwaiter().GetResult();
 #endif
         }
 

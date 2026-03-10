@@ -9,7 +9,7 @@ public sealed record Role : ICreateAt, IModifyAt
     /// <summary>
     /// 主键
     /// </summary>
-    [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
+    [SugarColumn(IsPrimaryKey = true, IsIdentity = false)]
     public int Id { get; set; }
 
     /// <summary>
