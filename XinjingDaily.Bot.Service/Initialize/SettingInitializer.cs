@@ -33,13 +33,11 @@ public class SettingInitializer(
     public async Task InitializeAsync()
     {
         List<Claim> claims = [
-            new Claim { Id = 1, Name = "查询自己的信息", Description = "", Value = "query:self" },
-            new Claim { Id = 2, Name = "查询所有人的信息", Description = "", Value = "query:all" },
-            //new Claim { Id = 3, Name = "所有人命令", Description = "", Value = "everyone:cmd" },
-            //new Claim { Id = 3, Name = "2级命令", Description = "", Value = "user:cmd" },
-            //new Claim { Id = 3, Name = "3级命令", Description = "", Value = "adv-user:cmd" },
-            //new Claim { Id = 3, Name = "4级命令", Description = "", Value = "l4:command" },
-            //new Claim { Id = 3, Name = "5级命令", Description = "", Value = "l5:command" },
+            new Claim { Id = 1, Name = "基础命令", Description = "", Value = "base:cmd" },
+            new Claim { Id = 4, Name = "设置命令", Description = "", Value = "user:setting:cmd" },
+            new Claim { Id = 3, Name = "3级命令", Description = "", Value = "adv-user:cmd" },
+            new Claim { Id = 3, Name = "4级命令", Description = "", Value = "l4:command" },
+            new Claim { Id = 3, Name = "5级命令", Description = "", Value = "l5:command" },
             new Claim { Id = 3, Name = "一般功能命令", Description = "", Value = "l2:command" },
             new Claim { Id = 4, Name = "群管功能命令", Description = "", Value = "group-admin:command" },
             new Claim { Id = 5, Name = "投稿功能命令", Description = "", Value = "group-admin:command" },
@@ -50,9 +48,15 @@ public class SettingInitializer(
             new Claim { Id = 10, Name = "执行审核命令", Description = "", Value = "review:command" },
             new Claim { Id = 11, Name = "用户管理", Description = "", Value = "UserManagement" },
             new Claim { Id = 12, Name = "角色管理", Description = "", Value = "RoleManagement" },
+
+            new Claim { Id = 10, Name = "查询自己的信息", Description = "", Value = "query:self" },
+            new Claim { Id = 11, Name = "查询所有人的信息", Description = "", Value = "query:all" },
+            new Claim { Id = 100, Name = "自己审核", Description = "", Value = "RoleManagement" },
         ];
 
         claims.ForEach(static x => x.Value = x.Value?.ToUpperInvariant());
+
+        DetectDuplicateClaims(claims);
 
         List<RoleClaimDefinition> roleDefinition = [
             new RoleClaimDefinition ( 1,"受限用户", "封禁用户", [1] ,true) ,
@@ -83,6 +87,32 @@ public class SettingInitializer(
         await InitDefaultRoleClaims(roleClaims).ConfigureAwait(false);
     }
 
+    private void DetectDuplicateClaims(List<Claim> claims)
+    {
+        var duplicateClaims = claims
+            .GroupBy(c => c.Id)            // 按Id分组
+            .Where(g => g.Count() > 1) // 筛选出数量大于1的组（即重复Id）
+            .Select(g => (g.Key, g.ToList()))
+            .ToList();
+
+        // 输出结果
+        if (duplicateClaims.Count != 0)
+        {
+            Console.WriteLine("检测到重复的Claim Id：");
+            Console.WriteLine("--------------------------------");
+            foreach (var (key, items) in duplicateClaims)
+            {
+                Console.WriteLine($"重复Id：{key}，重复次数：{items.Count}");
+                Console.WriteLine("对应的Claim元素：");
+                foreach (var claim in items)
+                {
+                    Console.WriteLine($"  - Id:{claim.Id}, Name:{claim.Name}, Value:{claim.Value}");
+                }
+                Console.WriteLine("--------------------------------");
+            }
+            Environment.Exit(0);
+        }
+    }
 
     #region 数据库操作
     /// <summary>
