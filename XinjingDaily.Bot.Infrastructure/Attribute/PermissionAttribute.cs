@@ -1,4 +1,5 @@
 using XinjingDaily.Bot.Infrastructure.Enums;
+using XinjingDaily.Bot.Infrastructure.Strings;
 
 namespace XinjingDaily.Bot.Infrastructure.Attribute;
 
@@ -45,5 +46,24 @@ public sealed class PermissionAttribute : System.Attribute
     public PermissionAttribute(ECommandScope scope, string? permission) : this(scope)
     {
         Permission = permission;
+    }
+
+    /// <summary>
+    /// 命令权限设定
+    /// </summary>
+    /// <param name="permission"></param>
+    public PermissionAttribute(EPermission permission) : this(ECommandScope.All)
+    {
+        Permission = Permissions.ToPermissionString(permission);
+    }
+
+    /// <summary>
+    /// 命令权限设定
+    /// </summary>
+    /// <param name="scope"></param>
+    /// <param name="permission"></param>
+    public PermissionAttribute(ECommandScope scope, EPermission permission) : this(scope)
+    {
+        Permission = Permissions.ToPermissionString(permission);
     }
 }

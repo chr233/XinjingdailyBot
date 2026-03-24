@@ -3,6 +3,8 @@ using Microsoft.Extensions.Options;
 using XinjingDaily.Bot.Entry.Columns;
 using XinjingDaily.Bot.Entry.Entries.Users.Rbac;
 using XinjingDaily.Bot.Infrastructure;
+using XinjingDaily.Bot.Infrastructure.Strings;
+using XinjingDaily.Bot.Infrastructure.Utils;
 using XinjingDaily.Bot.Interface.InitService;
 using XinjingDaily.Bot.IRepository.User.Rbac;
 
@@ -33,52 +35,50 @@ public class SettingInitializer(
     public async Task InitializeAsync()
     {
         List<Claim> claims = [
-            new Claim { Id = 1, Name = "基础命令", Description = "", Value = "base:cmd" },
-            new Claim { Id = 4, Name = "设置命令", Description = "", Value = "user:setting:cmd" },
-            new Claim { Id = 3, Name = "3级命令", Description = "", Value = "adv-user:cmd" },
-            new Claim { Id = 3, Name = "4级命令", Description = "", Value = "l4:command" },
-            new Claim { Id = 3, Name = "5级命令", Description = "", Value = "l5:command" },
-            new Claim { Id = 3, Name = "一般功能命令", Description = "", Value = "l2:command" },
-            new Claim { Id = 4, Name = "群管功能命令", Description = "", Value = "group-admin:command" },
-            new Claim { Id = 5, Name = "投稿功能命令", Description = "", Value = "group-admin:command" },
-            new Claim { Id = 6, Name = "功能命令", Description = "", Value = "function:command" },
-            new Claim { Id = 7, Name = "创建投稿", Description = "", Value = "post:create" },
-            new Claim { Id = 8, Name = "执行审核命令", Description = "", Value = "review:command" },
-            new Claim { Id = 9, Name = "执行审核命令", Description = "", Value = "review:command" },
-            new Claim { Id = 10, Name = "执行审核命令", Description = "", Value = "review:command" },
-            new Claim { Id = 11, Name = "用户管理", Description = "", Value = "UserManagement" },
-            new Claim { Id = 12, Name = "角色管理", Description = "", Value = "RoleManagement" },
-
-            new Claim { Id = 10, Name = "查询自己的信息", Description = "", Value = "query:self" },
-            new Claim { Id = 11, Name = "查询所有人的信息", Description = "", Value = "query:all" },
-            new Claim { Id = 100, Name = "自己审核", Description = "", Value = "RoleManagement" },
+            new Claim(1, "公共命令", Permissions.CommonCommand),
+            new Claim(2, "查询命令", Permissions.QueryCommand),
+            new Claim(3, "4级命令", "l4:command"),
+            new Claim(4, "5级命令", "l5:command"),
+            new Claim(5, "一般功能命令", "l2:command"),
+            new Claim(6, "群管功能命令", "group-admin:command"),
+            new Claim(7, "投稿功能命令", "group-admin:command"),
+            new Claim(8, "功能命令", "function:command"),
+            new Claim(9, "创建投稿", "post:create"),
+            new Claim(118, "执行审核命令", "review:command"),
+            new Claim(19, "执行审核命令", "review:command"),
+            new Claim(10, "执行审核命令", "review:command"),
+            new Claim(11, "用户管理", "UserManagement"),
+            new Claim(12, "角色管理", "RoleManagement"),
+            new Claim(110, "查询自己的信息", "query:self"),
+            new Claim(111, "查询所有人的信息", "query:all"),
+            new Claim(21, "个人设置命令", "command:self:setting") ,
+            new Claim(100, "自己审核", "RoleManagement"),
         ];
 
         claims.ForEach(static x => x.Value = x.Value?.ToUpperInvariant());
 
         DetectDuplicateClaims(claims);
 
-        List<RoleClaimDefinition> roleDefinition = [
-            new RoleClaimDefinition ( 1,"受限用户", "封禁用户", [1] ,true) ,
-            new RoleClaimDefinition ( 2,"初级用户", "默认角色, 未投稿过的用户", [1] ,true) ,
-            new RoleClaimDefinition ( 3,"普通用户", "投稿过的用户", [2,3,4] ),
-            new RoleClaimDefinition ( 4,"高级投稿用户", "无视投稿数量限制", [6,8,7] ),
-            new RoleClaimDefinition ( 5,"群聊管理员", "允许使用群管理命令", [3] ),
-            new RoleClaimDefinition ( 6,"投稿审核员", "允许使用投稿审核功能", [6] ),
-            new RoleClaimDefinition ( 7,"频道管理员", "允许设置发布频道", [4] ),
-            new RoleClaimDefinition ( 8,"机器人管理员", "允许修改机器人设置", [6] ),
-            new RoleClaimDefinition ( 9,"超级管理员", "最高的权限", [5] ),
+        List<RoleClaimDefinition> roleDefinitions = [
+            new RoleClaimDefinition( 1,"受限用户", "封禁用户", [1] ,true) ,
+            new RoleClaimDefinition( 2,"初级用户", "默认角色, 未投稿过的用户", [1] ,true) ,
+            new RoleClaimDefinition( 3,"普通用户", "投稿过的用户", [2,3,4] ),
+            new RoleClaimDefinition( 4,"高级投稿用户", "无视投稿数量限制", [6,8,7] ),
+            new RoleClaimDefinition( 5,"群聊管理员", "允许使用群管理命令", [3] ),
+            new RoleClaimDefinition( 6,"投稿审核员", "允许使用投稿审核功能", [6] ),
+            new RoleClaimDefinition( 7,"频道管理员", "允许设置发布频道", [4] ),
+            new RoleClaimDefinition( 8,"机器人管理员", "允许修改机器人设置", [6] ),
+            new RoleClaimDefinition( 9,"超级管理员", "最高的权限", [50] ),
         ];
 
-        var roles = roleDefinition
-            .Select(static x => new Role { Id = x.Id, Name = x.RoleName, Description = x.RoleDescriptions, IsDefaultUserRole = x.IsDefaultUserRole })
+        DetectMissingClaims(claims, roleDefinitions);
+
+        var roles = roleDefinitions
+            .Select(static x => new Role(x.Id, x.RoleName, x.RoleDescriptions, x.IsDefaultUserRole))
             .ToList();
 
-        var roleClaims = roleDefinition
-            .SelectMany(static x => (x.ClaimKeys ?? []).Select(claimId => new RoleClaim {
-                RoleId = x.Id,
-                ClaimId = claimId
-            }))
+        var roleClaims = roleDefinitions
+            .SelectMany(static x => (x.ClaimKeys ?? []).Select(claimId => new RoleClaim(x.Id, claimId)))
             .Distinct()
             .ToList();
 
@@ -87,30 +87,65 @@ public class SettingInitializer(
         await InitDefaultRoleClaims(roleClaims).ConfigureAwait(false);
     }
 
+    private static void Terminal()
+    {
+
+    }
+
     private void DetectDuplicateClaims(List<Claim> claims)
     {
         var duplicateClaims = claims
-            .GroupBy(c => c.Id)            // 按Id分组
-            .Where(g => g.Count() > 1) // 筛选出数量大于1的组（即重复Id）
+            .GroupBy(c => c.Id)                     // 按Id分组
+            .Where(g => g.Count() > 1)  // 筛选出数量大于1的组（即重复Id）
             .Select(g => (g.Key, g.ToList()))
             .ToList();
 
         // 输出结果
         if (duplicateClaims.Count != 0)
         {
-            Console.WriteLine("检测到重复的Claim Id：");
-            Console.WriteLine("--------------------------------");
+            _logger.LogWarning("检测到重复的 Claim Id:");
+            _logger.LogWarning(Langs.Line2);
             foreach (var (key, items) in duplicateClaims)
             {
-                Console.WriteLine($"重复Id：{key}，重复次数：{items.Count}");
-                Console.WriteLine("对应的Claim元素：");
+                _logger.LogWarning("重复 Id：{key}，重复次数：{count}", key, items.Count);
+                _logger.LogWarning("对应的 Claim 元素：");
                 foreach (var claim in items)
                 {
-                    Console.WriteLine($"  - Id:{claim.Id}, Name:{claim.Name}, Value:{claim.Value}");
+                    _logger.LogWarning("  - Id:{id}, Name:{name}, Value:{value}", claim.Id, claim.Name, claim.Value);
                 }
-                Console.WriteLine("--------------------------------");
+                _logger.LogWarning(Langs.Line2);
             }
-            Environment.Exit(0);
+
+            SystemUtils.Shutdown();
+        }
+    }
+
+    private void DetectMissingClaims(List<Claim> claims, List<RoleClaimDefinition> roleDefinitions)
+    {
+        var claimIds = claims.Select(c => c.Id).ToHashSet();
+
+        var invalidRoleDetails = roleDefinitions
+            .Where(static rd => rd.ClaimKeys != null)
+            .Select(rd => new {
+                Role = rd,
+                InvalidClaimIds = rd.ClaimKeys?.Where(claimId => !claimIds.Contains(claimId)).ToList()
+            })
+            .Where(static x => x.InvalidClaimIds != null && x.InvalidClaimIds.Count != 0)
+            .ToList();
+
+        if (invalidRoleDetails.Count > 0)
+        {
+            foreach (var item in invalidRoleDetails)
+            {
+                foreach (var claim in item.InvalidClaimIds!)
+                {
+                    if (!claimIds.Contains(claim))
+                    {
+                        _logger.LogWarning("角色 {id} {roleName} 引用了不存在的 Claim Id {claimId}", item.Role.Id, item.Role.RoleName, claim);
+                    }
+                }
+            }
+            SystemUtils.Shutdown();
         }
     }
 
@@ -154,11 +189,11 @@ public class SettingInitializer(
 
         foreach (var entity in entities)
         {
-            if (typeof(TEntity) is ICreateAt ca)
+            if (entity is ICreateAt ca)
             {
                 ca.CreateAt = create;
             }
-            if (typeof(TEntity) is IModifyAt ma)
+            if (entity is IModifyAt ma)
             {
                 ma.ModifyAt = modify;
             }
@@ -244,6 +279,4 @@ public class SettingInitializer(
 
         await InsertToTableInt(_roleClaimRepository, roleClaims).ConfigureAwait(false);
     }
-
-
 }

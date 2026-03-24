@@ -1,3 +1,4 @@
+using XinjingDaily.Bot.Infrastructure.Utils;
 using XinjingDaily.Bot.Interface.InitService;
 
 namespace XinjingDaily.Bot.App.Extensions;
@@ -48,7 +49,7 @@ public static class AppServiceExtensions
                 {
                     var serviceName = initService.GetType().Name;
 
-                    _logger.Info("初始化【{ServiceName} - {order}】", serviceName,initService.Order);
+                    _logger.Info("初始化【{ServiceName} - {order}】", serviceName, initService.Order);
 
                     await initService.InitializeAsync().ConfigureAwait(false);
 
@@ -59,7 +60,7 @@ public static class AppServiceExtensions
             catch (Exception ex)
             {
                 _logger.Error(ex, "初始化服务时发生未预期的异常");
-                throw;
+                SystemUtils.Shutdown();
             }
         }
     }

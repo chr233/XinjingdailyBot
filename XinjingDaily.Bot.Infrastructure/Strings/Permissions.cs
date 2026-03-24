@@ -4,6 +4,11 @@ namespace XinjingDaily.Bot.Infrastructure.Strings;
 
 public static class Permissions
 {
+    // 命令
+    public const string CommonCommand = "CMD:COMMON";
+    public const string QueryCommand = "CMD:QUERY";
+    public const string NormalCommand = "CMD:QUERY";
+
     // 投稿
     public const string PostCreate = "post:create";
     public const string PostDelete = "post:delete:own";

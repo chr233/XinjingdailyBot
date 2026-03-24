@@ -9,6 +9,7 @@ using XinjingDaily.Bot.Entry.Columns;
 using XinjingDaily.Bot.Infrastructure;
 using XinjingDaily.Bot.Infrastructure.Convertor;
 using XinjingDaily.Bot.Infrastructure.Options;
+using XinjingDaily.Bot.Infrastructure.Utils;
 
 namespace XinjingDaily.Bot.App.Extensions;
 
@@ -91,9 +92,7 @@ public static class DatabaseExtension
                 {
                     PrintDatabaseConfig(config);
                     _logger.Error("数据库配置有误, 请检查 Database 节配置");
-                    _logger.Info("按任意键退出...");
-                    Console.ReadKey();
-                    Environment.Exit(1);
+                    SystemUtils.Shutdown();
                 }
 
                 if (firstInit)

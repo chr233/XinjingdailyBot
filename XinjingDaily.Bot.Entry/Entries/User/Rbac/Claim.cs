@@ -1,4 +1,5 @@
 using SqlSugar;
+using System.Text.Json.Serialization;
 using XinjingDaily.Bot.Entry.Columns;
 
 namespace XinjingDaily.Bot.Entry.Entries.Users.Rbac;
@@ -7,6 +8,30 @@ namespace XinjingDaily.Bot.Entry.Entries.Users.Rbac;
 [SugarTable("claim", TableDescription = "权限表")]
 public sealed record Claim : ICreateAt, IModifyAt
 {
+    [Obsolete("仅供 ORM 使用")]
+    public Claim() { }
+
+    [JsonConstructor]
+    public Claim(int id, string? name, string? value, string? description, DateTime createAt, DateTime modifyAt)
+    {
+        Id = id;
+        Name = name;
+        Value = value;
+        Description = description;
+        CreateAt = createAt;
+        ModifyAt = modifyAt;
+    }
+
+    public Claim(int id, string name, string value, string? description = null)
+    {
+        Id = id;
+        Name = name;
+        Value = value;
+        Description = description;
+        CreateAt = DateTime.UtcNow;
+        ModifyAt = DateTime.MinValue;
+    }
+
     /// <summary>
     /// 主键
     /// </summary>

@@ -5,6 +5,17 @@ namespace XinjingDaily.Bot.Entry.Entries.Users.Rbac;
 [SugarTable("role_claim", TableDescription = "角色权限表")]
 public sealed record RoleClaim
 {
+    [Obsolete("仅供 ORM 使用")]
+    public RoleClaim() { }
+
+    public RoleClaim(int roleId, int claimId)
+    {
+        RoleId = roleId;
+        ClaimId = claimId;
+        Role = null;
+        Claim = null;
+    }
+
     /// <summary>
     /// Role主键
     /// </summary>

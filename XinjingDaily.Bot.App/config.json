@@ -32,7 +32,7 @@
   // 数据库设置
   "Database": {
     "Generate": true,
-    "LogSQL": false,
+    "LogSql": false,
     "TablePrefix": "xjb",
 
     //mysql

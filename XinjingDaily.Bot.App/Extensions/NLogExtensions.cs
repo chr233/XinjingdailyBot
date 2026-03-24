@@ -17,7 +17,6 @@ public static class NLogExtensions
 #else
     private const Microsoft.Extensions.Logging.LogLevel MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Information;
     private static NLog.LogLevel MinimumNLogLevel = NLog.LogLevel.Info;
-
 #endif
 
     extension(IServiceCollection services)
@@ -39,7 +38,7 @@ public static class NLogExtensions
             {
                 var config = new LoggingConfiguration();
 
-                const string loggerLayout = "${longdate}|${level:uppercase=true}|${logger:shortName=false}|${message} ${exception:format=toString,Data}";
+                const string loggerLayout = "${longdate}|${pad:padding=5:inner=${level:uppercase=true}}|${logger:shortName=false}|${message} ${exception:format=toString,Data}";
 
                 // ========== 1. 原有彩色控制台目标（通用日志） ==========
                 var consoleTarget = new ColoredConsoleTarget("coloredConsole") {

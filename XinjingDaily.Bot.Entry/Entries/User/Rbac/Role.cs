@@ -6,6 +6,33 @@ namespace XinjingDaily.Bot.Entry.Entries.Users.Rbac;
 [SugarTable("role", TableDescription = "角色表")]
 public sealed record Role : ICreateAt, IModifyAt
 {
+    [Obsolete("仅供 ORM 使用")]
+    public Role () { }
+   
+    public Role(int id, string? name, string? description, bool isDefaultUserRole, DateTime createAt, DateTime modifyAt, List<RoleClaim>? roleClaims, List<UserRole>? userRoles)
+    {
+        Id = id;
+        Name = name;
+        Description = description;
+        IsDefaultUserRole = isDefaultUserRole;
+        CreateAt = createAt;
+        ModifyAt = modifyAt;
+        RoleClaims = roleClaims;
+        UserRoles = userRoles;
+    }
+
+    public Role(int id, string? name, string? description, bool isDefaultUserRole)
+    {
+        Id = id;
+        Name = name;
+        Description = description;
+        IsDefaultUserRole = isDefaultUserRole;
+        CreateAt = DateTime.UtcNow;
+        ModifyAt = DateTime.MinValue;
+        RoleClaims = null;
+        UserRoles = null;
+    }
+
     /// <summary>
     /// 主键
     /// </summary>

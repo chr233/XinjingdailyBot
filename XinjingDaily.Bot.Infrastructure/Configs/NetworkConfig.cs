@@ -26,4 +26,6 @@ public sealed record NetworkConfig
     /// Telegram Api地址
     /// </summary>
     public string TelegramApi { get; init; } = "https://api.telegram.org/";
+
+    public int Timeout { get; init; } = 60;
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 using XinjingDaily.Bot.Infrastructure;
 using XinjingDaily.Bot.Infrastructure.Exceptions;
+using XinjingDaily.Bot.Infrastructure.Utils;
 using XinjingDaily.Bot.Interface.InitService;
 
 namespace XinjingDaily.Bot.Service.InitService;
@@ -54,6 +55,6 @@ public class RedisInitializer(
         }
 
         _logger.LogError("Redis 连接在 {MaxAttempts} 次尝试后失败", maxAttempts);
-        throw new InitializeException("Redis 初始化失败, 请检查配置");
+        SystemUtils.Shutdown();
     }
 }

@@ -2,7 +2,7 @@
   "profiles": {
     "调试源生成器": {
       "commandName": "DebugRoslynComponent",
-      "targetProject": "..\\XinjingDaily.Bot.WebAPI\\XinjingDaily.Bot.WebAPI.csproj"
+      "targetProject": "..\\XinjingDaily.Bot.Entry\\XinjingDaily.Bot.Entry.csproj"
     }
   }
 }

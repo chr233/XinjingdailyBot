@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Http.Headers;
 using XinjingDaily.Bot.Infrastructure;
+using XinjingDaily.Bot.Infrastructure.Utils;
 
 namespace XinjingDaily.Bot.App.Extensions;
 
@@ -94,7 +95,7 @@ public static class HttpClientExtension
         };
     }
 
-    internal static Uri GetBaseAddress(string name, string baseUrl)
+    internal static Uri? GetBaseAddress(string name, string baseUrl)
     {
         if (Uri.TryCreate(baseUrl, UriKind.Absolute, out var uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps))
         {
@@ -103,9 +104,7 @@ public static class HttpClientExtension
 
         _logger.Error("{0} 配置的 BaseUrl 无效: {1}", name, baseUrl);
         _logger.Error("网络配置有误, 请检查 Network 节配置");
-        _logger.Info("按任意键退出...");
-        Console.ReadKey();
-        Environment.Exit(1);
+        SystemUtils.Shutdown();
         return null;
     }
 

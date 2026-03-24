@@ -3,6 +3,7 @@ using Telegram.Bot.Types;
 using XinjingDaily.Bot.Entry.Entries.Command;
 using XinjingDaily.Bot.Entry.Entries.Users;
 using XinjingDaily.Bot.Infrastructure.Attribute;
+using XinjingDaily.Bot.Infrastructure.Enums;
 using XinjingDaily.Bot.Interface.Bot;
 using XinjingDaily.Bot.Interface.Bot.Handler;
 
@@ -19,6 +20,7 @@ public class NormalCommands(
         await _botClient.AutoReply("已取消当前操作", message).ConfigureAwait(false);
     }
 
+    [Permission(EPermission.PostDeleteOwn)]
     [TextCommand("Help", "帮助")]
     public async Task HelpCommand(UserInfo userInfo, Message message)
     {
