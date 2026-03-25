@@ -1,7 +1,7 @@
 using SqlSugar;
 using XinjingDaily.Bot.Infrastructure.Enums;
 
-namespace XinjingDaily.Bot.Model.Legacy;
+namespace XinjingDaily.Bot.ObsoleteEntry.LegacyEntries;
 
 /// <summary>
 /// 用户封禁记录

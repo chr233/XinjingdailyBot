@@ -15,12 +15,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\XinjingDaily.Bot.Generator\XinjingDaily.Bot.Generator.csproj" >
-			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-			<ReferPrivateAssets>all</ReferPrivateAssets>
-			<OutputItemType>Analyzer</OutputItemType>
-		</ProjectReference>
 		<ProjectReference Include="..\XinjingDaily.Bot.Infrastructure\XinjingDaily.Bot.Infrastructure.csproj" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='Release'">
+		<ProjectReference Include="..\XinjingDaily.Bot.Generator\XinjingDaily.Bot.Generator.csproj">
+			<OutputItemType>Analyzer</OutputItemType>
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+		</ProjectReference>
 	</ItemGroup>
 
 </Project>

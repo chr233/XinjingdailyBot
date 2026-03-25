@@ -1,6 +1,6 @@
 using SqlSugar;
 
-namespace XinjingDaily.Bot.Model.Legacy;
+namespace XinjingDaily.Bot.ObsoleteEntry.LegacyEntries;
 
 /// <summary>
 /// 机器人会话

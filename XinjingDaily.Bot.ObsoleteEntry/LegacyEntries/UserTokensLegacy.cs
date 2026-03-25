@@ -1,7 +1,7 @@
 using SqlSugar;
 using XinjingDaily.Bot.Entry.Columns;
 
-namespace XinjingDaily.Bot.Model.Legacy;
+namespace XinjingDaily.Bot.ObsoleteEntry.LegacyEntries;
 
 /// <summary>
 /// 用户密钥表, 储存WebAPI的Token

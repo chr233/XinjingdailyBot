@@ -2,7 +2,7 @@ using SqlSugar;
 using XinjingDaily.Bot.Entry.Columns;
 using XinjingDaily.Bot.Infrastructure.Extensions;
 
-namespace XinjingDaily.Bot.Model.Legacy;
+namespace XinjingDaily.Bot.ObsoleteEntry.LegacyEntries;
 
 /// <summary>
 /// 用户表, 储存所有用户的基本信息, 权限设定, 以及投稿信息统计

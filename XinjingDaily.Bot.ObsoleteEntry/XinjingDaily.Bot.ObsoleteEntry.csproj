@@ -19,4 +19,11 @@
 		<ProjectReference Include="..\XinjingDaily.Bot.Infrastructure\XinjingDaily.Bot.Infrastructure.csproj" />
 	</ItemGroup>
 
+	<ItemGroup Condition="'$(Configuration)'=='Release'">
+		<ProjectReference Include="..\XinjingDaily.Bot.Generator\XinjingDaily.Bot.Generator.csproj">
+			<OutputItemType>Analyzer</OutputItemType>
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+		</ProjectReference>
+	</ItemGroup>
+
 </Project>

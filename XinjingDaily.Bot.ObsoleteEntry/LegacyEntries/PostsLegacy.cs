@@ -3,7 +3,7 @@ using Telegram.Bot.Types.Enums;
 using XinjingDaily.Bot.Entry.Columns;
 using XinjingDaily.Bot.Infrastructure.Enums;
 
-namespace XinjingDaily.Bot.Model.Legacy;
+namespace XinjingDaily.Bot.ObsoleteEntry.LegacyEntries;
 
 /// <summary>
 /// 新的稿件表

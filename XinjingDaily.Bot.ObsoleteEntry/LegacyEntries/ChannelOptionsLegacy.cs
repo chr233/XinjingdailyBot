@@ -2,7 +2,7 @@ using SqlSugar;
 using XinjingDaily.Bot.Entry.Columns;
 using XinjingDaily.Bot.Infrastructure.Enums;
 
-namespace XinjingDaily.Bot.Model.Legacy;
+namespace XinjingDaily.Bot.ObsoleteEntry.LegacyEntries;
 
 /// <summary>
 /// 来源频道设定

@@ -2,9 +2,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SqlSugar;
-using XinjingDaily.Bot.Generator;
 using XinjingDaily.Bot.Infrastructure;
 using XinjingDaily.Bot.Interface.InitService;
+
+#if DEBUG
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+#endif
 
 namespace XinjingDaily.Bot.Service.InitService;
 
@@ -35,14 +39,60 @@ public class DatabaseInitializer(
             var dbClient = scope.ServiceProvider.GetRequiredService<ISqlSugarClient>();
 
             //创建数据库
-            dbClient.SafeCreateDatabase(_options.Value.Database.Database);
+            SafeCreateDatabase(dbClient);
 
             //创建数据表
-            dbClient.CreateTableByTypes(_logger);
+#if RELEASE
+            dbClient.CreateXinjingDailyBotEntryTables(_logger);
+#else
+            CreateTableByReflection(dbClient, "XinjingDaily.Bot.Entry");
+#endif
 
             _logger.LogWarning("数据库结构生成完毕, 建议禁用 Database.Generate 来加快启动速度");
         }
 
         return Task.CompletedTask;
+    }
+
+#if DEBUG
+    [RequiresUnreferencedCode("不兼容剪裁")]
+    private void CreateTableByReflection(ISqlSugarClient db, string table)
+    {
+        //创建数据表
+        var assembly = Assembly.Load("XinjingDaily.Bot.Entry");
+        var types = assembly.GetTypes()
+            .Where(x => x.GetCustomAttribute<SugarTable>() != null);
+
+        foreach (var type in types)
+        {
+            _logger.LogInformation("开始创建 {type} 表", type);
+            SafeCreateTable(db, type);
+        }
+    }
+
+
+    private void SafeCreateTable(ISqlSugarClient db, Type type)
+    {
+        try
+        {
+            db.CodeFirst.InitTables(type);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "创建表 {type} 失败, 可能没有权限", type.Name);
+        }
+    }
+#endif
+
+    private void SafeCreateDatabase(ISqlSugarClient db)
+    {
+        try
+        {
+            db.DbMaintenance.CreateDatabase(_options.Value.Database.Database);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "创建数据库失败, 可能没有权限");
+        }
     }
 }

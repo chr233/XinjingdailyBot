@@ -1,7 +1,7 @@
 using SqlSugar;
 using Telegram.Bot.Types.Enums;
 
-namespace XinjingDaily.Bot.Model.Legacy;
+namespace XinjingDaily.Bot.ObsoleteEntry.LegacyEntries;
 
 /// <summary>
 /// 投稿附件
