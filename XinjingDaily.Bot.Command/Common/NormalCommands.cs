@@ -1,7 +1,5 @@
-using System.Text;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot.Types;
-using XinjingDaily.Bot.Entry.Entries.Command;
-using XinjingDaily.Bot.Entry.Entries.Users;
 using XinjingDaily.Bot.Infrastructure.Attribute;
 using XinjingDaily.Bot.Infrastructure.Enums;
 using XinjingDaily.Bot.Interface.Bot;
@@ -12,40 +10,25 @@ namespace XinjingDaily.Bot.Command.Common;
 [RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
 public class NormalCommands(
     ITelegramBotService _botClient,
+    ILogger<NormalCommands> _logger,
     ICommandHandler _commandHandler)
 {
-    [TextCommand("CANCEL", "取消当前操作")]
-    public async Task CancelCommand(CommandContext? context, Message message)
+    /// <summary>
+    /// 检测机器人是否存活
+    /// </summary>
+    /// <param name="message"></param>
+    /// <returns></returns>
+    [Permission(ECommandScope.Private)]
+    [Permission(ECommandScope.Group, "")]
+    [TextCommand("PING", Description = "检测机器人是否存活")]
+    public async Task ResponsePing(Message message)
     {
-        await _botClient.AutoReply("已取消当前操作", message).ConfigureAwait(false);
-    }
+        var now = DateTime.UtcNow;
+        var receiveOffset = (now - message.Date).TotalMilliseconds;
 
-    [Permission(EPermission.PostDeleteOwn)]
-    [TextCommand("Help", "帮助")]
-    public async Task HelpCommand(UserInfo userInfo, Message message)
-    {
-        var commands = await _commandHandler.GetAvailabeCommands(userInfo, message.Chat.Type).ConfigureAwait(false);
+        var msg = await _botClient.SendCommandReply("PONG!", message).ConfigureAwait(false);
+        var sendOffset = (msg.Date - now).TotalMilliseconds;
 
-        if (commands.Count == 0)
-        {
-            await _botClient.AutoReply("没有可用命令", message).ConfigureAwait(false);
-        }
-        else
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine("可用命令列表:");
-            foreach (var command in commands)
-            {
-                if (!string.IsNullOrEmpty(command.Description))
-                {
-                    sb.AppendLine($" - /{command.Command} : {command.Description}");
-                }
-                else
-                {
-                    sb.AppendLine($" - /{command.Command}");
-                }
-            }
-            await _botClient.AutoReply(sb.ToString(), message, Telegram.Bot.Types.Enums.ParseMode.Html).ConfigureAwait(false);
-        }
+        await _botClient.EditMessageText(msg, $"PONG!\r\n收信延时: {receiveOffset:F3}ms\r\n发信延时: {sendOffset:F3}ms").ConfigureAwait(false);
     }
 }

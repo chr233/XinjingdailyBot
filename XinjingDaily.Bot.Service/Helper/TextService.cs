@@ -1,0 +1,362 @@
+using Microsoft.Extensions.Options;
+using System.Text;
+using System.Threading.Channels;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using XinjingDaily.Bot.Entry.Entries.Channel;
+using XinjingDaily.Bot.Entry.Entries.Posts;
+using XinjingDaily.Bot.Entry.Entries.Users;
+using XinjingDaily.Bot.Infrastructure;
+using XinjingDaily.Bot.Infrastructure.Extensions;
+using XinjingDaily.Bot.Infrastructure.Utils;
+
+namespace XinjingdailyBot.Service.Helper;
+
+/// <inheritdoc cref="ITextService"/>
+[RegisterTransient]
+public sealed class TextService(
+    IOptions<AppSettings> options) : ITextService
+{
+    private string[] PureWords { get; init; } = [];
+    private bool PureReturns { get; init; }
+    private bool PureHashTag { get; init; }
+
+    private static readonly char[] Separator = ['|'];
+
+    /// <inheritdoc/>
+    public string PureText(string? text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return "";
+        }
+
+        if (PureHashTag)
+        {
+            //过滤HashTag
+            text = RegexUtils.MatchHashTag().Replace(text, "");
+        }
+
+        if (PureReturns)
+        {
+            var matchSpace = RegexUtils.MatchBlankLine();
+            //过滤连续换行
+            var parts = text.Split('\n', StringSplitOptions.RemoveEmptyEntries).Where(x => !matchSpace.IsMatch(x)).Select(x => x.Trim());
+            text = string.Join('\n', parts);
+        }
+
+        return text;
+    }
+
+    /// <inheritdoc/>
+    public string HtmlUserLink(long userId, string? userName, string? userNick)
+    {
+        var nick = EscapeHtml(userNick).ReEscapeHtml();
+
+        if (string.IsNullOrEmpty(userName))
+        {
+            return HtmlLink($"tg://user?id={userId}", nick);
+        }
+        else
+        {
+            return HtmlLink($"https://t.me/{userName}", nick);
+        }
+    }
+
+    /// <inheritdoc/>
+    public string HtmlLink(string url, string text)
+    {
+        return $"<a href=\"{url}\">{text}</a>";
+    }
+
+    /// <inheritdoc/>
+    public string HtmlUserLink(UserInfo user)
+    {
+        return HtmlUserLink(user.TelegramId, user.TelegramName, user.FullName);
+    }
+
+    /// <inheritdoc/>
+    public string HtmlMessageLink(long messageID, string chatName, string linkName)
+    {
+        return $"<a href=\"https://t.me/{chatName}/{messageID}\">{linkName}</a>";
+    }
+
+    /// <inheritdoc/>
+    public string HtmlMessageLink(long messageID, long chatId, string linkName)
+    {
+        if (chatId < 0)
+        {
+            chatId = -1000000000000L - chatId;
+        }
+        return $"<a href=\"https://t.me/c/{chatId}/{messageID}\">{linkName}</a>";
+    }
+
+    /// <inheritdoc/>
+    public string EscapeHtml(string? text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return "";
+        }
+        else
+        {
+            var escapedText = text
+                .Replace("<", "＜")
+                .Replace(">", "＞")
+                .Replace("&", "＆");
+            foreach (var item in PureWords)
+            {
+                escapedText = escapedText.Replace(item, "");
+            }
+            return escapedText;
+        }
+    }
+
+    /// <inheritdoc/>
+    public string MakeReviewMessage(UserInfo poster, bool anymouse)
+    {
+        var pUser = HtmlUserLink(poster);
+        var strAny = anymouse ? "匿名投稿" : "保留来源";
+        var status = "待审核";
+
+        var msg = string.Join('\n', $"#待审核 ", $"投稿人: {pUser}", "", $"模式: {strAny}", $"状态: {status}");
+        return msg;
+    }
+
+    /// <inheritdoc/>
+    public string MakeReviewMessage(UserInfo poster, UserInfo reviewer, bool anymouse, bool second, Message? message)
+    {
+        var pUser = HtmlUserLink(poster);
+        var rUser = HtmlUserLink(reviewer);
+        var msgLink = message != null ? HtmlLink(message.GetMessageLink(), "消息直链") : "无";
+        var strAny = anymouse ? "匿名投稿" : "保留来源";
+        var status = !second ? "已发布" : "已发布 (第二频道)";
+
+        var msg = string.Join('\n', $"投稿人: {pUser}", $"审核人: {rUser}", $"消息: {msgLink}", $"模式: {strAny}", $"状态: {status}");
+        return msg;
+    }
+
+    /// <inheritdoc/>
+    public string MakeReviewMessage(UserInfo poster, bool anymouse, bool second, Message? message)
+    {
+        var pUser = HtmlUserLink(poster);
+        var strAny = anymouse ? "匿名投稿" : "保留来源";
+        var status = !second ? "已发布" : "已发布 (第二频道)";
+        var msgLink = message != null ? HtmlLink(message.GetMessageLink(), "消息直链") : "无";
+
+        var msg = string.Join('\n', $"发布人: {pUser}", $"消息: {msgLink}", $"模式: {strAny}", $"状态: {status}");
+        return msg;
+    }
+
+    /// <inheritdoc/>
+    public string MakeReviewMessage(UserInfo poster, UserInfo reviewer, bool anymouse, string rejectReason)
+    {
+        var pUser = HtmlUserLink(poster);
+        var rUser = HtmlUserLink(reviewer);
+        var strAny = anymouse ? "匿名投稿" : "保留来源";
+        var status = $"已拒绝 {rejectReason}";
+
+        var msg = string.Join('\n', $"投稿人: {pUser}", $"审核人: {rUser}", $"模式: {strAny}", $"状态: {status}");
+        return msg;
+    }
+
+    /// <inheritdoc/>
+    public string MakeNotification(bool isDirect, bool inPlan, Message? message)
+    {
+        var msgLink = message != null ? HtmlLink(message.GetMessageLink(), "消息直链") : "无";
+
+        if (!inPlan)
+        {
+            return isDirect ? $"稿件已发布, {msgLink}" : $"稿件已通过, 感谢您的支持 {msgLink}";
+        }
+        else
+        {
+            return isDirect ? $"稿件将按设定频率定期发布, {msgLink}" : $"稿件已通过, 将设定频率定期发布, 感谢您的支持 {msgLink}";
+        }
+    }
+
+    /// <inheritdoc/>
+    public string MakeNotification(string reason)
+    {
+        var msg = string.Join('\n', "稿件未通过", $"原因: {reason}");
+        return msg;
+    }
+
+    /// <inheritdoc/>
+    public string MakePoster(PostInfo post, UserInfo poster, SourceChannelSetting? channel)
+    {
+        var user = HtmlUserLink(poster);
+
+        //if (post.IsFromChannel && !string.IsNullOrEmpty(channel?.ChannelName))
+        //{
+        //    var link = HtmlMessageLink(post.ChannelMsgID, channel.ChannelName, channel.ChannelTitle);
+        //    if (post.Anonymous)
+        //    {
+        //        return $"<i>from</i> {link}";
+        //    }
+        //    else
+        //    {
+        //        return $"<i>from</i> {link} <i>via</i> {user}";
+        //    }
+        //}
+        //else
+        //{
+        //    if (post.Anonymous)
+        //    {
+        //        return $"<i>via</i> 匿名";
+        //    }
+        //    else
+        //    {
+        //        return $"<i>via</i> {user}";
+        //    }
+        //}
+
+        return "";
+    }
+
+    /// <inheritdoc/>
+    public string MakePostText(PostInfo post, UserInfo poster, SourceChannelSetting? channel)
+    {
+        //var tag = _tagRepository.GetActiviedHashTags(post.Tags);
+
+        var sb = new StringBuilder();
+
+        //if (!string.IsNullOrEmpty(tag))
+        //{
+        //    sb.AppendLine(tag);
+        //}
+
+        if (!string.IsNullOrEmpty(post.Text))
+        {
+            var text = post.Text;
+            sb.AppendLine(text);
+        }
+
+        var from = MakePoster(post, poster, channel);
+
+        if (sb.Length > 0)
+        {
+            sb.AppendLine();
+        }
+        sb.AppendLine(from);
+
+        return sb.ToString();
+    }
+
+    /// <inheritdoc/>
+    public string ParseMessage(Message message)
+    {
+        MessageEntity[]? entities;
+        string? text;
+
+        if (message.Type == MessageType.Text)
+        {
+            text = message.Text;
+            entities = message.Entities;
+        }
+        else
+        {
+            text = message.Caption;
+            entities = message.CaptionEntities;
+        }
+
+        if (string.IsNullOrEmpty(text))
+        {
+            return "";
+        }
+
+        return ParseMessage(entities, text).ReEscapeHtml();
+    }
+
+    /// <summary>
+    /// 根据Message.Enetities的字段格式生成HTML文本, 自动过滤无用HashTag
+    /// </summary>
+    /// <param name="entities"></param>
+    /// <param name="text"></param>
+    /// <returns></returns>
+    private string ParseMessage(MessageEntity[]? entities, string text)
+    {
+        var sb = new StringBuilder(text.EscapeHtml());
+
+        if (entities == null)
+        {
+            return sb.ToString();
+        }
+
+        //var tagMap = new Dictionary<int, TagObjct>();
+        //foreach (var entity in entities)
+        //{
+        //    string head;
+        //    string tail;
+
+        //    switch (entity.Type)
+        //    {
+        //        case MessageEntityType.Bold:
+        //            head = "<b>";
+        //            tail = "</b>";
+        //            break;
+        //        case MessageEntityType.Italic:
+        //            head = "<i>";
+        //            tail = "</i>";
+        //            break;
+        //        case MessageEntityType.Underline:
+        //            head = "<u>";
+        //            tail = "</u>";
+        //            break;
+        //        case MessageEntityType.Strikethrough:
+        //            head = "<s>";
+        //            tail = "</s>";
+        //            break;
+        //        case MessageEntityType.Spoiler:
+        //            head = "<tg-spoiler>";
+        //            tail = "</tg-spoiler>";
+        //            break;
+        //        case MessageEntityType.TextLink:
+        //            head = $"<a href=\"{EscapeHtml(entity.Url).ReEscapeHtml()}\">";
+        //            tail = "</a>";
+        //            break;
+        //        case MessageEntityType.Code:
+        //            head = "<code>";
+        //            tail = "</code>";
+        //            break;
+        //        case MessageEntityType.Pre:
+        //            head = "<pre>";
+        //            tail = "</pre>";
+        //            break;
+
+        //        default:
+        //            continue;
+        //    }
+
+        //    int start = entity.Offset;
+        //    int end = entity.Offset + entity.Length;
+
+        //    if (tagMap.TryGetValue(start, out var tagStart))
+        //    {
+        //        tagStart.AddLast(head);
+        //    }
+        //    else
+        //    {
+        //        tagMap.Add(start, new TagObjct(head));
+        //    }
+
+        //    if (tagMap.TryGetValue(end, out var tagEnd))
+        //    {
+        //        tagEnd.AddFirst(tail);
+        //    }
+        //    else
+        //    {
+        //        tagMap.Add(end, new TagObjct(tail));
+        //    }
+        //}
+
+        //var indexList = tagMap.Keys.ToArray().OrderByDescending(x => x);
+
+        //foreach (var index in indexList)
+        //{
+        //    sb.Insert(index, tagMap[index].ToString());
+        //}
+
+        return PureText(sb.ToString());
+    }
+}

@@ -80,7 +80,7 @@ public class SugarTableIncrementalGenerator : IIncrementalGenerator
         code.AppendLine("using SqlSugar;");
         code.AppendLine("using Microsoft.Extensions.Logging;");
         code.AppendLine();
-        code.AppendLine("namespace XinjingDaily.Bot.Generator;");
+        code.AppendLine("namespace Microsoft.Extensions.DependencyInjection;");
         code.AppendLine();
         code.AppendLine($"public static class {assemblyName}Extension");
         code.AppendLine("{");
