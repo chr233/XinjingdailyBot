@@ -11,8 +11,6 @@ namespace XinjingDaily.Bot.App.Extensions;
 /// </summary>
 public static class HttpClientExtension
 {
-    private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-
     private const DecompressionMethods DefaultDecompressMethod = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli;
 
     /// <summary>
@@ -26,9 +24,11 @@ public static class HttpClientExtension
         var proxy = CreateWebProxy(proxyAddress);
         if (proxy != null && !string.IsNullOrEmpty(proxyAddress))
         {
+            var logger = NLog.LogManager.GetCurrentClassLogger();
+
             if (proxyAddress.StartsWith("socks", StringComparison.InvariantCultureIgnoreCase))
             {
-                _logger.Info("{0} 已配置 Http 代理: {1}", name, proxyAddress);
+                logger.Info("{0} 已配置 Http 代理: {1}", name, proxyAddress);
                 return new SocketsHttpHandler {
                     AutomaticDecompression = DefaultDecompressMethod,
                     Proxy = proxy,
@@ -37,7 +37,7 @@ public static class HttpClientExtension
             }
             else if (proxyAddress.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
             {
-                _logger.Info("{0} 已配置 Socks 代理: {1}", name, proxyAddress);
+                logger.Info("{0} 已配置 Socks 代理: {1}", name, proxyAddress);
                 return new HttpClientHandler {
                     AutomaticDecompression = DefaultDecompressMethod,
                     Proxy = proxy,
@@ -46,7 +46,7 @@ public static class HttpClientExtension
             }
             else
             {
-                _logger.Warn("{0} 无效的代理: {1}", name, proxyAddress);
+                logger.Warn("{0} 无效的代理: {1}", name, proxyAddress);
             }
         }
 
@@ -69,7 +69,8 @@ public static class HttpClientExtension
 
         if (!Uri.TryCreate(proxy, UriKind.Absolute, out var webProxy))
         {
-            _logger.Warn("代理地址无效: {proxy}", proxy);
+            var logger = NLog.LogManager.GetCurrentClassLogger();
+            logger.Warn("代理地址无效: {proxy}", proxy);
             return null;
         }
 
@@ -102,8 +103,9 @@ public static class HttpClientExtension
             return uriResult;
         }
 
-        _logger.Error("{0} 配置的 BaseUrl 无效: {1}", name, baseUrl);
-        _logger.Error("网络配置有误, 请检查 Network 节配置");
+        var logger = NLog.LogManager.GetCurrentClassLogger();
+        logger.Error("{0} 配置的 BaseUrl 无效: {1}", name, baseUrl);
+        logger.Error("网络配置有误, 请检查 Network 节配置");
         SystemUtils.Shutdown();
         return null;
     }

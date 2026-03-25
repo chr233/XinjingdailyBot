@@ -59,7 +59,7 @@ public class CommandInitializer(
                         }
                     }
 
-                    _logger.LogDebug("注册命令 {cmd}", attr.Command.ToUpperInvariant());
+                    //_logger.LogDebug("注册命令 {cmd}", attr.Command.ToUpperInvariant());
                 }
 
                 var queryAttributes = method.GetCustomAttributes<QueryCommandAttribute>(inherit: false);
@@ -77,7 +77,7 @@ public class CommandInitializer(
                         }
                     }
 
-                    _logger.LogDebug("注册Q命令 {cmd}", attr.Command.ToUpperInvariant());
+                    //_logger.LogDebug("注册Q命令 {cmd}", attr.Command.ToUpperInvariant());
                 }
             }
         }

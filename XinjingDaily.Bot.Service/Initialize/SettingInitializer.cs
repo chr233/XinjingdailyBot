@@ -68,7 +68,7 @@ public class SettingInitializer(
             new RoleClaimDefinition( 6,"投稿审核员", "允许使用投稿审核功能", [6] ),
             new RoleClaimDefinition( 7,"频道管理员", "允许设置发布频道", [4] ),
             new RoleClaimDefinition( 8,"机器人管理员", "允许修改机器人设置", [6] ),
-            new RoleClaimDefinition( 9,"超级管理员", "最高的权限", [50] ),
+            new RoleClaimDefinition( 9,"超级管理员", "最高的权限", [5] ),
         ];
 
         DetectMissingClaims(claims, roleDefinitions);

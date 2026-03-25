@@ -98,7 +98,7 @@ public class CommandHandler : ICommandHandler
         }
         else
         {
-            _logger.LogTrace("注册 {scope} - {command} - {permission}", scope, command, permission);
+            _logger.LogDebug("注册 {scope} - {command} - {permission}", scope, command, permission);
         }
 
         if (!string.IsNullOrEmpty(attribute.Alias))
@@ -131,11 +131,15 @@ public class CommandHandler : ICommandHandler
         permission = permission?.ToUpperInvariant();
         var definition = new CommandDefinition<QueryCommandAttribute>(classType, methodInfo, attribute);
 
-        if (!_queryCommandDefinitions.TryAdd(command, definition))
+        _queryCommandDefinitions.TryAdd(command, definition);
+        if (!_queryCommandPermission.TryAdd((scope, command), permission))
         {
-            _logger.LogWarning("命令 {scope} - {command} - {permission} 已经存在, 请检查代码逻辑", scope, command, permission);
+            _logger.LogWarning("Q命令 {scope} - {command} - {permission} 已经存在, 请检查代码逻辑", scope, command, permission);
         }
-        _queryCommandPermission.TryAdd((scope, command), permission);
+        else
+        {
+            _logger.LogDebug("Q注册 {scope} - {command} - {permission}", scope, command, permission);
+        }
 
         if (!string.IsNullOrEmpty(attribute.Alias))
         {
@@ -144,7 +148,7 @@ public class CommandHandler : ICommandHandler
             {
                 if (!_queryCommandDefinitions.TryAdd(command, definition))
                 {
-                    _logger.LogWarning("命令 {command} 的别名 {alias} 已经存在, 请检查代码逻辑", command, entry);
+                    _logger.LogWarning("Q命令 {command} 的别名 {alias} 已经存在, 请检查代码逻辑", command, entry);
                 }
                 _queryCommandPermission.TryAdd((scope, entry), permission);
             }

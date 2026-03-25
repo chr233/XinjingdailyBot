@@ -48,15 +48,15 @@ public static class NLogExtensions
                 // 配置不同日志级别的颜色
                 consoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule {
                     Condition = "level == LogLevel.Trace",
-                    ForegroundColor = ConsoleOutputColor.DarkGray
+                    ForegroundColor = ConsoleOutputColor.Gray,
                 });
                 consoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule {
                     Condition = "level == LogLevel.Debug",
-                    ForegroundColor = ConsoleOutputColor.White
+                    ForegroundColor = ConsoleOutputColor.DarkCyan
                 });
                 consoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule {
                     Condition = "level == LogLevel.Info",
-                    ForegroundColor = ConsoleOutputColor.Cyan
+                    ForegroundColor = ConsoleOutputColor.White
                 });
                 consoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule {
                     Condition = "level == LogLevel.Warn",
@@ -68,8 +68,8 @@ public static class NLogExtensions
                 });
                 consoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule {
                     Condition = "level == LogLevel.Fatal",
-                    ForegroundColor = ConsoleOutputColor.Red,
-                    BackgroundColor = ConsoleOutputColor.DarkGray
+                    ForegroundColor = ConsoleOutputColor.White,
+                    BackgroundColor = ConsoleOutputColor.DarkRed
                 });
 
                 // ========== 2. 新增sqllog专属控制台目标（特殊颜色） ==========
@@ -77,41 +77,49 @@ public static class NLogExtensions
                     Layout = loggerLayout
                 };
 
-                // 规则1: SELECT 操作 - 蓝色（ForegroundColor = ConsoleOutputColor.Blue）
+                //SELECT 操作 - 青色
                 sqlConsoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule {
                     Condition = "Starts-With(message, '查询语句: select', true)",
-                    ForegroundColor = ConsoleOutputColor.Blue,
+                    ForegroundColor = ConsoleOutputColor.Cyan,
                     BackgroundColor = ConsoleOutputColor.DarkGray
                 });
 
-                // 规则2: CREATE 操作 - 绿色
+                //CREATE 操作 - 绿色
                 sqlConsoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule {
                     Condition = "Starts-With(message, '查询语句: create', true)",
                     ForegroundColor = ConsoleOutputColor.Green,
                     BackgroundColor = ConsoleOutputColor.DarkGray
                 });
 
-                // 规则3: INSERT 操作 - 青色
+                //INSERT 操作 - 青色
                 sqlConsoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule {
                     Condition = "Starts-With(message, '查询语句: insert', true)",
+                    ForegroundColor = ConsoleOutputColor.Green,
+                    BackgroundColor = ConsoleOutputColor.DarkGray
+                });
+
+                //UPDATE 操作 - 黄色
+                sqlConsoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule {
+                    Condition = "Starts-With(message, '查询语句: update', true)",
                     ForegroundColor = ConsoleOutputColor.Yellow,
                     BackgroundColor = ConsoleOutputColor.DarkGray
                 });
 
-                // 规则4: DELETE 操作 - 红色（醒目提醒删除操作）
+                //DELETE 操作 - 红色
                 sqlConsoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule {
                     Condition = "Starts-With(message, '查询语句: delete', true)",
                     ForegroundColor = ConsoleOutputColor.Red,
                     BackgroundColor = ConsoleOutputColor.DarkGray
                 });
 
+                //查询用时 - 白色
                 sqlConsoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule {
                     Condition = "Starts-With(message, '查询时间')",
                     ForegroundColor = ConsoleOutputColor.White,
                     BackgroundColor = ConsoleOutputColor.DarkGray
                 });
 
-                // 规则5: 其他SQL操作 - 紫色（默认兜底）
+                //其他操作 - 紫色（默认兜底）
                 sqlConsoleTarget.RowHighlightingRules.Add(new ConsoleRowHighlightingRule {
                     ForegroundColor = ConsoleOutputColor.Magenta,
                     BackgroundColor = ConsoleOutputColor.DarkGray

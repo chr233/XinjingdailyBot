@@ -65,8 +65,8 @@ public class DatabaseInitializer(
 
         foreach (var type in types)
         {
-            _logger.LogInformation("开始创建 {type} 表", type);
             SafeCreateTable(db, type);
+            _logger.LogDebug("创建表 {type} 成功", type);
         }
     }
 

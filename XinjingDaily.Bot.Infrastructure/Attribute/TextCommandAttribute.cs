@@ -72,6 +72,19 @@ public sealed class TextCommandAttribute : System.Attribute
     /// <param name="alias"></param>
     /// <param name="description"></param>
     /// <param name="isShareContext"></param>
+    public TextCommandAttribute(string command, string? alias, string? description) : this(command)
+    {
+        Alias = alias;
+        Description = description;
+    }
+
+    /// <summary>
+    /// 文字命令
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="alias"></param>
+    /// <param name="description"></param>
+    /// <param name="isShareContext"></param>
     public TextCommandAttribute(string command, string? alias, string? description, bool isShareContext) : this(command)
     {
         Alias = alias;

@@ -52,7 +52,7 @@ public class TestCommands(
     }
 
     [Permission(ECommandScope.All, "test:3")]
-    [TextCommand("TT", "测试指令")]
+    [TextCommand("TT", "TAAA", "测试指令")]
     public async Task Test2Command(UserInfo userInfo, Message message)
     {
         await _botClient.AutoReply(userInfo.ToString(), message).ConfigureAwait(false);
