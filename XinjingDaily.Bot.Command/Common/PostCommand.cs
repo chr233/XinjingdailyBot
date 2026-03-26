@@ -13,7 +13,7 @@ using XinjingdailyBot.Service.Helper;
 namespace XinjingDaily.Bot.Command.Common;
 
 [RegisterScoped(Registration = RegistrationStrategy.ImplementedInterfaces)]
-public class CommonCommands(
+public class PostCommand(
     ITelegramBotService _botClient,
     ICommandHandler _commandHandler,
     ITextService _textService,

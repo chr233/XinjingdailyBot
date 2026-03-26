@@ -335,7 +335,7 @@ public class CommandHandler : ICommandHandler
     /// <returns></returns>
     private async Task CallCommandAsync(UserInfo userInfo, Message message, Type type, MethodInfo method, string[] args)
     {
-        List<object> methodParameters = [];
+        List<object?> methodParameters = [];
 
         //获取服务
         var service = _serviceScope.ServiceProvider.GetRequiredService(type);
@@ -365,7 +365,8 @@ public class CommandHandler : ICommandHandler
             }
             else
             {
-                _logger.LogError("无效的参数类型 {paramName}", paramType.FullName);
+                methodParameters.Add(null);
+                _logger.LogWarning("无效的参数类型 {paramName}", paramType.FullName);
             }
         }
         //调用方法
@@ -446,7 +447,7 @@ public class CommandHandler : ICommandHandler
     {
         //获取服务
         var service = _serviceScope.ServiceProvider.GetRequiredService(type);
-        var methodParameters = new List<object>();
+        var methodParameters = new List<object?>();
         //组装函数的入参
         foreach (var parameter in method.GetParameters())
         {
@@ -476,7 +477,8 @@ public class CommandHandler : ICommandHandler
             }
             else
             {
-                _logger.LogError("无效的参数类型 {paramName}", paramType.FullName);
+                methodParameters.Add(null);
+                _logger.LogWarning("无效的参数类型 {paramName}", paramType.FullName);
             }
         }
 

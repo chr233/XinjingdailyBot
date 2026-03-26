@@ -37,7 +37,10 @@ public class CommandInitializer(
         foreach (var type in assembly.GetTypes())
         {
             // 跳过抽象类和接口
-            if (type.IsAbstract || type.IsInterface) continue;
+            if (type.IsAbstract || type.IsInterface)
+            {
+                continue;
+            }
 
             // 遍历类型中的所有方法
             foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance))
