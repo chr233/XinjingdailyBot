@@ -53,6 +53,14 @@
 		<TrimMode>partial</TrimMode>
 		<SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
 		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+
+		<SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+		
+		<Optimize>true</Optimize>
+		<TrimMode>Full</TrimMode>
+		<PublishSingleFile>true</PublishSingleFile>
+		<PublishReadyToRun>true</PublishReadyToRun>
+		<EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
 		
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<OpenApiGenerateDocuments>true</OpenApiGenerateDocuments>
