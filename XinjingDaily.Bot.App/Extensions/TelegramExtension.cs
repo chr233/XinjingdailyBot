@@ -34,6 +34,7 @@ public static class TelegramExtension
                     var logger = sp.GetRequiredService<ILogger<Program>>();
                     logger.LogError("BotToken 不能为空, 请检查 Bot 配置");
                     SystemUtils.Shutdown();
+                    throw new Exception("");
                 }
 
                 var handler = HttpClientExtension.CreateHttpClientHandler(TelegramClient, appSettings.Bot.BotProxy);

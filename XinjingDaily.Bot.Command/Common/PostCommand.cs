@@ -35,6 +35,7 @@ public class PostCommand(
             await _botClient.AutoReply("没有可用命令", message).ConfigureAwait(false);
         }
         else
+
         {
             var sb = new StringBuilder();
             sb.AppendLine("可用命令列表:");
@@ -58,7 +59,7 @@ public class PostCommand(
     {
         var sb = new StringBuilder();
 
-        string? msg = "start";// _optionsSetting.Message.Start;
+        string? msg = "start"; // _options.Value.Message.Start;
         if (!string.IsNullOrEmpty(msg))
         {
             sb.AppendLine(msg);
