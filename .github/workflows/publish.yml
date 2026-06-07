@@ -71,14 +71,14 @@ jobs:
           7z a -bd -slp -tzip -mm=Deflate -mx=5 -mfb=150 -mpass=10 "./dist/${{ matrix.arch }}.zip" "./tmp/${{ env.PROJECT_NAME }}/*"
       - name: Upload ${{ env.PROJECT_NAME }}-fde ${{ matrix.arch }}
         continue-on-error: true
-        uses: actions/upload-artifact@v3.0.0
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: ${{ matrix.arch }}-fde
           path: ./dist/${{ matrix.arch }}-fde.zip
 
       - name: Upload ${{ env.PROJECT_NAME }} ${{ matrix.arch }}
         continue-on-error: true
-        uses: actions/upload-artifact@v3.0.0
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: ${{ matrix.arch }}
           path: ./dist/${{ matrix.arch }}.zip
