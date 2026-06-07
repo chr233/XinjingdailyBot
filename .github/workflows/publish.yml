@@ -93,98 +93,98 @@ jobs:
 
       - name: Download win-x64-fde artifact
         continue-on-error: true
-        uses: actions/download-artifact@v3.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: win-x64-fde
           path: out
 
       - name: Download win-x64 artifact
         continue-on-error: true
-        uses: actions/download-artifact@v3.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: win-x64
           path: out
 
       - name: Download win-arm64-fde artifact
         continue-on-error: true
-        uses: actions/download-artifact@v3.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: win-arm64-fde
           path: out
 
       - name: Download win-arm64 artifact
         continue-on-error: true
-        uses: actions/download-artifact@v3.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: win-arm64
           path: out
 
       - name: Download osx-x64-fde artifact
         continue-on-error: true
-        uses: actions/download-artifact@v3.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: osx-x64-fde
           path: out
 
       - name: Download osx-x64 artifact
         continue-on-error: true
-        uses: actions/download-artifact@v3.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: osx-x64
           path: out
 
       - name: Download osx-arm64-fde artifact
         continue-on-error: true
-        uses: actions/download-artifact@v3.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: osx-arm64-fde
           path: out
 
       - name: Download osx-arm64 artifact
         continue-on-error: true
-        uses: actions/download-artifact@v3.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: osx-arm64
           path: out
 
       - name: Download linux-x64-fde artifact
         continue-on-error: true
-        uses: actions/download-artifact@v3.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: linux-x64-fde
           path: out
 
       - name: Download linux-x64 artifact
         continue-on-error: true
-        uses: actions/download-artifact@v3.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: linux-x64
           path: out
 
       - name: Download linux-arm-fde artifact
         continue-on-error: true
-        uses: actions/download-artifact@v3.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: linux-arm-fde
           path: out
 
       - name: Download linux-arm artifact
         continue-on-error: true
-        uses: actions/download-artifact@v3.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: linux-arm
           path: out
 
       - name: Download linux-arm64-fde artifact
         continue-on-error: true
-        uses: actions/download-artifact@v3.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: linux-arm64-fde
           path: out
 
       - name: Download linux-arm64 artifact
         continue-on-error: true
-        uses: actions/download-artifact@v3.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: linux-arm64
           path: out
