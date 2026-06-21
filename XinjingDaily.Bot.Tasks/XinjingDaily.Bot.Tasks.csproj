@@ -19,7 +19,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="NLog" />
+		<PackageReference Include="NRedisStack" />
 		<PackageReference Include="Quartz" />
+		<PackageReference Include="Telegram.Bot" />
 	</ItemGroup>
 
 	<ItemGroup>
