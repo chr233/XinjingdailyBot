@@ -20,6 +20,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Quartz" />
+		<PackageReference Include="SqlSugarCore" />
 	</ItemGroup>
 
 	<ItemGroup>
