@@ -19,7 +19,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="NLog" />
+		<PackageReference Include="NRedisStack" />
 		<PackageReference Include="Quartz" />
+		<PackageReference Include="SqlSugarCore" />
+		<PackageReference Include="StackExchange.Redis" />
+		<PackageReference Include="Telegram.Bot" />
 	</ItemGroup>
 
 	<ItemGroup>
