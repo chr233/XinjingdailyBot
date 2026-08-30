@@ -1,41 +1,41 @@
 <Project>
   <ItemGroup>
     <PackageVersion Include="ConfigureAwaitChecker.Analyzer" Version="5.0.0.1" />
-    <PackageVersion Include="Injectio" Version="6.1.0" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="5.6.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.6.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.6.0" />
+    <PackageVersion Include="Injectio" Version="6.2.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="5.9.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.9.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.9" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.9" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.9" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.11" />
     <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.ResxSourceGenerator" Version="3.11.0-beta1.26226.5" />
     <PackageVersion Include="MySql.Data" Version="8.2.0" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageVersion Include="NLog" Version="6.1.4" />
-    <PackageVersion Include="NLog.Extensions.Logging" Version="6.1.4" />
-    <PackageVersion Include="NLog.Web.AspNetCore" Version="6.1.4" />
-    <PackageVersion Include="NRedisStack" Version="1.6.0" />
+    <PackageVersion Include="NLog" Version="6.2.0" />
+    <PackageVersion Include="NLog.Extensions.Logging" Version="6.2.0" />
+    <PackageVersion Include="NLog.Web.AspNetCore" Version="6.2.0" />
+    <PackageVersion Include="NRedisStack" Version="1.7.4" />
     <PackageVersion Include="NSwag.AspNetCore" Version="14.7.1" />
     <PackageVersion Include="NSwag.Generation.AspNetCore" Version="14.6.3" />
-    <PackageVersion Include="Quartz" Version="3.18.2" />
-    <PackageVersion Include="Quartz.AspNetCore" Version="3.18.2" />
-    <PackageVersion Include="Scalar.AspNetCore" Version="2.16.11" />
-    <PackageVersion Include="SkiaSharp" Version="4.150.0" />
+    <PackageVersion Include="Quartz" Version="3.20.0" />
+    <PackageVersion Include="Quartz.AspNetCore" Version="3.20.0" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.17.2" />
+    <PackageVersion Include="SkiaSharp" Version="4.151.1" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="2.88.8" />
-    <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.150.0" />
-    <PackageVersion Include="SkiaSharp.NativeAssets.macOS" Version="4.150.0" />
-    <PackageVersion Include="SkiaSharp.NativeAssets.Win32" Version="4.150.0" />
+    <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.151.1" />
+    <PackageVersion Include="SkiaSharp.NativeAssets.macOS" Version="4.151.1" />
+    <PackageVersion Include="SkiaSharp.NativeAssets.Win32" Version="4.151.1" />
     <PackageVersion Include="Spectre.Console" Version="0.57.2" />
     <PackageVersion Include="SqlSugar.IOC" Version="2.0.0" />
-    <PackageVersion Include="SqlSugarCore" Version="5.1.4.216" />
-    <PackageVersion Include="StackExchange.Redis" Version="3.0.17" />
+    <PackageVersion Include="SqlSugarCore" Version="5.1.4.217" />
+    <PackageVersion Include="StackExchange.Redis" Version="3.1.31" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.2.3" />
     <PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="10.2.3" />
     <PackageVersion Include="System.Private.Uri" Version="4.3.2" />
     <PackageVersion Include="System.Text.Json" Version="8.0.1" />
-    <PackageVersion Include="Telegram.Bot" Version="22.10.1.1" />
+    <PackageVersion Include="Telegram.Bot" Version="22.10.3" />
   </ItemGroup>
 </Project>
